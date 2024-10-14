@@ -14,15 +14,10 @@ class Loginpage extends StatefulWidget {
 class _LoginpageState extends State<Loginpage> {
   TextEditingController _usernamecontroller = TextEditingController();
   TextEditingController _passwordcontroller = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
   final AuthService _authService = AuthService();
-
   bool _isPasswordVisible = false;
-
   bool _isLoginEnabled = false;
-
-  // Add these two variables to store the error messages
   String? _usernameErrorMessage;
   String? _passwordErrorMessage;
 
@@ -35,19 +30,38 @@ class _LoginpageState extends State<Loginpage> {
 
       try {
         final response = await _authService.login(username, password);
+        print('Full API response: $response');
 
-        if (response['success']) {
+        String message = response['message'];
+
+        setState(() {
+          _usernameErrorMessage = null;
+          _passwordErrorMessage = null;
+        });
+
+        if (response['success'] == true) {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Dashboard()));
+            context,
+            MaterialPageRoute(builder: (context) => Dashboard()),
+          );
         } else {
-          setState(() {
-            _usernameErrorMessage = 'Username is not valid';
-            _passwordErrorMessage =
-                response['passwordError'] ?? 'Password is not valid';
-          });
+          if (message.contains('Incorrect Password')) {
+            _passwordErrorMessage = 'Please enter valid Password';
+          } else if (message.contains('Incorrect Username')) {
+            _usernameErrorMessage = 'Please enter Valid username';
+          } else {
+            _usernameErrorMessage = 'Invalid username or password';
+          }
+
+          setState(() {});
         }
       } catch (e) {
         print('Error during login: $e');
+        setState(() {
+          _usernameErrorMessage =
+              'An unexpected error occurred. Please try again.';
+          _passwordErrorMessage = null;
+        });
       }
     } else {
       print('Form validation failed');
@@ -69,30 +83,13 @@ class _LoginpageState extends State<Loginpage> {
     super.dispose();
   }
 
+//enable button
   void _updateLoginButtonState() {
     setState(() {
-      // Enable the button only if both fields are not empty
       _isLoginEnabled = _usernamecontroller.text.isNotEmpty &&
           _passwordcontroller.text.isNotEmpty;
     });
-    // Add a listener to track changes in the username field
-    _usernamecontroller.addListener(() {
-      setState(() {
-        // Update the border color based on whether the username field has any text
-        // _isUsernameValid = _usernamecontroller.text.isNotEmpty;
-      });
-    });
-    // Add listener to password controller
-    _passwordcontroller.addListener(() {
-      setState(() {
-        // _isPasswordValid = _passwordcontroller.text.isNotEmpty;
-      });
-    });
   }
-
-  // New variables to track validation status
-  bool _isUsernameValid = true;
-  bool _isPasswordValid = true;
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +141,7 @@ class _LoginpageState extends State<Loginpage> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
+                  //username textfield...
                   Container(
                     color: Color.fromRGBO(255, 255, 255, 0.7),
                     width: MediaQuery.of(context).size.width * 0.6,
@@ -158,29 +156,41 @@ class _LoginpageState extends State<Loginpage> {
                         contentPadding: EdgeInsets.only(left: 20),
                         hintText: 'Enter Unique ID',
                         hintStyle: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'medium',
-                            color: Color.fromRGBO(62, 62, 62, 1)),
+                          fontSize: 14,
+                          fontFamily: 'medium',
+                          color: Color.fromRGBO(62, 62, 62, 1),
+                        ),
                         border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(252, 190, 58, 1),
-                                width: 2)),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: _usernameErrorMessage == null
+                                ? Color.fromRGBO(252, 190, 58, 1)
+                                : Colors.red,
+                            width: 2,
+                          ),
+                        ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
-                              color: Color.fromRGBO(252, 190, 58, 1),
-                              width: 2.0),
+                            color: _usernameErrorMessage == null
+                                ? Color.fromRGBO(252, 190, 58, 1)
+                                : Colors.red,
+                            width: 2.0,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(252, 190, 58, 1),
-                                width: 2)),
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: _usernameErrorMessage == null
+                                ? Color.fromRGBO(252, 190, 58, 1)
+                                : Colors.red,
+                            width: 2,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                  // Show error message below the username field
+                  // username error text
                   if (_usernameErrorMessage != null)
                     Container(
                       width: MediaQuery.of(context).size.width * 0.6,
@@ -198,6 +208,7 @@ class _LoginpageState extends State<Loginpage> {
                   SizedBox(
                     height: 7,
                   ),
+                  //password textfield....
                   Container(
                     color: Color.fromRGBO(255, 255, 255, 0.7),
                     width: MediaQuery.of(context).size.width * 0.6,
@@ -220,13 +231,28 @@ class _LoginpageState extends State<Loginpage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
-                              color: Color.fromRGBO(252, 190, 58, 1)),
+                            color: _passwordErrorMessage == null
+                                ? Color.fromRGBO(252, 190, 58, 1)
+                                : Colors.red,
+                            width: 2,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
-                            color: Color.fromRGBO(252, 190, 58, 1),
+                            color: _passwordErrorMessage == null
+                                ? Color.fromRGBO(252, 190, 58, 1)
+                                : Colors.red, // Set to red if there's an error
                             width: 2.0,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(
+                            color: _passwordErrorMessage == null
+                                ? Color.fromRGBO(252, 190, 58, 1)
+                                : Colors.red, // Set to red if there's an error
+                            width: 2,
                           ),
                         ),
                         suffixIcon: IconButton(
@@ -242,15 +268,10 @@ class _LoginpageState extends State<Loginpage> {
                             });
                           },
                         ),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(252, 190, 58, 1),
-                                width: 2)),
                       ),
                     ),
                   ),
-                  // Show error message below the password field
+                  // password error text..
                   if (_passwordErrorMessage != null)
                     Container(
                       width: MediaQuery.of(context).size.width * 0.6,
@@ -304,7 +325,6 @@ class _LoginpageState extends State<Loginpage> {
                       ),
                     ),
                   ),
-                  // News and calendar section (fixed)
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
@@ -337,10 +357,10 @@ class _LoginpageState extends State<Loginpage> {
                       ),
                     ),
                   ),
-                  //cards scrollable
                   Expanded(
                     child: SingleChildScrollView(
                       child: Container(
+                        height: 1000,
                         color: Color.fromRGBO(242, 247, 249, 1),
                         child: Padding(
                           padding: const EdgeInsets.only(top: 1),

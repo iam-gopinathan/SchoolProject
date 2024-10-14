@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 
 class AuthService {
@@ -14,42 +13,38 @@ class AuthService {
         'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/Login?UserName=$username&Password=$password';
 
     print('Login URL: $url');
-    var request = http.Request('GET', Uri.parse(url));
-
-    request.headers.addAll(headers);
 
     try {
       print('Sending request...');
-      http.StreamedResponse response = await request.send();
+
+      var response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
 
       print('Request sent. Awaiting response...');
 
-      if (response.statusCode == 200) {
-        String responseBody = await response.stream.bytesToString();
-        print('Response: $responseBody'); // Print the full response
+      String responseBody = response.body;
+      print('Response: $responseBody');
 
-        // Parse the response as JSON
-        Map<String, dynamic> jsonResponse = json.decode(responseBody);
+      Map<String, dynamic> jsonResponse = json.decode(responseBody);
 
-        if (jsonResponse['message'] == 'Success') {
-          // Assuming success means user is authenticated
-          return {
-            'success': true,
-            'userType': jsonResponse['userType'],
-            'grade': jsonResponse['grade'],
-            'section': jsonResponse['section'],
-            'message': 'Login successful'
-          };
-        } else {
-          return {'success': false, 'message': 'Invalid username or password'};
-        }
-      } else {
-        print('Error: ${response.reasonPhrase}');
-        return {'success': false, 'message': 'Error: ${response.reasonPhrase}'};
-      }
+      return {
+        'success': jsonResponse['success'] ?? false,
+        'userType': jsonResponse['userType'],
+        'grade': jsonResponse['grade'],
+        'section': jsonResponse['section'],
+        'message': jsonResponse['message'] ?? 'Invalid username or password',
+      };
     } catch (e) {
       print('Exception occurred: $e');
-      return {'success': false, 'message': 'An error occurred: $e'};
+      return {
+        'success': false,
+        'message': 'An error occurred: $e',
+        'userType': null,
+        'grade': null,
+        'section': null,
+      };
     }
   }
 }
