@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/services/auth_services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:intl/intl.dart';
 
 class Loginpage extends StatefulWidget {
   const Loginpage({super.key});
@@ -22,6 +23,7 @@ class _LoginpageState extends State<Loginpage> {
   String? _passwordErrorMessage;
 
 //login function....
+
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       String username = _usernamecontroller.text;
@@ -45,12 +47,13 @@ class _LoginpageState extends State<Loginpage> {
             MaterialPageRoute(builder: (context) => Dashboard()),
           );
         } else {
-          if (message.contains('Incorrect Password')) {
-            _passwordErrorMessage = 'Please enter valid Password';
-          } else if (message.contains('Incorrect Username')) {
-            _usernameErrorMessage = 'Please enter Valid username';
+          // Instead of checking for specific phrases, use the message directly
+          if (message == "Invalid Username") {
+            _usernameErrorMessage = 'Please enter a valid username.';
+          } else if (message == "Invalid Password") {
+            _passwordErrorMessage = 'Please enter a valid password.';
           } else {
-            _usernameErrorMessage = 'Invalid username or password';
+            _usernameErrorMessage = 'Invalid username or password.';
           }
 
           setState(() {});
@@ -118,10 +121,10 @@ class _LoginpageState extends State<Loginpage> {
                   Text(
                     'Morning Star \n Matriculation School',
                     style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'semibold',
-                      height: 1.1,
-                    ),
+                        fontSize: 24,
+                        fontFamily: 'semibold',
+                        height: 1.1,
+                        color: Colors.black),
                     textAlign: TextAlign.center,
                   ),
                   // Login text
@@ -132,9 +135,9 @@ class _LoginpageState extends State<Loginpage> {
                     child: Text(
                       'Login',
                       style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'semibold',
-                      ),
+                          fontSize: 24,
+                          fontFamily: 'semibold',
+                          color: Colors.black),
                     ),
                   ),
                   // Username text box
@@ -242,7 +245,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderSide: BorderSide(
                             color: _passwordErrorMessage == null
                                 ? Color.fromRGBO(252, 190, 58, 1)
-                                : Colors.red, // Set to red if there's an error
+                                : Colors.red,
                             width: 2.0,
                           ),
                         ),
@@ -251,7 +254,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderSide: BorderSide(
                             color: _passwordErrorMessage == null
                                 ? Color.fromRGBO(252, 190, 58, 1)
-                                : Colors.red, // Set to red if there's an error
+                                : Colors.red,
                             width: 2,
                           ),
                         ),
@@ -349,9 +352,25 @@ class _LoginpageState extends State<Loginpage> {
                                 fontFamily: 'bold',
                                 color: Colors.black),
                           ),
-                          SvgPicture.asset(
-                            'assets/images/Calender_icon.svg',
-                            fit: BoxFit.contain,
+                          GestureDetector(
+                            onTap: () async {
+                              DateTime? selectedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime(2101),
+                              );
+
+                              if (selectedDate != null) {
+                                String formattedDate = DateFormat('yyyy-MM-dd')
+                                    .format(selectedDate);
+                                print("Selected date: $formattedDate");
+                              }
+                            },
+                            child: SvgPicture.asset(
+                              'assets/images/Calender_icon.svg',
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ],
                       ),

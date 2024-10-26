@@ -69,9 +69,9 @@ class _SplashscreenState extends State<Splashscreen> {
                   child: Text(
                     'Morning Star \n Matriculation School',
                     style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'semibold',
-                    ),
+                        fontSize: 24,
+                        fontFamily: 'semibold',
+                        color: Colors.black),
                     textAlign: TextAlign.center,
                   ),
                 ),
