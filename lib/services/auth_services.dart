@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
@@ -38,6 +39,9 @@ class AuthService {
         Map<String, dynamic> jsonResponse = json.decode(responseBody);
 
         if (jsonResponse['error'] == false) {
+          String rollNumber = jsonResponse['data']['rollNumber'];
+          String userType = jsonResponse['data']['userType'];
+          UserSession().setUserInfo(rollNumber, userType);
           return {
             'success': true,
             'message': jsonResponse['data']['message'],

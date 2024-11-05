@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
+
 import 'dart:async';
 import 'package:flutter_application_1/screens/loginscreen.dart';
+import 'package:flutter_application_1/services/Login_Api/loginpage_news.dart';
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
@@ -16,6 +19,7 @@ class _SplashscreenState extends State<Splashscreen> {
   @override
   void initState() {
     super.initState();
+    _loadNewsAndNavigate();
 
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
@@ -28,17 +32,30 @@ class _SplashscreenState extends State<Splashscreen> {
         _showText = true;
       });
     });
-
-    Timer(Duration(seconds: 8), () {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Loginpage()));
-    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     precacheImage(AssetImage('assets/images/splashscreen_image.png'), context);
+  }
+
+  //api integration code for login news..
+  Future<void> _loadNewsAndNavigate() async {
+    try {
+      List<NewsArticle> newsArticles = await fetchNews();
+
+      Timer(Duration(seconds: 8), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Loginpage(newsArticles: newsArticles),
+          ),
+        );
+      });
+    } catch (error) {
+      print('Error loading news: $error');
+    }
   }
 
   @override

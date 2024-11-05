@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/screens/splashScreen.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       debugShowCheckedModeBanner: false,
       home: Splashscreen(),
+      // home: Dashboard(),
     );
   }
 }

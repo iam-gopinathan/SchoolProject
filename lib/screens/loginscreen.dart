@@ -1,12 +1,15 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/services/auth_services.dart';
+import 'package:flutter_application_1/services/dashboard_API/Dashboard_Name.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
 class Loginpage extends StatefulWidget {
-  const Loginpage({super.key});
+  final List<NewsArticle> newsArticles;
+  const Loginpage({super.key, required this.newsArticles});
 
   @override
   State<Loginpage> createState() => _LoginpageState();
@@ -41,10 +44,27 @@ class _LoginpageState extends State<Loginpage> {
         });
 
         if (response['success'] == true) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Dashboard()),
-          );
+          String rollNumber = response['rollNumber'];
+          String userType = response['userType'];
+
+          final dashboardData = await fetchDashboardData(rollNumber, userType);
+
+          if (dashboardData != null) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => Dashboard(
+                  username: dashboardData.userDetails.username,
+                  userType: dashboardData.userDetails.usertype,
+                  imagePath: dashboardData.userDetails.filepath,
+                ),
+              ),
+            );
+          } else {
+            _usernameErrorMessage =
+                'Failed to load dashboard data. Please try again.';
+            setState(() {});
+          }
         } else {
           if (message == "Invalid Username") {
             _usernameErrorMessage = 'Please enter a valid username.';
@@ -53,7 +73,6 @@ class _LoginpageState extends State<Loginpage> {
           } else {
             _usernameErrorMessage = 'Invalid username or password.';
           }
-
           setState(() {});
         }
       } catch (e) {
@@ -73,7 +92,7 @@ class _LoginpageState extends State<Loginpage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // Add listeners to update button state based on input
+
     _usernamecontroller.addListener(_updateLoginButtonState);
     _passwordcontroller.addListener(_updateLoginButtonState);
   }
@@ -374,130 +393,133 @@ class _LoginpageState extends State<Loginpage> {
                       ),
                     ),
                   ),
+
+                  ///fetched news data section..
                   Expanded(
                     child: SingleChildScrollView(
                       child: Container(
-                        height: 1000,
                         color: Color.fromRGBO(242, 247, 249, 1),
                         child: Padding(
                           padding: const EdgeInsets.only(top: 1),
                           child: Column(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, right: 20, top: 12),
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    side: BorderSide(
-                                        color: Colors.black, width: 0.2),
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    width: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(10),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'News',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontFamily: 'medium',
-                                                    color: Colors.black),
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    '10/10/2024',
+                              for (var article in widget.newsArticles)
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, right: 20, top: 12),
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side: BorderSide(
+                                          color: Colors.black, width: 0.2),
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.6,
+                                                  child: Text(
+                                                    article.headline,
                                                     style: TextStyle(
+                                                        fontSize: 14,
                                                         fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black),
+                                                        color: Colors.black,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
                                                   ),
-                                                  SizedBox(width: 5),
-                                                  Text(
-                                                    '|',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black),
-                                                  ),
-                                                  SizedBox(width: 5),
-                                                  Text(
-                                                    '2.44PM',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.009,
-                                          ),
-                                          Divider(
-                                            height: 1,
-                                            color: Colors.black,
-                                            thickness: 0.5,
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.004,
-                                          ),
-                                          Text(
-                                            'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s....',
-                                            style: TextStyle(
-                                                fontSize: 14,
-                                                fontFamily: 'regular',
-                                                color: Colors.black),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.010,
-                                          ),
-                                          Text(
-                                            'Continue Reading...',
-                                            style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 14,
-                                              color: Color.fromRGBO(
-                                                  252, 190, 58, 1),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      article.postedOn,
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.010,
-                                          ),
-                                          Image.asset(
-                                            'assets/images/school_bannerimg.png',
-                                            fit: BoxFit.cover,
-                                          ),
-                                          SizedBox(height: 10),
-                                        ],
+                                            SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.009,
+                                            ),
+                                            Divider(
+                                              height: 1,
+                                              color: Colors.black,
+                                              thickness: 0.5,
+                                            ),
+                                            SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.006,
+                                            ),
+                                            Text(
+                                              article.newsContent,
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: 'regular',
+                                                  color: Colors.black),
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.010,
+                                            ),
+                                            Text(
+                                              'Continue Reading...',
+                                              style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 14,
+                                                color: Color.fromRGBO(
+                                                    252, 190, 58, 1),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.010,
+                                            ),
+                                            Image.network(
+                                              article.filePath,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            SizedBox(height: 10),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
