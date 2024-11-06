@@ -34,7 +34,7 @@ class _DashboardState extends State<Dashboard> {
 
   int _activeIndex = 0;
 
-  // firstsection menu....
+// firstsection menu...............
   final List<String> _menuItems = [
     'Dashboard',
     'Communication',
@@ -43,7 +43,7 @@ class _DashboardState extends State<Dashboard> {
     'Academic',
   ];
 
-  //birthday section..........
+  //birthday section..................
   String? selectedValue = 'Teaching';
   List<String> options = [
     'Teaching',
@@ -92,7 +92,7 @@ class _DashboardState extends State<Dashboard> {
     _futureAttendanceData = fetchTeacherAttendance();
   }
 
-//management section count..
+//management section count.......
   Future<void> fetchDashboardData() async {
     try {
       String rollNumber = widget.username;
@@ -108,7 +108,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  //newssection...
+  //newssection.........
   int _currentIndex = 0;
   List<News> newsList = [];
   Future<void> fetchNewsData() async {
@@ -124,7 +124,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  //circular section....
+  //circular section..........
   int _circulars_currentindex = 0;
   List<Circular> circularList = [];
   Future<void> fetchCircular() async {
@@ -142,13 +142,9 @@ class _DashboardState extends State<Dashboard> {
   }
 
   //graph section teacher attendance..
-  ///speechbubblebutton
   String selectedButton = "Students";
-
   late Future<List<TeacherAttendance>> _futureAttendanceData;
-
   List<TeacherAttendance> attendanceData = [];
-
   Future<void> _loadAttendanceData() async {
     try {
       attendanceData = await fetchTeacherAttendance();
@@ -158,6 +154,9 @@ class _DashboardState extends State<Dashboard> {
       setState(() {});
     }
   }
+
+  ///students chart section...
+  int selectedTab = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -1287,7 +1286,117 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
 
-            ///staff section Graph.......
+            ///student graph section........
+            if (selectedButton == 'Students')
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    side: BorderSide(
+                      color: Color.fromRGBO(225, 225, 225, 1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Color.fromRGBO(204, 204, 204, 0.3),
+                            spreadRadius: -10,
+                            blurRadius: 20,
+                            offset: Offset(-4, 1),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: Color.fromRGBO(225, 225, 225, 1),
+                        ),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedTab = 0;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: selectedTab == 0
+                                  ? Color.fromRGBO(252, 190, 58, 1)
+                                  : Colors.white,
+                              foregroundColor: selectedTab == 0
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            child: Text(
+                              'Nursery',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color.fromRGBO(24, 24, 24, 1),
+                                  fontFamily: 'medium'),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedTab = 1;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: selectedTab == 1
+                                  ? Color.fromRGBO(252, 190, 58, 1)
+                                  : Colors.white,
+                              foregroundColor: selectedTab == 1
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            child: Text(
+                              'Primary',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color.fromRGBO(24, 24, 24, 1),
+                                  fontFamily: 'medium'),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedTab = 2;
+                              });
+                            },
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: selectedTab == 2
+                                  ? Color.fromRGBO(252, 190, 58, 1)
+                                  : Colors.white,
+                              foregroundColor: selectedTab == 2
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                            child: Text(
+                              'Secondary',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  color: Color.fromRGBO(24, 24, 24, 1),
+                                  fontFamily: 'medium'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+            ///student graph end.......
+
+//...................///staff section Graph.................................................................
             SizedBox(
               height: 10,
             ),
@@ -1319,7 +1428,7 @@ class _DashboardState extends State<Dashboard> {
                           );
                         }),
                       ),
-                      // Scrollable bar chart
+                      // Scrollable bar chart....................
                       Expanded(
                         child: SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
@@ -1334,18 +1443,106 @@ class _DashboardState extends State<Dashboard> {
                                     barTouchData: BarTouchData(
                                       enabled: true,
                                       touchTooltipData: BarTouchTooltipData(
+                                        tooltipRoundedRadius: 10,
+                                        tooltipPadding: EdgeInsets.only(
+                                            left: 45, right: 45),
                                         fitInsideHorizontally: true,
                                         fitInsideVertically: true,
                                         getTooltipItem:
                                             (group, groupIndex, rod, rodIndex) {
+                                          String presentText =
+                                              'Present: ${attendanceData[groupIndex].present}';
+                                          String absentText =
+                                              'Absent: ${attendanceData[groupIndex].absent}';
+                                          String lateText =
+                                              'Late: ${attendanceData[groupIndex].late}';
+                                          String leaveText =
+                                              'Leave: ${attendanceData[groupIndex].leave}';
+                                          String percentageText =
+                                              '${attendanceData[groupIndex].percentage}%';
                                           return BarTooltipItem(
-                                            '${attendanceData[groupIndex].subUserType}\n${rod.toY}%',
+                                            '',
                                             TextStyle(
-                                              color: Colors.black,
+                                              color: Colors.white,
                                               fontFamily: 'medium',
                                               fontSize: 10,
                                             ),
+                                            textAlign: TextAlign.left,
+                                            children: [
+                                              TextSpan(
+                                                text: '• ',
+                                                style: TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        99, 42, 179, 1),
+                                                    fontSize: 18),
+                                              ),
+                                              TextSpan(
+                                                text: presentText + '\n',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              TextSpan(
+                                                text: '• ',
+                                                style: TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        0, 150, 60, 1),
+                                                    fontSize: 18),
+                                              ),
+                                              TextSpan(
+                                                text: absentText + '\n',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              TextSpan(
+                                                text: '• ',
+                                                style: TextStyle(
+                                                    color: Color.fromRGBO(
+                                                      255,
+                                                      212,
+                                                      0,
+                                                      1,
+                                                    ),
+                                                    fontSize: 18),
+                                              ),
+                                              TextSpan(
+                                                text: lateText + '\n',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              TextSpan(
+                                                text: '• ',
+                                                style: TextStyle(
+                                                  color: Color.fromRGBO(
+                                                    255,
+                                                    0,
+                                                    4,
+                                                    1,
+                                                  ),
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              TextSpan(
+                                                text: leaveText + '\n',
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              ),
+                                              TextSpan(
+                                                text: percentageText,
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10,
+                                                    backgroundColor:
+                                                        Color.fromRGBO(
+                                                            0, 150, 60, 1),
+                                                    fontWeight: FontWeight.bold,
+                                                    letterSpacing: 1.5,
+                                                    height: 1.5),
+                                              ),
+                                            ],
                                           );
+                                        },
+                                        getTooltipColor: (group) {
+                                          return Colors.black;
                                         },
                                       ),
                                     ),
