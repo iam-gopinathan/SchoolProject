@@ -1,17 +1,17 @@
 class StudentAttendanceModel {
-  List<Attendance> preKgAttendance;
-  List<Attendance> lkgAttendance;
-  List<Attendance> ukgAttendance;
-  List<Attendance> grade1Attendance;
-  List<Attendance> grade2Attendance;
-  List<Attendance> grade3Attendance;
-  List<Attendance> grade4Attendance;
-  List<Attendance> grade5Attendance;
-  List<Attendance> grade6Attendance;
-  List<Attendance> grade7Attendance;
-  List<Attendance> grade8Attendance;
-  List<Attendance> grade9Attendance;
-  List<Attendance> grade10Attendance;
+  List<StudentAttendance> preKgAttendance;
+  List<StudentAttendance> lkgAttendance;
+  List<StudentAttendance> ukgAttendance;
+  List<StudentAttendance> grade1Attendance;
+  List<StudentAttendance> grade2Attendance;
+  List<StudentAttendance> grade3Attendance;
+  List<StudentAttendance> grade4Attendance;
+  List<StudentAttendance> grade5Attendance;
+  List<StudentAttendance> grade6Attendance;
+  List<StudentAttendance> grade7Attendance;
+  List<StudentAttendance> grade8Attendance;
+  List<StudentAttendance> grade9Attendance;
+  List<StudentAttendance> grade10Attendance;
 
   StudentAttendanceModel({
     required this.preKgAttendance,
@@ -31,37 +31,37 @@ class StudentAttendanceModel {
 
   factory StudentAttendanceModel.fromJson(Map<String, dynamic> json) {
     return StudentAttendanceModel(
-      preKgAttendance: List<Attendance>.from(
-          json['pre_kg_attendance'].map((x) => Attendance.fromJson(x))),
-      lkgAttendance: List<Attendance>.from(
-          json['lkg_attendance'].map((x) => Attendance.fromJson(x))),
-      ukgAttendance: List<Attendance>.from(
-          json['ukg_attendance'].map((x) => Attendance.fromJson(x))),
-      grade1Attendance: List<Attendance>.from(
-          json['grade1Attendance'].map((x) => Attendance.fromJson(x))),
-      grade2Attendance: List<Attendance>.from(
-          json['grade2Attendance'].map((x) => Attendance.fromJson(x))),
-      grade3Attendance: List<Attendance>.from(
-          json['grade3Attendance'].map((x) => Attendance.fromJson(x))),
-      grade4Attendance: List<Attendance>.from(
-          json['grade4Attendance'].map((x) => Attendance.fromJson(x))),
-      grade5Attendance: List<Attendance>.from(
-          json['grade5Attendance'].map((x) => Attendance.fromJson(x))),
-      grade6Attendance: List<Attendance>.from(
-          json['grade6Attendance'].map((x) => Attendance.fromJson(x))),
-      grade7Attendance: List<Attendance>.from(
-          json['grade7Attendance'].map((x) => Attendance.fromJson(x))),
-      grade8Attendance: List<Attendance>.from(
-          json['grade8Attendance'].map((x) => Attendance.fromJson(x))),
-      grade9Attendance: List<Attendance>.from(
-          json['grade9Attendance'].map((x) => Attendance.fromJson(x))),
-      grade10Attendance: List<Attendance>.from(
-          json['grade10Attendance'].map((x) => Attendance.fromJson(x))),
+      preKgAttendance: List<StudentAttendance>.from(
+          json['pre_kg_attendance'].map((x) => StudentAttendance.fromJson(x))),
+      lkgAttendance: List<StudentAttendance>.from(
+          json['lkg_attendance'].map((x) => StudentAttendance.fromJson(x))),
+      ukgAttendance: List<StudentAttendance>.from(
+          json['ukg_attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade1Attendance: List<StudentAttendance>.from(
+          json['grade1Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade2Attendance: List<StudentAttendance>.from(
+          json['grade2Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade3Attendance: List<StudentAttendance>.from(
+          json['grade3Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade4Attendance: List<StudentAttendance>.from(
+          json['grade4Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade5Attendance: List<StudentAttendance>.from(
+          json['grade5Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade6Attendance: List<StudentAttendance>.from(
+          json['grade6Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade7Attendance: List<StudentAttendance>.from(
+          json['grade7Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade8Attendance: List<StudentAttendance>.from(
+          json['grade8Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade9Attendance: List<StudentAttendance>.from(
+          json['grade9Attendance'].map((x) => StudentAttendance.fromJson(x))),
+      grade10Attendance: List<StudentAttendance>.from(
+          json['grade10Attendance'].map((x) => StudentAttendance.fromJson(x))),
     );
   }
 }
 
-class Attendance {
+class StudentAttendance {
   String section;
   int total;
   int present;
@@ -70,7 +70,7 @@ class Attendance {
   int absent;
   double percentage;
 
-  Attendance({
+  StudentAttendance({
     required this.section,
     required this.total,
     required this.present,
@@ -80,8 +80,8 @@ class Attendance {
     required this.percentage,
   });
 
-  factory Attendance.fromJson(Map<String, dynamic> json) {
-    return Attendance(
+  factory StudentAttendance.fromJson(Map<String, dynamic> json) {
+    return StudentAttendance(
       section: json['section'],
       total: json['total'],
       present: json['present'],

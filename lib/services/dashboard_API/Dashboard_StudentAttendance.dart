@@ -11,7 +11,7 @@ Future<StudentAttendanceModel> FetchStudentsAttendance() async {
 
   final response = await http.get(
     Uri.parse(
-      'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardStudentsAttendance?RollNumber=$rollNumber&UserType=$userType&Date=02-11-2024',
+      'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardStudentsAttendance?RollNumber=$rollNumber&UserType=$userType&Date=30-11-2024',
     ),
     headers: {
       'Authorization': 'Bearer $token',

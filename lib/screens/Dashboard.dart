@@ -1,12 +1,16 @@
+import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/Dashboard_models/Dashboard_StudentsAttendance.dart';
 import 'package:flutter_application_1/models/Dashboard_models/Dashboard_circularsection.dart';
 import 'package:flutter_application_1/models/Dashboard_models/Dashboard_teacherAttendance.dart';
 import 'package:flutter_application_1/models/Dashboard_models/Dashboard_teacherBirthday.dart';
 import 'package:flutter_application_1/models/Dashboard_models/dashboard_Management_count.dart';
 import 'package:flutter_application_1/models/Dashboard_models/dashboard_newsModel.dart';
+import 'package:flutter_application_1/screens/splashScreen.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Newssection.dart';
+import 'package:flutter_application_1/services/dashboard_API/Dashboard_StudentAttendance.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_TeacherAttendance.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_circularsection.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_teachersBirthday.dart';
@@ -90,6 +94,33 @@ class _DashboardState extends State<Dashboard> {
     _loadBirthdayData();
     _loadAttendanceData();
     _futureAttendanceData = fetchTeacherAttendance();
+
+    fetchStudentsAttendanceData();
+
+    studentAttendanceModel = StudentAttendanceModel(
+      preKgAttendance: [],
+      lkgAttendance: [],
+      ukgAttendance: [],
+      grade1Attendance: [],
+      grade2Attendance: [],
+      grade3Attendance: [],
+      grade4Attendance: [],
+      grade5Attendance: [],
+      grade6Attendance: [],
+      grade7Attendance: [],
+      grade8Attendance: [],
+      grade9Attendance: [],
+      grade10Attendance: [],
+    );
+
+    _linearprogresscontroller.addListener(() {
+      setState(() {
+        double progress = _linearprogresscontroller.offset /
+            (_linearprogresscontroller.position.maxScrollExtent);
+
+        _progress = progress.clamp(0.0, 1.0);
+      });
+    });
   }
 
 //management section count.......
@@ -141,7 +172,7 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  //graph section teacher attendance..
+  //graph section teacher attendance....
   String selectedButton = "Students";
   late Future<List<TeacherAttendance>> _futureAttendanceData;
   List<TeacherAttendance> attendanceData = [];
@@ -155,8 +186,202 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  ///students chart section...
+  ///students chart section......
   int selectedTab = 0;
+  late StudentAttendanceModel studentAttendanceModel;
+
+  final List<String> leftTitles = ['100', '75', '50', '25', '0'];
+
+  List<StudentAttendanceModel> studentAttendance = [];
+
+  Future<void> fetchStudentsAttendanceData() async {
+    try {
+      StudentAttendanceModel model = await FetchStudentsAttendance();
+      setState(() {
+        studentAttendanceModel = model;
+      });
+    } catch (e) {
+      print("Failed to load data: $e");
+    }
+  }
+
+  List<BarChartGroupData> getBarGroups() {
+    List<BarChartGroupData> barGroups = [];
+    Map<String, List<StudentAttendance>> attendanceData = {
+      'pre_kg_attendance': studentAttendanceModel.preKgAttendance,
+      'lkg_attendance': studentAttendanceModel.lkgAttendance,
+      'ukg_attendance': studentAttendanceModel.ukgAttendance,
+      'grade1_attendance': studentAttendanceModel.grade1Attendance,
+      'grade2_attendance': studentAttendanceModel.grade2Attendance,
+      'grade3_attendance': studentAttendanceModel.grade3Attendance,
+      'grade4_attendance': studentAttendanceModel.grade4Attendance,
+      'grade5_attendance': studentAttendanceModel.grade5Attendance,
+      'grade6_attendance': studentAttendanceModel.grade6Attendance,
+      'grade7_attendance': studentAttendanceModel.grade7Attendance,
+      'grade8_attendance': studentAttendanceModel.grade8Attendance,
+      'grade9_attendance': studentAttendanceModel.grade9Attendance,
+      'grade10_attendance': studentAttendanceModel.grade10Attendance,
+    };
+
+    Map<String, List<Color>> colorMapping = {
+      'pre_kg_attendance': [
+        Color.fromRGBO(74, 32, 134, 1),
+        Color.fromRGBO(131, 56, 236, 1)
+      ],
+      'lkg_attendance': [
+        Color.fromRGBO(0, 132, 125, 1),
+        Color.fromRGBO(0, 173, 164, 1)
+      ],
+      'ukg_attendance': [
+        Color.fromRGBO(216, 70, 0, 1),
+        Color.fromRGBO(251, 85, 6, 1)
+      ],
+      'grade1_attendance': [
+        Color.fromRGBO(74, 32, 134, 1),
+        Color.fromRGBO(131, 56, 236, 1)
+      ],
+      'grade2_attendance': [
+        Color.fromRGBO(0, 132, 125, 1),
+        Color.fromRGBO(0, 173, 164, 1)
+      ],
+      'grade3_attendance': [
+        Color.fromRGBO(216, 70, 0, 1),
+        Color.fromRGBO(251, 85, 6, 1)
+      ],
+      'grade4_attendance': [Colors.teal, Colors.greenAccent],
+      'grade5_attendance': [Colors.pink, Colors.pinkAccent],
+      'grade6_attendance': [Colors.brown, Colors.deepPurple],
+      'grade7_attendance': [Colors.cyan, Colors.lightBlue],
+      'grade8_attendance': [Colors.indigo, Colors.blueAccent],
+      'grade9_attendance': [Colors.lime, Colors.green],
+      'grade10_attendance': [Colors.amber, Colors.orangeAccent],
+    };
+
+    if (selectedTab == 0) {
+      // Nursery (Pre-KG, LKG, UKG)
+      List<String> levels = [
+        'pre_kg_attendance',
+        'lkg_attendance',
+        'ukg_attendance'
+      ];
+      for (int i = 0; i < levels.length; i++) {
+        String level = levels[i];
+        List<StudentAttendance> sections = attendanceData[level] ?? [];
+        barGroups.add(
+          BarChartGroupData(
+            barsSpace: 5,
+            x: i,
+            barRods: sections.map((section) {
+              return BarChartRodData(
+                toY: section.present.toDouble(),
+                borderRadius: BorderRadius.zero,
+                width: 20,
+                color: null,
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: colorMapping[level] ?? [Colors.black, Colors.black],
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      }
+    } else if (selectedTab == 1) {
+      // Primary (1st to 5th grade)
+      List<String> levels = [
+        'grade1_attendance',
+        'grade2_attendance',
+        'grade3_attendance',
+        'grade4_attendance',
+        'grade5_attendance'
+      ];
+      for (int i = 0; i < levels.length; i++) {
+        String level = levels[i];
+        List<StudentAttendance> sections = attendanceData[level] ?? [];
+        barGroups.add(BarChartGroupData(
+          x: i,
+          barRods: sections.map((section) {
+            return BarChartRodData(
+              toY: section.present.toDouble(),
+              borderRadius: BorderRadius.zero,
+              width: 20,
+              color: null,
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: colorMapping[level] ?? [Colors.black, Colors.black],
+              ),
+            );
+          }).toList(),
+        ));
+      }
+    } else if (selectedTab == 2) {
+      // Secondary (6th to 10th grade)
+      List<String> levels = [
+        'grade6_attendance',
+        'grade7_attendance',
+        'grade8_attendance',
+        'grade9_attendance',
+        'grade10_attendance'
+      ];
+      for (int i = 0; i < levels.length; i++) {
+        String level = levels[i];
+        List<StudentAttendance> sections = attendanceData[level] ?? [];
+        barGroups.add(BarChartGroupData(
+          x: i,
+          barRods: sections.map((section) {
+            return BarChartRodData(
+              toY: section.present.toDouble(),
+              borderRadius: BorderRadius.zero,
+              width: 20,
+              color: null,
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: colorMapping[level] ?? [Colors.black, Colors.black],
+              ),
+            );
+          }).toList(),
+        ));
+      }
+    }
+    return barGroups;
+  }
+
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    if (selectedTab == 0) {
+      final titles = ['Pre-KG', 'LKG', 'UKG'];
+      return SideTitleWidget(
+        axisSide: meta.axisSide,
+        space: 10,
+        child: Text(titles[value.toInt()]),
+      );
+    } else if (selectedTab == 1) {
+      final titles = ['1st', '2nd', '3rd', '4th', '5th'];
+      return SideTitleWidget(
+        axisSide: meta.axisSide,
+        space: 10,
+        child: Text(titles[value.toInt()]),
+      );
+    } else if (selectedTab == 2) {
+      final titles = ['6th', '7th', '8th', '9th', '10th'];
+      return SideTitleWidget(
+        axisSide: meta.axisSide,
+        space: 10,
+        child: Text(titles[value.toInt()]),
+      );
+    }
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      space: 20,
+      child: Text(''),
+    );
+  }
+
+  ///linear progress indicator..
+  ScrollController _linearprogresscontroller = ScrollController();
+  double _progress = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -1288,6 +1513,8 @@ class _DashboardState extends State<Dashboard> {
 
             ///student graph section........
             if (selectedButton == 'Students')
+
+              ///nursery secondary primary text......
               Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
                 child: Card(
@@ -1394,8 +1621,359 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
 
-            ///student graph end.......
+            ///student graph start......
+            if (selectedButton == 'Students')
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Card(
+                  elevation: 1,
+                  child: Container(
+                    color: Colors.white,
+                    child: Row(
+                      children: [
+                        // Static Left Titles...
+                        Container(
+                          decoration: BoxDecoration(color: Colors.white),
+                          width: 60,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: leftTitles.map((title) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 12),
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'medium',
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
 
+                        ///student graph here start.....
+                        Expanded(
+                          child: Container(
+                            color: Colors.white,
+                            height: 250,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 20, bottom: 10),
+                              child: SingleChildScrollView(
+                                controller: _linearprogresscontroller,
+                                scrollDirection: Axis.horizontal,
+                                child: Container(
+                                  width: 550,
+                                  child: BarChart(
+                                    BarChartData(
+                                      borderData: FlBorderData(show: false),
+                                      barGroups: getBarGroups(),
+                                      titlesData: FlTitlesData(
+                                        topTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false)),
+                                        rightTitles: AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false),
+                                        ),
+                                        bottomTitles: AxisTitles(
+                                          drawBelowEverything: true,
+                                          sideTitles: SideTitles(
+                                            reservedSize: 25,
+                                            showTitles: true,
+                                            getTitlesWidget: bottomTitleWidgets,
+                                          ),
+                                        ),
+                                        leftTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            interval: 1,
+                                            showTitles: false,
+                                            reservedSize: 45,
+                                            getTitlesWidget: (value, meta) {
+                                              return Text(
+                                                value.toInt().toString(),
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      gridData: FlGridData(
+                                          show: true, horizontalInterval: 5),
+                                      backgroundColor:
+                                          Color.fromRGBO(254, 247, 255, 1),
+                                      barTouchData: BarTouchData(
+                                        touchTooltipData: BarTouchTooltipData(
+                                          tooltipRoundedRadius: 10,
+                                          getTooltipColor: (group) {
+                                            return Colors.black;
+                                          },
+                                          maxContentWidth: 180,
+                                          fitInsideVertically: true,
+                                          fitInsideHorizontally: true,
+                                          tooltipHorizontalOffset: 50.0,
+                                          getTooltipItem: (group, groupIndex,
+                                              rod, rodIndex) {
+                                            String level = '';
+                                            List<StudentAttendance> sections =
+                                                [];
+
+                                            if (selectedTab == 0) {
+                                              level = [
+                                                'pre_kg_attendance',
+                                                'lkg_attendance',
+                                                'ukg_attendance'
+                                              ][groupIndex];
+
+                                              if (level ==
+                                                  'pre_kg_attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .preKgAttendance;
+                                              } else if (level ==
+                                                  'lkg_attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .lkgAttendance;
+                                              } else if (level ==
+                                                  'ukg_attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .ukgAttendance;
+                                              }
+                                            } else if (selectedTab == 1) {
+                                              level = [
+                                                'grade1Attendance',
+                                                'grade2Attendance',
+                                                'grade3Attendance',
+                                                'grade4Attendance',
+                                                'grade5Attendance'
+                                              ][groupIndex];
+
+                                              if (level == 'grade1Attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .grade1Attendance;
+                                              } else if (level ==
+                                                  'grade2Attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .grade2Attendance;
+                                              } else if (level ==
+                                                  'grade3Attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .grade3Attendance;
+                                              } else if (level ==
+                                                  'grade4Attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .grade4Attendance;
+                                              } else if (level ==
+                                                  'grade5Attendance') {
+                                                sections =
+                                                    studentAttendanceModel
+                                                        .grade5Attendance;
+                                              }
+                                            } else if (selectedTab == 2) {
+                                              level = [
+                                                'grade6Attendance',
+                                                'grade7Attendance',
+                                                'grade8Attendance',
+                                                'grade9Attendance',
+                                                'grade10Attendance'
+                                              ][groupIndex];
+
+                                              Map<String,
+                                                      List<StudentAttendance>>
+                                                  gradeSections = {
+                                                'grade6Attendance':
+                                                    studentAttendanceModel
+                                                        .grade6Attendance,
+                                                'grade7Attendance':
+                                                    studentAttendanceModel
+                                                        .grade7Attendance,
+                                                'grade8Attendance':
+                                                    studentAttendanceModel
+                                                        .grade8Attendance,
+                                                'grade9Attendance':
+                                                    studentAttendanceModel
+                                                        .grade9Attendance,
+                                                'grade10Attendance':
+                                                    studentAttendanceModel
+                                                        .grade10Attendance,
+                                              };
+
+                                              sections =
+                                                  gradeSections[level] ?? [];
+                                            }
+
+                                            StudentAttendance sectionData =
+                                                sections[rodIndex];
+
+                                            return BarTooltipItem(
+                                              '',
+                                              TextStyle(),
+                                              textAlign: TextAlign.left,
+                                              children: [
+                                                TextSpan(
+                                                  text:
+                                                      '${level.replaceAll('_', ' ').toUpperCase()} - ${sectionData.section}\n',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontFamily: 'medium',
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: '• ',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        99, 42, 179, 1),
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontFamily: 'medium',
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'Total Students: (${sectionData.total})\n',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      fontFamily: 'medium'),
+                                                ),
+                                                TextSpan(
+                                                  text: '• ',
+                                                  style: TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        0, 150, 60, 1),
+                                                    fontSize: 18,
+                                                    fontFamily: 'medium',
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'Present: (${sectionData.present})\n',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      fontFamily: 'medium'),
+                                                ),
+                                                TextSpan(
+                                                  text: '• ',
+                                                  style: TextStyle(
+                                                      color: Color.fromRGBO(
+                                                          255, 212, 0, 1),
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily: 'medium'),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'Late: (${sectionData.late})\n',
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      fontFamily: 'medium'),
+                                                ),
+                                                TextSpan(
+                                                  text: '• ',
+                                                  style: TextStyle(
+                                                      color: Color.fromRGBO(
+                                                          255, 0, 4, 1),
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily: 'medium'),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      'Leave: (${sectionData.leave})\n',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: '• ',
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily: 'medium'),
+                                                ),
+                                                TextSpan(
+                                                  text: 'Percentage: ',
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text:
+                                                      '${sectionData.percentage.toStringAsFixed(2)}%',
+                                                  style: TextStyle(
+                                                    fontSize: 12.0,
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    background: Paint()
+                                                      ..strokeWidth = 25
+                                                      ..color = Colors.green
+                                                      ..style =
+                                                          PaintingStyle.fill,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                        touchCallback: (event, response) {
+                                          if (event
+                                                  .isInterestedForInteractions &&
+                                              response != null &&
+                                              response.spot != null) {
+                                            print(
+                                                'Tapped bar at index: ${response.spot!.touchedBarGroupIndex}');
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
+            if (selectedButton == 'Students')
+              Container(
+                width: 60,
+                height: 10,
+                child: LinearProgressIndicator(
+                  borderRadius: BorderRadius.circular(10),
+                  backgroundColor: Color.fromRGBO(225, 225, 225, 1),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                  value: _progress,
+                ),
+              ),
+            //student graph end.........
 //...................///staff section Graph.................................................................
             SizedBox(
               height: 10,
@@ -1890,4 +2468,7 @@ class _DashboardState extends State<Dashboard> {
         );
     }
   }
+
+  ///staff section end.....
+  ///students graph...
 }
