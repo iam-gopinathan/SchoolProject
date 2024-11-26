@@ -4,6 +4,7 @@ import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart
 import 'dart:async';
 import 'package:flutter_application_1/screens/loginscreen.dart';
 import 'package:flutter_application_1/services/Login_Api/loginpage_news.dart';
+import 'package:flutter_application_1/utils/theme.dart';
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
@@ -21,7 +22,7 @@ class _SplashscreenState extends State<Splashscreen> {
     super.initState();
     _loadNewsAndNavigate();
 
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(Duration(seconds: 0), () {
       setState(() {
         _showImage = true;
       });
@@ -37,7 +38,7 @@ class _SplashscreenState extends State<Splashscreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    precacheImage(AssetImage('assets/images/splashscreen_image.png'), context);
+    precacheImage(AssetImage(AppTheme.appLogoImage), context);
   }
 
   //api integration code for login news..
@@ -61,7 +62,7 @@ class _SplashscreenState extends State<Splashscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(255, 253, 247, 1),
+      backgroundColor: AppTheme.appBackgroundPrimaryColor,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -70,7 +71,7 @@ class _SplashscreenState extends State<Splashscreen> {
             duration: Duration(seconds: 1),
             child: Center(
               child: Image.asset(
-                'assets/images/splashscreen_image.png',
+                AppTheme.appLogoImage,
                 width: 150,
                 height: 150,
                 fit: BoxFit.contain,
@@ -84,7 +85,7 @@ class _SplashscreenState extends State<Splashscreen> {
               children: [
                 Center(
                   child: Text(
-                    'Morning Star \n Matriculation School',
+                    AppTheme.appLogoName,
                     style: TextStyle(
                         fontSize: 24,
                         fontFamily: 'semibold',
@@ -96,7 +97,7 @@ class _SplashscreenState extends State<Splashscreen> {
                   height: MediaQuery.of(context).size.height * 0.002,
                 ),
                 Text(
-                  'Where every student thrives'.toUpperCase(),
+                  AppTheme.appSubtitle.toUpperCase(),
                   style: TextStyle(
                     fontFamily: 'medium',
                     fontSize: 12,

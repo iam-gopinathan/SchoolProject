@@ -1,14 +1,27 @@
 import 'dart:convert';
+
 import 'package:flutter_application_1/models/Dashboard_models/Dashboard_name_model.dart';
+import 'package:flutter_application_1/user_Session.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<DashboardName> fetchDashboardData(
     String rollNumber, String userType) async {
+  final String rollNumber = UserSession().rollNumber ?? '';
+  final String userType = UserSession().userType ?? '';
   final String token = '123';
+
+  // Construct the dashboard URL dynamically
+  final String dashboardUrl =
+      '$dashboardNAme' 'RollNumber=$rollNumber&UserType=$userType';
+
   final response = await http.get(
-    Uri.parse(
-      'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardUsers?RollNumber=$rollNumber&UserType=$userType',
-    ),
+    // Uri.parse(
+    //   'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardUsers?RollNumber=$rollNumber&UserType=$userType',
+    // ),
+
+    Uri.parse(dashboardUrl),
+
     headers: {
       'Authorization': 'Bearer $token',
       'Content-Type': 'application/json',

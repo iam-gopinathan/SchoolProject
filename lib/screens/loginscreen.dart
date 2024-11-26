@@ -4,6 +4,7 @@ import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/services/auth_services.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Name.dart';
+import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 
@@ -26,6 +27,9 @@ class _LoginpageState extends State<Loginpage> {
   String? _passwordErrorMessage;
 
 //login function....
+
+  bool _isLoading = false;
+
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       String username = _usernamecontroller.text;
@@ -43,11 +47,17 @@ class _LoginpageState extends State<Loginpage> {
           _passwordErrorMessage = null;
         });
 
+        _isLoading = true;
+
         if (response['success'] == true) {
           String rollNumber = response['rollNumber'];
           String userType = response['userType'];
 
           final dashboardData = await fetchDashboardData(rollNumber, userType);
+
+          setState(() {
+            _isLoading = false;
+          });
 
           if (dashboardData != null) {
             Navigator.push(
@@ -66,6 +76,7 @@ class _LoginpageState extends State<Loginpage> {
             setState(() {});
           }
         } else {
+          _isLoading = false;
           if (message == "Invalid Username") {
             _usernameErrorMessage = 'Please enter a valid username.';
           } else if (message == "Invalid Password") {
@@ -115,7 +126,7 @@ class _LoginpageState extends State<Loginpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: Color.fromRGBO(255, 253, 247, 1),
+      backgroundColor: AppTheme.appBackgroundPrimaryColor,
       body: Padding(
         padding: EdgeInsets.only(
           top: MediaQuery.of(context).size.height * 0.05,
@@ -129,14 +140,14 @@ class _LoginpageState extends State<Loginpage> {
                 children: [
                   // Logo image
                   Image.asset(
-                    'assets/images/splashscreen_image.png',
+                    AppTheme.appLogoImage,
                     height: 150,
                     width: 150,
                     fit: BoxFit.contain,
                   ),
                   // School name
                   Text(
-                    'Morning Star \n Matriculation School',
+                    AppTheme.appLogoName,
                     style: TextStyle(
                         fontSize: 24,
                         fontFamily: 'semibold',
@@ -184,7 +195,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: _usernameErrorMessage == null
-                                ? Color.fromRGBO(252, 190, 58, 1)
+                                ? AppTheme.textFieldborderColor
                                 : Colors.red,
                             width: 2,
                           ),
@@ -193,7 +204,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: _usernameErrorMessage == null
-                                ? Color.fromRGBO(252, 190, 58, 1)
+                                ? AppTheme.textFieldborderColor
                                 : Colors.red,
                             width: 2.0,
                           ),
@@ -202,7 +213,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: _usernameErrorMessage == null
-                                ? Color.fromRGBO(252, 190, 58, 1)
+                                ? AppTheme.textFieldborderColor
                                 : Colors.red,
                             width: 2,
                           ),
@@ -252,7 +263,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: _passwordErrorMessage == null
-                                ? Color.fromRGBO(252, 190, 58, 1)
+                                ? AppTheme.textFieldborderColor
                                 : Colors.red,
                             width: 2,
                           ),
@@ -261,7 +272,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: _passwordErrorMessage == null
-                                ? Color.fromRGBO(252, 190, 58, 1)
+                                ? AppTheme.textFieldborderColor
                                 : Colors.red,
                             width: 2.0,
                           ),
@@ -270,7 +281,7 @@ class _LoginpageState extends State<Loginpage> {
                           borderRadius: BorderRadius.circular(10),
                           borderSide: BorderSide(
                             color: _passwordErrorMessage == null
-                                ? Color.fromRGBO(252, 190, 58, 1)
+                                ? AppTheme.textFieldborderColor
                                 : Colors.red,
                             width: 2,
                           ),
@@ -309,29 +320,35 @@ class _LoginpageState extends State<Loginpage> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.02,
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.4,
-                    height: MediaQuery.of(context).size.height * 0.04,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromRGBO(252, 190, 58, 1),
-                        disabledBackgroundColor:
-                            Color.fromRGBO(246, 234, 208, 1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
+
+                  _isLoading
+                      ? CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.textFieldborderColor,
+                        )
+                      : Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          height: MediaQuery.of(context).size.height * 0.04,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.textFieldborderColor,
+                              disabledBackgroundColor:
+                                  Color.fromRGBO(246, 234, 208, 1),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                            onPressed: _isLoginEnabled ? _login : null,
+                            child: Text(
+                              'Login',
+                              style: TextStyle(
+                                color: Color.fromRGBO(0, 0, 0, 1),
+                                fontSize: 16,
+                                fontFamily: 'medium',
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      onPressed: _isLoginEnabled ? _login : null,
-                      child: Text(
-                        'Login',
-                        style: TextStyle(
-                          color: Color.fromRGBO(0, 0, 0, 1),
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                        ),
-                      ),
-                    ),
-                  ),
                   // Forget password
                   Padding(
                     padding: EdgeInsets.only(
@@ -372,11 +389,29 @@ class _LoginpageState extends State<Loginpage> {
                           GestureDetector(
                             onTap: () async {
                               DateTime? selectedDate = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime(2000),
-                                lastDate: DateTime(2101),
-                              );
+                                  context: context,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime(2000),
+                                  lastDate: DateTime(2101),
+                                  builder:
+                                      (BuildContext context, Widget? child) {
+                                    return Theme(
+                                      data: ThemeData.dark().copyWith(
+                                          colorScheme: ColorScheme.dark(
+                                            primary:
+                                                AppTheme.textFieldborderColor,
+                                            onPrimary: Colors.black,
+                                            surface: Colors.black,
+                                            onSurface: Colors.white,
+                                          ),
+                                          dialogBackgroundColor: Colors.black,
+                                          textButtonTheme: TextButtonThemeData(
+                                              style: TextButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                          ))),
+                                      child: child!,
+                                    );
+                                  });
 
                               if (selectedDate != null) {
                                 String formattedDate = DateFormat('yyyy-MM-dd')

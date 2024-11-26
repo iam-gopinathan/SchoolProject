@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_application_1/user_Session.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 class AuthService {
@@ -10,8 +11,10 @@ class AuthService {
       'Authorization': 'Bearer $token',
     };
 
-    String url =
-        'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Login';
+    // String url =
+    //     'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Login';
+
+    String url = Login_Api;
 
     print('Login URL: $url');
 

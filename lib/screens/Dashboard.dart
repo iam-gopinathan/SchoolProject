@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +7,14 @@ import 'package:flutter_application_1/models/Dashboard_models/Dashboard_teacherA
 import 'package:flutter_application_1/models/Dashboard_models/Dashboard_teacherBirthday.dart';
 import 'package:flutter_application_1/models/Dashboard_models/dashboard_Management_count.dart';
 import 'package:flutter_application_1/models/Dashboard_models/dashboard_newsModel.dart';
-import 'package:flutter_application_1/screens/splashScreen.dart';
+import 'package:flutter_application_1/screens/Communication.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Newssection.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_StudentAttendance.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_TeacherAttendance.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_circularsection.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_teachersBirthday.dart';
 import 'package:flutter_application_1/services/dashboard_API/dashboard_managementsection_Api.dart';
+import 'package:flutter_application_1/utils/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:speech_bubble/speech_bubble.dart';
 
@@ -73,9 +73,6 @@ class _DashboardState extends State<Dashboard> {
     }
     return chunks;
   }
-
-  //scroll controller for birthay section
-  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -258,7 +255,6 @@ class _DashboardState extends State<Dashboard> {
     };
 
     if (selectedTab == 0) {
-      // Nursery (Pre-KG, LKG, UKG)
       List<String> levels = [
         'pre_kg_attendance',
         'lkg_attendance',
@@ -267,9 +263,16 @@ class _DashboardState extends State<Dashboard> {
       for (int i = 0; i < levels.length; i++) {
         String level = levels[i];
         List<StudentAttendance> sections = attendanceData[level] ?? [];
+
+        print(level);
+        for (var section in sections) {
+          print(
+              'Section: ${section.section}, Present: ${section.present}, Total: ${section.total}, Percentage: ${section.percentage}');
+        }
+
         barGroups.add(
           BarChartGroupData(
-            barsSpace: 5,
+            barsSpace: 10,
             x: i,
             barRods: sections.map((section) {
               return BarChartRodData(
@@ -299,6 +302,7 @@ class _DashboardState extends State<Dashboard> {
       for (int i = 0; i < levels.length; i++) {
         String level = levels[i];
         List<StudentAttendance> sections = attendanceData[level] ?? [];
+
         barGroups.add(BarChartGroupData(
           x: i,
           barRods: sections.map((section) {
@@ -331,6 +335,7 @@ class _DashboardState extends State<Dashboard> {
         barGroups.add(BarChartGroupData(
           x: i,
           barRods: sections.map((section) {
+            print('sectionnnnnnnnnnnnnnnnnnnnn $section');
             return BarChartRodData(
               toY: section.present.toDouble(),
               borderRadius: BorderRadius.zero,
@@ -355,21 +360,30 @@ class _DashboardState extends State<Dashboard> {
       return SideTitleWidget(
         axisSide: meta.axisSide,
         space: 10,
-        child: Text(titles[value.toInt()]),
+        child: Text(
+          titles[value.toInt()],
+          style: TextStyle(color: Colors.black),
+        ),
       );
     } else if (selectedTab == 1) {
       final titles = ['1st', '2nd', '3rd', '4th', '5th'];
       return SideTitleWidget(
         axisSide: meta.axisSide,
         space: 10,
-        child: Text(titles[value.toInt()]),
+        child: Text(
+          titles[value.toInt()],
+          style: TextStyle(color: Colors.black),
+        ),
       );
     } else if (selectedTab == 2) {
       final titles = ['6th', '7th', '8th', '9th', '10th'];
       return SideTitleWidget(
         axisSide: meta.axisSide,
         space: 10,
-        child: Text(titles[value.toInt()]),
+        child: Text(
+          titles[value.toInt()],
+          style: TextStyle(color: Colors.black),
+        ),
       );
     }
     return SideTitleWidget(
@@ -388,7 +402,7 @@ class _DashboardState extends State<Dashboard> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppTheme.appBackgroundPrimaryColor,
         toolbarHeight: 100,
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
@@ -487,1472 +501,1739 @@ class _DashboardState extends State<Dashboard> {
         child: Column(
           children: [
             //firstsection
-            Padding(
-              padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(204, 204, 204, 0.3),
-                      spreadRadius: -10,
-                      blurRadius: 20,
-                      offset: Offset(-4, 1),
+            if (_activeIndex == 0 || _activeIndex == 1)
+              Padding(
+                padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(204, 204, 204, 0.3),
+                        spreadRadius: -10,
+                        blurRadius: 20,
+                        offset: Offset(-4, 1),
+                      ),
+                    ],
+                  ),
+                  child: Card(
+                    elevation: 0,
+                    color: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: Color.fromRGBO(225, 225, 225, 1),
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(30)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: List.generate(_menuItems.length, (index) {
+                              bool isActive = _activeIndex == index;
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                  right:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                ),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _activeIndex = index;
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 5, horizontal: 18),
+                                    decoration: BoxDecoration(
+                                      color: isActive
+                                          ? AppTheme.textFieldborderColor
+                                          : Colors.white,
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    child: Text(
+                                      _menuItems[index],
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: 'medium',
+                                          color: AppTheme.menuTextColor),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            //managementsection....
+
+            if (_activeIndex == 0)
+              Container(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 25, top: 20),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Management',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'semibold',
+                            color: Colors.black),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            //heading end...
+            if (_activeIndex == 0)
+              Row(
+                children: [
+                  //curriculam title..
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25, top: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromRGBO(229, 31, 103, 1),
+                                      Color.fromRGBO(255, 0, 93, 1)
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(229, 31, 103, 0.1),
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(8),
+                                        bottomRight: Radius.circular(8))),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.03,
+                                    ),
+                                    Text(
+                                      'Curriculum \nManagement',
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        fontSize: 12,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.04,
+                                    ),
+                                    if (dashboardManagementCount != null)
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppTheme.gradientStartColor,
+                                              AppTheme.gradientEndColor
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Text(
+                                          dashboardManagementCount!
+                                              .curriculamManagementCount
+                                              .toString(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontFamily: 'semibold',
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.01,
+                                    ),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      color: Color.fromRGBO(229, 31, 103, 1),
+                                      size: 25,
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.01,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //facilities management..
+                  if (_activeIndex == 0)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20, top: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(12, 149, 62, 1),
+                                        Color.fromRGBO(0, 141, 52, 1)
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      bottomLeft: Radius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(50, 174, 96, 0.1),
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(8),
+                                          bottomRight: Radius.circular(8))),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                      ),
+                                      Text(
+                                        'Facilities \nManagement',
+                                        style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 12,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.04,
+                                      ),
+                                      //count..
+                                      if (dashboardManagementCount != null)
+                                        Container(
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                AppTheme.gradientStartColor,
+                                                AppTheme.gradientEndColor
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            dashboardManagementCount!
+                                                .facilitiesManagementCount
+                                                .toString(),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontFamily: 'semibold',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward,
+                                        color: Color.fromRGBO(12, 149, 62, 1),
+                                        size: 25,
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            //performance metrics.....
+            if (_activeIndex == 0)
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 25, top: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 8,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color.fromRGBO(113, 19, 165, 1),
+                                      Color.fromRGBO(100, 0, 156, 1)
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10),
+                                    bottomLeft: Radius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 15,
+                                ),
+                                decoration: BoxDecoration(
+                                    color: Color.fromRGBO(113, 19, 165, 0.1),
+                                    borderRadius: BorderRadius.only(
+                                        topRight: Radius.circular(8),
+                                        bottomRight: Radius.circular(8))),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.03,
+                                    ),
+                                    Text(
+                                      'Performance \nMetrics',
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        fontSize: 12,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.04,
+                                    ),
+                                    if (dashboardManagementCount != null)
+                                      Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              AppTheme.gradientStartColor,
+                                              AppTheme.gradientEndColor
+                                            ],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Text(
+                                          dashboardManagementCount!
+                                              .performanceMetricsCount
+                                              .toString(),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14,
+                                            fontFamily: 'semibold',
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                    Icon(
+                                      Icons.arrow_forward,
+                                      color: Color.fromRGBO(113, 19, 165, 1),
+                                      size: 25,
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.02,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //parent feedback..
+                  if (_activeIndex == 0)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        top: 10,
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 8,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Color.fromRGBO(100, 0, 156, 1),
+                                        Color.fromRGBO(158, 88, 197, 1),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      bottomLeft: Radius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 15,
+                                  ),
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(245, 159, 52, 0.06),
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(8),
+                                          bottomRight: Radius.circular(8))),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                      ),
+                                      Text(
+                                        'Parents \nFeedback',
+                                        style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 12,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.09,
+                                      ),
+                                      if (dashboardManagementCount != null)
+                                        Container(
+                                          padding: EdgeInsets.all(8),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                AppTheme.gradientStartColor,
+                                                AppTheme.gradientEndColor
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Text(
+                                            dashboardManagementCount!
+                                                .parentsFeedbackCount
+                                                .toString(),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 14,
+                                              fontFamily: 'semibold',
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      Icon(
+                                        Icons.arrow_forward,
+                                        color: Color.fromRGBO(238, 141, 19, 1),
+                                        size: 25,
+                                      ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.02,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            //news section carosuel....
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.only(
+                    left: 25, top: 25, right: 25, bottom: 10),
+                child: Row(
+                  children: [
+                    Text(
+                      'News',
+                      style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 18,
+                          color: Colors.black),
+                    ),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.02,
+                    ),
+                    Text(
+                      'Latest Update',
+                      style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 12,
+                          color: Color.fromRGBO(101, 101, 101, 1)),
+                    ),
+                    Spacer(),
+                    Row(
+                      children: [
+                        Text(
+                          'See all',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'semibold',
+                              color: Colors.black),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.02,
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            //news carousel section...
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(204, 204, 204, 0.3),
+                        spreadRadius: -10,
+                        blurRadius: 20,
+                        offset: Offset(-4, 1),
+                      ),
+                    ],
+                  ),
+                  width: double.infinity,
+                  child: CarouselSlider(
+                    items: newsList.map((newsItem) {
+                      return Container(
+                        width: double.infinity,
+                        child: Card(
+                          color: Colors.white,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image.network(
+                                  newsItem.filePath,
+                                  fit: BoxFit.cover,
+                                  width: 150,
+                                  height: 150,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 12, left: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.35,
+                                            child: Text(
+                                              newsItem.headline,
+                                              style: TextStyle(
+                                                fontFamily: 'bold',
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    AppTheme.gradientStartColor,
+                                                    AppTheme.gradientEndColor,
+                                                  ],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Text(
+                                                newsItem.count.toString(),
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontFamily: 'semibold',
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        newsItem.postedOn.toString(),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'regular',
+                                          color:
+                                              Color.fromRGBO(104, 104, 104, 1),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Container(
+                                          width: double.infinity,
+                                          child: Text(
+                                            newsItem.newsContent,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontFamily: 'medium',
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    options: CarouselOptions(
+                      height: 200,
+                      padEnds: false,
+                      aspectRatio: 16 / 9,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _currentIndex = index;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            //dots indicator........
+            if (_activeIndex == 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(newsList.length, (index) {
+                  return AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    margin: EdgeInsets.symmetric(horizontal: 3),
+                    height: 8,
+                    width: _currentIndex == index ? 20 : 8,
+                    decoration: BoxDecoration(
+                      color: _currentIndex == index
+                          ? AppTheme.carouselDotActiveColor
+                          : AppTheme.carouselDotUnselectColor,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                }),
+              ),
+
+            ///circular heading sections..
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 25, top: 15, right: 25),
+                child: Row(
+                  children: [
+                    Text(
+                      'Circulars',
+                      style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 18,
+                          color: Colors.black),
+                    ),
+                    Spacer(),
+                    Row(
+                      children: [
+                        Text(
+                          'See all',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'semibold',
+                              color: Colors.black),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.02,
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            //circular carousel..
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color.fromRGBO(204, 204, 204, 0.3),
+                        spreadRadius: -10,
+                        blurRadius: 20,
+                        offset: Offset(-4, 1),
+                      ),
+                    ],
+                  ),
+                  width: double.infinity,
+                  child: CarouselSlider(
+                    items: circularList.map((Circular circular) {
+                      return Container(
+                        width: double.infinity,
+                        child: Card(
+                          color: Colors.white,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Image.network(
+                                  circular.filePath,
+                                  fit: BoxFit.cover,
+                                  width: 150,
+                                  height: 150,
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 12, left: 10),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.35,
+                                            child: Text(
+                                              circular.headline,
+                                              style: TextStyle(
+                                                fontFamily: 'bold',
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                              padding: EdgeInsets.all(8),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    AppTheme.gradientStartColor,
+                                                    AppTheme.gradientEndColor,
+                                                  ],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Text(
+                                                circular.count.toString(),
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontFamily: 'semibold',
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5),
+                                      Text(
+                                        circular.postedOn.toString(),
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontFamily: 'regular',
+                                          color:
+                                              Color.fromRGBO(104, 104, 104, 1),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 10),
+                                        child: Container(
+                                          width: double.infinity,
+                                          child: Text(
+                                            circular.circularcontent,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontFamily: 'medium',
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    options: CarouselOptions(
+                      height: 200,
+                      padEnds: false,
+                      aspectRatio: 16 / 9,
+                      enlargeCenterPage: true,
+                      autoPlay: true,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      viewportFraction: 1.0,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _circulars_currentindex = index;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            //dots indicator
+            if (_activeIndex == 0)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(circularList.length, (index) {
+                  return AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    margin: EdgeInsets.symmetric(horizontal: 3),
+                    height: 8,
+                    width: _circulars_currentindex == index ? 20 : 8,
+                    decoration: BoxDecoration(
+                      color: _circulars_currentindex == index
+                          ? AppTheme.carouselDotActiveColor
+                          : AppTheme.carouselDotUnselectColor,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                }),
+              ),
+
+            ///attendance chart section....
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.only(left: 25, top: 25, right: 25),
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Attendance Graph',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 18,
+                              color: Colors.black),
+                        ),
+                        Text(
+                          DateFormat('dd-MMM-yyyy').format(DateTime.now()),
+                          style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 12,
+                              color: Color.fromRGBO(104, 104, 104, 1)),
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    Row(
+                      children: [
+                        Text(
+                          'Detailed View',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontFamily: 'semibold',
+                              color: Colors.black),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.02,
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.black,
+                          size: 18,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            //graph section..button code........
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    //students button.......
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedButton = "Students";
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: selectedButton == "Students"
+                                    ? AppTheme.textFieldborderColor
+                                    : AppTheme.textFieldborderColor,
+                                width: 1.5)),
+                        child: SpeechBubble(
+                          color: selectedButton == "Students"
+                              ? AppTheme.textFieldborderColor
+                              : Colors.white ?? Colors.white,
+                          height: 37,
+                          width: 160,
+                          offset: Offset(-10, 0),
+                          nipLocation: NipLocation.BOTTOM_RIGHT,
+                          nipHeight: selectedButton == "Students" ? 15 : 0,
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Students",
+                                  style: TextStyle(
+                                      color: AppTheme.menuTextColor,
+                                      fontSize: 16.0,
+                                      fontFamily: 'medium'),
+                                )
+                              ]),
+                        ),
+                      ),
+                    ),
+                    //staffs button..........
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedButton = "Staffs";
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: selectedButton == "Staffs"
+                                    ? AppTheme.textFieldborderColor
+                                    : AppTheme.textFieldborderColor,
+                                width: 1.5)),
+                        child: SpeechBubble(
+                          color: selectedButton == "Staffs"
+                              ? AppTheme.textFieldborderColor
+                              : Colors.white ?? Colors.white,
+                          nipHeight: 0,
+                          height: 37,
+                          width: 160,
+                          offset: Offset(-10, 0),
+                          nipLocation: NipLocation.BOTTOM_RIGHT,
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Staffs",
+                                  style: TextStyle(
+                                      color: AppTheme.menuTextColor,
+                                      fontSize: 16.0,
+                                      fontFamily: 'medium'),
+                                ),
+                              ]),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: Card(
-                  elevation: 0,
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
+              ),
+
+            ///student graph section........
+            if (_activeIndex == 0)
+              if (selectedButton == 'Students')
+
+                ///nursery secondary primary text......
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
                       side: BorderSide(
                         color: Color.fromRGBO(225, 225, 225, 1),
                         width: 1,
                       ),
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(30),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(204, 204, 204, 0.3),
+                              spreadRadius: -10,
+                              blurRadius: 20,
+                              offset: Offset(-4, 1),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: Color.fromRGBO(225, 225, 225, 1),
+                          ),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(30)),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 5, bottom: 5),
                         child: Row(
-                          children: List.generate(_menuItems.length, (index) {
-                            bool isActive = _activeIndex == index;
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                left: MediaQuery.of(context).size.width * 0.04,
-                                right: MediaQuery.of(context).size.width * 0.04,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedTab = 0;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: selectedTab == 0
+                                    ? AppTheme.textFieldborderColor
+                                    : Colors.white,
+                                foregroundColor: selectedTab == 0
+                                    ? Colors.white
+                                    : Colors.black,
                               ),
-                              child: GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _activeIndex = index;
-                                  });
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 18),
-                                  decoration: BoxDecoration(
-                                    color: isActive
-                                        ? Color.fromRGBO(252, 190, 58, 1)
-                                        : Colors.white,
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
+                              child: Text(
+                                'Nursery',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppTheme.menuTextColor,
+                                    fontFamily: 'medium'),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedTab = 1;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: selectedTab == 1
+                                    ? AppTheme.textFieldborderColor
+                                    : Colors.white,
+                                foregroundColor: selectedTab == 1
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                              child: Text(
+                                'Primary',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppTheme.menuTextColor,
+                                    fontFamily: 'medium'),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedTab = 2;
+                                });
+                              },
+                              style: ElevatedButton.styleFrom(
+                                elevation: 0,
+                                backgroundColor: selectedTab == 2
+                                    ? AppTheme.textFieldborderColor
+                                    : Colors.white,
+                                foregroundColor: selectedTab == 2
+                                    ? Colors.white
+                                    : Colors.black,
+                              ),
+                              child: Text(
+                                'Secondary',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppTheme.menuTextColor,
+                                    fontFamily: 'medium'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+            ///student graph start......
+            if (_activeIndex == 0)
+              if (selectedButton == 'Students')
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 1,
+                    child: Container(
+                      color: Colors.white,
+                      child: Row(
+                        children: [
+                          // Static Left Titles...
+                          Container(
+                            decoration: BoxDecoration(color: Colors.white),
+                            width: 60,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: leftTitles.map((title) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                   child: Text(
-                                    _menuItems[index],
+                                    title,
                                     style: TextStyle(
-                                      fontSize: 14,
+                                      color: Colors.black,
                                       fontFamily: 'medium',
-                                      color: Color.fromRGBO(24, 24, 24, 1),
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+
+                          ///student graph here start.....
+                          Expanded(
+                            child: Container(
+                              color: Colors.white,
+                              height: 250,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 20, bottom: 10),
+                                child: SingleChildScrollView(
+                                  controller: _linearprogresscontroller,
+                                  scrollDirection: Axis.horizontal,
+                                  child: Container(
+                                    width: 550,
+                                    child: BarChart(
+                                      BarChartData(
+                                        borderData: FlBorderData(show: false),
+                                        barGroups: getBarGroups(),
+                                        titlesData: FlTitlesData(
+                                          topTitles: AxisTitles(
+                                              sideTitles: SideTitles(
+                                                  showTitles: false)),
+                                          rightTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          bottomTitles: AxisTitles(
+                                            drawBelowEverything: true,
+                                            sideTitles: SideTitles(
+                                              reservedSize: 30,
+                                              showTitles: true,
+                                              getTitlesWidget:
+                                                  bottomTitleWidgets,
+                                            ),
+                                          ),
+                                          leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              interval: 1,
+                                              showTitles: false,
+                                              reservedSize: 45,
+                                              getTitlesWidget: (value, meta) {
+                                                return Text(
+                                                  value.toInt().toString(),
+                                                  style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 14,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ),
+                                        gridData: FlGridData(
+                                            show: true, horizontalInterval: 5),
+                                        backgroundColor:
+                                            Color.fromRGBO(254, 247, 255, 1),
+                                        barTouchData: BarTouchData(
+                                          touchTooltipData: BarTouchTooltipData(
+                                            tooltipRoundedRadius: 10,
+                                            getTooltipColor: (group) {
+                                              return Colors.black;
+                                            },
+                                            maxContentWidth: 180,
+                                            fitInsideVertically: true,
+                                            fitInsideHorizontally: true,
+                                            tooltipHorizontalOffset: 50.0,
+                                            getTooltipItem: (group, groupIndex,
+                                                rod, rodIndex) {
+                                              String level = '';
+                                              List<StudentAttendance> sections =
+                                                  [];
+
+                                              if (selectedTab == 0) {
+                                                level = [
+                                                  'pre_kg_attendance',
+                                                  'lkg_attendance',
+                                                  'ukg_attendance'
+                                                ][groupIndex];
+
+                                                if (level ==
+                                                    'pre_kg_attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .preKgAttendance;
+                                                } else if (level ==
+                                                    'lkg_attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .lkgAttendance;
+                                                } else if (level ==
+                                                    'ukg_attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .ukgAttendance;
+                                                }
+                                              } else if (selectedTab == 1) {
+                                                level = [
+                                                  'grade1Attendance',
+                                                  'grade2Attendance',
+                                                  'grade3Attendance',
+                                                  'grade4Attendance',
+                                                  'grade5Attendance'
+                                                ][groupIndex];
+
+                                                if (level ==
+                                                    'grade1Attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .grade1Attendance;
+                                                } else if (level ==
+                                                    'grade2Attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .grade2Attendance;
+                                                } else if (level ==
+                                                    'grade3Attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .grade3Attendance;
+                                                } else if (level ==
+                                                    'grade4Attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .grade4Attendance;
+                                                } else if (level ==
+                                                    'grade5Attendance') {
+                                                  sections =
+                                                      studentAttendanceModel
+                                                          .grade5Attendance;
+                                                }
+                                              } else if (selectedTab == 2) {
+                                                level = [
+                                                  'grade6Attendance',
+                                                  'grade7Attendance',
+                                                  'grade8Attendance',
+                                                  'grade9Attendance',
+                                                  'grade10Attendance'
+                                                ][groupIndex];
+
+                                                Map<String,
+                                                        List<StudentAttendance>>
+                                                    gradeSections = {
+                                                  'grade6Attendance':
+                                                      studentAttendanceModel
+                                                          .grade6Attendance,
+                                                  'grade7Attendance':
+                                                      studentAttendanceModel
+                                                          .grade7Attendance,
+                                                  'grade8Attendance':
+                                                      studentAttendanceModel
+                                                          .grade8Attendance,
+                                                  'grade9Attendance':
+                                                      studentAttendanceModel
+                                                          .grade9Attendance,
+                                                  'grade10Attendance':
+                                                      studentAttendanceModel
+                                                          .grade10Attendance,
+                                                };
+
+                                                sections =
+                                                    gradeSections[level] ?? [];
+                                              }
+
+                                              StudentAttendance sectionData =
+                                                  sections[rodIndex];
+
+                                              return BarTooltipItem(
+                                                '',
+                                                TextStyle(),
+                                                textAlign: TextAlign.left,
+                                                children: [
+                                                  TextSpan(
+                                                    text:
+                                                        '${level.replaceAll('_', ' ').toUpperCase()} - ${sectionData.section}\n',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontFamily: 'medium',
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '• ',
+                                                    style: TextStyle(
+                                                      color: Color.fromRGBO(
+                                                          99, 42, 179, 1),
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontFamily: 'medium',
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        'Total Students: (${sectionData.total})\n',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontFamily: 'medium'),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '• ',
+                                                    style: TextStyle(
+                                                      color: Color.fromRGBO(
+                                                          0, 150, 60, 1),
+                                                      fontSize: 18,
+                                                      fontFamily: 'medium',
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        'Present: (${sectionData.present})\n',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontFamily: 'medium'),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '• ',
+                                                    style: TextStyle(
+                                                        color: Color.fromRGBO(
+                                                            255, 212, 0, 1),
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily: 'medium'),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        'Late: (${sectionData.late})\n',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 10,
+                                                        fontFamily: 'medium'),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '• ',
+                                                    style: TextStyle(
+                                                        color: Color.fromRGBO(
+                                                            255, 0, 4, 1),
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily: 'medium'),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        'Leave: (${sectionData.leave})\n',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: '• ',
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 18,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontFamily: 'medium'),
+                                                  ),
+                                                  TextSpan(
+                                                    text: 'Percentage: ',
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text:
+                                                        '${sectionData.percentage.toStringAsFixed(2)}%',
+                                                    style: TextStyle(
+                                                      fontSize: 12.0,
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      background: Paint()
+                                                        ..strokeWidth = 25
+                                                        ..color = Colors.green
+                                                        ..style =
+                                                            PaintingStyle.fill,
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            },
+                                          ),
+                                          touchCallback: (event, response) {
+                                            if (event
+                                                    .isInterestedForInteractions &&
+                                                response != null &&
+                                                response.spot != null) {
+                                              print(
+                                                  'Tapped bar at index: ${response.spot!.touchedBarGroupIndex}');
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+            if (_activeIndex == 0)
+              if (selectedButton == 'Students')
+                Container(
+                  width: 60,
+                  height: 10,
+                  child: LinearProgressIndicator(
+                    borderRadius: BorderRadius.circular(10),
+                    backgroundColor: Color.fromRGBO(225, 225, 225, 1),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                    value: _progress,
+                  ),
+                ),
+            //student graph end.........
+//...................///staff section Graph.................................................................
+            if (_activeIndex == 0)
+              SizedBox(
+                height: 10,
+              ),
+            if (_activeIndex == 0)
+              if (selectedButton == 'Staffs')
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    color: Colors.white,
+                    height: MediaQuery.of(context).size.height * 0.23,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(5, (index) {
+                            final value = (4 - index) * 25;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 20.0),
+                              child: Text(
+                                value.toString(),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'medium',
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             );
                           }),
                         ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            //managementsection
-            Padding(
-              padding: const EdgeInsets.only(left: 25, top: 20),
-              child: Row(
-                children: [
-                  Text(
-                    'Management',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'semibold',
-                        color: Colors.black),
-                  )
-                ],
-              ),
-            ),
-            //heading end...
-            Row(
-              children: [
-                //curriculam title..
-                Padding(
-                  padding: const EdgeInsets.only(left: 25, top: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromRGBO(229, 31, 103, 1),
-                                    Color.fromRGBO(255, 0, 93, 1)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(229, 31, 103, 0.1),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(8),
-                                      bottomRight: Radius.circular(8))),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.03,
-                                  ),
-                                  Text(
-                                    'Curriculum \nManagement',
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      fontSize: 12,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.04,
-                                  ),
-                                  if (dashboardManagementCount != null)
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color.fromRGBO(251, 174, 78, 1),
-                                            Color.fromRGBO(235, 130, 0, 1),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        dashboardManagementCount!
-                                            .curriculamManagementCount
-                                            .toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontFamily: 'semibold',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01,
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    color: Color.fromRGBO(229, 31, 103, 1),
-                                    size: 25,
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                //facilities management..
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromRGBO(12, 149, 62, 1),
-                                    Color.fromRGBO(0, 141, 52, 1)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(50, 174, 96, 0.1),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(8),
-                                      bottomRight: Radius.circular(8))),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.03,
-                                  ),
-                                  Text(
-                                    'Facilities \nManagement',
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      fontSize: 12,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.04,
-                                  ),
-                                  //count..
-                                  if (dashboardManagementCount != null)
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color.fromRGBO(251, 174, 78, 1),
-                                            Color.fromRGBO(235, 130, 0, 1),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        dashboardManagementCount!
-                                            .facilitiesManagementCount
-                                            .toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontFamily: 'semibold',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01,
-                                  ),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    color: Color.fromRGBO(12, 149, 62, 1),
-                                    size: 25,
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            //performance metrics.....
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 25, top: 10),
-                  child: Row(
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromRGBO(113, 19, 165, 1),
-                                    Color.fromRGBO(100, 0, 156, 1)
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(113, 19, 165, 0.1),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(8),
-                                      bottomRight: Radius.circular(8))),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.03,
-                                  ),
-                                  Text(
-                                    'Performance \nMetrics',
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      fontSize: 12,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.04,
-                                  ),
-                                  if (dashboardManagementCount != null)
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color.fromRGBO(251, 174, 78, 1),
-                                            Color.fromRGBO(235, 130, 0, 1),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        dashboardManagementCount!
-                                            .performanceMetricsCount
-                                            .toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontFamily: 'semibold',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    color: Color.fromRGBO(113, 19, 165, 1),
-                                    size: 25,
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.02,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                //parent feedback..
-                Padding(
-                  padding: const EdgeInsets.only(
-                    left: 16,
-                    top: 10,
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 8,
-                              height: 60,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color.fromRGBO(100, 0, 156, 1),
-                                    Color.fromRGBO(158, 88, 197, 1),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(10),
-                                  bottomLeft: Radius.circular(10),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: 15,
-                              ),
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(245, 159, 52, 0.06),
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(8),
-                                      bottomRight: Radius.circular(8))),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.03,
-                                  ),
-                                  Text(
-                                    'Parents \nFeedback',
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      fontSize: 12,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.09,
-                                  ),
-                                  if (dashboardManagementCount != null)
-                                    Container(
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color.fromRGBO(251, 174, 78, 1),
-                                            Color.fromRGBO(235, 130, 0, 1),
-                                          ],
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                        ),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Text(
-                                        dashboardManagementCount!
-                                            .parentsFeedbackCount
-                                            .toString(),
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontFamily: 'semibold',
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    color: Color.fromRGBO(238, 141, 19, 1),
-                                    size: 25,
-                                  ),
-                                  SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.02,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            //news section carosuel....
-            Padding(
-              padding: const EdgeInsets.only(
-                  left: 25, top: 25, right: 25, bottom: 10),
-              child: Row(
-                children: [
-                  Text(
-                    'News',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 18,
-                        color: Colors.black),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.02,
-                  ),
-                  Text(
-                    'Latest Update',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 12,
-                        color: Color.fromRGBO(101, 101, 101, 1)),
-                  ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      Text(
-                        'See all',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'semibold',
-                            color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.02,
-                      ),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: Colors.black,
-                        size: 18,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            //news carousel section...
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(204, 204, 204, 0.3),
-                      spreadRadius: -10,
-                      blurRadius: 20,
-                      offset: Offset(-4, 1),
-                    ),
-                  ],
-                ),
-                width: double.infinity,
-                child: CarouselSlider(
-                  items: newsList.map((newsItem) {
-                    return Container(
-                      width: double.infinity,
-                      child: Card(
-                        color: Colors.white,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.network(
-                                newsItem.filePath,
-                                fit: BoxFit.cover,
-                                width: 150,
-                                height: 150,
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 12, left: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.35,
-                                          child: Text(
-                                            newsItem.headline,
-                                            style: TextStyle(
-                                              fontFamily: 'bold',
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Color.fromRGBO(
-                                                      251, 174, 78, 1),
-                                                  Color.fromRGBO(
-                                                      235, 130, 0, 1),
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                              ),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Text(
-                                              newsItem.count.toString(),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontFamily: 'semibold',
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      newsItem.postedOn.toString(),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: 'regular',
-                                        color: Color.fromRGBO(104, 104, 104, 1),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Container(
-                                        width: double.infinity,
-                                        child: Text(
-                                          newsItem.newsContent,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontFamily: 'medium',
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  options: CarouselOptions(
-                    height: 200,
-                    padEnds: false,
-                    aspectRatio: 16 / 9,
-                    enlargeCenterPage: true,
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 3),
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    viewportFraction: 1.0,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentIndex = index;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ),
-            //dots indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(newsList.length, (index) {
-                return AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  margin: EdgeInsets.symmetric(horizontal: 3),
-                  height: 8,
-                  width: _currentIndex == index ? 20 : 8,
-                  decoration: BoxDecoration(
-                    color: _currentIndex == index
-                        ? Color.fromRGBO(252, 190, 58, 1)
-                        : Color.fromRGBO(252, 190, 58, 0.5),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }),
-            ),
-
-            ///circular heading sections..
-            Padding(
-              padding: const EdgeInsets.only(left: 25, top: 15, right: 25),
-              child: Row(
-                children: [
-                  Text(
-                    'Circulars',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 18,
-                        color: Colors.black),
-                  ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      Text(
-                        'See all',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'semibold',
-                            color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.02,
-                      ),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: Colors.black,
-                        size: 18,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            //circular carousel..
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color.fromRGBO(204, 204, 204, 0.3),
-                      spreadRadius: -10,
-                      blurRadius: 20,
-                      offset: Offset(-4, 1),
-                    ),
-                  ],
-                ),
-                width: double.infinity,
-                child: CarouselSlider(
-                  items: circularList.map((Circular circular) {
-                    return Container(
-                      width: double.infinity,
-                      child: Card(
-                        color: Colors.white,
-                        child: Row(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Image.network(
-                                circular.filePath,
-                                fit: BoxFit.cover,
-                                width: 150,
-                                height: 150,
-                              ),
-                            ),
-                            Expanded(
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 12, left: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.35,
-                                          child: Text(
-                                            circular.headline,
-                                            style: TextStyle(
-                                              fontFamily: 'bold',
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                            padding: EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  Color.fromRGBO(
-                                                      251, 174, 78, 1),
-                                                  Color.fromRGBO(
-                                                      235, 130, 0, 1),
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                              ),
-                                              shape: BoxShape.circle,
-                                            ),
-                                            child: Text(
-                                              circular.count.toString(),
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 14,
-                                                fontFamily: 'semibold',
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      circular.postedOn.toString(),
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontFamily: 'regular',
-                                        color: Color.fromRGBO(104, 104, 104, 1),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Container(
-                                        width: double.infinity,
-                                        child: Text(
-                                          circular.circularcontent,
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontFamily: 'medium',
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  options: CarouselOptions(
-                    height: 200,
-                    padEnds: false,
-                    aspectRatio: 16 / 9,
-                    enlargeCenterPage: true,
-                    autoPlay: true,
-                    autoPlayInterval: Duration(seconds: 3),
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    viewportFraction: 1.0,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _circulars_currentindex = index;
-                      });
-                    },
-                  ),
-                ),
-              ),
-            ),
-            //dots indicator
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(circularList.length, (index) {
-                return AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  margin: EdgeInsets.symmetric(horizontal: 3),
-                  height: 8,
-                  width: _circulars_currentindex == index ? 20 : 8,
-                  decoration: BoxDecoration(
-                    color: _circulars_currentindex == index
-                        ? Color.fromRGBO(252, 190, 58, 1)
-                        : Color.fromRGBO(252, 190, 58, 0.5),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }),
-            ),
-
-            ///attendance chart section....
-            Padding(
-              padding: const EdgeInsets.only(left: 25, top: 25, right: 25),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Attendance Graph',
-                        style: TextStyle(
-                            fontFamily: 'semibold',
-                            fontSize: 18,
-                            color: Colors.black),
-                      ),
-                      Text(
-                        DateFormat('dd-MMM-yyyy').format(DateTime.now()),
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Color.fromRGBO(104, 104, 104, 1)),
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  Row(
-                    children: [
-                      Text(
-                        'Detailed View',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'semibold',
-                            color: Colors.black),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.02,
-                      ),
-                      Icon(
-                        Icons.arrow_forward,
-                        color: Colors.black,
-                        size: 18,
-                      ),
-                    ],
-                  )
-                ],
-              ),
-            ),
-            //graph section..button code........
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  //students button.......
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedButton = "Students";
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: selectedButton == "Students"
-                                  ? Color.fromRGBO(252, 190, 58, 1)
-                                  : Color.fromRGBO(252, 190, 58, 1),
-                              width: 1.5)),
-                      child: SpeechBubble(
-                        color: selectedButton == "Students"
-                            ? Color.fromRGBO(252, 190, 58, 1)
-                            : Colors.white ?? Colors.white,
-                        height: 37,
-                        width: 160,
-                        offset: Offset(-10, 0),
-                        nipLocation: NipLocation.BOTTOM_RIGHT,
-                        nipHeight: selectedButton == "Students" ? 15 : 0,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                "Students",
-                                style: TextStyle(
-                                    color: Color.fromRGBO(24, 24, 24, 1),
-                                    fontSize: 16.0,
-                                    fontFamily: 'medium'),
-                              )
-                            ]),
-                      ),
-                    ),
-                  ),
-                  //staffs button..........
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedButton = "Staffs";
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              color: selectedButton == "Staffs"
-                                  ? Color.fromRGBO(252, 190, 58, 1)
-                                  : Color.fromRGBO(252, 190, 58, 1),
-                              width: 1.5)),
-                      child: SpeechBubble(
-                        color: selectedButton == "Staffs"
-                            ? Color.fromRGBO(252, 190, 58, 1)
-                            : Colors.white ?? Colors.white,
-                        nipHeight: 0,
-                        height: 37,
-                        width: 160,
-                        offset: Offset(-10, 0),
-                        nipLocation: NipLocation.BOTTOM_RIGHT,
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text(
-                                "Staffs",
-                                style: TextStyle(
-                                    color: Color.fromRGBO(24, 24, 24, 1),
-                                    fontSize: 16.0,
-                                    fontFamily: 'medium'),
-                              ),
-                            ]),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            ///student graph section........
-            if (selectedButton == 'Students')
-
-              ///nursery secondary primary text......
-              Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20, top: 15),
-                child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    side: BorderSide(
-                      color: Color.fromRGBO(225, 225, 225, 1),
-                      width: 1,
-                    ),
-                  ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(204, 204, 204, 0.3),
-                            spreadRadius: -10,
-                            blurRadius: 20,
-                            offset: Offset(-4, 1),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: Color.fromRGBO(225, 225, 225, 1),
-                        ),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(30)),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 5, bottom: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                selectedTab = 0;
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: selectedTab == 0
-                                  ? Color.fromRGBO(252, 190, 58, 1)
-                                  : Colors.white,
-                              foregroundColor: selectedTab == 0
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                            child: Text(
-                              'Nursery',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color.fromRGBO(24, 24, 24, 1),
-                                  fontFamily: 'medium'),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                selectedTab = 1;
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: selectedTab == 1
-                                  ? Color.fromRGBO(252, 190, 58, 1)
-                                  : Colors.white,
-                              foregroundColor: selectedTab == 1
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                            child: Text(
-                              'Primary',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color.fromRGBO(24, 24, 24, 1),
-                                  fontFamily: 'medium'),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                selectedTab = 2;
-                              });
-                            },
-                            style: ElevatedButton.styleFrom(
-                              elevation: 0,
-                              backgroundColor: selectedTab == 2
-                                  ? Color.fromRGBO(252, 190, 58, 1)
-                                  : Colors.white,
-                              foregroundColor: selectedTab == 2
-                                  ? Colors.white
-                                  : Colors.black,
-                            ),
-                            child: Text(
-                              'Secondary',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  color: Color.fromRGBO(24, 24, 24, 1),
-                                  fontFamily: 'medium'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-            ///student graph start......
-            if (selectedButton == 'Students')
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Card(
-                  elevation: 1,
-                  child: Container(
-                    color: Colors.white,
-                    child: Row(
-                      children: [
-                        // Static Left Titles...
-                        Container(
-                          decoration: BoxDecoration(color: Colors.white),
-                          width: 60,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: leftTitles.map((title) {
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                child: Text(
-                                  title,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'medium',
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-
-                        ///student graph here start.....
+                        // Scrollable bar chart....................
                         Expanded(
-                          child: Container(
-                            color: Colors.white,
-                            height: 250,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 20, bottom: 10),
-                              child: SingleChildScrollView(
-                                controller: _linearprogresscontroller,
-                                scrollDirection: Axis.horizontal,
-                                child: Container(
-                                  width: 550,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: attendanceData.length * 90,
                                   child: BarChart(
                                     BarChartData(
-                                      borderData: FlBorderData(show: false),
-                                      barGroups: getBarGroups(),
-                                      titlesData: FlTitlesData(
-                                        topTitles: AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false)),
-                                        rightTitles: AxisTitles(
-                                          sideTitles:
-                                              SideTitles(showTitles: false),
-                                        ),
-                                        bottomTitles: AxisTitles(
-                                          drawBelowEverything: true,
-                                          sideTitles: SideTitles(
-                                            reservedSize: 25,
-                                            showTitles: true,
-                                            getTitlesWidget: bottomTitleWidgets,
-                                          ),
-                                        ),
-                                        leftTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            interval: 1,
-                                            showTitles: false,
-                                            reservedSize: 45,
-                                            getTitlesWidget: (value, meta) {
-                                              return Text(
-                                                value.toInt().toString(),
-                                                style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 14,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      gridData: FlGridData(
-                                          show: true, horizontalInterval: 5),
-                                      backgroundColor:
-                                          Color.fromRGBO(254, 247, 255, 1),
+                                      backgroundColor: Colors.white,
+                                      maxY: 100,
                                       barTouchData: BarTouchData(
+                                        enabled: true,
                                         touchTooltipData: BarTouchTooltipData(
                                           tooltipRoundedRadius: 10,
-                                          getTooltipColor: (group) {
-                                            return Colors.black;
-                                          },
-                                          maxContentWidth: 180,
-                                          fitInsideVertically: true,
+                                          tooltipPadding: EdgeInsets.only(
+                                              left: 45, right: 45),
                                           fitInsideHorizontally: true,
-                                          tooltipHorizontalOffset: 50.0,
+                                          fitInsideVertically: true,
                                           getTooltipItem: (group, groupIndex,
                                               rod, rodIndex) {
-                                            String level = '';
-                                            List<StudentAttendance> sections =
-                                                [];
-
-                                            if (selectedTab == 0) {
-                                              level = [
-                                                'pre_kg_attendance',
-                                                'lkg_attendance',
-                                                'ukg_attendance'
-                                              ][groupIndex];
-
-                                              if (level ==
-                                                  'pre_kg_attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .preKgAttendance;
-                                              } else if (level ==
-                                                  'lkg_attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .lkgAttendance;
-                                              } else if (level ==
-                                                  'ukg_attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .ukgAttendance;
-                                              }
-                                            } else if (selectedTab == 1) {
-                                              level = [
-                                                'grade1Attendance',
-                                                'grade2Attendance',
-                                                'grade3Attendance',
-                                                'grade4Attendance',
-                                                'grade5Attendance'
-                                              ][groupIndex];
-
-                                              if (level == 'grade1Attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .grade1Attendance;
-                                              } else if (level ==
-                                                  'grade2Attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .grade2Attendance;
-                                              } else if (level ==
-                                                  'grade3Attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .grade3Attendance;
-                                              } else if (level ==
-                                                  'grade4Attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .grade4Attendance;
-                                              } else if (level ==
-                                                  'grade5Attendance') {
-                                                sections =
-                                                    studentAttendanceModel
-                                                        .grade5Attendance;
-                                              }
-                                            } else if (selectedTab == 2) {
-                                              level = [
-                                                'grade6Attendance',
-                                                'grade7Attendance',
-                                                'grade8Attendance',
-                                                'grade9Attendance',
-                                                'grade10Attendance'
-                                              ][groupIndex];
-
-                                              Map<String,
-                                                      List<StudentAttendance>>
-                                                  gradeSections = {
-                                                'grade6Attendance':
-                                                    studentAttendanceModel
-                                                        .grade6Attendance,
-                                                'grade7Attendance':
-                                                    studentAttendanceModel
-                                                        .grade7Attendance,
-                                                'grade8Attendance':
-                                                    studentAttendanceModel
-                                                        .grade8Attendance,
-                                                'grade9Attendance':
-                                                    studentAttendanceModel
-                                                        .grade9Attendance,
-                                                'grade10Attendance':
-                                                    studentAttendanceModel
-                                                        .grade10Attendance,
-                                              };
-
-                                              sections =
-                                                  gradeSections[level] ?? [];
-                                            }
-
-                                            StudentAttendance sectionData =
-                                                sections[rodIndex];
-
+                                            String presentText =
+                                                'Present: ${attendanceData[groupIndex].present}';
+                                            String absentText =
+                                                'Absent: ${attendanceData[groupIndex].absent}';
+                                            String lateText =
+                                                'Late: ${attendanceData[groupIndex].late}';
+                                            String leaveText =
+                                                'Leave: ${attendanceData[groupIndex].leave}';
+                                            String percentageText =
+                                                '${attendanceData[groupIndex].percentage}%';
                                             return BarTooltipItem(
                                               '',
-                                              TextStyle(),
+                                              TextStyle(
+                                                color: Colors.white,
+                                                fontFamily: 'medium',
+                                                fontSize: 10,
+                                              ),
                                               textAlign: TextAlign.left,
                                               children: [
                                                 TextSpan(
-                                                  text:
-                                                      '${level.replaceAll('_', ' ').toUpperCase()} - ${sectionData.section}\n',
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontFamily: 'medium',
-                                                    fontSize: 10,
-                                                  ),
-                                                ),
-                                                TextSpan(
                                                   text: '• ',
                                                   style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        99, 42, 179, 1),
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontFamily: 'medium',
-                                                  ),
+                                                      color: Color.fromRGBO(
+                                                          99, 42, 179, 1),
+                                                      fontSize: 18),
                                                 ),
                                                 TextSpan(
-                                                  text:
-                                                      'Total Students: (${sectionData.total})\n',
+                                                  text: presentText + '\n',
                                                   style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10,
-                                                      fontFamily: 'medium'),
-                                                ),
-                                                TextSpan(
-                                                  text: '• ',
-                                                  style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        0, 150, 60, 1),
-                                                    fontSize: 18,
-                                                    fontFamily: 'medium',
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      'Present: (${sectionData.present})\n',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10,
-                                                      fontFamily: 'medium'),
+                                                      color: Colors.white),
                                                 ),
                                                 TextSpan(
                                                   text: '• ',
                                                   style: TextStyle(
                                                       color: Color.fromRGBO(
-                                                          255, 212, 0, 1),
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontFamily: 'medium'),
+                                                          0, 150, 60, 1),
+                                                      fontSize: 18),
                                                 ),
                                                 TextSpan(
-                                                  text:
-                                                      'Late: (${sectionData.late})\n',
+                                                  text: absentText + '\n',
                                                   style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 10,
-                                                      fontFamily: 'medium'),
+                                                      color: Colors.white),
                                                 ),
                                                 TextSpan(
                                                   text: '• ',
                                                   style: TextStyle(
                                                       color: Color.fromRGBO(
-                                                          255, 0, 4, 1),
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontFamily: 'medium'),
+                                                        255,
+                                                        212,
+                                                        0,
+                                                        1,
+                                                      ),
+                                                      fontSize: 18),
                                                 ),
                                                 TextSpan(
-                                                  text:
-                                                      'Leave: (${sectionData.leave})\n',
+                                                  text: lateText + '\n',
                                                   style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 10,
-                                                  ),
+                                                      color: Colors.white),
                                                 ),
                                                 TextSpan(
                                                   text: '• ',
                                                   style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 18,
+                                                    color: Color.fromRGBO(
+                                                      255,
+                                                      0,
+                                                      4,
+                                                      1,
+                                                    ),
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: leaveText + '\n',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                                TextSpan(
+                                                  text: percentageText,
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 10,
+                                                      backgroundColor:
+                                                          Color.fromRGBO(
+                                                              0, 150, 60, 1),
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontFamily: 'medium'),
-                                                ),
-                                                TextSpan(
-                                                  text: 'Percentage: ',
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 12,
-                                                  ),
-                                                ),
-                                                TextSpan(
-                                                  text:
-                                                      '${sectionData.percentage.toStringAsFixed(2)}%',
-                                                  style: TextStyle(
-                                                    fontSize: 12.0,
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold,
-                                                    background: Paint()
-                                                      ..strokeWidth = 25
-                                                      ..color = Colors.green
-                                                      ..style =
-                                                          PaintingStyle.fill,
-                                                  ),
+                                                      letterSpacing: 1.5,
+                                                      height: 1.5),
                                                 ),
                                               ],
                                             );
                                           },
+                                          getTooltipColor: (group) {
+                                            return Colors.black;
+                                          },
                                         ),
-                                        touchCallback: (event, response) {
-                                          if (event
-                                                  .isInterestedForInteractions &&
-                                              response != null &&
-                                              response.spot != null) {
-                                            print(
-                                                'Tapped bar at index: ${response.spot!.touchedBarGroupIndex}');
-                                          }
-                                        },
                                       ),
+                                      titlesData: FlTitlesData(
+                                        leftTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            showTitles: false,
+                                          ),
+                                        ),
+                                        bottomTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            reservedSize: 25,
+                                            showTitles: true,
+                                            getTitlesWidget: (value, meta) {
+                                              return Text(
+                                                attendanceData[value.toInt()]
+                                                    .subUserType,
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontFamily: 'medium',
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              );
+                                            },
+                                            interval: 1,
+                                          ),
+                                        ),
+                                        rightTitles: AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false),
+                                        ),
+                                        topTitles: AxisTitles(
+                                          sideTitles:
+                                              SideTitles(showTitles: false),
+                                        ),
+                                      ),
+                                      borderData: FlBorderData(show: false),
+                                      barGroups: attendanceData
+                                          .asMap()
+                                          .entries
+                                          .map((entry) {
+                                        int index = entry.key;
+                                        TeacherAttendance data = entry.value;
+                                        return BarChartGroupData(
+                                          x: index,
+                                          barsSpace: 15,
+                                          barRods: [
+                                            BarChartRodData(
+                                              borderRadius:
+                                                  BorderRadius.circular(0),
+                                              toY: data.percentage,
+                                              gradient:
+                                                  getGradientForSubUserType(
+                                                      data.subUserType),
+                                              width: 25,
+                                            ),
+                                          ],
+                                        );
+                                      }).toList(),
                                     ),
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
                           ),
                         ),
@@ -1960,444 +2241,226 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                 ),
-              ),
-
-            if (selectedButton == 'Students')
-              Container(
-                width: 60,
-                height: 10,
-                child: LinearProgressIndicator(
-                  borderRadius: BorderRadius.circular(10),
-                  backgroundColor: Color.fromRGBO(225, 225, 225, 1),
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
-                  value: _progress,
-                ),
-              ),
-            //student graph end.........
-//...................///staff section Graph.................................................................
-            SizedBox(
-              height: 10,
-            ),
-            if (selectedButton == 'Staffs')
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  color: Colors.white,
-                  height: MediaQuery.of(context).size.height * 0.23,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(5, (index) {
-                          final value = (4 - index) * 25;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 20.0),
-                            child: Text(
-                              value.toString(),
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'medium',
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
-                      // Scrollable bar chart....................
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              Container(
-                                width: attendanceData.length * 90,
-                                child: BarChart(
-                                  BarChartData(
-                                    backgroundColor: Colors.white,
-                                    maxY: 100,
-                                    barTouchData: BarTouchData(
-                                      enabled: true,
-                                      touchTooltipData: BarTouchTooltipData(
-                                        tooltipRoundedRadius: 10,
-                                        tooltipPadding: EdgeInsets.only(
-                                            left: 45, right: 45),
-                                        fitInsideHorizontally: true,
-                                        fitInsideVertically: true,
-                                        getTooltipItem:
-                                            (group, groupIndex, rod, rodIndex) {
-                                          String presentText =
-                                              'Present: ${attendanceData[groupIndex].present}';
-                                          String absentText =
-                                              'Absent: ${attendanceData[groupIndex].absent}';
-                                          String lateText =
-                                              'Late: ${attendanceData[groupIndex].late}';
-                                          String leaveText =
-                                              'Leave: ${attendanceData[groupIndex].leave}';
-                                          String percentageText =
-                                              '${attendanceData[groupIndex].percentage}%';
-                                          return BarTooltipItem(
-                                            '',
-                                            TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: 'medium',
-                                              fontSize: 10,
-                                            ),
-                                            textAlign: TextAlign.left,
-                                            children: [
-                                              TextSpan(
-                                                text: '• ',
-                                                style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        99, 42, 179, 1),
-                                                    fontSize: 18),
-                                              ),
-                                              TextSpan(
-                                                text: presentText + '\n',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              TextSpan(
-                                                text: '• ',
-                                                style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        0, 150, 60, 1),
-                                                    fontSize: 18),
-                                              ),
-                                              TextSpan(
-                                                text: absentText + '\n',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              TextSpan(
-                                                text: '• ',
-                                                style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                      255,
-                                                      212,
-                                                      0,
-                                                      1,
-                                                    ),
-                                                    fontSize: 18),
-                                              ),
-                                              TextSpan(
-                                                text: lateText + '\n',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              TextSpan(
-                                                text: '• ',
-                                                style: TextStyle(
-                                                  color: Color.fromRGBO(
-                                                    255,
-                                                    0,
-                                                    4,
-                                                    1,
-                                                  ),
-                                                  fontSize: 18,
-                                                ),
-                                              ),
-                                              TextSpan(
-                                                text: leaveText + '\n',
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              ),
-                                              TextSpan(
-                                                text: percentageText,
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 10,
-                                                    backgroundColor:
-                                                        Color.fromRGBO(
-                                                            0, 150, 60, 1),
-                                                    fontWeight: FontWeight.bold,
-                                                    letterSpacing: 1.5,
-                                                    height: 1.5),
-                                              ),
-                                            ],
-                                          );
-                                        },
-                                        getTooltipColor: (group) {
-                                          return Colors.black;
-                                        },
-                                      ),
-                                    ),
-                                    titlesData: FlTitlesData(
-                                      leftTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          showTitles: false,
-                                        ),
-                                      ),
-                                      bottomTitles: AxisTitles(
-                                        sideTitles: SideTitles(
-                                          reservedSize: 25,
-                                          showTitles: true,
-                                          getTitlesWidget: (value, meta) {
-                                            return Text(
-                                              attendanceData[value.toInt()]
-                                                  .subUserType,
-                                              style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: 'medium',
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            );
-                                          },
-                                          interval: 1,
-                                        ),
-                                      ),
-                                      rightTitles: AxisTitles(
-                                        sideTitles:
-                                            SideTitles(showTitles: false),
-                                      ),
-                                      topTitles: AxisTitles(
-                                        sideTitles:
-                                            SideTitles(showTitles: false),
-                                      ),
-                                    ),
-                                    borderData: FlBorderData(show: false),
-                                    barGroups: attendanceData
-                                        .asMap()
-                                        .entries
-                                        .map((entry) {
-                                      int index = entry.key;
-                                      TeacherAttendance data = entry.value;
-                                      return BarChartGroupData(
-                                        x: index,
-                                        barsSpace: 15,
-                                        barRods: [
-                                          BarChartRodData(
-                                            borderRadius:
-                                                BorderRadius.circular(0),
-                                            toY: data.percentage,
-                                            gradient: getGradientForSubUserType(
-                                                data.subUserType),
-                                            width: 25,
-                                          ),
-                                        ],
-                                      );
-                                    }).toList(),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
 
             ///stafff graph end...
             ///staff birthday section heading..
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 25),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Staffs Birthday',
-                        style: TextStyle(
-                            fontFamily: 'semibold',
-                            fontSize: 18,
-                            color: Colors.black),
-                      ),
-                      Text(
-                        DateFormat('dd-MMMM-yyyy').format(DateTime.now()),
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Color.fromRGBO(104, 104, 104, 1)),
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.01,
-                      ),
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/images/dashboard_teaching.png',
-                            height: 20,
-                            fit: BoxFit.contain,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 2),
-                            child: Text(
-                              selectedValue ?? "",
-                              style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 14,
-                                  color: Colors.black),
-                            ),
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Spacer(),
-                  //dropdownformfield.......
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.4,
-                      margin: EdgeInsets.zero,
-                      height: 35,
-                      child: DropdownButtonFormField<String>(
-                        style: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 14,
-                            color: Colors.black),
-                        dropdownColor: Colors.white,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.only(left: 15, right: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(252, 190, 58, 1),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(252, 190, 58, 1),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(252, 190, 58, 1),
-                            ),
-                          ),
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 10, left: 25),
+                child: Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Staffs Birthday',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 18,
+                              color: Colors.black),
                         ),
-                        value: selectedValue,
-                        isExpanded: true,
-                        items: options.map((String option) {
-                          return DropdownMenuItem<String>(
-                            value: option,
-                            child: Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.only(
-                                  top: 10,
-                                  bottom: 10,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: selectedValue == option
-                                      ? Color.fromRGBO(252, 190, 58, 1)
-                                      : Colors.white,
-                                ),
-                                child: Text(
-                                  option,
-                                )),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedValue = newValue;
-                          });
-                          _loadBirthdayData();
-                        },
-                        selectedItemBuilder: (BuildContext context) {
-                          return options.map((String option) {
-                            return Container(
-                              width: double.infinity,
+                        Text(
+                          DateFormat('dd-MMMM-yyyy').format(DateTime.now()),
+                          style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 12,
+                              color: Color.fromRGBO(104, 104, 104, 1)),
+                        ),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.01,
+                        ),
+                        Row(
+                          children: [
+                            Image.asset(
+                              'assets/images/dashboard_teaching.png',
+                              height: 20,
+                              fit: BoxFit.contain,
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 2),
                               child: Text(
-                                option,
-                                style: TextStyle(color: Colors.black),
+                                selectedValue ?? "",
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 14,
+                                    color: Colors.black),
                               ),
-                            );
-                          }).toList();
-                        },
-                        icon: Image.asset(
-                          'assets/images/Dashboard_dropdownicon.png',
-                          height: 8,
-                          fit: BoxFit.cover,
+                            )
+                          ],
                         ),
-                      ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            //birthday shows text...
-            Padding(
-              padding: const EdgeInsets.only(top: 25, left: 25),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:
-                      _chunkList(birthdayList, 4).asMap().entries.map((entry) {
-                    int rowIndex = entry.key;
-                    List<Birthday> chunk = entry.value;
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 20),
-                      child: IntrinsicHeight(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: chunk.asMap().entries.map((entry) {
-                            int index = entry.key;
-                            Birthday birthday = entry.value;
-                            return Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundImage:
-                                      NetworkImage(birthday.filepath ?? ''),
+                    Spacer(),
+                    //dropdownformfield.......
+                    if (_activeIndex == 0)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          margin: EdgeInsets.zero,
+                          height: 35,
+                          child: DropdownButtonFormField<String>(
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 14,
+                                color: Colors.black),
+                            dropdownColor: Colors.white,
+                            decoration: InputDecoration(
+                              contentPadding:
+                                  EdgeInsets.only(left: 15, right: 15),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: AppTheme.textFieldborderColor,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        birthday.name,
-                                        style: TextStyle(
-                                          fontFamily: 'medium',
-                                          fontSize: 12,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                      Text(
-                                        birthday.subject ?? 'No Subject',
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          color: Colors.black,
-                                          fontFamily: 'medium',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: AppTheme.textFieldborderColor,
                                 ),
-                                if (index < chunk.length - 1)
-                                  SizedBox(
-                                    width: rowIndex == 1 ? 38 : 10,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: AppTheme.textFieldborderColor,
+                                ),
+                              ),
+                            ),
+                            value: selectedValue,
+                            isExpanded: true,
+                            items: options.map((String option) {
+                              return DropdownMenuItem<String>(
+                                value: option,
+                                child: Container(
+                                    width: double.infinity,
+                                    padding: EdgeInsets.only(
+                                      top: 10,
+                                      bottom: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: selectedValue == option
+                                          ? AppTheme.textFieldborderColor
+                                          : Colors.white,
+                                    ),
+                                    child: Text(
+                                      option,
+                                    )),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                selectedValue = newValue;
+                              });
+                              _loadBirthdayData();
+                            },
+                            selectedItemBuilder: (BuildContext context) {
+                              return options.map((String option) {
+                                return Container(
+                                  width: double.infinity,
+                                  child: Text(
+                                    option,
+                                    style: TextStyle(color: Colors.black),
                                   ),
-                                if (index < chunk.length - 1)
-                                  VerticalDivider(
-                                    thickness: 2,
-                                    width: 20,
-                                    color: Color.fromRGBO(255, 239, 205, 1),
-                                  ),
-                              ],
-                            );
-                          }).toList(),
+                                );
+                              }).toList();
+                            },
+                            icon: Image.asset(
+                              'assets/images/Dashboard_dropdownicon.png',
+                              height: 8,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                         ),
                       ),
-                    );
-                  }).toList(),
+                  ],
                 ),
               ),
-            ),
+            //birthday shows text...
+            if (_activeIndex == 0)
+              Padding(
+                padding: const EdgeInsets.only(top: 25, left: 25),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _chunkList(birthdayList, 4)
+                        .asMap()
+                        .entries
+                        .map((entry) {
+                      int rowIndex = entry.key;
+                      List<Birthday> chunk = entry.value;
 
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.06,
-            ),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 20),
+                        child: IntrinsicHeight(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: chunk.asMap().entries.map((entry) {
+                              int index = entry.key;
+                              Birthday birthday = entry.value;
+                              return Row(
+                                children: [
+                                  CircleAvatar(
+                                    backgroundImage:
+                                        NetworkImage(birthday.filepath ?? ''),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 10),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          birthday.name,
+                                          style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        Text(
+                                          birthday.subject ?? 'No Subject',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.black,
+                                            fontFamily: 'medium',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (index < chunk.length - 1)
+                                    SizedBox(
+                                      width: rowIndex == 1 ? 38 : 10,
+                                    ),
+                                  if (index < chunk.length - 1)
+                                    VerticalDivider(
+                                      thickness: 2,
+                                      width: 20,
+                                      color: Color.fromRGBO(255, 239, 205, 1),
+                                    ),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+            if (_activeIndex == 0)
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.06,
+              ),
+//////////////////////////////////////////////////communication section...................................
+            if (_activeIndex == 1)
+              Communication(
+                imagePath: widget.imagePath,
+                userType: widget.userType,
+                username: widget.username,
+              ),
           ],
         ),
       ),
@@ -2470,5 +2533,4 @@ class _DashboardState extends State<Dashboard> {
   }
 
   ///staff section end.....
-  ///students graph...
 }
