@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/AttendencePage/Attendence_page.dart';
+import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Communication extends StatefulWidget {
@@ -28,7 +29,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(250, 248, 251, 1),
         Color.fromRGBO(250, 248, 251, 1)
-      ]
+      ],
+      "page": Newsmainpage(),
     },
     {
       "svg": 'assets/icons/Attendancepage_message.svg',

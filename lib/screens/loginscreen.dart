@@ -7,6 +7,7 @@ import 'package:flutter_application_1/services/dashboard_API/Dashboard_Name.dart
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Loginpage extends StatefulWidget {
   final List<NewsArticle> newsArticles;
@@ -532,11 +533,10 @@ class _LoginpageState extends State<Loginpage> {
                                             Text(
                                               'Continue Reading...',
                                               style: TextStyle(
-                                                fontFamily: 'medium',
-                                                fontSize: 14,
-                                                color: Color.fromRGBO(
-                                                    252, 190, 58, 1),
-                                              ),
+                                                  fontFamily: 'medium',
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
                                             ),
                                             SizedBox(
                                               height: MediaQuery.of(context)
@@ -544,11 +544,33 @@ class _LoginpageState extends State<Loginpage> {
                                                       .height *
                                                   0.010,
                                             ),
-                                            Image.network(
-                                              article.filePath,
-                                              fit: BoxFit.cover,
-                                            ),
-                                            SizedBox(height: 10),
+                                            if (article.filePath
+                                                    .contains('youtube.com') ||
+                                                article.filePath
+                                                    .contains('youtu.be'))
+                                              YoutubePlayer(
+                                                controller:
+                                                    YoutubePlayerController(
+                                                  initialVideoId: YoutubePlayer
+                                                      .convertUrlToId(
+                                                          article.filePath)!,
+                                                  flags: YoutubePlayerFlags(
+                                                    autoPlay: false,
+                                                    mute: false,
+                                                  ),
+                                                ),
+                                                showVideoProgressIndicator:
+                                                    true,
+                                              )
+                                            else
+                                              Image.network(
+                                                article.filePath,
+                                                fit: BoxFit.cover,
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return const Text("");
+                                                },
+                                              ),
                                           ],
                                         ),
                                       ),

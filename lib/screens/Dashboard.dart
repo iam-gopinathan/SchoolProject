@@ -17,6 +17,7 @@ import 'package:flutter_application_1/services/dashboard_API/dashboard_managemen
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:speech_bubble/speech_bubble.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Dashboard extends StatefulWidget {
   final String username;
@@ -1089,12 +1090,33 @@ class _DashboardState extends State<Dashboard> {
                             children: [
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Image.network(
-                                  newsItem.filePath,
-                                  fit: BoxFit.cover,
-                                  width: 150,
-                                  height: 150,
-                                ),
+                                child: (newsItem.filePath
+                                            .contains('youtube.com') ||
+                                        newsItem.filePath.contains('youtu.be'))
+                                    ? YoutubePlayer(
+                                        controller: YoutubePlayerController(
+                                          initialVideoId:
+                                              YoutubePlayer.convertUrlToId(
+                                                  newsItem.filePath)!,
+                                          flags: YoutubePlayerFlags(
+                                            autoPlay: false,
+                                            mute: false,
+                                          ),
+                                        ),
+                                        showVideoProgressIndicator: true,
+                                        width: 150,
+                                        aspectRatio: 16 / 9,
+                                      )
+                                    : Image.network(
+                                        newsItem.filePath,
+                                        fit: BoxFit.cover,
+                                        width: 150,
+                                        height: 150,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Container();
+                                        },
+                                      ),
                               ),
                               Expanded(
                                 child: Padding(
@@ -1172,6 +1194,7 @@ class _DashboardState extends State<Dashboard> {
                                               fontFamily: 'medium',
                                               color: Colors.black,
                                             ),
+                                            maxLines: 3,
                                           ),
                                         ),
                                       ),

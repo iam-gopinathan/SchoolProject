@@ -19,12 +19,12 @@ class News {
 
   factory News.fromJson(Map<String, dynamic> json) {
     return News(
-      headline: json['headline'],
-      newsContent: json['newscontent'],
-      postedOn: DateFormat("dd-MM-yyyy").parse(json['postedOn']),
-      filePath: json['filepath'],
-      count: json['count'],
-      fileType: json['filetype'],
+      headline: json['headline'] ?? '',
+      newsContent: json['newscontent'] ?? '',
+      postedOn: DateFormat("dd-MM-yyyy").parse(json['postedOn'] ?? ''),
+      filePath: json['filepath'] ?? "",
+      count: json['count'] ?? '',
+      fileType: json['filetype'] ?? '',
     );
   }
 }

@@ -15,19 +15,14 @@ class Splashscreen extends StatefulWidget {
 
 class _SplashscreenState extends State<Splashscreen> {
   bool _showText = false;
-  bool _showImage = false;
+  bool _showImage = true;
 
   @override
   void initState() {
     super.initState();
     _loadNewsAndNavigate();
 
-    Future.delayed(Duration(seconds: 0), () {
-      setState(() {
-        _showImage = true;
-      });
-    });
-
+    _showImage = true;
     Future.delayed(Duration(seconds: 2), () {
       setState(() {
         _showText = true;
@@ -39,6 +34,9 @@ class _SplashscreenState extends State<Splashscreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     precacheImage(AssetImage(AppTheme.appLogoImage), context);
+    setState(() {
+      _showImage = true;
+    });
   }
 
   //api integration code for login news..
@@ -46,7 +44,7 @@ class _SplashscreenState extends State<Splashscreen> {
     try {
       List<NewsArticle> newsArticles = await fetchNews();
 
-      Timer(Duration(seconds: 8), () {
+      Timer(Duration(seconds: 5), () {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -66,16 +64,12 @@ class _SplashscreenState extends State<Splashscreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          AnimatedOpacity(
-            opacity: _showImage ? 1.0 : 0.0,
-            duration: Duration(seconds: 1),
-            child: Center(
-              child: Image.asset(
-                AppTheme.appLogoImage,
-                width: 150,
-                height: 150,
-                fit: BoxFit.contain,
-              ),
+          Center(
+            child: Image.asset(
+              AppTheme.appLogoImage,
+              width: 150,
+              height: 150,
+              fit: BoxFit.contain,
             ),
           ),
           AnimatedOpacity(

@@ -1,17 +1,25 @@
 import 'dart:collection';
+import 'dart:io';
 
-import 'package:fl_chart/fl_chart.dart';
+import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_application_1/models/Attendence_models/First_student_attendence_model.dart';
 import 'package:flutter_application_1/models/Attendence_models/Sectionwise_barchart.dart';
 import 'package:flutter_application_1/models/Attendence_models/Studentscounts_piechart.dart';
 import 'package:flutter_application_1/models/Attendence_models/show_studentDetails.dart';
+import 'package:flutter_application_1/screens/AttendencePage/Add_Attendence_page.dart';
+import 'package:flutter_application_1/screens/AttendencePage/IrregularAttendencies.dart';
 import 'package:flutter_application_1/services/Attendance_Api/First_student_Attendence.dart';
 import 'package:flutter_application_1/services/Attendance_Api/Sectionwise_Barchart.dart';
 import 'package:flutter_application_1/services/Attendance_Api/Show_student_details.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../../services/Attendance_Api/studentscount_piechart.dart';
 
 class AttendencePage extends StatefulWidget {
@@ -106,7 +114,171 @@ class _AttendencePageState extends State<AttendencePage> {
 
     _attendanceData =
         fetchPiechartAttendanceData(widget.username, widget.userType);
+
+    _initializeNotification();
   }
+  //notification and excel convert code...
+
+  //local notificationscode...
+  final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
+  void _initializeNotification() {
+    const AndroidInitializationSettings androidInitializationSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: androidInitializationSettings);
+    _notificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: _onNotificationClick,
+    );
+  }
+
+  void _onNotificationClick(NotificationResponse response) {
+    if (response.payload != null) {
+      OpenFile.open(response.payload!);
+    }
+  }
+
+  Future<void> _showNotification(String title, String body) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'download_channel',
+      'Downloads',
+      importance: Importance.max,
+      priority: Priority.high,
+      showProgress: true,
+      onlyAlertOnce: true,
+    );
+
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidDetails);
+
+    await _notificationsPlugin.show(0, title, body, notificationDetails);
+  }
+
+  Future<void> _updateProgressNotification(int progress) async {
+    AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      'download_channel',
+      'Downloads',
+      importance: Importance.max,
+      priority: Priority.high,
+      showProgress: true,
+      onlyAlertOnce: true,
+      maxProgress: 100,
+      progress: progress,
+    );
+
+    NotificationDetails notificationDetails =
+        NotificationDetails(android: androidDetails);
+    await _notificationsPlugin.show(
+        0, 'Exporting Excel...', '$progress% Complete', notificationDetails);
+  }
+
+  Future<void> _finishNotification(String filePath) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'download_channel',
+      'Downloads',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidDetails);
+
+    await _notificationsPlugin.show(
+        0, 'Export Complete', 'Excel Download completed!', notificationDetails,
+        payload: filePath);
+  }
+
+  Future<void> requestPermission(List<Student> filteredStudents) async {
+    PermissionStatus status;
+
+    if (await Permission.storage.isGranted) {
+      status = PermissionStatus.granted;
+    } else {
+      status = await Permission.storage.request();
+    }
+
+    if (status.isGranted) {
+      exportToExcel(filteredStudents);
+    } else if (await Permission.manageExternalStorage.isGranted) {
+      exportToExcel(filteredStudents);
+    } else {
+      print("Permission denied. Please enable it from settings.");
+      openAppSettings();
+    }
+  }
+
+  Future<void> exportToExcel(List<Student> filteredStudents) async {
+    await _showNotification('Export Started', 'Preparing to export data...');
+
+    final excel = Excel.createExcel();
+
+    // Create a new sheet named 'Sheet1'
+    final sheet = excel['Sheet1'];
+
+    // Add headers using TextCellValue
+    sheet.appendRow([
+      TextCellValue('Index'),
+      TextCellValue('Name'),
+      TextCellValue('Roll Number'),
+      TextCellValue('Attendance %'),
+      TextCellValue('Status'),
+    ]);
+
+    // Add student data using TextCellValue
+    for (int i = 0; i < filteredStudents.length; i++) {
+      Student student = filteredStudents[i];
+      sheet.appendRow([
+        TextCellValue((i + 1).toString()),
+        TextCellValue(student.studentName),
+        TextCellValue(student.rollNumber.toString()),
+        TextCellValue('${student.attendancePercent}%'),
+        TextCellValue(student.attendanceStatus),
+      ]);
+    }
+
+    // Set 'Sheet1' as the default active sheet
+    excel.setDefaultSheet('Sheet1');
+
+    final directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      print("Failed to get external directory");
+      return;
+    }
+
+    final downloadDir = Directory('${directory.path}/Download');
+    if (!await downloadDir.exists()) {
+      await downloadDir.create(recursive: true);
+    }
+    String? selectedSection = 'A1';
+    final filePath =
+        '${downloadDir.path}/${selectedClass}_${selectedSection}.xlsx';
+    // final fileName = '${selectedClass}_${selectedSection}_Data.xlsx';
+
+    final file = File(filePath);
+
+    final bytes = excel.encode();
+
+    if (bytes != null) {
+      for (int progress = 0; progress <= 100; progress += 25) {
+        await Future.delayed(Duration(milliseconds: 500));
+        _updateProgressNotification(progress);
+      }
+
+      await file.writeAsBytes(bytes, flush: true);
+      print('File saved at $filePath');
+
+      // Finish notification
+      await _finishNotification(filePath);
+    } else {
+      print('Failed to save file.');
+    }
+  }
+
+  //notification and export code end......
 
 //total attendence.......fetch.......
   Future<void> _loadAttendanceData() async {
@@ -255,8 +427,11 @@ class _AttendencePageState extends State<AttendencePage> {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       isScrollControlled: true,
       builder: (BuildContext context) {
+        String? tempSelectedSection =
+            selectedSection; // Local copy for BottomSheet
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Stack(clipBehavior: Clip.none, children: [
@@ -715,7 +890,6 @@ class _AttendencePageState extends State<AttendencePage> {
                                         ),
                                         //row section end...
 
-                                        //
                                         Padding(
                                           padding: const EdgeInsets.all(8.0),
                                           child: Container(
@@ -1016,23 +1190,6 @@ class _AttendencePageState extends State<AttendencePage> {
     String status = "overall";
 //api calls
     ShowStudentdetails? showStudentdetails;
-
-    // // Fetch the initial overall data
-    // void fetchInitialData(Function setModalState) {
-    //   fetchShowStudentDetails(
-    //     date: formattedDate,
-    //     grade: grade,
-    //     section: section,
-    //     percentage: "overall",
-    //     status: "overall",
-    //   ).then((data) {
-    //     setModalState(() {
-    //       showStudentdetails = data;
-    //     });
-    //   }).catchError((error) {
-    //     print("Error fetching initial data: $error");
-    //   });
-    // }
 
     bool isLoading = true;
 
@@ -1545,14 +1702,21 @@ class _AttendencePageState extends State<AttendencePage> {
                                 ),
                               ),
                               //export icons....
-                              Padding(
-                                padding: const EdgeInsets.only(left: 14),
-                                child: SvgPicture.asset(
-                                  'assets/icons/export_icon.svg',
-                                  fit: BoxFit.contain,
-                                  height: 24,
-                                  width: 24,
-                                  color: Colors.black,
+                              GestureDetector(
+                                onTap: () {
+                                  print('export clicked');
+                                  _initializeNotification();
+                                  requestPermission(filteredStudents);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 14),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/export_icon.svg',
+                                    fit: BoxFit.contain,
+                                    height: 24,
+                                    width: 24,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               )
                             ],
@@ -1834,129 +1998,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             ),
                           ),
 //listtile code.....
-                          // for (int index = 0;
-                          //     index < (showStudentdetails?.data?.length ?? 0);
-                          //     index++)
-                          //   Padding(
-                          //     padding: const EdgeInsets.only(top: 10),
-                          //     child: ListTile(
-                          //       contentPadding: EdgeInsets.symmetric(
-                          //           vertical: 5, horizontal: 10),
-                          //       shape: RoundedRectangleBorder(
-                          //           side: BorderSide(
-                          //               color:
-                          //                   Color.fromRGBO(238, 238, 238, 1)),
-                          //           borderRadius: BorderRadius.circular(12)),
-                          //       tileColor: Colors.white,
-                          //       leading: Row(
-                          //         mainAxisSize: MainAxisSize.min,
-                          //         children: [
-                          //           Text(
-                          //             '${index + 1}',
-                          //             style: TextStyle(
-                          //                 fontFamily: 'medium',
-                          //                 fontSize: 16,
-                          //                 color: Colors.black),
-                          //           ),
-                          //           Padding(
-                          //             padding: const EdgeInsets.only(left: 10),
-                          //             child: CircleAvatar(
-                          //               radius: 30,
-                          //               backgroundImage: NetworkImage(
-                          //                 '${showStudentdetails!.data[index].studentPicture}',
-                          //               ),
-                          //             ),
-                          //           ),
-                          //         ],
-                          //       ),
-                          //       title: Column(
-                          //         crossAxisAlignment: CrossAxisAlignment.start,
-                          //         children: [
-                          //           Text(
-                          //             '${showStudentdetails!.data[index].studentName}',
-                          //             style: TextStyle(
-                          //                 fontFamily: 'semibold',
-                          //                 fontSize: 16,
-                          //                 color: Colors.black),
-                          //           ),
-                          //           Text(
-                          //             '${showStudentdetails!.data[index].rollNumber}',
-                          //             style: TextStyle(
-                          //                 fontFamily: 'semibold',
-                          //                 fontSize: 16,
-                          //                 color: Colors.black),
-                          //           ),
-                          //           Row(
-                          //             children: [
-                          //               Text(
-                          //                 'Student History',
-                          //                 style: TextStyle(
-                          //                     fontFamily: 'regular',
-                          //                     fontSize: 14,
-                          //                     color: Colors.black),
-                          //               ),
-                          //               Icon(
-                          //                 Icons.arrow_forward_ios,
-                          //                 size: 14,
-                          //                 color: Colors.black,
-                          //               )
-                          //             ],
-                          //           ),
-                          //         ],
-                          //       ),
-                          //       trailing: Container(
-                          //         width:
-                          //             MediaQuery.of(context).size.width * 0.27,
-                          //         child: Column(
-                          //           mainAxisSize: MainAxisSize.min,
-                          //           crossAxisAlignment:
-                          //               CrossAxisAlignment.start,
-                          //           children: [
-                          //             Row(
-                          //               children: [
-                          //                 Text(
-                          //                   'Attendance ${showStudentdetails!.data[index].attendancePercent}%',
-                          //                   style: TextStyle(
-                          //                       fontFamily: 'medium',
-                          //                       fontSize: 12,
-                          //                       color: Color.fromRGBO(
-                          //                           54, 54, 54, 1)),
-                          //                 )
-                          //               ],
-                          //             ),
-
-                          //             //present container...
-                          //             Padding(
-                          //               padding: const EdgeInsets.only(top: 5),
-                          //               child: Container(
-                          //                 padding:
-                          //                     EdgeInsets.symmetric(vertical: 5),
-                          //                 width: MediaQuery.of(context)
-                          //                         .size
-                          //                         .width *
-                          //                     0.5,
-                          //                 decoration: BoxDecoration(
-                          //                   borderRadius:
-                          //                       BorderRadius.circular(20),
-                          //                   color: _getContainerColor(
-                          //                       '${showStudentdetails!.data[index].attendanceStatus}'),
-                          //                 ),
-                          //                 child: Center(
-                          //                   child: Text(
-                          //                     '${showStudentdetails!.data[index].attendanceStatus}',
-                          //                     style: TextStyle(
-                          //                         color: Colors.white,
-                          //                         fontSize: 16,
-                          //                         fontFamily: 'medium'),
-                          //                   ),
-                          //                 ),
-                          //               ),
-                          //             )
-                          //           ],
-                          //         ),
-                          //       ),
-                          //     ),
-                          //   ),
 
                           Container(
                             child: isLoading
@@ -2173,19 +2214,27 @@ class _AttendencePageState extends State<AttendencePage> {
                           color: Colors.black),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Align(
-                      alignment: Alignment.topRight,
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.black,
-                          size: 30,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddAttendencePage()));
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 20),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle),
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.black,
+                            size: 30,
+                          ),
                         ),
                       ),
                     ),
@@ -2671,48 +2720,60 @@ class _AttendencePageState extends State<AttendencePage> {
                         height: MediaQuery.of(context).size.height * 0.03,
                       ),
                       //absent student...
-                      Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(255, 0, 4, 0.05),
-                              borderRadius: BorderRadius.circular(10)),
-                          height: MediaQuery.of(context).size.height * 0.07,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 2,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Color.fromRGBO(218, 0, 0, 1),
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10))),
-                                  width: 8,
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.08,
-                                ),
-                                Text(
-                                  'Absent Students',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'medium',
-                                      color: Colors.black),
-                                ),
-                                Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 15),
-                                  child: Icon(
-                                    Icons.arrow_forward,
-                                    size: 30,
-                                    color: Color.fromRGBO(218, 0, 0, 1),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Irregularattendencies(
+                                        initialTab: 'Absent',
+                                        selectedClass: 'overall',
+                                        selectedSection: 'overall',
+                                      )));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(255, 0, 4, 0.05),
+                                borderRadius: BorderRadius.circular(10)),
+                            height: MediaQuery.of(context).size.height * 0.07,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 2,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Color.fromRGBO(218, 0, 0, 1),
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10))),
+                                    width: 8,
                                   ),
-                                )
-                              ],
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.08,
+                                  ),
+                                  Text(
+                                    'Absent Students',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontFamily: 'medium',
+                                        color: Colors.black),
+                                  ),
+                                  Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      size: 30,
+                                      color: Color.fromRGBO(218, 0, 0, 1),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -2721,48 +2782,60 @@ class _AttendencePageState extends State<AttendencePage> {
                         height: 10,
                       ),
                       //leave student...
-                      Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(89, 100, 219, 0.04),
-                              borderRadius: BorderRadius.circular(10)),
-                          height: MediaQuery.of(context).size.height * 0.07,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 2,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Color.fromRGBO(59, 72, 213, 1),
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10))),
-                                  width: 8,
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.08,
-                                ),
-                                Text(
-                                  'Leave Students',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'medium',
-                                      color: Colors.black),
-                                ),
-                                Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 15),
-                                  child: Icon(
-                                    Icons.arrow_forward,
-                                    size: 30,
-                                    color: Color.fromRGBO(59, 72, 213, 1),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Irregularattendencies(
+                                        initialTab: 'Leave',
+                                        selectedClass: 'overall',
+                                        selectedSection: 'overall',
+                                      )));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(89, 100, 219, 0.04),
+                                borderRadius: BorderRadius.circular(10)),
+                            height: MediaQuery.of(context).size.height * 0.07,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 2,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Color.fromRGBO(59, 72, 213, 1),
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10))),
+                                    width: 8,
                                   ),
-                                )
-                              ],
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.08,
+                                  ),
+                                  Text(
+                                    'Leave Students',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontFamily: 'medium',
+                                        color: Colors.black),
+                                  ),
+                                  Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      size: 30,
+                                      color: Color.fromRGBO(59, 72, 213, 1),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -2771,48 +2844,60 @@ class _AttendencePageState extends State<AttendencePage> {
                         height: 10,
                       ),
                       //late students..
-                      Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                              color: Color.fromRGBO(176, 93, 208, 0.05),
-                              borderRadius: BorderRadius.circular(10)),
-                          height: MediaQuery.of(context).size.height * 0.07,
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              left: 2,
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      color: Color.fromRGBO(138, 9, 189, 1),
-                                      borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10))),
-                                  width: 8,
-                                ),
-                                SizedBox(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.08,
-                                ),
-                                Text(
-                                  'Late Students',
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'medium',
-                                      color: Colors.black),
-                                ),
-                                Spacer(),
-                                Padding(
-                                  padding: const EdgeInsets.only(right: 15),
-                                  child: Icon(
-                                    Icons.arrow_forward,
-                                    size: 30,
-                                    color: Color.fromRGBO(138, 9, 189, 1),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Irregularattendencies(
+                                        initialTab: 'Late',
+                                        selectedClass: 'overall',
+                                        selectedSection: 'overall',
+                                      )));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(3.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(176, 93, 208, 0.05),
+                                borderRadius: BorderRadius.circular(10)),
+                            height: MediaQuery.of(context).size.height * 0.07,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 2,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        color: Color.fromRGBO(138, 9, 189, 1),
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                            bottomLeft: Radius.circular(10))),
+                                    width: 8,
                                   ),
-                                )
-                              ],
+                                  SizedBox(
+                                    width: MediaQuery.of(context).size.width *
+                                        0.08,
+                                  ),
+                                  Text(
+                                    'Late Students',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontFamily: 'medium',
+                                        color: Colors.black),
+                                  ),
+                                  Spacer(),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: Icon(
+                                      Icons.arrow_forward,
+                                      size: 30,
+                                      color: Color.fromRGBO(138, 9, 189, 1),
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
                         ),

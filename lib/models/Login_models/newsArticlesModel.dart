@@ -15,11 +15,11 @@ class NewsArticle {
 
   factory NewsArticle.fromJson(Map<String, dynamic> json) {
     return NewsArticle(
-      headline: json['headline'],
-      newsContent: json['newscontent'],
-      postedOn: json['postedOn'],
-      filePath: json['filepath'],
-      count: json['count'],
+      headline: json['headline'] ?? '',
+      newsContent: json['newscontent'] ?? '',
+      postedOn: json['postedOn'] ?? '',
+      filePath: json['filepath'] ?? '',
+      count: json['count'] ?? '',
     );
   }
 }

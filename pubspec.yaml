@@ -41,6 +41,16 @@ dependencies:
   speech_bubble: ^0.0.9
   fl_chart: ^0.69.0
   flutter_launcher_icons: ^0.14.1
+  permission_handler: ^11.3.1
+  excel: ^4.0.6
+  path_provider: ^2.1.5
+  flutter_local_notifications: ^18.0.1
+  open_file: ^3.5.10
+  collection: ^1.18.0
+  file_picker: ^8.1.4
+  youtube_player_flutter: ^9.1.1
+  flutter_quill: ^10.8.5
+
 flutter_launcher_icons:
   android: true
   ios: true
