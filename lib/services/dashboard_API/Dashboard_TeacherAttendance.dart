@@ -13,18 +13,17 @@ Future<List<TeacherAttendance>> fetchTeacherAttendance() async {
     throw Exception('Roll number or user type is missing');
   }
 
-  final String token = '123';
   String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
   final String teacheratt = '$teacherAttendance'
-      'RollNumber=$rollNumber&UserType=$userType&Date=30-11-2024';
+      'RollNumber=$rollNumber&UserType=$userType&Date=$formattedDate';
 
   final response = await http.get(
     // Uri.parse(
     //     'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardTeachersAttendance?RollNumber=$rollNumber&UserType=$userType&Date=30-11-2024'),
     Uri.parse(teacheratt),
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

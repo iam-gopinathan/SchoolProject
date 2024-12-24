@@ -5,15 +5,13 @@ import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<NewsArticle>> fetchNews() async {
-  final String bearerToken = '123';
-
   final response = await http.get(
     // Uri.parse(
     //     'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/LoginNews'),
 
     Uri.parse(Login_news_Api),
     headers: {
-      'Authorization': 'Bearer $bearerToken',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

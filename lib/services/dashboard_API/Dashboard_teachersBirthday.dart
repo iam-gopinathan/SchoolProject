@@ -8,19 +8,18 @@ import 'package:intl/intl.dart';
 Future<List<Birthday>> fetchBirthdayData(String category) async {
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
-  final String token = '123';
 
   String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
 
   final String staffbirthdays = '$teachersBirthday'
-      'RollNumber=$rollNumber&UserType=$userType&Date=04-11-2024';
+      'RollNumber=$rollNumber&UserType=$userType&Date=$formattedDate';
 
   final response = await http.get(
     // Uri.parse(
     //     'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardBirthday?RollNumber=$rollNumber&UserType=$userType&Date=$formattedDate'),
     Uri.parse(staffbirthdays),
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

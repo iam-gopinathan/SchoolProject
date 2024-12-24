@@ -45,3 +45,6 @@ const totalstudentgraph =
 //attendence page students count piechart...
 const studentcountpiechart =
     'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/attendance/piechart?';
+
+///auth token
+var authToken = '123';

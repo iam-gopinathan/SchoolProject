@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/models/Attendence_models/show_studentDetails.dart';
 
@@ -9,7 +10,6 @@ Future<ShowStudentdetails> fetchShowStudentDetails({
   required String percentage,
   required String status,
 }) async {
-  const String token = '123';
   final String url =
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/attendance/attendanceTable'
       '?Date=$date&Grade=$grade&Section=$section&Percentage=$percentage&Status=$status';
@@ -18,7 +18,7 @@ Future<ShowStudentdetails> fetchShowStudentDetails({
     final response = await http.get(
       Uri.parse(url),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json',
       },
     );

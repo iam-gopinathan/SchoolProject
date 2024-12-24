@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_application_1/models/Attendence_models/Post_Add_attendence.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
+
 import 'package:http/http.dart' as http;
 
 // Define the function to post attendance data
@@ -21,9 +23,9 @@ Future<void> postAttendance(String grade, String section, String date,
       url,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer 123', // Make sure to replace with actual token
+        'Authorization': '$authToken',
       },
-      body: jsonEncode(body), // Convert the body map to a JSON string
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {

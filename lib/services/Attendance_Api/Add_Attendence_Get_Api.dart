@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_application_1/models/Attendence_models/Add_Attendence_Get_Model.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<AddAttendenceGetModel> fetchADDGETAttendanceData(
@@ -10,7 +11,6 @@ Future<AddAttendenceGetModel> fetchADDGETAttendanceData(
   final String endpoint = '/attendance/fetchAttendance';
   final url = Uri.parse(
       '$baseUrl$endpoint?Grade=$grade&Section=$section&Date=$date&Status=$status');
-  const String authToken = '123';
 
   try {
     final response = await http.get(

@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_application_1/models/Attendence_models/Post_Update_Attendence.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<void> updateAttendance(String grade, String section, String date,
     List<PostUpdateAttendence> attendanceList) async {
   final url = Uri.parse(
       "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/attendance/updateAttendance");
-  const String authToken = '123';
 
   final body = json.encode({
     'grade': grade,

@@ -6,8 +6,6 @@ import 'package:http/http.dart' as http;
 
 Future<List<Circular>> fetchCirculars(
     String rollNumber, String userType) async {
-  final String token = '123';
-
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
 
@@ -19,7 +17,7 @@ Future<List<Circular>> fetchCirculars(
     //     'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardNews&Circular?RollNumber=$rollNumber&UserType=$userType'),
     Uri.parse(dashboardcircular),
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

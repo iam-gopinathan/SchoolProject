@@ -19,13 +19,11 @@ Future<AttendanceResponse> fetchAttendanceData(
   // const String baseUrl =
   // 'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/attendance/barchart?RollNumber=$rollNumber&UserType=$userType&Date=01-12-2024';
 
-  const String token = '123';
-
   try {
     final response = await http.get(
       Uri.parse(attendencepagetotalstudent),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json',
       },
     );

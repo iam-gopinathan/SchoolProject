@@ -9,6 +9,7 @@ import 'package:flutter_application_1/services/Attendance_Api/IrRegularAttendenc
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -115,6 +116,8 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
   List<String> displayedTeachers = [];
   Future<void> _fetchIrregularAttendanceData(
       String selectedClass, String selectedSection, String status) async {
+    // Get the current date in 'dd-MM-yyyy' format
+    String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
     try {
       setState(() {
         displayedTeachers.clear();
@@ -124,7 +127,7 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
       List<Irregularmodels> fetchedStudents = await fetchAttendanceIrRegular(
         selectedClass,
         selectedSection,
-        '01-12-2024',
+        currentDate,
         status,
       );
 

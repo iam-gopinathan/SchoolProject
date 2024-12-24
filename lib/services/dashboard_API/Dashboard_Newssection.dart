@@ -11,7 +11,6 @@ Future<List<News>> fetchDashboardNews(
 
   final String dashboardnews =
       '$dashboardNews' 'RollNumber=$rollNumber&UserType=$userType';
-  final String token = '123';
 
   final response = await http.get(
     // Uri.parse(
@@ -19,7 +18,7 @@ Future<List<News>> fetchDashboardNews(
 
     Uri.parse(dashboardnews),
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

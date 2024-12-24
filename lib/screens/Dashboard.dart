@@ -7,13 +7,16 @@ import 'package:flutter_application_1/models/Dashboard_models/Dashboard_teacherA
 import 'package:flutter_application_1/models/Dashboard_models/Dashboard_teacherBirthday.dart';
 import 'package:flutter_application_1/models/Dashboard_models/dashboard_Management_count.dart';
 import 'package:flutter_application_1/models/Dashboard_models/dashboard_newsModel.dart';
+import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
 import 'package:flutter_application_1/screens/Communication.dart';
+import 'package:flutter_application_1/screens/loginscreen.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Newssection.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_StudentAttendance.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_TeacherAttendance.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_circularsection.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_teachersBirthday.dart';
 import 'package:flutter_application_1/services/dashboard_API/dashboard_managementsection_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:intl/intl.dart';
 import 'package:speech_bubble/speech_bubble.dart';
@@ -23,12 +26,14 @@ class Dashboard extends StatefulWidget {
   final String username;
   final String userType;
   final String imagePath;
+  final List<NewsArticle> newsArticles;
 
   Dashboard(
       {super.key,
       required this.username,
       required this.userType,
-      required this.imagePath});
+      required this.imagePath,
+      required this.newsArticles});
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -2489,8 +2494,25 @@ class _DashboardState extends State<Dashboard> {
       ),
       endDrawer: Drawer(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text('data'),
+            //logout button..
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.textFieldborderColor),
+                  onPressed: () {
+                    _showLogoutConfirmationDialog(context);
+                  },
+                  child: Text(
+                    'Logout',
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 16,
+                        color: Colors.white),
+                  )),
+            )
           ],
         ),
       ),
@@ -2556,4 +2578,63 @@ class _DashboardState extends State<Dashboard> {
   }
 
   ///staff section end.....
+
+  ///logout function...
+  void _showLogoutConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: Navigator.of(context, rootNavigator: true).context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Center(
+            child: Text(
+              'Logout Confirmation',
+              style: TextStyle(
+                  fontFamily: 'semibold', fontSize: 16, color: Colors.black),
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(
+                fontFamily: 'medium', fontSize: 16, color: Colors.black),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  side: BorderSide(color: Colors.black, width: 1)),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                    color: Colors.black, fontSize: 14, fontFamily: 'regular'),
+              ),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.textFieldborderColor),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                UserSession().clearSession();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        Loginpage(newsArticles: widget.newsArticles),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: Text(
+                'Logout',
+                style: TextStyle(
+                    color: Colors.white, fontSize: 14, fontFamily: 'regular'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

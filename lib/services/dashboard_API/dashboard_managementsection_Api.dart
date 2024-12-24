@@ -8,7 +8,6 @@ Future<DashboardManagementCount> fetchDashboardCount(
     String rollNumber, String userType) async {
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
-  final String token = '123';
 
   final String dashboardmanagementsection =
       '$dashboardManagementCount' 'RollNumber=$rollNumber&UserType=$userType';
@@ -19,7 +18,7 @@ Future<DashboardManagementCount> fetchDashboardCount(
 
     Uri.parse(dashboardmanagementsection),
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

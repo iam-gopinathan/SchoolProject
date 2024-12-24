@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/screens/AttendencePage/IrregularAttendencies.dart';
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/screens/splashScreen.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'dart:io';
+
+import 'package:get/get.dart';
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
@@ -28,7 +31,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    final GradeController gradeController = Get.put(GradeController());
+
+    gradeController.fetchGrades();
+    return GetMaterialApp(
       //theme code..
       themeMode: ThemeMode.system,
       theme: AppTheme.lightTheme,

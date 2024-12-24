@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/AttendencePage/Attendence_page.dart';
+import 'package:flutter_application_1/screens/ExamTimeTable/examTimetable_mainpage.dart';
+import 'package:flutter_application_1/screens/Feedback/feedback_mainpage.dart';
+import 'package:flutter_application_1/screens/Homeworks/Homework_Mainpage.dart';
+import 'package:flutter_application_1/screens/ImportantEvents/ImportantEvents_mainpage.dart';
+import 'package:flutter_application_1/screens/MarksAndResults/MarksMainpage.dart';
+import 'package:flutter_application_1/screens/Messages/Message_mainPage.dart';
 import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
+import 'package:flutter_application_1/screens/Schoolcalender/schoolCalender_mainPage.dart';
+import 'package:flutter_application_1/screens/StudyMaterial/studyMaterial_mainpage.dart';
+import 'package:flutter_application_1/screens/TimeTables/timeTable_mainpage.dart';
+import 'package:flutter_application_1/screens/circularPage/circular_mainPage.dart';
+import 'package:flutter_application_1/screens/consentFoms/consentForm_mainpage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Communication extends StatefulWidget {
@@ -42,7 +53,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(254, 252, 251, 1),
         Color.fromRGBO(254, 252, 251, 1),
-      ]
+      ],
+      "page": MessageMainpage(),
     },
     {
       "svg": 'assets/icons/Attendancepage_notesoutline.svg',
@@ -54,7 +66,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(252, 253, 250, 1),
         Color.fromRGBO(252, 253, 250, 1)
-      ]
+      ],
+      "page": CircularMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_form.svg',
@@ -66,7 +79,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(254, 251, 250, 1),
         Color.fromRGBO(254, 251, 250, 1),
-      ]
+      ],
+      "page": ConsentformMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_time.svg',
@@ -78,7 +92,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(254, 253, 250, 1),
         Color.fromRGBO(254, 253, 250, 1),
-      ]
+      ],
+      "page": TimetableMainpage(),
     },
     {
       "svg": 'assets/icons/Attendancepage_homework.svg',
@@ -90,7 +105,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(254, 250, 251, 1),
         Color.fromRGBO(254, 250, 251, 1),
-      ]
+      ],
+      "page": HomeworkMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_examhomework.svg',
@@ -102,7 +118,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(251, 250, 253, 1),
         Color.fromRGBO(251, 250, 253, 1),
-      ]
+      ],
+      "page": ExamtimetableMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_book.svg',
@@ -114,7 +131,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(250, 251, 253, 1),
         Color.fromRGBO(250, 251, 253, 1)
-      ]
+      ],
+      "page": StudymaterialMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_audit.svg',
@@ -126,7 +144,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(250, 251, 252, 1),
         Color.fromRGBO(250, 251, 252, 1),
-      ]
+      ],
+      "page": Marksmainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_calendar.svg',
@@ -138,7 +157,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(250, 252, 252, 1),
         Color.fromRGBO(250, 252, 252, 1),
-      ]
+      ],
+      "page": SchoolcalenderMainpage(),
     },
     {
       "svg": 'assets/icons/Attendancepage_microphone.svg',
@@ -150,7 +170,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(250, 250, 253, 1),
         Color.fromRGBO(250, 250, 253, 1),
-      ]
+      ],
+      "page": ImportanteventsMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_comment.svg',
@@ -162,7 +183,8 @@ class _CommunicationState extends State<Communication> {
       "cardcolor": [
         Color.fromRGBO(254, 251, 250, 1),
         Color.fromRGBO(254, 251, 250, 1),
-      ]
+      ],
+      "page": FeedbackMainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_timeline.svg',

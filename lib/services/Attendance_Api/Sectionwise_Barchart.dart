@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_application_1/models/Attendence_models/Sectionwise_barchart.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<AttendanceDataModel> fetchsectionwise(
@@ -13,14 +14,12 @@ Future<AttendanceDataModel> fetchsectionwise(
     'Section': section,
   };
 
-  const String token = '123';
-
   final uri = Uri.parse(apiUrl).replace(queryParameters: queryParams);
 
   final response = await http.get(
     uri,
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

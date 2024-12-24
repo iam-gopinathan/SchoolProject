@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:flutter_application_1/models/Attendence_models/IrRegularmodels.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Irregularmodels>> fetchAttendanceIrRegular(
     String grade, String section, String date, String status) async {
   const String baseUrl =
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api';
-
-  final String authToken = '123';
 
   final String endpoint = '/attendance/irregularAttendees';
   final url = Uri.parse(

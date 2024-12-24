@@ -9,21 +9,15 @@ Future<DashboardName> fetchDashboardData(
     String rollNumber, String userType) async {
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
-  final String token = '123';
 
   // Construct the dashboard URL dynamically
   final String dashboardUrl =
       '$dashboardNAme' 'RollNumber=$rollNumber&UserType=$userType';
 
   final response = await http.get(
-    // Uri.parse(
-    //   'https://schoolcommunication-azfthrgshmgegbdc.southindia-01.azurewebsites.net/api/Dashboard/DashboardUsers?RollNumber=$rollNumber&UserType=$userType',
-    // ),
-
     Uri.parse(dashboardUrl),
-
     headers: {
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
       'Content-Type': 'application/json',
     },
   );

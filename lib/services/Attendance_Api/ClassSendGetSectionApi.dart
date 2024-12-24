@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_application_1/models/Attendence_models/ClassSendGetSectionModel.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
 Future<List<Section>> fetchSections(String grade) async {
@@ -10,7 +11,7 @@ Future<List<Section>> fetchSections(String grade) async {
     final response = await http.get(
       url,
       headers: {
-        'Authorization': 'Bearer 123',
+        'Authorization': '$authToken',
         'Content-Type': 'application/json',
       },
     );

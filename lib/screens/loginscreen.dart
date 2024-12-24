@@ -68,6 +68,7 @@ class _LoginpageState extends State<Loginpage> {
                   username: dashboardData.userDetails.username,
                   userType: dashboardData.userDetails.usertype,
                   imagePath: dashboardData.userDetails.filepath,
+                  newsArticles: widget.newsArticles,
                 ),
               ),
             );

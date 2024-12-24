@@ -4,17 +4,18 @@ import 'package:flutter_application_1/models/Attendence_models/Studentscounts_pi
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 Future<AttendanceData> fetchPiechartAttendanceData(
     String rollNumber, String userType) async {
+  String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
 
   // Construct the dashboard URL dynamically
   final String attendencepagepiechart = '$studentcountpiechart'
-      'RollNumber=$rollNumber&UserType=$userType&Date=01-12-2024';
+      'RollNumber=$rollNumber&UserType=$userType&Date=$currentDate';
 
-  const String token = '123';
   try {
     final response = await http.get(
       // Uri.parse(
@@ -22,7 +23,7 @@ Future<AttendanceData> fetchPiechartAttendanceData(
 
       Uri.parse(attendencepagepiechart),
       headers: {
-        'Authorization': 'Bearer $token',
+        'Authorization': 'Bearer $authToken',
         'Content-Type': 'application/json',
       },
     );

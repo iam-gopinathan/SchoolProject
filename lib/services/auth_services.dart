@@ -5,10 +5,9 @@ import 'package:http/http.dart' as http;
 
 class AuthService {
   Future<Map<String, dynamic>> login(String username, String password) async {
-    var token = '123';
     var headers = {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $token',
+      'Authorization': 'Bearer $authToken',
     };
 
     // String url =
