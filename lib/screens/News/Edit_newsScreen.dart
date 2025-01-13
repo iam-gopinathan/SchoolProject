@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/News_Models/Edit_news_model.dart';
 import 'package:flutter_application_1/models/News_Models/Update_news.model.dart';
+import 'package:flutter_application_1/models/School_calendar_model/Update_school_calender_model.dart';
 import 'package:flutter_application_1/services/News_Api/Update_news_Api.dart';
 import 'package:flutter_application_1/services/News_Api/Edit_news_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
@@ -190,7 +191,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
   }
 
   ///image bottomsheeet
-  void _PreviewBottomsheet(BuildContext context) {
+  void _PreviewBottomsheet(BuildContext context, String imageUrl) {
     showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context,
@@ -256,12 +257,15 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                         padding: const EdgeInsets.only(left: 15, top: 10),
                         child: Row(
                           children: [
-                            Text(
-                              headingController.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.9,
+                              child: Text(
+                                headingController.text,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
                             ),
                           ],
                         ),
@@ -277,6 +281,13 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                           ),
                         ),
                       ),
+                      //fetched image...
+                      if (imageUrl.isNotEmpty)
+                        Image.network(
+                          imageUrl,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
 
                       ///image section...
                       Padding(
@@ -459,6 +470,8 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
       print(e);
     }
   }
+
+  bool isFetchedImageVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -800,6 +813,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                 child: GestureDetector(
                                   onTap: () {
                                     pickFile();
+                                    isFetchedImageVisible = false;
                                   },
                                   child: Container(
                                     color: Color.fromRGBO(228, 238, 253, 1)
@@ -864,8 +878,9 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               ),
                             ),
                           ),
-
-                        if (news.file != null &&
+//fetched image
+                        if (isFetchedImageVisible &&
+                            news.file != null &&
                             news.file!.isNotEmpty &&
                             news.fileType != 'existing')
                           Padding(
@@ -897,44 +912,77 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               },
                             ),
                           ),
-
-                        if (selectedFile != null)
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: Column(
-                              children: [
-                                if (['jpeg', 'png', 'webp', 'jpg']
-                                    .contains(selectedFile!.extension))
-                                  selectedFile!.bytes != null
-                                      ? Image.memory(
-                                          selectedFile!.bytes!,
-                                          height: 150,
-                                          width: double.infinity,
-                                          fit: BoxFit.contain,
-                                        )
-                                      : Text(
-                                          'Failed to load image data.',
-                                          style: TextStyle(color: Colors.red),
-                                        )
-                                else if (selectedFile!.extension == 'pdf')
-                                  Icon(
-                                    Icons.picture_as_pdf,
-                                    size: 100,
-                                    color: Colors.red,
+//selected image...
+                        /// Display selected image...
+                        if (isuploadimage)
+                          if (selectedFile != null)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Stack(
+                                children: [
+                                  Column(
+                                    children: [
+                                      if (['jpeg', 'png', 'webp', 'jpg']
+                                          .contains(selectedFile!.extension))
+                                        selectedFile!.bytes != null
+                                            ? Image.memory(
+                                                selectedFile!.bytes!,
+                                                height: 150,
+                                                width: double.infinity,
+                                                fit: BoxFit.contain,
+                                              )
+                                            : Text(
+                                                'Failed to load image data.',
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              )
+                                      else if (selectedFile!.extension == 'pdf')
+                                        Icon(
+                                          Icons.picture_as_pdf,
+                                          size: 100,
+                                          color: Colors.red,
+                                        ),
+                                      SizedBox(height: 10),
+                                      // Display file name
+                                      Text(
+                                        selectedFile!.name,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                SizedBox(height: 10),
-                                // Display file name
-                                Text(
-                                  selectedFile!.name,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
+                                  // Close icon to remove image
+                                  Positioned(
+                                    top: 0,
+                                    right: 40,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedFile = null;
+                                          isFetchedImageVisible = true;
+                                        });
+                                      },
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          border:
+                                              Border.all(color: Colors.black),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        padding: EdgeInsets.all(4),
+                                        child: Icon(
+                                          Icons.close,
+                                          size: 18,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
 
                         /// Display Selected File end...
 
@@ -1079,7 +1127,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               ///preview
                               GestureDetector(
                                 onTap: () {
-                                  _PreviewBottomsheet(context);
+                                  _PreviewBottomsheet(context, imageUrl!);
                                 },
                                 child: Text(
                                   'Preview',

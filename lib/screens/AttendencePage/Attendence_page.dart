@@ -1,6 +1,4 @@
-import 'dart:collection';
 import 'dart:io';
-
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -37,6 +35,7 @@ class AttendencePage extends StatefulWidget {
 }
 
 class _AttendencePageState extends State<AttendencePage> {
+  bool isLoading = true;
   //date picker....for total attendence....
   DateTime _selectedDate = DateTime.now();
 
@@ -1937,7 +1936,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             ),
                           ),
 
-                          //sections wise details.....
                           //listtile top sections...
                           Transform.translate(
                             offset: Offset(0, 12),

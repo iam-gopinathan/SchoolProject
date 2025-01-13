@@ -1,36 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/Controller/grade_controller.dart';
+import 'package:flutter_application_1/models/ConsentForm/Create_consentForm_model.dart';
+import 'package:flutter_application_1/services/ConsentForm/create_ConsentForm_api.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class CreateConsentformpage extends StatefulWidget {
-  const CreateConsentformpage({super.key});
+  final Function fetch;
+  const CreateConsentformpage({super.key, required this.fetch});
 
   @override
   State<CreateConsentformpage> createState() => _CreateConsentformpageState();
 }
 
 class _CreateConsentformpageState extends State<CreateConsentformpage> {
-  List<String> selectClass = ['Everyone', 'Students', 'Teachers'];
   TextEditingController _heading = TextEditingController();
 
-  // List to keep track of text fields
+  final GradeController gradeController = Get.put(GradeController());
+
+  String selectedGradeName = '';
+
+  String? selectedGrade;
+  String? selectedSection;
+  String? selectedClasses;
+
+  String? selectedSubject;
+
+  String? selectedGradeId;
+  List<String> sections = [];
+  List<String> subjects = [];
+
   List<int> textFieldList = [1];
   int questionCounter = 1;
 
+  List<TextEditingController> questionControllers = [TextEditingController()];
+
   void _addTextField() {
     setState(() {
-      questionCounter++;
-      textFieldList.add(questionCounter);
+      questionControllers.add(TextEditingController());
+      textFieldList.add(questionCounter++);
     });
   }
 
   void _removeTextField(int index) {
     setState(() {
-      textFieldList.remove(index);
+      questionControllers[index].dispose();
+      questionControllers.removeAt(index);
+      textFieldList.removeAt(index);
     });
   }
 
-  ///questions...
   Widget _buildQuestion(int index) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,6 +118,7 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
               ],
             ),
             child: TextFormField(
+              controller: questionControllers[index],
               inputFormatters: [LengthLimitingTextInputFormatter(300)],
               maxLines: 5,
               decoration: InputDecoration(
@@ -135,6 +158,269 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
     );
   }
 
+  void _PreviewBottomsheet(BuildContext context) {
+    showModalBottomSheet(
+        backgroundColor: Colors.white,
+        context: context,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(clipBehavior: Clip.none, children: [
+              // Close icon
+              Positioned(
+                top: -70,
+                left: 180,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Preview Screen',
+                              style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 16,
+                                  color: Color.fromRGBO(104, 104, 104, 1)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Divider(
+                          thickness: 2,
+                          color: Color.fromRGBO(243, 243, 243, 1),
+                        ),
+                      ),
+//heading...
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${selectedGradeName}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      //selected section..
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${selectedSection}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //subject..
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${selectedSubject}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //heading
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${_heading.text}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              questionControllers
+                                  .map((controller) => controller.text)
+                                  .join(", "),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ]);
+          });
+        });
+  }
+
+  List<String> selectedSections = [];
+
+  //show menu
+  void _showSectionMenu(
+    BuildContext context,
+  ) {
+    showMenu<String>(
+      color: Colors.black,
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      position: RelativeRect.fromLTRB(1, 270, 0, 0),
+      items: [
+        PopupMenuItem<String>(
+          enabled: false,
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter menuSetState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      menuSetState(() {
+                        if (selectedSections.length == sections.length) {
+                          selectedSections.clear();
+                        } else {
+                          selectedSections = List<String>.from(sections);
+                        }
+                      });
+                      setState(() {});
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Container(
+                        color: Colors.black,
+                        height: 50,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: selectedSections.length == sections.length,
+                              onChanged: (bool? value) {
+                                menuSetState(() {
+                                  if (value == true) {
+                                    selectedSections =
+                                        List<String>.from(sections);
+                                  } else {
+                                    selectedSections.clear();
+                                  }
+                                });
+                                setState(() {});
+                              },
+                              checkColor: Colors.black,
+                              activeColor: Colors.white,
+                            ),
+                            Text(
+                              "Select All",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 200,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: sections.map((String section) {
+                          return Container(
+                            color: Colors.black,
+                            height: 50,
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  value: selectedSections.contains(section),
+                                  onChanged: (bool? value) {
+                                    menuSetState(() {
+                                      if (value == true) {
+                                        selectedSections.add(section);
+                                      } else {
+                                        selectedSections.remove(section);
+                                      }
+                                    });
+                                    setState(() {});
+                                  },
+                                  checkColor: Colors.black,
+                                  activeColor: Colors.white,
+                                ),
+                                Text(
+                                  section,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -160,6 +446,7 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                     children: [
                       GestureDetector(
                         onTap: () {
+                          widget.fetch();
                           Navigator.pop(context);
                         },
                         child: Icon(
@@ -203,63 +490,93 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                 //dropdown field.......
                 Container(
                   width: MediaQuery.of(context).size.width * 0.5,
-                  child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        hintText: 'Select',
-                        hintStyle: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 16,
-                            color: Colors.black),
-                        border: OutlineInputBorder(
+                  child: Obx(
+                    () {
+                      if (gradeController.gradeList.isEmpty) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      return DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
                             borderSide: BorderSide(
                               color: Color.fromRGBO(203, 203, 203, 1),
-                              width: 0.5,
                             ),
-                            borderRadius: BorderRadius.circular(10)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                              width: 0.5,
-                            ),
-                            borderRadius: BorderRadius.circular(10)),
-                      ),
-                      dropdownColor: Colors.black,
-                      items: selectClass.map((String item) {
-                        return DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontFamily: 'regular'),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {},
-                      selectedItemBuilder: (BuildContext context) {
-                        return selectClass.map((className) {
-                          return Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                className,
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    fontFamily: 'regular'),
-                              ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                            ),
+                          ),
+                        ),
+                        dropdownColor: Colors.black,
+                        menuMaxHeight: 150,
+                        value: selectedGradeId,
+                        hint: Text("Select Class"),
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedGradeId = value;
+
+                            final selectedGrade =
+                                gradeController.gradeList.firstWhere(
+                              (grade) => grade['id'].toString() == value,
+                              orElse: () => null,
+                            );
+
+                            if (selectedGrade != null) {
+                              selectedGradeName =
+                                  selectedGrade['sign'].toString();
+                              sections = List<String>.from(
+                                  selectedGrade['sections'] ?? []);
+                              subjects = List<String>.from(
+                                  selectedGrade['subjects'] ?? []);
+                            } else {
+                              sections = [];
+                              subjects = [];
+                            }
+                            selectedSection = null;
+                            selectedSubject = null;
+                          });
+                        },
+                        items: gradeController.gradeList.map((grade) {
+                          return DropdownMenuItem<String>(
+                            value: grade['id'].toString(),
+                            child: Text(
+                              grade['sign'].toString(),
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'regular',
+                                  fontSize: 14),
                             ),
                           );
-                        }).toList();
-                      }),
-                )
+                        }).toList(),
+                        selectedItemBuilder: (BuildContext context) {
+                          return gradeController.gradeList.map((grade) {
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                grade['sign'].toString(),
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            );
+                          }).toList();
+                        },
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
-          //select section...
-          //select class
+
+          //select sections...
           Padding(
             padding: const EdgeInsets.only(top: 20),
             child: Row(
@@ -273,64 +590,51 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                       color: Color.fromRGBO(38, 38, 38, 1)),
                 ),
 
-                //dropdown field.......
+                ///section dropdown..
                 Container(
                   width: MediaQuery.of(context).size.width * 0.5,
-                  child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        hintText: 'Select',
-                        hintStyle: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 16,
-                            color: Colors.black),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                              width: 0.5,
-                            ),
-                            borderRadius: BorderRadius.circular(10)),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                              width: 0.5,
-                            ),
-                            borderRadius: BorderRadius.circular(10)),
+                  child: GestureDetector(
+                    onTap: () {
+                      _showSectionMenu(
+                          context); // Show section selection menu on tap
+                    },
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Color.fromRGBO(203, 203, 203, 1),
+                          width: 0.5,
+                        ),
                       ),
-                      dropdownColor: Colors.black,
-                      items: selectClass.map((String item) {
-                        return DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: TextStyle(
-                                color: Colors.white,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              selectedSections.isEmpty
+                                  ? 'Select section'
+                                  : selectedSections.join(
+                                      ', '), // Show selected sections here
+                              style: TextStyle(
                                 fontSize: 14,
-                                fontFamily: 'regular'),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {},
-                      selectedItemBuilder: (BuildContext context) {
-                        return selectClass.map((className) {
-                          return Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                className,
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    fontFamily: 'regular'),
+                                color: Colors.black,
+                                fontFamily: 'regular',
                               ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                             ),
-                          );
-                        }).toList();
-                      }),
-                )
+                          ),
+                          Icon(Icons.arrow_drop_down, color: Colors.black),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
+
           //add heading...
           Padding(
             padding: const EdgeInsets.only(left: 20, top: 45),
@@ -412,7 +716,10 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       side: BorderSide(color: Colors.black, width: 1.5)),
-                  onPressed: () {},
+                  onPressed: () {
+                    String status = 'draft';
+                    _createconsentform(status);
+                  },
                   child: Text(
                     'Save as Draft',
                     style: TextStyle(
@@ -423,7 +730,9 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                 ),
                 //preview
                 GestureDetector(
-                  onTap: () {},
+                  onTap: () {
+                    _PreviewBottomsheet(context);
+                  },
                   child: Text(
                     'Preview',
                     style: TextStyle(
@@ -438,7 +747,10 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.textFieldborderColor,
                       side: BorderSide.none),
-                  onPressed: () {},
+                  onPressed: () {
+                    String status = 'post';
+                    _createconsentform(status);
+                  },
                   child: Text(
                     'Publish',
                     style: TextStyle(
@@ -451,5 +763,35 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
             ),
           ),
         ])));
+  }
+  //create consent form..
+
+  void _createconsentform(String status) {
+    String currentDateTime =
+        DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+
+    String postedOn = status == "post" ? currentDateTime : "";
+    String draftedOn = status == "draft" ? currentDateTime : "";
+
+    // Collect all the questions
+    List<String> questions =
+        questionControllers.map((controller) => controller.text).toList();
+
+    // Get the selected section (assuming you have selectedSections)
+    String selectedSection =
+        selectedSections.isEmpty ? "" : selectedSections.join(", ");
+
+    CreateConsentformModel create = CreateConsentformModel(
+        userType: UserSession().userType.toString(),
+        rollNumber: UserSession().rollNumber.toString(),
+        gradeId: selectedGradeId!,
+        section: selectedSection,
+        heading: _heading.text,
+        question: questions.join("|"),
+        status: status,
+        postedOn: postedOn,
+        draftedOn: draftedOn);
+
+    CreateConsentForm(create, context);
   }
 }

@@ -2,6 +2,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/models/ImportantEvents_models/Create_important_event_model.dart';
+import 'package:flutter_application_1/services/ImportantEvents_Api/Create_important_events_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -17,9 +20,7 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
   TextEditingController _heading = TextEditingController();
   TextEditingController _desc = TextEditingController();
   TextEditingController _linkController = TextEditingController();
-
   TextEditingController _startdate = TextEditingController();
-
   TextEditingController _enddate = TextEditingController();
 
   Future<void> _selectStartDate(BuildContext context) async {
@@ -242,6 +243,7 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                             child: Container(
                               width: MediaQuery.of(context).size.width * 0.4,
                               child: TextFormField(
+                                enabled: !_isChecked,
                                 controller: _enddate,
                                 decoration: InputDecoration(
                                   suffixIcon: IconButton(
@@ -572,39 +574,67 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                   ),
                 ),
 
-              ///display selected image...
+              /// Display selected image...
               if (isuploadimage)
                 if (selectedFile != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                    child: Column(
+                    child: Stack(
                       children: [
-                        if (['jpeg', 'png', 'webp', 'jpg']
-                            .contains(selectedFile!.extension))
-                          selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  height: 150,
-                                  width: double.infinity,
-                                  fit: BoxFit.contain,
-                                )
-                              : Text(
-                                  'Failed to load image data.',
-                                  style: TextStyle(color: Colors.red),
-                                )
-                        else if (selectedFile!.extension == 'pdf')
-                          Icon(
-                            Icons.picture_as_pdf,
-                            size: 100,
-                            color: Colors.red,
-                          ),
-                        SizedBox(height: 10),
-                        // Display file name
-                        Text(
-                          selectedFile!.name,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
+                        Column(
+                          children: [
+                            if (['jpeg', 'png', 'webp', 'jpg']
+                                .contains(selectedFile!.extension))
+                              selectedFile!.bytes != null
+                                  ? Image.memory(
+                                      selectedFile!.bytes!,
+                                      height: 150,
+                                      width: double.infinity,
+                                      fit: BoxFit.contain,
+                                    )
+                                  : Text(
+                                      'Failed to load image data.',
+                                      style: TextStyle(color: Colors.red),
+                                    )
+                            else if (selectedFile!.extension == 'pdf')
+                              Icon(
+                                Icons.picture_as_pdf,
+                                size: 100,
+                                color: Colors.red,
+                              ),
+                            SizedBox(height: 10),
+                            // Display file name
+                            Text(
+                              selectedFile!.name,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Close icon to remove image
+                        Positioned(
+                          top: 0,
+                          right: 40,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                selectedFile = null;
+                              });
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.black),
+                                shape: BoxShape.circle,
+                              ),
+                              padding: EdgeInsets.all(4),
+                              child: Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Colors.black,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -688,7 +718,9 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                         style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.textFieldborderColor,
                             side: BorderSide.none),
-                        onPressed: () {},
+                        onPressed: () {
+                          createevent();
+                        },
                         child: Text(
                           'Publish',
                           style: TextStyle(
@@ -704,5 +736,35 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
             ],
           ),
         ));
+  }
+
+  //create
+  void createevent() {
+    String fileType = '';
+    String? filePath;
+    String? link;
+
+    if (isuploadimage && selectedFile != null) {
+      fileType = 'image';
+      filePath = selectedFile!.path;
+    } else if (isaddLink && _linkController.text.isNotEmpty) {
+      fileType = 'link';
+      link = _linkController.text;
+    } else {
+      print("Please upload a file or provide a link.");
+      return;
+    }
+    CreateImportantEventModel create = CreateImportantEventModel(
+        userType: UserSession().userType ?? '',
+        rollNumber: UserSession().rollNumber ?? '',
+        headLine: _heading.text,
+        description: _desc.text,
+        fileType: fileType,
+        file: filePath.toString(),
+        link: _linkController.text,
+        fromDate: _startdate.text,
+        toDate: _enddate.text);
+
+    postEventCalendar(create, context);
   }
 }

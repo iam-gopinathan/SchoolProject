@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/Controller/grade_controller.dart';
+import 'package:flutter_application_1/models/Feedback_models/create_feedback_model.dart';
+
+import 'package:flutter_application_1/services/Feedback_Api/create_feedback_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 class CreateFeedback extends StatefulWidget {
   const CreateFeedback({super.key});
@@ -10,157 +17,52 @@ class CreateFeedback extends StatefulWidget {
 }
 
 class _CreateFeedbackState extends State<CreateFeedback> {
-  List<String> selectClass = [
-    'PREKG',
-    'LKG',
-    'UKG',
-    'I',
-    'II',
-    'III',
-    'IV',
-    'V',
-    'VI',
-    'VII',
-    'VIII',
-    'IX',
-    'X',
-  ];
+  final GradeController gradeController = Get.put(GradeController());
+
+  TextEditingController _heading = TextEditingController();
+
+  List<String> dropdownItems = ['Everyone', 'Students', 'Teachers'];
+  String? selectedRecipient;
+
+  String selectedGradeName = '';
+
+  String? selectedGrade;
+  String? selectedSection;
   String? selectedClasses;
 
-  List<String> sectionList = ['A1', 'A2', 'A3'];
-  List<String> selectedSections = [];
+  String? selectedSubject;
 
-  void _showMenu(BuildContext context) {
-    showMenu<String>(
-      color: Colors.black,
-      context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      position: RelativeRect.fromLTRB(1, 180, 0, 0),
-      items: [
-        PopupMenuItem<String>(
-          enabled: false,
-          child: StatefulBuilder(
-            builder: (BuildContext context, StateSetter menuSetState) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Select All Option
-                  GestureDetector(
-                    onTap: () {
-                      menuSetState(() {
-                        if (selectedSections.length == sectionList.length) {
-                          selectedSections.clear();
-                        } else {
-                          selectedSections = List.from(sectionList);
-                        }
-                      });
-                      setState(() {}); // Update parent state
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Container(
-                        color: Colors.black,
-                        height: 50,
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        child: Row(
-                          children: [
-                            Checkbox(
-                              value:
-                                  selectedSections.length == sectionList.length,
-                              onChanged: (bool? value) {
-                                menuSetState(() {
-                                  if (value == true) {
-                                    selectedSections = List.from(sectionList);
-                                  } else {
-                                    selectedSections.clear();
-                                  }
-                                });
-                                setState(() {}); // Update parent state
-                              },
-                              checkColor: Colors.black,
-                              activeColor: Colors.white,
-                            ),
-                            Text(
-                              "Select All",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+  String? selectedGradeId;
+  List<String> sections = [];
 
-                  Container(
-                    height: 200,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: sectionList.map((String sectionName) {
-                          return Container(
-                            color: Colors.black,
-                            height: 50,
-                            padding: EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Row(
-                              children: [
-                                Checkbox(
-                                  value: selectedSections.contains(sectionName),
-                                  onChanged: (bool? value) {
-                                    menuSetState(() {
-                                      if (value == true) {
-                                        selectedSections.add(sectionName);
-                                      } else {
-                                        selectedSections.remove(sectionName);
-                                      }
-                                    });
-                                    setState(() {});
-                                  },
-                                  checkColor: Colors.black,
-                                  activeColor: Colors.white,
-                                ),
-                                Text(
-                                  sectionName,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-      ],
-    );
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    gradeController.fetchGrades();
   }
 
-  // List to keep track of text fields
-  List<int> textFieldListss = [1];
-  int questionCounterss = 1;
+  List<int> textFieldList = [1];
+  int questionCounter = 1;
 
-  void _addTextFieldss() {
+  List<TextEditingController> questionControllers = [TextEditingController()];
+
+  void _addTextField() {
     setState(() {
-      questionCounterss++;
-      textFieldListss.add(questionCounterss);
+      questionControllers.add(TextEditingController());
+      textFieldList.add(questionCounter++);
     });
   }
 
-  void _removeTextFieldss(int index) {
+  void _removeTextField(int index) {
     setState(() {
-      textFieldListss.remove(index);
+      questionControllers[index].dispose();
+      questionControllers.removeAt(index);
+      textFieldList.removeAt(index);
     });
   }
 
-  ///questions...
-  Widget _buildQuestionss(int index) {
+  Widget _buildQuestion(int index) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -180,7 +82,7 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                 style: ElevatedButton.styleFrom(
                     elevation: 0,
                     backgroundColor: Color.fromRGBO(247, 240, 249, 1)),
-                onPressed: _addTextFieldss,
+                onPressed: _addTextField,
                 child: Row(
                   children: [
                     Icon(Icons.add),
@@ -204,7 +106,7 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                       Icons.close,
                       color: Color.fromRGBO(84, 84, 84, 1),
                     ),
-                    onPressed: () => _removeTextFieldss(index),
+                    onPressed: () => _removeTextField(index),
                   ),
                 ),
             ],
@@ -225,6 +127,7 @@ class _CreateFeedbackState extends State<CreateFeedback> {
               ],
             ),
             child: TextFormField(
+              controller: questionControllers[index],
               inputFormatters: [LengthLimitingTextInputFormatter(300)],
               maxLines: 5,
               decoration: InputDecoration(
@@ -262,6 +165,157 @@ class _CreateFeedbackState extends State<CreateFeedback> {
         ),
       ],
     );
+  }
+
+  ///
+
+  void _PreviewBottomsheet(BuildContext context) {
+    showModalBottomSheet(
+        backgroundColor: Colors.white,
+        context: context,
+        isScrollControlled: true,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        ),
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(clipBehavior: Clip.none, children: [
+              // Close icon
+              Positioned(
+                top: -70,
+                left: 180,
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 35,
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.vertical,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Preview Screen',
+                              style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 16,
+                                  color: Color.fromRGBO(104, 104, 104, 1)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Divider(
+                          thickness: 2,
+                          color: Color.fromRGBO(243, 243, 243, 1),
+                        ),
+                      ),
+                      //selected reciepents..
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${selectedRecipient}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+
+//selected grade
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${selectedGradeName}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      //selected section..
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${selectedSection}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //heading
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${_heading.text}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //questions...
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              questionControllers
+                                  .map((controller) => controller.text)
+                                  .join(", "),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            ]);
+          });
+        });
   }
 
   @override
@@ -316,14 +370,14 @@ class _CreateFeedbackState extends State<CreateFeedback> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            //select class
+            //select receipents..
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'Select Class',
+                    'Select Recipient',
                     style: TextStyle(
                         fontFamily: 'medium',
                         fontSize: 14,
@@ -334,133 +388,322 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                          ),
+                        decoration: InputDecoration(
+                          hintText: 'Select',
+                          hintStyle: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 16,
+                              color: Colors.black),
+                          border: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                                width: 0.5,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                                width: 0.5,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                            )),
-                      ),
-                      value: selectedClasses,
-                      dropdownColor: Colors.black,
-                      menuMaxHeight: 150,
-                      hint: Text(
-                        "Select Class",
-                        style: TextStyle(
-                          fontFamily: 'regular',
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedClasses = value;
-                        });
-                      },
-                      items: selectClass.map((String className) {
-                        return DropdownMenuItem<String>(
-                          value: className,
-                          child: Text(
-                            className,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'regular',
-                              fontSize: 14,
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      selectedItemBuilder: (BuildContext context) {
-                        return selectClass.map((String className) {
-                          return Text(
-                            className,
-                            style: TextStyle(
-                              color: Colors.black,
+                        dropdownColor: Colors.black,
+                        items: dropdownItems.map((String item) {
+                          return DropdownMenuItem<String>(
+                            value: item,
+                            child: Text(
+                              item,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontFamily: 'regular'),
                             ),
                           );
-                        }).toList();
-                      },
-                    ),
-                  ),
+                        }).toList(),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedRecipient = newValue;
+                          });
+                        },
+                        selectedItemBuilder: (BuildContext context) {
+                          return dropdownItems.map((className) {
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8),
+                                child: Text(
+                                  className,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                      fontFamily: 'regular'),
+                                ),
+                              ),
+                            );
+                          }).toList();
+                        }),
+                  )
                 ],
               ),
             ),
 
-            //select section...
+            if (selectedRecipient == 'Students')
+              //select class
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      'Select Class',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 14,
+                          color: Color.fromRGBO(38, 38, 38, 1)),
+                    ),
+
+                    //dropdown field.......
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: Obx(
+                        () {
+                          if (gradeController.gradeList.isEmpty) {
+                            return Center(child: CircularProgressIndicator());
+                          }
+                          return DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 15),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                            ),
+                            dropdownColor: Colors.black,
+                            menuMaxHeight: 150,
+                            value: selectedGradeId,
+                            hint: Text("Select Class"),
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedGradeId = value;
+
+                                final selectedGrade =
+                                    gradeController.gradeList.firstWhere(
+                                  (grade) => grade['id'].toString() == value,
+                                  orElse: () => null,
+                                );
+
+                                if (selectedGrade != null) {
+                                  selectedGradeName =
+                                      selectedGrade['sign'].toString();
+                                  sections = List<String>.from(
+                                      selectedGrade['sections'] ?? []);
+                                } else {
+                                  sections = [];
+                                }
+                                selectedSection = null;
+                                selectedSubject = null;
+                              });
+                            },
+                            items: gradeController.gradeList.map((grade) {
+                              return DropdownMenuItem<String>(
+                                value: grade['id'].toString(),
+                                child: Text(
+                                  grade['sign'].toString(),
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'regular',
+                                      fontSize: 14),
+                                ),
+                              );
+                            }).toList(),
+                            selectedItemBuilder: (BuildContext context) {
+                              return gradeController.gradeList.map((grade) {
+                                return Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    grade['sign'].toString(),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'regular',
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                );
+                              }).toList();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            if (selectedRecipient == 'Students')
+              //select sections...
+              Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Select Section',
+                        style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 14,
+                            color: Color.fromRGBO(38, 38, 38, 1)),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: DropdownButtonFormField<String>(
+                          dropdownColor: Colors.black,
+                          menuMaxHeight: 150,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                              ),
+                            ),
+                          ),
+                          value: selectedSection,
+                          hint: Text(
+                            "Select Section",
+                            style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSection = value;
+                            });
+                          },
+                          items: sections.map((String section) {
+                            return DropdownMenuItem<String>(
+                              value: section,
+                              child: Text(
+                                section,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          selectedItemBuilder: (BuildContext context) {
+                            return sections.map((String section) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  section,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'regular',
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
+                        ),
+                      ),
+                    ],
+                  )),
+
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.03,
+            ),
+
+            //heading...
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: const EdgeInsets.only(left: 20, top: 45),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   Text(
-                    'Select Section',
+                    'Add Heading',
                     style: TextStyle(
                         fontFamily: 'medium',
                         fontSize: 14,
                         color: Color.fromRGBO(38, 38, 38, 1)),
                   ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: GestureDetector(
-                      onTap: () {
-                        _showMenu(context);
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                            width: 0.5,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                selectClass.isEmpty
-                                    ? 'Select Section'
-                                    : selectedSections.join(', '),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontFamily: 'regular',
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
-                              ),
-                            ),
-                            Icon(Icons.arrow_drop_down, color: Colors.black),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 0.03,
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 0),
+                    ),
+                  ],
+                ),
+                child: TextFormField(
+                  controller: _heading,
+                  inputFormatters: [LengthLimitingTextInputFormatter(100)],
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: Colors.white),
+                    ),
+                    filled: true,
+                    fillColor: Colors.white,
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  style: TextStyle(
+                      color: Colors.black, fontFamily: 'medium', fontSize: 14),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 15),
+              child: Row(
+                children: [
+                  Text(
+                    '*Max 100 Characters',
+                    style: TextStyle(
+                        fontFamily: 'regular',
+                        fontSize: 12,
+                        color: Color.fromRGBO(127, 127, 127, 1)),
+                  )
+                ],
+              ),
             ),
 
             ///questions loop...
-            for (int i = 0; i < textFieldListss.length; i++)
-              _buildQuestionss(i),
+
+            for (int i = 0; i < textFieldList.length; i++) _buildQuestion(i),
 
             //save as draft
             Padding(
@@ -472,7 +715,10 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: BorderSide(color: Colors.black, width: 1.5)),
-                    onPressed: () {},
+                    onPressed: () {
+                      String status = 'draft';
+                      submitFeedback(status);
+                    },
                     child: Text(
                       'Save as Draft',
                       style: TextStyle(
@@ -483,7 +729,9 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                   ),
                   //preview
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      _PreviewBottomsheet(context);
+                    },
                     child: Text(
                       'Preview',
                       style: TextStyle(
@@ -498,7 +746,10 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.textFieldborderColor,
                         side: BorderSide.none),
-                    onPressed: () {},
+                    onPressed: () {
+                      String status = 'post';
+                      submitFeedback(status);
+                    },
                     child: Text(
                       'Publish',
                       style: TextStyle(
@@ -514,5 +765,33 @@ class _CreateFeedbackState extends State<CreateFeedback> {
         ),
       ),
     );
+  }
+
+  List<String> selected = [];
+
+  // Create feedback
+  void submitFeedback(String status) {
+    // Collect all the questions
+    List<String> questions =
+        questionControllers.map((controller) => controller.text).toList();
+
+    CreateFeedbackModel create = CreateFeedbackModel(
+      userType: UserSession().userType ?? '',
+      rollNumber: UserSession().rollNumber ?? '',
+      recipient: selectedRecipient!,
+      gradeId: selectedGradeId!,
+      section: selectedSection!,
+      heading: _heading.text,
+      question: questions.join("|"),
+      status: status,
+      postedOn: status == "post"
+          ? DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())
+          : "",
+      draftedOn: status == "draft"
+          ? DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())
+          : "",
+    );
+
+    CreateFeedbackss(create, context);
   }
 }

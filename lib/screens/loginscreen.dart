@@ -388,44 +388,44 @@ class _LoginpageState extends State<Loginpage> {
                                 fontFamily: 'bold',
                                 color: Colors.black),
                           ),
-                          GestureDetector(
-                            onTap: () async {
-                              DateTime? selectedDate = await showDatePicker(
-                                  context: context,
-                                  initialDate: DateTime.now(),
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(2101),
-                                  builder:
-                                      (BuildContext context, Widget? child) {
-                                    return Theme(
-                                      data: ThemeData.dark().copyWith(
-                                          colorScheme: ColorScheme.dark(
-                                            primary:
-                                                AppTheme.textFieldborderColor,
-                                            onPrimary: Colors.black,
-                                            surface: Colors.black,
-                                            onSurface: Colors.white,
-                                          ),
-                                          dialogBackgroundColor: Colors.black,
-                                          textButtonTheme: TextButtonThemeData(
-                                              style: TextButton.styleFrom(
-                                            foregroundColor: Colors.white,
-                                          ))),
-                                      child: child!,
-                                    );
-                                  });
+                          // GestureDetector(
+                          //   onTap: () async {
+                          //     DateTime? selectedDate = await showDatePicker(
+                          //         context: context,
+                          //         initialDate: DateTime.now(),
+                          //         firstDate: DateTime(2000),
+                          //         lastDate: DateTime(2101),
+                          //         builder:
+                          //             (BuildContext context, Widget? child) {
+                          //           return Theme(
+                          //             data: ThemeData.dark().copyWith(
+                          //                 colorScheme: ColorScheme.dark(
+                          //                   primary:
+                          //                       AppTheme.textFieldborderColor,
+                          //                   onPrimary: Colors.black,
+                          //                   surface: Colors.black,
+                          //                   onSurface: Colors.white,
+                          //                 ),
+                          //                 dialogBackgroundColor: Colors.black,
+                          //                 textButtonTheme: TextButtonThemeData(
+                          //                     style: TextButton.styleFrom(
+                          //                   foregroundColor: Colors.white,
+                          //                 ))),
+                          //             child: child!,
+                          //           );
+                          //         });
 
-                              if (selectedDate != null) {
-                                String formattedDate = DateFormat('yyyy-MM-dd')
-                                    .format(selectedDate);
-                                print("Selected date: $formattedDate");
-                              }
-                            },
-                            child: SvgPicture.asset(
-                              'assets/images/Calender_icon.svg',
-                              fit: BoxFit.contain,
-                            ),
-                          ),
+                          //     if (selectedDate != null) {
+                          //       String formattedDate = DateFormat('yyyy-MM-dd')
+                          //           .format(selectedDate);
+                          //       print("Selected date: $formattedDate");
+                          //     }
+                          //   },
+                          //   child: SvgPicture.asset(
+                          //     'assets/images/Calender_icon.svg',
+                          //     fit: BoxFit.contain,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),

@@ -3,7 +3,7 @@ class EditNewsModel {
   final String headline;
   final String news;
   final String fileType;
-  final String file;
+  String file;
   final String link;
   final String postedOn;
   final String status;

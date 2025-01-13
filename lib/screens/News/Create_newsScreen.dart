@@ -21,81 +21,13 @@ class CreateNewsscreen extends StatefulWidget {
 }
 
 class _CreateNewsscreenState extends State<CreateNewsscreen> {
-  QuillController _controller = QuillController.basic();
-
-// Function to convert Delta to HTML with <b> for bold text
-  String convertDeltaToHtml(Delta delta) {
-    final StringBuffer htmlContent = StringBuffer();
-
-    for (final op in delta.toList()) {
-      final attributes = op.attributes;
-      final text = op.data.toString();
-
-      if (op.isInsert) {
-        // Check for bold attribute
-        if (attributes != null && attributes['bold'] == true) {
-          htmlContent.write('<b>$text</b>');
-        } else {
-          // For normal text, no formatting
-          htmlContent.write(text);
-        }
-      }
-    }
-
-    return htmlContent.toString();
-  }
-
-// Function to extract HTML content from the controller
-  String getHtmlContent() {
-    final delta = _controller.document.toDelta();
-    return convertDeltaToHtml(delta);
-  }
-// Function to convert Delta to HTML with <b> for bold text endddddddd
-
-  final FocusNode _focusNode = FocusNode();
-
   TextEditingController _heading = TextEditingController();
   TextEditingController _linkController = TextEditingController();
-
-  TextSpan convertDeltaToTextSpan(Delta delta) {
-    final List<TextSpan> textSpans = [];
-
-    for (final op in delta.toList()) {
-      final attributes = op.attributes;
-      final text = op.data.toString();
-
-      if (op.isInsert) {
-        final isBold = attributes != null && attributes['bold'] == true;
-
-        textSpans.add(
-          TextSpan(
-            text: text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
-            ),
-          ),
-        );
-      }
-    }
-
-    return TextSpan(children: textSpans);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-    _focusNode.dispose();
-  }
-
+  QuillController _controller = QuillController.basic();
   bool isuploadimage = true;
   bool isaddLink = false;
-
   TextEditingController _scheduledDateandtime = TextEditingController();
   String _dateTime = "";
-
   // Date format
   final DateFormat _dateFormat = DateFormat("dd-MM-yyyy");
   final DateFormat _timeFormat = DateFormat("HH:mm");
@@ -165,6 +97,52 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
       setState(() {
         _dateTime += " ${_timeFormat.format(parsedTime)}";
       });
+    }
+  }
+
+  // Define the selectedFile variable
+  PlatformFile? selectedFile;
+  void pickFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpeg', 'webp', 'pdf', 'png'],
+        withData: true,
+      );
+
+      if (result != null) {
+        final file = result.files.single;
+
+        if (file.bytes == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to read file data.')),
+          );
+          return;
+        }
+
+        if (file.size > 25 * 1024 * 1024) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('File size exceeds 25 MB limit.')),
+          );
+        } else {
+          setState(() {
+            selectedFile = file;
+          });
+
+          print('Selected file name: ${file.name}');
+          print('Selected file size: ${file.size}');
+          print('Selected file extension: ${file.extension}');
+          print('File bytes length: ${file.bytes?.length ?? 0}');
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('File selected: ${file.name}')),
+          );
+        }
+      } else {
+        print('File selection canceled');
+      }
+    } catch (e) {
+      print('Error selecting file: $e');
     }
   }
 
@@ -280,104 +258,59 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
         });
   }
 
-  // Define the selectedFile variable
-  PlatformFile? selectedFile;
-  void pickFile() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['jpeg', 'webp', 'pdf', 'png'],
-        withData: true,
-      );
+//html converter code....
+  String convertDeltaToHtml(Delta delta) {
+    final StringBuffer htmlContent = StringBuffer();
 
-      if (result != null) {
-        final file = result.files.single;
+    for (final op in delta.toList()) {
+      final attributes = op.attributes;
+      final text = op.data.toString();
 
-        if (file.bytes == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to read file data.')),
-          );
-          return;
-        }
-
-        if (file.size > 25 * 1024 * 1024) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('File size exceeds 25 MB limit.')),
-          );
+      if (op.isInsert) {
+        if (attributes != null && attributes['bold'] == true) {
+          htmlContent.write('<b>$text</b>');
         } else {
-          setState(() {
-            selectedFile = file;
-          });
-
-          print('Selected file name: ${file.name}');
-          print('Selected file size: ${file.size}');
-          print('Selected file extension: ${file.extension}');
-          print('File bytes length: ${file.bytes?.length ?? 0}');
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('File selected: ${file.name}')),
-          );
+          htmlContent.write(text);
         }
-      } else {
-        print('File selection canceled');
       }
-    } catch (e) {
-      print('Error selecting file: $e');
     }
+    return htmlContent.toString();
   }
 
-  ////create news api call....................................................
-  void _publishNews({String? status}) {
-    final String heading = _heading.text;
+  String getHtmlContent() {
+    final delta = _controller.document.toDelta();
+    return convertDeltaToHtml(delta);
+  }
 
-    final String description = getHtmlContent();
+  final FocusNode _focusNode = FocusNode();
+  TextSpan convertDeltaToTextSpan(Delta delta) {
+    final List<TextSpan> textSpans = [];
+    for (final op in delta.toList()) {
+      final attributes = op.attributes;
+      final text = op.data.toString();
+      if (op.isInsert) {
+        final isBold = attributes != null && attributes['bold'] == true;
+        textSpans.add(
+          TextSpan(
+            text: text,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              color: Colors.black,
+            ),
+          ),
+        );
+      }
+    }
 
-    if (heading.isEmpty || description.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.red,
-          content: Text('Please fill in both heading and description'),
-        ),
-      );
-      return;
-    }
-    String fileType = '';
-    String file = '';
-    String link = '';
+    return TextSpan(children: textSpans);
+  }
 
-    if (selectedFile != null) {
-      fileType = 'image';
-      file =
-          selectedFile!.bytes != null ? base64Encode(selectedFile!.bytes!) : '';
-    } else if (_linkController.text.isNotEmpty) {
-      fileType = 'link';
-      link = _linkController.text;
-    } else {
-      fileType = 'empty';
-    }
-    String postedOn = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
-    String scheduleOn =
-        _scheduledDateandtime.text.isNotEmpty ? _scheduledDateandtime.text : '';
-    String draftedOn = '';
-    if (status == 'draft') {
-      draftedOn = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
-    } else if (status == 'schedule' && scheduleOn.isEmpty) {
-      scheduleOn = postedOn;
-    }
-    final newsPost = CreateNewsModel(
-      headline: heading,
-      news: description,
-      userType: UserSession().userType ?? '',
-      rollNumber: UserSession().rollNumber ?? '',
-      postedOn: status == 'draft' ? '' : postedOn,
-      status: status ?? (scheduleOn.isEmpty ? 'post' : 'schedule'),
-      scheduleOn: status == 'schedule' ? scheduleOn : '',
-      draftedOn: status == 'draft' ? draftedOn : '',
-      fileType: fileType,
-      file: file,
-      link: link,
-    );
-    postNews(newsPost, status ?? 'post', context);
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.dispose();
+    _focusNode.dispose();
   }
 
   @override
@@ -668,7 +601,6 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                 ),
 
                 ///upload sections....
-
                 if (isuploadimage)
 
                   ///upload section
@@ -746,39 +678,67 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                     ),
                   ),
 
-                ///display selected image...
+                /// Display selected image...
                 if (isuploadimage)
                   if (selectedFile != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: Column(
+                      child: Stack(
                         children: [
-                          if (['jpeg', 'png', 'webp', 'jpg']
-                              .contains(selectedFile!.extension))
-                            selectedFile!.bytes != null
-                                ? Image.memory(
-                                    selectedFile!.bytes!,
-                                    height: 150,
-                                    width: double.infinity,
-                                    fit: BoxFit.contain,
-                                  )
-                                : Text(
-                                    'Failed to load image data.',
-                                    style: TextStyle(color: Colors.red),
-                                  )
-                          else if (selectedFile!.extension == 'pdf')
-                            Icon(
-                              Icons.picture_as_pdf,
-                              size: 100,
-                              color: Colors.red,
-                            ),
-                          SizedBox(height: 10),
-                          // Display file name
-                          Text(
-                            selectedFile!.name,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          Column(
+                            children: [
+                              if (['jpeg', 'png', 'webp', 'jpg']
+                                  .contains(selectedFile!.extension))
+                                selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        height: 150,
+                                        width: double.infinity,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : Text(
+                                        'Failed to load image data.',
+                                        style: TextStyle(color: Colors.red),
+                                      )
+                              else if (selectedFile!.extension == 'pdf')
+                                Icon(
+                                  Icons.picture_as_pdf,
+                                  size: 100,
+                                  color: Colors.red,
+                                ),
+                              SizedBox(height: 10),
+                              // Display file name
+                              Text(
+                                selectedFile!.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Close icon to remove image
+                          Positioned(
+                            top: 0,
+                            right: 40,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedFile = null;
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ],
@@ -982,5 +942,59 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
         ),
       ),
     );
+  }
+
+  ////create news api call....................................................
+  void _publishNews({String? status}) {
+    final String heading = _heading.text;
+
+    final String description = getHtmlContent();
+
+    if (heading.isEmpty || description.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
+    String fileType = '';
+    String file = '';
+    String link = '';
+
+    if (selectedFile != null) {
+      fileType = 'image';
+      file =
+          selectedFile!.bytes != null ? base64Encode(selectedFile!.bytes!) : '';
+    } else if (_linkController.text.isNotEmpty) {
+      fileType = 'link';
+      link = _linkController.text;
+    } else {
+      fileType = 'empty';
+    }
+    String postedOn = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+    String scheduleOn =
+        _scheduledDateandtime.text.isNotEmpty ? _scheduledDateandtime.text : '';
+    String draftedOn = '';
+    if (status == 'draft') {
+      draftedOn = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+    } else if (status == 'schedule' && scheduleOn.isEmpty) {
+      scheduleOn = postedOn;
+    }
+    final newsPost = CreateNewsModel(
+      headline: heading,
+      news: description,
+      userType: UserSession().userType ?? '',
+      rollNumber: UserSession().rollNumber ?? '',
+      postedOn: status == 'draft' ? '' : postedOn,
+      status: status ?? (scheduleOn.isEmpty ? 'post' : 'schedule'),
+      scheduleOn: status == 'schedule' ? scheduleOn : '',
+      draftedOn: status == 'draft' ? draftedOn : '',
+      fileType: fileType,
+      file: file,
+      link: link,
+    );
+    postNews(newsPost, status ?? 'post', context);
   }
 }

@@ -607,43 +607,72 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
             ),
 
             ///display selected image...
+            /// Display selected image...
+
             if (selectedFile != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Column(
+                child: Stack(
                   children: [
-                    if (['jpeg', 'png', 'webp', 'jpg']
-                        .contains(selectedFile!.extension))
-                      selectedFile!.bytes != null
-                          ? Image.memory(
-                              selectedFile!.bytes!,
-                              height: 150,
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                            )
-                          : Text(
-                              'Failed to load image data.',
-                              style: TextStyle(color: Colors.red),
-                            )
-                    else if (selectedFile!.extension == 'pdf')
-                      Icon(
-                        Icons.picture_as_pdf,
-                        size: 100,
-                        color: Colors.red,
-                      ),
-                    SizedBox(height: 10),
-                    // Display file name
-                    Text(
-                      selectedFile!.name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                    Column(
+                      children: [
+                        if (['jpeg', 'png', 'webp', 'jpg']
+                            .contains(selectedFile!.extension))
+                          selectedFile!.bytes != null
+                              ? Image.memory(
+                                  selectedFile!.bytes!,
+                                  height: 150,
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                )
+                              : Text(
+                                  'Failed to load image data.',
+                                  style: TextStyle(color: Colors.red),
+                                )
+                        else if (selectedFile!.extension == 'pdf')
+                          Icon(
+                            Icons.picture_as_pdf,
+                            size: 100,
+                            color: Colors.red,
+                          ),
+                        SizedBox(height: 10),
+                        // Display file name
+                        Text(
+                          selectedFile!.name,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Close icon to remove image
+                    Positioned(
+                      top: 0,
+                      right: 40,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedFile = null;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.black),
+                            shape: BoxShape.circle,
+                          ),
+                          padding: EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [

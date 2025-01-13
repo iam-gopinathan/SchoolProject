@@ -1,12 +1,22 @@
+import 'dart:convert';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+import 'package:flutter_application_1/models/Message_models/GradeModels.dart';
+import 'package:flutter_application_1/models/circular_models/Create_Circular_model.dart';
+import 'package:flutter_application_1/services/Circular_Api/Create_circular_Api.dart';
+import 'package:flutter_application_1/services/Message_Api/Grade_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 
 class CreateCircularpage extends StatefulWidget {
-  const CreateCircularpage({super.key});
+  final Function fetchcircular;
+  const CreateCircularpage({super.key, required this.fetchcircular});
 
   @override
   State<CreateCircularpage> createState() => _CreateCircularpageState();
@@ -14,6 +24,12 @@ class CreateCircularpage extends StatefulWidget {
 
 class _CreateCircularpageState extends State<CreateCircularpage> {
   List<String> dropdownItems = ['Everyone', 'Students', 'Teachers'];
+  String? selectedRecipient;
+
+  List<String> selected = [];
+  List<GradeGet> grades = [];
+
+  List<int> selectedIds = [];
 
   TextEditingController _heading = TextEditingController();
   TextEditingController _desc = TextEditingController();
@@ -132,6 +148,35 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                           color: Color.fromRGBO(243, 243, 243, 1),
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              selectedRecipient.toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                      //class
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              selected.toString(),
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
 //heading...
                       Padding(
                         padding: const EdgeInsets.only(left: 15, top: 10),
@@ -162,6 +207,35 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                           ],
                         ),
                       ),
+                      //image..
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Center(
+                          child: selectedFile != null &&
+                                  selectedFile!.bytes != null
+                              ? Image.memory(
+                                  selectedFile!.bytes!,
+                                  width: double.infinity,
+                                  fit: BoxFit.cover,
+                                )
+                              : Container(),
+                        ),
+                      ),
+                      //
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              _scheduledDateandtime.text,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -169,6 +243,140 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
             ]);
           });
         });
+  }
+
+  //show menu..
+
+//show menu............
+  void _showMenu(
+    BuildContext context,
+  ) {
+    showMenu<String>(
+      color: Colors.black,
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      position: RelativeRect.fromLTRB(1, 270, 0, 0),
+      items: [
+        PopupMenuItem<String>(
+          enabled: false,
+          child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter menuSetState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      menuSetState(() {
+                        if (selected.length == grades.length) {
+                          selected.clear();
+                        } else {
+                          selected = grades.map((grade) => grade.sign).toList();
+                        }
+                      });
+                      setState(() {});
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Container(
+                        color: Colors.black,
+                        height: 50,
+                        width: MediaQuery.of(context).size.width * 0.4,
+                        child: Row(
+                          children: [
+                            Checkbox(
+                              value: selected.length == grades.length,
+                              onChanged: (bool? value) {
+                                menuSetState(() {
+                                  if (value == true) {
+                                    selected = grades
+                                        .map((grade) => grade.sign)
+                                        .toList();
+                                  } else {
+                                    selected.clear();
+                                  }
+                                });
+                                setState(() {});
+                              },
+                              checkColor: Colors.black,
+                              activeColor: Colors.white,
+                            ),
+                            Text(
+                              "Everyone",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 200,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: grades.map((GradeGet grade) {
+                          return Container(
+                            color: Colors.black,
+                            height: 50,
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              children: [
+                                Checkbox(
+                                  value: selected.contains(grade.sign),
+                                  onChanged: (bool? value) {
+                                    menuSetState(() {
+                                      if (value == true) {
+                                        selected.add(grade.sign);
+                                      } else {
+                                        selected.remove(grade.sign);
+                                      }
+                                    });
+                                    setState(() {});
+                                  },
+                                  checkColor: Colors.black,
+                                  activeColor: Colors.white,
+                                ),
+                                Text(
+                                  grade.sign,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadGrades();
+  }
+
+  void _loadGrades() async {
+    try {
+      final fetchedGrades = await fetchGrades();
+      setState(() {
+        grades = fetchedGrades;
+      });
+    } catch (error) {
+      print('Error fetching grades: $error');
+    }
   }
 
   @override
@@ -196,6 +404,7 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                   children: [
                     GestureDetector(
                       onTap: () {
+                        widget.fetchcircular();
                         Navigator.pop(context);
                       },
                       child: Icon(
@@ -272,7 +481,11 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                             ),
                           );
                         }).toList(),
-                        onChanged: (String? newValue) {},
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedRecipient = newValue;
+                          });
+                        },
                         selectedItemBuilder: (BuildContext context) {
                           return dropdownItems.map((className) {
                             return Align(
@@ -295,80 +508,63 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
             ),
             //
-            Padding(
-              padding: const EdgeInsets.only(top: 35),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Select Class',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-
-                  //dropdown field.......
-                  Padding(
-                    padding: const EdgeInsets.only(left: 15),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: DropdownButtonFormField<String>(
-                          decoration: InputDecoration(
-                            hintText: 'Students',
-                            hintStyle: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 16,
-                                color: Colors.black),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color.fromRGBO(203, 203, 203, 1),
-                                  width: 0.5,
-                                ),
-                                borderRadius: BorderRadius.circular(10)),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Color.fromRGBO(203, 203, 203, 1),
-                                  width: 0.5,
-                                ),
-                                borderRadius: BorderRadius.circular(10)),
-                          ),
-                          dropdownColor: Colors.black,
-                          items: dropdownItems.map((String item) {
-                            return DropdownMenuItem<String>(
-                              value: item,
-                              child: Text(
-                                item,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontFamily: 'regular'),
-                              ),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {},
-                          selectedItemBuilder: (BuildContext context) {
-                            return dropdownItems.map((className) {
-                              return Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 8),
-                                  child: Text(
-                                    className,
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontFamily: 'regular'),
-                                  ),
-                                ),
-                              );
-                            }).toList();
-                          }),
+            if (selectedRecipient == 'Students')
+              Padding(
+                padding: EdgeInsets.only(top: 35),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(
+                      'Select Class',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 14,
+                          color: Color.fromRGBO(38, 38, 38, 1)),
                     ),
-                  )
-                ],
+                    //class dropdown...
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: GestureDetector(
+                        onTap: () {
+                          _showMenu(context);
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 15),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  selected.isEmpty
+                                      ? 'Select class'
+                                      : selected.join(', '),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontFamily: 'regular',
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                              ),
+                              Icon(Icons.arrow_drop_down, color: Colors.black),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+
+            SizedBox(height: 20),
 
             //heading...
             Padding(
@@ -645,39 +841,67 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ),
               ),
 
-            ///display selected image...
+            /// Display selected image...
             if (isuploadimage)
               if (selectedFile != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
+                  child: Stack(
                     children: [
-                      if (['jpeg', 'png', 'webp', 'jpg']
-                          .contains(selectedFile!.extension))
-                        selectedFile!.bytes != null
-                            ? Image.memory(
-                                selectedFile!.bytes!,
-                                height: 150,
-                                width: double.infinity,
-                                fit: BoxFit.contain,
-                              )
-                            : Text(
-                                'Failed to load image data.',
-                                style: TextStyle(color: Colors.red),
-                              )
-                      else if (selectedFile!.extension == 'pdf')
-                        Icon(
-                          Icons.picture_as_pdf,
-                          size: 100,
-                          color: Colors.red,
-                        ),
-                      SizedBox(height: 10),
-                      // Display file name
-                      Text(
-                        selectedFile!.name,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      Column(
+                        children: [
+                          if (['jpeg', 'png', 'webp', 'jpg']
+                              .contains(selectedFile!.extension))
+                            selectedFile!.bytes != null
+                                ? Image.memory(
+                                    selectedFile!.bytes!,
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Text(
+                                    'Failed to load image data.',
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                          else if (selectedFile!.extension == 'pdf')
+                            Icon(
+                              Icons.picture_as_pdf,
+                              size: 100,
+                              color: Colors.red,
+                            ),
+                          SizedBox(height: 10),
+                          // Display file name
+                          Text(
+                            selectedFile!.name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Close icon to remove image
+                      Positioned(
+                        top: 0,
+                        right: 40,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedFile = null;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(4),
+                            child: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.black,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -801,7 +1025,11 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                                 color: Color.fromRGBO(203, 203, 203, 1),
                                 width: 1)),
                       ),
-                      onTap: () async {},
+                      onTap: () async {
+                        await _pickDate();
+                        await _pickTime();
+                        _scheduledDateandtime.text = _dateTime;
+                      },
                     ),
                   ),
                 ],
@@ -817,7 +1045,9 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         side: BorderSide(color: Colors.black, width: 1.5)),
-                    onPressed: () {},
+                    onPressed: () {
+                      _createcircular("draft");
+                    },
                     child: Text(
                       'Save as Draft',
                       style: TextStyle(
@@ -846,9 +1076,17 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                     style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.textFieldborderColor,
                         side: BorderSide.none),
-                    onPressed: () {},
+                    onPressed: () {
+                      if (_scheduledDateandtime.text.isEmpty) {
+                        _createcircular("post");
+                      } else {
+                        _createcircular("schedule");
+                      }
+                    },
                     child: Text(
-                      'Publish',
+                      _scheduledDateandtime.text.isEmpty
+                          ? 'Publish'
+                          : 'Schedule',
                       style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'medium',
@@ -862,5 +1100,140 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
         ),
       ),
     );
+  }
+
+  // Method to show date picker
+  Future<void> _pickDate() async {
+    DateTime? pickedDate = await showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        firstDate: DateTime(2000),
+        lastDate: DateTime(2101),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData.dark().copyWith(
+              colorScheme: ColorScheme.dark(
+                primary: AppTheme.textFieldborderColor,
+                onPrimary: Colors.black,
+                surface: Colors.black,
+                onSurface: Colors.white,
+              ),
+              dialogBackgroundColor: Colors.black,
+              textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+              )),
+            ),
+            child: child!,
+          );
+        });
+
+    if (pickedDate != null) {
+      setState(() {
+        _dateTime = _dateFormat.format(pickedDate);
+      });
+    }
+  }
+
+  // Date format
+  final DateFormat _dateFormat = DateFormat("dd-MM-yyyy");
+  final DateFormat _timeFormat = DateFormat("HH:mm");
+
+  String _dateTime = "";
+
+  // Method to show time picker
+  Future<void> _pickTime() async {
+    TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData.dark().copyWith(
+              colorScheme: ColorScheme.dark(
+                primary: AppTheme.textFieldborderColor,
+                onPrimary: Colors.black,
+                surface: Colors.black,
+                onSurface: Colors.white,
+              ),
+              dialogBackgroundColor: Colors.black,
+              textButtonTheme: TextButtonThemeData(
+                  style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+              )),
+            ),
+            child: child!,
+          );
+        });
+
+    if (pickedTime != null) {
+      final DateTime now = DateTime.now();
+      final DateTime parsedTime = DateTime(
+          now.year, now.month, now.day, pickedTime.hour, pickedTime.minute);
+
+      setState(() {
+        _dateTime += " ${_timeFormat.format(parsedTime)}";
+      });
+    }
+  }
+
+  //match grade Id...
+  int? getGradeId(String sign) {
+    for (var grade in grades) {
+      if (grade.sign == sign) {
+        return grade.id;
+      }
+    }
+    return null;
+  }
+
+  void _createcircular(String status) {
+    String gradeIds = '';
+
+    if (selectedRecipient == 'Students') {
+      gradeIds = selected
+          .map((className) {
+            int? gradeId = getGradeId(className);
+            return gradeId?.toString();
+          })
+          .where((id) => id != null)
+          .join(',');
+    }
+
+    String fileType = '';
+    String file = '';
+    String link = '';
+
+    if (selectedFile != null) {
+      fileType = 'image';
+      file =
+          selectedFile!.bytes != null ? base64Encode(selectedFile!.bytes!) : '';
+    } else if (_linkController.text.isNotEmpty) {
+      fileType = 'link';
+      link = _linkController.text;
+    } else {
+      fileType = 'empty';
+    }
+
+    final circular = CreateCircularModel(
+      headline: _heading.text,
+      circular: _desc.text,
+      userType: UserSession().userType ?? '',
+      rollNumber: UserSession().rollNumber ?? '',
+      status: status,
+      recipient: selectedRecipient ?? '',
+      gradeIds: gradeIds,
+      postedOn: status == "post"
+          ? DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())
+          : "",
+      scheduleOn: status == "schedule" ? _scheduledDateandtime.text : "",
+      draftedOn: status == "draft"
+          ? DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())
+          : "",
+      fileType: fileType,
+      file: file,
+      link: link,
+    );
+
+    postCircular(circular, selectedFile, context);
   }
 }

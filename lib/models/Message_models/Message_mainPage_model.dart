@@ -64,8 +64,9 @@ class Post {
       postedOnDay: json['postedOnDay'] ?? '',
       tag: json['tag'] ?? '',
       messages: (json['messages'] as List)
-          .map((message) => MessageMainpageModel.fromJson(message))
-          .toList(),
+              .map((message) => MessageMainpageModel.fromJson(message))
+              .toList() ??
+          [],
     );
   }
 }
@@ -77,7 +78,9 @@ class PostResponse {
 
   factory PostResponse.fromJson(Map<String, dynamic> json) {
     return PostResponse(
-      data: (json['data'] as List).map((post) => Post.fromJson(post)).toList(),
+      data:
+          (json['data'] as List).map((post) => Post.fromJson(post)).toList() ??
+              [],
     );
   }
 }

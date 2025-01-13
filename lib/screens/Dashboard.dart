@@ -19,7 +19,8 @@ import 'package:flutter_application_1/services/dashboard_API/dashboard_managemen
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:intl/intl.dart';
-import 'package:speech_bubble/speech_bubble.dart';
+import 'package:speech_balloon/speech_balloon.dart';
+
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Dashboard extends StatefulWidget {
@@ -1500,7 +1501,7 @@ class _DashboardState extends State<Dashboard> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    //students button.......
+                    // //students button.......
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -1514,14 +1515,14 @@ class _DashboardState extends State<Dashboard> {
                                     ? AppTheme.textFieldborderColor
                                     : AppTheme.textFieldborderColor,
                                 width: 1.5)),
-                        child: SpeechBubble(
+                        child: SpeechBalloon(
+                          nipLocation: NipLocation.bottomRight,
                           color: selectedButton == "Students"
                               ? AppTheme.textFieldborderColor
                               : Colors.white ?? Colors.white,
                           height: 37,
                           width: 160,
                           offset: Offset(-10, 0),
-                          nipLocation: NipLocation.BOTTOM_RIGHT,
                           nipHeight: selectedButton == "Students" ? 15 : 0,
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -1537,6 +1538,7 @@ class _DashboardState extends State<Dashboard> {
                         ),
                       ),
                     ),
+
                     //staffs button..........
                     GestureDetector(
                       onTap: () {
@@ -1551,7 +1553,7 @@ class _DashboardState extends State<Dashboard> {
                                     ? AppTheme.textFieldborderColor
                                     : AppTheme.textFieldborderColor,
                                 width: 1.5)),
-                        child: SpeechBubble(
+                        child: SpeechBalloon(
                           color: selectedButton == "Staffs"
                               ? AppTheme.textFieldborderColor
                               : Colors.white ?? Colors.white,
@@ -1559,7 +1561,6 @@ class _DashboardState extends State<Dashboard> {
                           height: 37,
                           width: 160,
                           offset: Offset(-10, 0),
-                          nipLocation: NipLocation.BOTTOM_RIGHT,
                           child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -2510,7 +2511,7 @@ class _DashboardState extends State<Dashboard> {
                     style: TextStyle(
                         fontFamily: 'semibold',
                         fontSize: 16,
-                        color: Colors.white),
+                        color: Colors.black),
                   )),
             )
           ],
@@ -2629,7 +2630,7 @@ class _DashboardState extends State<Dashboard> {
               child: Text(
                 'Logout',
                 style: TextStyle(
-                    color: Colors.white, fontSize: 14, fontFamily: 'regular'),
+                    color: Colors.black, fontSize: 14, fontFamily: 'regular'),
               ),
             ),
           ],

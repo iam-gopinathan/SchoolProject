@@ -76,6 +76,7 @@ class _EditTimetableState extends State<EditTimetable> {
     _gradeController.fetchGrades();
   }
 
+  String? imageUrl;
   Future<void> EditTimetableData() async {
     try {
       final data = await fetchEditTimetableData(widget.id);
@@ -99,6 +100,9 @@ class _EditTimetableState extends State<EditTimetable> {
             timetableData?.section != null ? [timetableData?.section] : []);
 
         _selectedSection = timetableData?.section;
+
+        // Store the image URL
+        imageUrl = timetableData?.filepath;
       });
     } catch (e) {
       print("Error: $e");
@@ -271,6 +275,8 @@ class _EditTimetableState extends State<EditTimetable> {
         });
   }
 
+  bool isFetchedImageVisible = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -321,271 +327,348 @@ class _EditTimetableState extends State<EditTimetable> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Column(children: [
-            //select class
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Select Class',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                  //class dropdown code..
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Select class',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+        body: isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  color: AppTheme.textFieldborderColor,
+                ),
+              )
+            : SingleChildScrollView(
+                child: Column(children: [
+                  //select class
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Select Class',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 14,
+                              color: Color.fromRGBO(38, 38, 38, 1)),
                         ),
-                      ),
-                      value: _selectedClass,
-                      items: gradeList.map((grade) {
-                        return DropdownMenuItem<String>(
-                          value: grade['sign'],
-                          child: Text(grade['sign']),
-                        );
-                      }).toList(),
-                      onChanged: null,
+                        //class dropdown code..
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'Select class',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            value: _selectedClass,
+                            items: gradeList.map((grade) {
+                              return DropdownMenuItem<String>(
+                                value: grade['sign'],
+                                child: Text(grade['sign']),
+                              );
+                            }).toList(),
+                            onChanged: null,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
 
-            //select sections.....
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Select Section',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-
-                  // Section dropdown code
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Select Section',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
+                  //select sections.....
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Select Section',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 14,
+                              color: Color.fromRGBO(38, 38, 38, 1)),
                         ),
-                      ),
-                      value: _selectedSection,
-                      items: sectionList.map((section) {
-                        return DropdownMenuItem<String>(
-                          value: section,
-                          child: Text(section),
-                        );
-                      }).toList(),
-                      onChanged: null,
+
+                        // Section dropdown code
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: DropdownButtonFormField<String>(
+                            decoration: InputDecoration(
+                              labelText: 'Select Section',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            value: _selectedSection,
+                            items: sectionList.map((section) {
+                              return DropdownMenuItem<String>(
+                                value: section,
+                                child: Text(section),
+                              );
+                            }).toList(),
+                            onChanged: null,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
 
 //upload image......
-            Padding(
-              padding: const EdgeInsets.only(top: 40, left: 15),
-              child: Row(
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Color.fromRGBO(246, 246, 246, 1)),
-                    child: Text(
-                      'Re-Upload Image',
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontFamily: 'medium',
-                          color: Colors.black),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 40, left: 15),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: Color.fromRGBO(246, 246, 246, 1)),
+                          child: Text(
+                            'Re-Upload Image',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'medium',
+                                color: Colors.black),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: DottedBorder(
-                  dashPattern: [8, 4],
-                  borderType: BorderType.Rect,
-                  color: Color.fromRGBO(0, 102, 255, 1),
-                  strokeWidth: 2,
-                  child: GestureDetector(
-                    onTap: () {
-                      pickFile();
-                    },
-                    child: Container(
-                      color: Color.fromRGBO(228, 238, 253, 1).withOpacity(0.9),
-                      height: 100,
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/NewsPage_file.svg',
-                              fit: BoxFit.contain,
-                              height: 40,
-                              width: 40,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: Column(
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: DottedBorder(
+                        dashPattern: [8, 4],
+                        borderType: BorderType.Rect,
+                        color: Color.fromRGBO(0, 102, 255, 1),
+                        strokeWidth: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            pickFile();
+                            isFetchedImageVisible = false;
+                          },
+                          child: Container(
+                            color: Color.fromRGBO(228, 238, 253, 1)
+                                .withOpacity(0.9),
+                            height: 100,
+                            child: Center(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    'Click Here to',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        fontFamily: 'medium',
-                                        color: Color.fromRGBO(93, 93, 93, 1)),
+                                  SvgPicture.asset(
+                                    'assets/icons/NewsPage_file.svg',
+                                    fit: BoxFit.contain,
+                                    height: 40,
+                                    width: 40,
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 2),
-                                    child: Text(
-                                      'Upload File',
-                                      style: TextStyle(
-                                          fontFamily: 'semibold',
-                                          fontSize: 16,
-                                          color: Colors.black),
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Click Here to',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontFamily: 'medium',
+                                              color: Color.fromRGBO(
+                                                  93, 93, 93, 1)),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 2),
+                                          child: Text(
+                                            'Upload File',
+                                            style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                        Text(
+                                          'Maximum Size : 25MB',
+                                          style: TextStyle(
+                                              fontFamily: 'medium',
+                                              fontSize: 10,
+                                              color: Color.fromRGBO(
+                                                  0, 102, 255, 1)),
+                                        )
+                                      ],
                                     ),
                                   ),
-                                  Text(
-                                    'Maximum Size : 25MB',
-                                    style: TextStyle(
-                                        fontFamily: 'medium',
-                                        fontSize: 10,
-                                        color: Color.fromRGBO(0, 102, 255, 1)),
-                                  )
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ),
-            ),
 
-            ///display selected image...
-
-            if (selectedFile != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Column(
-                  children: [
-                    if (['jpeg', 'png', 'webp', 'jpg']
-                        .contains(selectedFile!.extension))
-                      selectedFile!.bytes != null
-                          ? Image.memory(
-                              selectedFile!.bytes!,
-                              height: 150,
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                            )
-                          : Text(
-                              'Failed to load image data.',
-                              style: TextStyle(color: Colors.red),
-                            )
-                    else if (selectedFile!.extension == 'pdf')
-                      Icon(
-                        Icons.picture_as_pdf,
-                        size: 100,
-                        color: Colors.red,
-                      ),
-                    SizedBox(height: 10),
-                    // Display file name
-                    Text(
-                      selectedFile!.name,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                  //fetched image...
+                  // Display the fetched image if the URL exists
+                  if (isFetchedImageVisible &&
+                      imageUrl != null &&
+                      imageUrl!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Image.network(
+                        imageUrl!,
+                        height: 150,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 4,
+                              value: progress.expectedTotalBytes != null
+                                  ? progress.cumulativeBytesLoaded /
+                                      (progress.expectedTotalBytes ?? 1)
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Text(
+                            'Failed to load image.',
+                            style: TextStyle(color: Colors.red),
+                          );
+                        },
                       ),
                     ),
-                  ],
-                ),
-              ),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-                Text(
-                  '*Upload either an image or a link',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-              ],
-            ),
+                  /// Display selected image...
 
-            Padding(
-              padding: const EdgeInsets.only(top: 100, bottom: 50),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  //preview
-                  GestureDetector(
-                    onTap: () {
-                      _PreviewBottomsheet(context);
-                    },
-                    child: Text(
-                      'Preview',
-                      style: TextStyle(
-                          fontFamily: 'semibold',
-                          fontSize: 16,
-                          color: Colors.black),
+                  if (selectedFile != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Stack(
+                        children: [
+                          Column(
+                            children: [
+                              if (['jpeg', 'png', 'webp', 'jpg']
+                                  .contains(selectedFile!.extension))
+                                selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        height: 150,
+                                        width: double.infinity,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : Text(
+                                        'Failed to load image data.',
+                                        style: TextStyle(color: Colors.red),
+                                      )
+                              else if (selectedFile!.extension == 'pdf')
+                                Icon(
+                                  Icons.picture_as_pdf,
+                                  size: 100,
+                                  color: Colors.red,
+                                ),
+                              SizedBox(height: 10),
+                              // Display file name
+                              Text(
+                                selectedFile!.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          // Close icon to remove image
+                          Positioned(
+                            top: 0,
+                            right: 40,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedFile = null;
+                                  isFetchedImageVisible = true;
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                      Text(
+                        '*Upload either an image or a link',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                    ],
                   ),
 
-                  ///publish
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.textFieldborderColor,
-                        side: BorderSide.none),
-                    onPressed: () {
-                      _updateTimetable();
-                    },
-                    child: Text(
-                      'Update',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 100, bottom: 50),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        //preview
+                        GestureDetector(
+                          onTap: () {
+                            _PreviewBottomsheet(context);
+                          },
+                          child: Text(
+                            'Preview',
+                            style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ),
+
+                        ///publish
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.textFieldborderColor,
+                              side: BorderSide.none),
+                          onPressed: () {
+                            _updateTimetable();
+                          },
+                          child: Text(
+                            'Update',
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'medium',
+                                color: Colors.black),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ]),
-        ));
+                ]),
+              ));
   }
 
   //update timetable...

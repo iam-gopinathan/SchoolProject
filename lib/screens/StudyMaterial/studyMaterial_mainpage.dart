@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Controller/grade_controller.dart';
+
+import 'package:flutter_application_1/models/StudyMaterial/StudyMaterial_MainPage_model.dart';
 import 'package:flutter_application_1/screens/StudyMaterial/Create_studyMaterial.dart';
+import 'package:flutter_application_1/screens/StudyMaterial/Edit_StudymaterialPage.dart';
+import 'package:flutter_application_1/services/StudyMaterial/StudyMaterial_mainPage_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
+
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class StudymaterialMainpage extends StatefulWidget {
   const StudymaterialMainpage({super.key});
@@ -12,7 +23,57 @@ class StudymaterialMainpage extends StatefulWidget {
 }
 
 class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
+  final GradeController gradeController = Get.put(GradeController());
+
+  Future<List<StudyMaterialModel>>? futureStudyMaterials;
+
+  int initiallyExpandedIndex = 0;
   bool isswitched = false;
+
+  bool isloading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchStudyMaterial();
+    gradeController.fetchGrades();
+  }
+
+//fetched
+  void _fetchStudyMaterial(
+      {String grade = '131',
+      String section = "A1",
+      String date = '',
+      String subject = ''}) async {
+    try {
+      final int gradeInt = int.parse(grade);
+      final response = await fetchStudyMaterials(
+        rollNumber: UserSession().rollNumber ?? '',
+        userType: UserSession().userType ?? '',
+        grade: gradeInt,
+        section: section,
+        date: date,
+        isMyProject: isswitched ? 'Y' : 'N',
+        subject: subject,
+      );
+      print("Fetching homework with date: $date");
+      print('gradId: $grade');
+
+      final List<StudyMaterialModel> studyMaterials = response;
+      isloading = true;
+
+      setState(() {
+        isloading = false;
+        this.studyMaterials = studyMaterials;
+        print('Fetching study materials with grade: $grade, section: $section');
+      });
+    } catch (error) {
+      print("Error fetching study materials: $error");
+    }
+  }
+
+  List<StudyMaterialModel> studyMaterials = [];
+
   //select date
   String selectedDate = '';
   var displayDate = '';
@@ -51,24 +112,15 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
   }
   //selected date end
 
-  final List<String> classes = [
-    'PREKG',
-    'LKG',
-    'UKG',
-    'I',
-    'II',
-    'III',
-    'IV',
-    'V',
-    'VI',
-    'VII',
-    'VIII',
-    'IX',
-    'X',
-  ];
-
-  ///filter bottomsheeet
+//filter bottomsheet..
   void _showFilterBottomSheet(BuildContext context) {
+    String selectedGrade = '';
+    List<String> sections = [];
+
+    String selectedSection = '';
+
+    final gradeController = Get.find<GradeController>();
+
     showModalBottomSheet(
       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
       context: context,
@@ -77,214 +129,254 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
       ),
       builder: (BuildContext context) {
         return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModalState) {
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // Close icon
-              Positioned(
-                top: -70,
-                left: 180,
-                child: GestureDetector(
-                  onTap: () {
-                    setModalState(() {});
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: MediaQuery.of(context).size.height *
-                    0.4, //bottomsheet containner
-                width: double.infinity,
-                child: Column(children: [
-                  Container(
-                    decoration: BoxDecoration(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Positioned(
+                  top: -70,
+                  left: 180,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
                         color: Colors.white,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25))),
-                    padding: EdgeInsets.symmetric(vertical: 15),
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Select Class and Section',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ],
+                        size: 35,
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      elevation: 0,
-                      child: Container(
-                        color: Colors.white,
-                        child: Column(
-                          children: [
-                            //select class
-                            Padding(
-                              padding: const EdgeInsets.only(top: 30, left: 20),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Select Class',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: 'regular',
-                                      color: Color.fromRGBO(53, 53, 53, 1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            //classes..
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: classes.map((className) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 6),
-                                      child: Container(
-                                        width: 100,
-                                        padding: EdgeInsets.all(5),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          border: Border.all(
-                                              color: Color.fromRGBO(
-                                                  223, 223, 223, 1)),
-                                        ),
-                                        child: Center(
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              setModalState(() {});
-                                            },
-                                            child: Text(
-                                              className,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: 'medium',
-                                                  color: Colors.black),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    );
-                                  }).toList(),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
+                        ),
+                        padding: EdgeInsets.symmetric(vertical: 15),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Select Class and Section',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
                                 ),
                               ),
-                            ),
-                            //sectionwise.....
-                            Padding(
-                              padding: const EdgeInsets.only(top: 20, left: 20),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'Select Section',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontFamily: 'regular',
-                                      color: Color.fromRGBO(53, 53, 53, 1),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Card(
+                          elevation: 0,
+                          child: Container(
+                            color: Colors.white,
+                            child: Column(
+                              children: [
+                                // Select Class
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(top: 30, left: 20),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Select Class',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: 'regular',
+                                          color: Color.fromRGBO(53, 53, 53, 1),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                // Classes
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: List.generate(
+                                        gradeController.gradeList.length,
+                                        (index) {
+                                          var grade =
+                                              gradeController.gradeList[index];
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  selectedGrade =
+                                                      grade['id'].toString();
+                                                  sections = List<String>.from(
+                                                      grade['sections'] ?? []);
+                                                });
+                                              },
+                                              child: Container(
+                                                width: 100,
+                                                padding: EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                  color: selectedGrade ==
+                                                          grade['id'].toString()
+                                                      ? AppTheme
+                                                          .textFieldborderColor
+                                                      : Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                    color: Color.fromRGBO(
+                                                        223, 223, 223, 1),
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    grade['sign'],
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontFamily: 'medium',
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                // Select Section
+                                if (sections.isNotEmpty) ...[
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 30, left: 20),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          'Select Section',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontFamily: 'regular',
+                                            color:
+                                                Color.fromRGBO(53, 53, 53, 1),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 20),
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: List.generate(sections.length,
+                                            (index) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 6),
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                setModalState(() {
+                                                  selectedSection =
+                                                      sections[index];
+                                                });
+                                              },
+                                              child: Container(
+                                                width: 100,
+                                                padding: EdgeInsets.all(5),
+                                                decoration: BoxDecoration(
+                                                  color: selectedSection ==
+                                                          sections[index]
+                                                      ? AppTheme
+                                                          .textFieldborderColor
+                                                      : Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                    color: Color.fromRGBO(
+                                                        223, 223, 223, 1),
+                                                  ),
+                                                ),
+                                                child: Center(
+                                                  child: Text(
+                                                    sections[index],
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontFamily: 'medium',
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                      ),
                                     ),
                                   ),
                                 ],
-                              ),
+                              ],
                             ),
-
-                            // Display sections below the classes
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 15, bottom: 15),
-                              child: SingleChildScrollView(
-                                scrollDirection: Axis.horizontal,
-                                child: Row(
-                                  children: [
-                                    // Dynamic sections
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setModalState(() {});
-                                        },
-                                        child: Container(
-                                          width: 100,
-                                          padding: const EdgeInsets.all(5),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                              color: const Color.fromRGBO(
-                                                  223, 223, 223, 1),
-                                            ),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              '',
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontFamily: 'medium',
-                                                color: Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.textFieldborderColor,
+                              ),
+                              onPressed: () {
+                                _fetchStudyMaterial(
+                                    grade: selectedGrade,
+                                    section: selectedSection);
+                                Navigator.of(context).pop();
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 50),
+                                child: Text(
+                                  'OK',
+                                  style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.textFieldborderColor),
-                        onPressed: () {},
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 50),
-                          child: Text(
-                            'OK',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
-                ]),
-              )
-            ],
-          );
-        });
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -340,6 +432,13 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                             GestureDetector(
                               onTap: () async {
                                 await _selectDate(context);
+
+                                if (selectedDate.isNotEmpty) {
+                                  print("Selected Date: $selectedDate");
+                                  _fetchStudyMaterial(date: selectedDate);
+                                } else {
+                                  print("No date selected");
+                                }
                               },
                               child: Row(
                                 children: [
@@ -397,7 +496,9 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                             onChanged: (value) {
                               setState(() {
                                 isswitched = value;
+                                print("Switch value changed: $isswitched");
                               });
+                              _fetchStudyMaterial();
                             },
                           ),
                         ],
@@ -423,7 +524,8 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => CreateStudymaterial()));
+                                builder: (context) => CreateStudymaterial(
+                                    fetchstudymaterial: _fetchStudyMaterial)));
                       },
                       child: Container(
                         padding: EdgeInsets.all(10),
@@ -445,288 +547,424 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Row(
+      body: studyMaterials.isEmpty
+          ? Center(
+              child: CircularProgressIndicator(
+              strokeWidth: 4,
+              color: AppTheme.textFieldborderColor,
+            ))
+          : SingleChildScrollView(
+              child: Column(
                 children: [
-                  Transform.translate(
-                    offset: Offset(20, 16),
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              colors: [
-                                Color.fromRGBO(48, 126, 185, 1),
-                                Color.fromRGBO(0, 70, 123, 1),
-                              ],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                          )),
-                      child: Text(
-                        'PreKG',
-                        style: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                showMenu(
-                  menuPadding: EdgeInsets.all(10),
-                  context: context,
-                  color: Colors.black,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
-                  position: RelativeRect.fromLTRB(100, 180, 0, 0),
-                  items: [
-                    PopupMenuItem<String>(
-                      height: 25,
-                      value: 'Allsubjects',
-                      child: Text(
-                        'All subjects',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      height: 25,
-                      value: 'English',
-                      child: Text(
-                        'English',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      height: 25,
-                      value: 'Tamil',
-                      child: Text(
-                        'Tamil',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      height: 25,
-                      value: 'Maths',
-                      child: Text(
-                        'Maths',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      height: 25,
-                      value: 'Science',
-                      child: Text(
-                        'Science',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                    PopupMenuItem<String>(
-                      height: 25,
-                      value: 'Social',
-                      child: Text(
-                        'Social',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Colors.white),
-                      ),
-                    ),
-                  ],
-                  elevation: 8.0,
-                ).then((value) {
-                  if (value != null) {
-                    print('Selected: $value');
-                  }
-                });
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(right: 25),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/Filter_icon.svg',
-                      fit: BoxFit.contain,
-                      height: 20,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5),
-                      child: Text(
-                        'by Subjects',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Color.fromRGBO(47, 47, 47, 1)),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
-                child: Container(
-                  padding: EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Colors.white,
-                      border: Border.all(
-                          color: Color.fromRGBO(238, 238, 238, 1), width: 1.5)),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 5),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: GestureDetector(
+                      onTap: () {
+                        int selectedGradeId = 131;
+                        //filter subject wise
+                        Get.find<GradeController>().filterSubjectsByGrade(131);
+                        showMenu(
+                          context: context,
+                          color: Colors.black,
+                          position: RelativeRect.fromLTRB(100, 180, 0, 0),
+                          items: Get.find<GradeController>()
+                              .filteredSubjects
+                              .map((subject) {
+                            return PopupMenuItem<String>(
+                              value: subject,
+                              child: Text(
+                                subject,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.white,
+                                    fontFamily: 'regular'),
+                              ),
+                            );
+                          }).toList(),
+                          elevation: 8.0,
+                        ).then((value) {
+                          if (value != null) {
+                            print('Selected subject: $value');
+                          }
+                          _fetchStudyMaterial(subject: value!);
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 25),
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Text(
-                              'Posted on : 13.11.2024 | Tuesday',
-                              style: TextStyle(
-                                  fontFamily: 'regular',
-                                  fontSize: 12,
-                                  color: Colors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                      ExpansionTile(
-                        shape: Border(),
-                        title: Row(
-                          children: [
-                            Text(
-                              'Grade 4 : Term 1 - Social Science',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 12,
-                                  color: Colors.black),
+                            SvgPicture.asset(
+                              'assets/icons/Filter_icon.svg',
+                              fit: BoxFit.contain,
+                              height: 20,
                             ),
-                            Spacer(),
-                            //today text...
-
-                            Transform.translate(
-                              offset: Offset(5, 17),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 10),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(10),
-                                        topRight: Radius.circular(10)),
-                                    color: AppTheme.textFieldborderColor),
-                                child: Text(
-                                  'Today',
-                                  style: TextStyle(
-                                      color: Color.fromRGBO(49, 49, 49, 1),
-                                      fontFamily: 'medium',
-                                      fontSize: 12),
-                                ),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 5),
+                              child: Text(
+                                'by Subjects',
+                                style: TextStyle(
+                                    fontFamily: 'regular',
+                                    fontSize: 12,
+                                    color: Color.fromRGBO(47, 47, 47, 1)),
                               ),
                             )
                           ],
                         ),
-                        children: [
-                          Center(
-                            child: Image.asset(
-                              'assets/images/Exam_timetable.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 25),
-                            child: Row(
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Posted by : Admin - Nandhini M.',
-                                      style: TextStyle(
-                                          fontFamily: 'regular',
-                                          fontSize: 12,
-                                          color:
-                                              Color.fromRGBO(138, 138, 138, 1)),
-                                    ),
-                                    Text(
-                                      'Time : 10.45 Am',
-                                      style: TextStyle(
-                                          fontFamily: 'regular',
-                                          fontSize: 12,
-                                          color:
-                                              Color.fromRGBO(138, 138, 138, 1)),
-                                    ),
-                                  ],
-                                ),
-                                Spacer(),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 8),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15),
-                                      border: Border.all(color: Colors.black)),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                          'assets/icons/timetable_upload.svg'),
-                                      Text(
-                                        'Reupload',
+                      ),
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      ...studyMaterials.map((e) {
+                        int index = studyMaterials.indexOf(e);
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 10),
+                              child: Row(
+                                children: [
+                                  Transform.translate(
+                                    offset: Offset(20, 16),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                              colors: [
+                                                Color.fromRGBO(48, 126, 185, 1),
+                                                Color.fromRGBO(0, 70, 123, 1),
+                                              ],
+                                              begin: Alignment.centerLeft,
+                                              end: Alignment.centerRight),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                          )),
+                                      child: Text(
+                                        '${e.gradeSection}',
                                         style: TextStyle(
                                             fontFamily: 'medium',
                                             fontSize: 12,
-                                            color: Colors.black),
+                                            color: Colors.white),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Card(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                                child: Container(
+                                  padding: EdgeInsets.all(15),
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color:
+                                              Color.fromRGBO(238, 238, 238, 1),
+                                          width: 1.5)),
+                                  child: Column(
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 15, top: 5),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              '${e.postedOn} | ${e.day}',
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 12,
+                                                  color: Colors.black),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      ExpansionTile(
+                                        initiallyExpanded:
+                                            initiallyExpandedIndex == index,
+                                        shape: Border(),
+                                        title: Row(
+                                          children: [
+                                            Text(
+                                              '${e.subject}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.black),
+                                            ),
+                                            Spacer(),
+                                          ],
+                                        ),
+                                        children: [
+                                          Center(
+                                            child: Image.network(
+                                              '${e.filePath}',
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 25),
+                                            child: Row(
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Posted by : ${e.postedBy}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'regular',
+                                                          fontSize: 12,
+                                                          color: Color.fromRGBO(
+                                                              138,
+                                                              138,
+                                                              138,
+                                                              1)),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Spacer(),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    showDialog(
+                                                        barrierDismissible:
+                                                            false,
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return AlertDialog(
+                                                              backgroundColor:
+                                                                  Colors.white,
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10)),
+                                                              content: Text(
+                                                                "Do you really want to make\n changes to this Study Material?",
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'regular',
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .black),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                              actions: <Widget>[
+                                                                Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      ElevatedButton(
+                                                                          style: ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              elevation: 0,
+                                                                              side: BorderSide(color: Colors.black, width: 1)),
+                                                                          onPressed: () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Text(
+                                                                            'Cancel',
+                                                                            style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 16,
+                                                                                fontFamily: 'regular'),
+                                                                          )),
+                                                                      //edit...
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child: ElevatedButton(
+                                                                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                            onPressed: () {
+                                                                              Navigator.pop(context);
+                                                                              Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(
+                                                                                      builder: (context) => EditStudymaterialpage(
+                                                                                            id: e.id,
+                                                                                            fetchstudymaterial: _fetchStudyMaterial,
+                                                                                          )));
+                                                                            },
+                                                                            child: Text(
+                                                                              'Edit',
+                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                            )),
+                                                                      ),
+                                                                    ])
+                                                              ]);
+                                                        });
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5,
+                                                            horizontal: 8),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(15),
+                                                        border: Border.all(
+                                                            color:
+                                                                Colors.black)),
+                                                    child: Row(
+                                                      children: [
+                                                        SvgPicture.asset(
+                                                            'assets/icons/timetable_upload.svg'),
+                                                        Text(
+                                                          'Reupload',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 12,
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                //delete icon
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    showDialog(
+                                                        barrierDismissible:
+                                                            false,
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return AlertDialog(
+                                                              backgroundColor:
+                                                                  Colors.white,
+                                                              shape: RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              10)),
+                                                              content: Text(
+                                                                "Do you really want to Delete\n to this StudyMaterial?",
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'regular',
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .black),
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              ),
+                                                              actions: <Widget>[
+                                                                Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      ElevatedButton(
+                                                                          style: ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              elevation: 0,
+                                                                              side: BorderSide(color: Colors.black, width: 1)),
+                                                                          onPressed: () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Text(
+                                                                            'Cancel',
+                                                                            style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 16,
+                                                                                fontFamily: 'regular'),
+                                                                          )),
+                                                                      //edit...
+                                                                      Padding(
+                                                                        padding: const EdgeInsets
+                                                                            .only(
+                                                                            left:
+                                                                                10),
+                                                                        child: ElevatedButton(
+                                                                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                            onPressed: () async {
+                                                                              var studydelete = e.id;
+                                                                              final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeStudyMaterial/DeleteStudyMaterial?Id=$studydelete';
+
+                                                                              try {
+                                                                                final response = await http.delete(
+                                                                                  Uri.parse(url),
+                                                                                  headers: {
+                                                                                    'Content-Type': 'application/json',
+                                                                                    'Authorization': 'Bearer $authToken',
+                                                                                  },
+                                                                                );
+
+                                                                                if (response.statusCode == 200) {
+                                                                                  print('id has beeen deleted ${studydelete}');
+
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    SnackBar(backgroundColor: Colors.green, content: Text('Studymaterial deleted successfully!')),
+                                                                                  );
+                                                                                } else {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete .')),
+                                                                                  );
+                                                                                }
+                                                                              } catch (e) {
+                                                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                                                  SnackBar(content: Text('An error occurred: $e')),
+                                                                                );
+                                                                              }
+                                                                              _fetchStudyMaterial();
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            child: Text(
+                                                                              'Delete',
+                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                            )),
+                                                                      ),
+                                                                    ])
+                                                              ]);
+                                                        });
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10),
+                                                    child: SvgPicture.asset(
+                                                      'assets/icons/timetable_delete.svg',
+                                                      fit: BoxFit.contain,
+                                                      height: 25,
+                                                    ),
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          )
+                                        ],
                                       ),
                                     ],
                                   ),
                                 ),
-                                //delete icon
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/timetable_delete.svg',
-                                    fit: BoxFit.contain,
-                                    height: 25,
-                                  ),
-                                )
-                              ],
+                              ),
                             ),
-                          )
-                        ],
-                      ),
+                          ],
+                        );
+                      }).toList(),
                     ],
                   ),
-                ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }

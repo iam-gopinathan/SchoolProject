@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 
 class GradeController extends GetxController {
   var gradeList = [].obs;
+  var examList = <String>[].obs;
+  var subjectList = <String>[].obs;
+
+  var filteredSubjects = <String>[].obs;
 
   Future<void> fetchGrades() async {
     const url =
@@ -16,11 +20,41 @@ class GradeController extends GetxController {
 
       if (response.statusCode == 200) {
         gradeList.value = response.body;
+
+        print(response.body);
+        examList.value = gradeList
+            .expand((grade) => grade['exams'])
+            .toSet()
+            .toList()
+            .cast<String>();
+
+        //subjects..
+
+        subjectList.value = gradeList
+            .expand((grade) => grade['subjects'])
+            .toSet()
+            .toList()
+            .cast<String>();
       } else {
         Get.snackbar('Error', 'Failed to fetch grades: ${response.statusCode}');
       }
     } catch (e) {
       Get.snackbar('Error', 'An error occurred: $e');
+    }
+  }
+
+  // Filter subjects based on grade ID
+  void filterSubjectsByGrade(int gradeId) {
+    final grade = gradeList.firstWhere(
+      (grade) => grade['id'] == gradeId,
+      orElse: () => null,
+    );
+
+    if (grade != null) {
+      filteredSubjects.value = List<String>.from(grade['subjects'] ?? []);
+    } else {
+      filteredSubjects.clear();
+      Get.snackbar('Info', 'No subjects found for the selected grade.');
     }
   }
 }

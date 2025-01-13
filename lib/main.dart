@@ -1,21 +1,31 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
-import 'package:flutter_application_1/screens/AttendencePage/IrregularAttendencies.dart';
-import 'package:flutter_application_1/screens/Dashboard.dart';
+import 'package:flutter_application_1/Firebase_api.dart';
+import 'package:flutter_application_1/firebase_options.dart';
 import 'package:flutter_application_1/screens/splashScreen.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'dart:io';
-
 import 'package:get/get.dart';
 
-void main() {
+void main() async {
   HttpOverrides.global = MyHttpOverrides();
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await FirebaseApi().initnotification();
+
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
   runApp(new MyApp());
 }
 
 //http crertification code...
-
 class MyHttpOverrides extends HttpOverrides {
   @override
   HttpClient createHttpClient(SecurityContext? context) {

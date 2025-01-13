@@ -2,6 +2,9 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/models/School_calendar_model/Create_school_calendar_model.dart';
+import 'package:flutter_application_1/services/school_Calendar_Api/Create_school_calender_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -17,9 +20,7 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
   TextEditingController _heading = TextEditingController();
   TextEditingController _desc = TextEditingController();
   TextEditingController _linkController = TextEditingController();
-
   TextEditingController _startdate = TextEditingController();
-
   TextEditingController _enddate = TextEditingController();
 
   Future<void> _selectStartDate(BuildContext context) async {
@@ -240,6 +241,7 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.4,
                             child: TextFormField(
+                              enabled: !_isChecked,
                               controller: _enddate,
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
@@ -427,7 +429,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
               ),
             ),
 
-            //
             // Upload Image and Add Link Section
             Padding(
               padding: const EdgeInsets.only(left: 15, top: 30),
@@ -488,8 +489,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                 ],
               ),
             ),
-
-            ///upload sections....
 
             if (isuploadimage)
 
@@ -564,39 +563,67 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                 ),
               ),
 
-            ///display selected image...
+            /// Display selected image...
             if (isuploadimage)
               if (selectedFile != null)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Column(
+                  child: Stack(
                     children: [
-                      if (['jpeg', 'png', 'webp', 'jpg']
-                          .contains(selectedFile!.extension))
-                        selectedFile!.bytes != null
-                            ? Image.memory(
-                                selectedFile!.bytes!,
-                                height: 150,
-                                width: double.infinity,
-                                fit: BoxFit.contain,
-                              )
-                            : Text(
-                                'Failed to load image data.',
-                                style: TextStyle(color: Colors.red),
-                              )
-                      else if (selectedFile!.extension == 'pdf')
-                        Icon(
-                          Icons.picture_as_pdf,
-                          size: 100,
-                          color: Colors.red,
-                        ),
-                      SizedBox(height: 10),
-                      // Display file name
-                      Text(
-                        selectedFile!.name,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                      Column(
+                        children: [
+                          if (['jpeg', 'png', 'webp', 'jpg']
+                              .contains(selectedFile!.extension))
+                            selectedFile!.bytes != null
+                                ? Image.memory(
+                                    selectedFile!.bytes!,
+                                    height: 150,
+                                    width: double.infinity,
+                                    fit: BoxFit.contain,
+                                  )
+                                : Text(
+                                    'Failed to load image data.',
+                                    style: TextStyle(color: Colors.red),
+                                  )
+                          else if (selectedFile!.extension == 'pdf')
+                            Icon(
+                              Icons.picture_as_pdf,
+                              size: 100,
+                              color: Colors.red,
+                            ),
+                          SizedBox(height: 10),
+                          // Display file name
+                          Text(
+                            selectedFile!.name,
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Close icon to remove image
+                      Positioned(
+                        top: 0,
+                        right: 40,
+                        child: GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedFile = null;
+                            });
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.black),
+                              shape: BoxShape.circle,
+                            ),
+                            padding: EdgeInsets.all(4),
+                            child: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: Colors.black,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -680,7 +707,9 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                       style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.textFieldborderColor,
                           side: BorderSide.none),
-                      onPressed: () {},
+                      onPressed: () {
+                        _createschoolcalender();
+                      },
                       child: Text(
                         'Publish',
                         style: TextStyle(
@@ -697,5 +726,36 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
         ),
       ),
     );
+  }
+
+  //create school calendar.............
+  void _createschoolcalender() {
+    String fileType = '';
+    String? filePath;
+    String? link;
+
+    if (isuploadimage && selectedFile != null) {
+      fileType = 'image';
+      filePath = selectedFile!.path;
+    } else if (isaddLink && _linkController.text.isNotEmpty) {
+      fileType = 'link';
+      link = _linkController.text;
+    } else {
+      print("Please upload a file or provide a link.");
+      return;
+    }
+
+    CreateSchoolCalendarModel create = CreateSchoolCalendarModel(
+        userType: UserSession().userType ?? '',
+        rollNumber: UserSession().rollNumber ?? '',
+        headLine: _heading.text,
+        description: _desc.text,
+        fileType: fileType,
+        filePath: filePath,
+        link: _linkController.text,
+        fromDate: _startdate.text,
+        toDate: _enddate.text);
+
+    postSchoolCalendar(create, context);
   }
 }
