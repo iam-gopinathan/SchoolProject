@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Feedback_models/parent_feedback_fetch_model.dart';
 import 'package:flutter_application_1/screens/Feedback/MyQuestions_page.dart';
 import 'package:flutter_application_1/screens/Feedback/create_feedback.dart';
-import 'package:flutter_application_1/screens/Feedback/received_feedback.dart';
 import 'package:flutter_application_1/services/Feedback_Api/Parent_feedback_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
@@ -18,20 +17,30 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
   String? selectedOption;
 
   ScrollController _scrollController = ScrollController();
+  //
+  Map<String, bool> _expandedQuestions = {};
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+    _scrollController.removeListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {});
   }
 
   List<String> options = ['Suggestions', 'Complaints', 'Others'];
-  String? selectedOptions = 'Suggestions';
+  String? selectedOptions;
 
   @override
   void initState() {
     // TODO: implement initState
-    _parentfetch();
+    selectedOptions = options.first;
+    _parentfetch(type: selectedOptions!);
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
   }
 
 //fetch parent...
@@ -61,6 +70,7 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
       });
     }
   }
+  //
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +125,6 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                       ],
                     ),
                     Spacer(),
-
                     //questions....
                     Padding(
                       padding: const EdgeInsets.only(right: 20),
@@ -192,6 +201,7 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
               ),
             )
           : SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 children: [
                   //filter icon...
@@ -247,7 +257,7 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                                 isLoading = false;
                               });
                             },
-                            value: selectedOption ?? options.first,
+                            value: selectedOptions ?? options.first,
                             selectedItemBuilder: (BuildContext context) {
                               return options.map((option) {
                                 return Text(
@@ -265,13 +275,11 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                       ],
                     ),
                   ),
-
                   //card sections..
                   ...feedbackList.map((feedbackData) {
                     return Column(
                       children: [
                         //postedon
-
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 20, top: 10, right: 15),
@@ -288,6 +296,8 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                           ),
                         ),
                         ...feedbackData.parentsFeedBack.map((e) {
+                          bool isExpanded =
+                              _expandedQuestions[e.question] ?? false;
                           return Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Card(
@@ -367,6 +377,7 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                                             fontFamily: 'medium',
                                             fontSize: 16,
                                             color: Colors.black),
+                                        maxLines: isExpanded ? null : 4,
                                       ),
                                     ),
                                     //readmore button...
@@ -376,17 +387,23 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                                       child: Row(
                                         children: [
                                           ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.black,
-                                              ),
-                                              onPressed: () {},
-                                              child: Text(
-                                                'Read More...',
-                                                style: TextStyle(
-                                                    fontFamily: 'regular',
-                                                    fontSize: 16,
-                                                    color: Colors.white),
-                                              )),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.black,
+                                            ),
+                                            onPressed: () {
+                                              setState(() {
+                                                _expandedQuestions[e.question] =
+                                                    !isExpanded;
+                                              });
+                                            },
+                                            child: Text(
+                                              'Read More...',
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 16,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     )
@@ -399,7 +416,6 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                       ],
                     );
                   }).toList(),
-
                   //top arrow..
                   Column(
                     children: [
@@ -427,6 +443,31 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                 ],
               ),
             ),
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

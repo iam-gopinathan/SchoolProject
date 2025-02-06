@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:excel/excel.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +6,10 @@ import 'package:flutter_application_1/models/Attendence_models/Add_Attendence_Ge
 import 'package:flutter_application_1/models/Attendence_models/ClassSendGetSectionModel.dart';
 import 'package:flutter_application_1/models/Attendence_models/Post_Add_attendence.dart';
 import 'package:flutter_application_1/models/Attendence_models/Post_Update_Attendence.dart';
-import 'package:flutter_application_1/models/Attendence_models/Studentscounts_piechart.dart';
-import 'package:flutter_application_1/models/Attendence_models/show_studentDetails.dart';
-
 import 'package:flutter_application_1/services/Attendance_Api/Add_Attendence_Get_Api.dart';
 import 'package:flutter_application_1/services/Attendance_Api/ClassSendGetSectionApi.dart';
 import 'package:flutter_application_1/services/Attendance_Api/Post_Add_attendence.dart';
 import 'package:flutter_application_1/services/Attendance_Api/Post_Update_Attendence.dart';
-
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
@@ -94,11 +89,8 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     _initializeNotification();
-
     String formattedDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
-
     _fetchAddgetAttendanceData(
         selectedGrade, selectedGradeSection, formattedDate, status);
     futureSections = fetchSections('PreKG');
@@ -1487,6 +1479,8 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                               backgroundColor: Colors.green,
                             ),
                           );
+                          //
+                          Navigator.pop(context);
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -1507,10 +1501,12 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
 
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Attendance added successfully'),
+                              content: Text('Attendance Added successfully'),
                               backgroundColor: Colors.green,
                             ),
                           );
+                          //
+                          Navigator.pop(context);
                         } catch (e) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

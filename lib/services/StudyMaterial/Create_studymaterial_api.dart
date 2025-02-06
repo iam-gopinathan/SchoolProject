@@ -4,8 +4,8 @@ import 'package:flutter_application_1/models/StudyMaterial/Create_StudyMaterial_
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
-Future<void> postStudyMaterial(
-    CreateStudymaterialModel studyMaterial, context) async {
+Future<void> postStudyMaterial(CreateStudymaterialModel studyMaterial, context,
+    Function fetchstudymaterial) async {
   Uri url = Uri.parse(
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/studyMaterial/poststudyMaterial');
 
@@ -44,6 +44,15 @@ Future<void> postStudyMaterial(
 
       var responseBody = await response.stream.bytesToString();
       print(responseBody);
+
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchstudymaterial();
+
+      Navigator.pop(
+        context,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to post Study Material. Please try again.'),

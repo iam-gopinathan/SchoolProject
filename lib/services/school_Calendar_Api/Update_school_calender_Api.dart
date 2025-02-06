@@ -8,8 +8,8 @@ import 'package:http_parser/http_parser.dart';
 const String updateUrl =
     'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeSchoolCalender/updateSchoolCalender';
 
-Future<void> updateSchoolCalendarApi(
-    UpdateSchoolCalendarModel model, context) async {
+Future<void> updateSchoolCalendarApi(UpdateSchoolCalendarModel model, context,
+    Function fetchStudentCalendar) async {
   try {
     var request = http.MultipartRequest('PUT', Uri.parse(updateUrl));
 
@@ -69,6 +69,15 @@ Future<void> updateSchoolCalendarApi(
         ),
       );
       print('School calendar updated successfully');
+      //
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+      //
+      fetchStudentCalendar();
+
+      Navigator.pop(
+        context,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to Update schoolcalender. Please try again.'),

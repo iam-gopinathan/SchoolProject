@@ -1,18 +1,20 @@
 import 'dart:convert';
-
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_application_1/models/Message_models/GradeModels.dart';
 import 'package:flutter_application_1/models/circular_models/Create_Circular_model.dart';
 import 'package:flutter_application_1/services/Circular_Api/Create_circular_Api.dart';
 import 'package:flutter_application_1/services/Message_Api/Grade_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class CreateCircularpage extends StatefulWidget {
   final Function fetchcircular;
@@ -32,13 +34,17 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
   List<int> selectedIds = [];
 
   TextEditingController _heading = TextEditingController();
-  TextEditingController _desc = TextEditingController();
+
   TextEditingController _scheduledDateandtime = TextEditingController();
 
   TextEditingController _linkController = TextEditingController();
 
+  QuillController _controller = QuillController.basic();
+
   bool isuploadimage = true;
   bool isaddLink = false;
+
+  late String htmlContent = "";
 
   // Define the selectedFile variable
   PlatformFile? selectedFile;
@@ -193,19 +199,16 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                         ),
                       ),
                       //description...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _desc.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            padding: const EdgeInsets.all(10),
+                            child: htmlContent.isNotEmpty
+                                ? Html(data: htmlContent)
+                                : const Text(''),
+                          ),
+                        ],
                       ),
                       //image..
                       Padding(
@@ -366,6 +369,7 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
     // TODO: implement initState
     super.initState();
     _loadGrades();
+    initialHeading = _heading.text;
   }
 
   void _loadGrades() async {
@@ -377,6 +381,58 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
     } catch (error) {
       print('Error fetching grades: $error');
     }
+  }
+
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return _heading.text != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 
   @override
@@ -403,7 +459,10 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         widget.fetchcircular();
                         Navigator.pop(context);
                       },
@@ -650,12 +709,14 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
             ),
 
-            //description field..
+            //editor...
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(12.0),
               child: Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -665,31 +726,78 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                     ),
                   ],
                 ),
-                child: TextFormField(
-                  maxLines: 6,
-                  controller: _desc,
-                  inputFormatters: [LengthLimitingTextInputFormatter(600)],
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          QuillSimpleToolbar(
+                            controller: _controller,
+                            configurations:
+                                const QuillSimpleToolbarConfigurations(
+                              dialogTheme: QuillDialogTheme(
+                                  labelTextStyle:
+                                      TextStyle(color: Colors.black),
+                                  inputTextStyle: TextStyle(
+                                      color: Colors.black, fontSize: 14)),
+                              showBoldButton: true,
+                              showClearFormat: false,
+                              showAlignmentButtons: false,
+                              showBackgroundColorButton: false,
+                              showFontSize: false,
+                              showColorButton: false,
+                              showCenterAlignment: false,
+                              showClipboardCut: false,
+                              showIndent: false,
+                              showDirection: false,
+                              showDividers: false,
+                              showFontFamily: false,
+                              showItalicButton: false,
+                              showClipboardPaste: false,
+                              showInlineCode: false,
+                              showCodeBlock: false,
+                              showHeaderStyle: false,
+                              showJustifyAlignment: false,
+                              showLeftAlignment: false,
+                              showLineHeightButton: false,
+                              showLink: false,
+                              showListBullets: false,
+                              showListCheck: false,
+                              showListNumbers: false,
+                              showQuote: false,
+                              showRightAlignment: false,
+                              showSearchButton: false,
+                              showRedo: false,
+                              showSmallButton: false,
+                              showSubscript: false,
+                              showStrikeThrough: false,
+                              showUndo: false,
+                              showUnderLineButton: false,
+                              showSuperscript: false,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
+                    // Quill editor
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 10),
+                          child: quill.QuillEditor.basic(
+                            controller: _controller,
+                          ),
+                        ),
+                      ),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: Colors.black, fontFamily: 'medium', fontSize: 14),
+                  ],
                 ),
               ),
             ),
+            //
             Padding(
               padding: const EdgeInsets.only(left: 15),
               child: Row(
@@ -731,34 +839,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                             fontSize: 12,
                             fontFamily: 'medium',
                             color: Colors.black),
-                      ),
-                    ),
-                  ),
-                  // Add Link Button
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isuploadimage = false;
-                        isaddLink = true;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: isaddLink
-                                ? Color.fromRGBO(246, 246, 246, 1)
-                                : Colors.transparent),
-                        child: Text(
-                          'Add Link',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontFamily: 'medium',
-                              color: Colors.black),
-                        ),
                       ),
                     ),
                   ),
@@ -939,17 +1019,10 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-                Text(
-                  '*Upload either an image or a link',
                   style: TextStyle(
                       fontFamily: 'regular',
                       fontSize: 9,
@@ -1060,6 +1133,16 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                   ///preview
                   GestureDetector(
                     onTap: () {
+                      final generatedHtml = QuillDeltaToHtmlConverter(
+                        _controller.document.toDelta().toJson(),
+                      ).convert();
+
+                      setState(() {
+                        htmlContent = generatedHtml;
+                      });
+
+                      print("Generated HTML Content: $htmlContent");
+
                       _PreviewBottomsheet(context);
                     },
                     child: Text(
@@ -1187,6 +1270,26 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
   }
 
   void _createcircular(String status) {
+    //
+    final generatedHtml = QuillDeltaToHtmlConverter(
+      _controller.document.toDelta().toJson(),
+    ).convert();
+
+    late String htmlContent = generatedHtml;
+    // Print the generated HTML content for debugging
+    print("Generated HTML Content: $htmlContent");
+    //
+    if (_heading.text.isEmpty || htmlContent.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
+    //
+
     String gradeIds = '';
 
     if (selectedRecipient == 'Students') {
@@ -1216,7 +1319,7 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
 
     final circular = CreateCircularModel(
       headline: _heading.text,
-      circular: _desc.text,
+      circular: htmlContent,
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',
       status: status,
@@ -1234,6 +1337,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
       link: link,
     );
 
-    postCircular(circular, selectedFile, context);
+    postCircular(circular, selectedFile, context, widget.fetchcircular);
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
-
 import 'dart:async';
 import 'package:flutter_application_1/screens/loginscreen.dart';
 import 'package:flutter_application_1/services/Login_Api/loginpage_news.dart';

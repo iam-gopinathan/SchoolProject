@@ -26,6 +26,9 @@ Future<List<NewsResponse>> fetchMainNews({
         'Authorization': 'Bearer $authToken',
       },
     );
+    // Debugging: Print rollNumber and userType to verify their values
+    print('Roll Number: $rollNumber');
+    print('User Type: $userType');
 
     print('Response status: ${response.statusCode}'); // Log the status code
     print('Response body: ${response.body}'); // Log the response body

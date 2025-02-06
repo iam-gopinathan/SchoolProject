@@ -4,9 +4,9 @@ class EditTimetableModel {
   final String section;
   final String userType;
   final String rollNumber;
-  final String filetype;
+  final String? filetype;
   final String filename;
-  final String filepath;
+  final String? filepath;
   final String status;
   final String postedOn;
   final String? draftedOn;
@@ -18,9 +18,9 @@ class EditTimetableModel {
     required this.section,
     required this.userType,
     required this.rollNumber,
-    required this.filetype,
+    this.filetype,
     required this.filename,
-    required this.filepath,
+    this.filepath,
     required this.status,
     required this.postedOn,
     this.draftedOn,

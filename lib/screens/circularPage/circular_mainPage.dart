@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/circular_models/Circular_mainpage_model.dart';
-import 'package:flutter_application_1/models/circular_models/Create_Circular_model.dart';
 import 'package:flutter_application_1/screens/circularPage/create_circularPage.dart';
 import 'package:flutter_application_1/screens/circularPage/edit_CircularPage.dart';
 import 'package:flutter_application_1/services/Circular_Api/circular_mainPage_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class CircularMainpage extends StatefulWidget {
-  const CircularMainpage({super.key});
+  final bool isswitched;
+  const CircularMainpage({super.key, required this.isswitched});
 
   @override
   State<CircularMainpage> createState() => _CircularMainpageState();
@@ -22,7 +23,9 @@ class _CircularMainpageState extends State<CircularMainpage> {
   //loading....
   bool isLoading = true;
   TextEditingController searchcontroller = TextEditingController();
-  bool isswitched = false;
+
+  late bool isswitched;
+
   //select date
   String selectedDate = '';
   var displayDate = '';
@@ -118,7 +121,25 @@ class _CircularMainpageState extends State<CircularMainpage> {
   @override
   void initState() {
     super.initState();
-    _fetchCircular();
+    isswitched = widget.isswitched;
+    print("Newsmainpage opened with isswitched: $isswitched");
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchCircular();
+    });
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   List<CircularResponse> circulars = [];
@@ -158,7 +179,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
       setState(() {
         isLoading = false;
       });
-      print('Error fetching circulars: $e');
+      print('Error fetching circularsssss: $e');
       return [];
     }
   }
@@ -177,6 +198,8 @@ class _CircularMainpageState extends State<CircularMainpage> {
     });
   }
 
+  //
+  ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -262,65 +285,67 @@ class _CircularMainpageState extends State<CircularMainpage> {
                         ],
                       ),
                       Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'My \n Projects',
-                              style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                      if (UserSession().userType == 'admin')
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'My \n Projects',
+                                style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Switch(
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeTrackColor: AppTheme.textFieldborderColor,
-                              inactiveTrackColor: Colors.white,
-                              inactiveThumbColor: Colors.black,
-                              value: isswitched,
-                              onChanged: (value) {
-                                setState(() {
-                                  isswitched = value;
-                                  print(isswitched);
-                                });
-                                _fetchCircular();
-                              },
-                            ),
-                          ],
+                              Switch(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeTrackColor: AppTheme.textFieldborderColor,
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.black,
+                                value: isswitched,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isswitched = value;
+                                    print(isswitched);
+                                  });
+                                  _fetchCircular();
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
 //create mesages screen....
-                      Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CreateCircularpage(
-                                          fetchcircular: _fetchCircular,
-                                        )));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.Addiconcolor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 30,
+                      if (UserSession().userType == 'admin')
+                        Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CreateCircularpage(
+                                            fetchcircular: _fetchCircular,
+                                          )));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                 ],
@@ -407,6 +432,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
                       ),
                       Expanded(
                         child: ListView.builder(
+                            controller: _scrollController,
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
                             itemCount: filteredCircularList.length,
@@ -500,6 +526,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                           ),
                                                         ),
                                                       //today
+                                                      Spacer(),
                                                       if (circular
                                                           .tag.isNotEmpty)
                                                         Container(
@@ -568,21 +595,30 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                             color:
                                                                 Colors.black),
                                                       ),
-
-                                                      Text(
-                                                        '${circularModel.circular}',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'medium',
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.black),
+//description..
+                                                      Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.7,
+                                                        child: circularModel
+                                                                        .circular !=
+                                                                    null &&
+                                                                circularModel
+                                                                    .circular!
+                                                                    .isNotEmpty
+                                                            ? Html(
+                                                                data:
+                                                                    '${circularModel.circular}')
+                                                            : const Text(''),
                                                       ),
                                                       //image section...
                                                       Stack(
                                                         alignment:
                                                             Alignment.center,
                                                         children: [
+                                                          //
                                                           SizedBox(
                                                             height: 250,
                                                             width:
@@ -667,7 +703,6 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                           ),
                                                         ],
                                                       ),
-
                                                       Padding(
                                                         padding:
                                                             const EdgeInsets
@@ -710,239 +745,238 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                               ],
                                                             ),
                                                             Spacer(),
-                                                            //edit
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                showDialog(
-                                                                  barrierDismissible:
-                                                                      false,
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (BuildContext
-                                                                          context) {
-                                                                    return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Do you really want to make\n changes to this message?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
+                                                            if (UserSession()
+                                                                    .userType ==
+                                                                'admin')
+                                                              //edit
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  showDialog(
+                                                                    barrierDismissible:
+                                                                        false,
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors.white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(10)),
+                                                                        content:
+                                                                            Text(
+                                                                          "Do you really want to make\n changes to this message?",
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'regular',
+                                                                              fontSize: 16,
+                                                                              color: Colors.black),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //edit...
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(
+                                                                                      padding: EdgeInsets.symmetric(horizontal: 40),
+                                                                                      backgroundColor: AppTheme.textFieldborderColor,
+                                                                                      elevation: 0,
+                                                                                    ),
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                      Navigator.push(
+                                                                                          context,
+                                                                                          MaterialPageRoute(
+                                                                                              builder: (context) => EditCircularpage(
+                                                                                                    Id: circularModel.id,
+                                                                                                    fetchcircular: _fetchCircular,
+                                                                                                  )));
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Edit',
+                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    )),
+                                                                              )
+                                                                            ],
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                  child:
+                                                                      Container(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            5,
+                                                                        horizontal:
+                                                                            15),
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                20),
+                                                                        border: Border.all(
                                                                             color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Cancel',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                            //edit...
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 10),
-                                                                              child: ElevatedButton(
+                                                                                Colors.black)),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Icon(Icons
+                                                                            .edit),
+                                                                        Text(
+                                                                          'Edit',
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'medium',
+                                                                              fontSize: 12,
+                                                                              color: Colors.black),
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            //delete icon
+                                                            if (UserSession()
+                                                                    .userType ==
+                                                                'admin')
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  showDialog(
+                                                                    barrierDismissible:
+                                                                        false,
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors.white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(10)),
+                                                                        content:
+                                                                            Text(
+                                                                          "Are you sure you want to delete\n this item?",
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'regular',
+                                                                              fontSize: 16,
+                                                                              color: Colors.black),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //delete......
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
                                                                                   style: ElevatedButton.styleFrom(
                                                                                     padding: EdgeInsets.symmetric(horizontal: 40),
                                                                                     backgroundColor: AppTheme.textFieldborderColor,
                                                                                     elevation: 0,
                                                                                   ),
-                                                                                  onPressed: () {
+                                                                                  onPressed: () async {
+                                                                                    var cirId = circularModel.id;
+                                                                                    final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeCircular/DeleteCircular?Id=$cirId';
+
+                                                                                    try {
+                                                                                      final response = await http.delete(
+                                                                                        Uri.parse(url),
+                                                                                        headers: {
+                                                                                          'Content-Type': 'application/json',
+                                                                                          'Authorization': 'Bearer $authToken',
+                                                                                        },
+                                                                                      );
+
+                                                                                      if (response.statusCode == 200) {
+                                                                                        print('id has beeen deleted ${cirId}');
+
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.green, content: Text('Circular deleted successfully!')),
+                                                                                        );
+                                                                                        //
+                                                                                        // Refresh the news data after deletion
+                                                                                        Navigator.pop(context);
+
+                                                                                        //
+                                                                                        await _fetchCircular();
+                                                                                      } else {
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete Circular.')),
+                                                                                        );
+                                                                                      }
+                                                                                    } catch (e) {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(content: Text('An error occurred: $e')),
+                                                                                      );
+                                                                                    }
+                                                                                    await _fetchCircular();
+
                                                                                     Navigator.pop(context);
-                                                                                    Navigator.push(
-                                                                                        context,
-                                                                                        MaterialPageRoute(
-                                                                                            builder: (context) => EditCircularpage(
-                                                                                                  Id: circularModel.id,
-                                                                                                  fetchcircular: _fetchCircular,
-                                                                                                )));
                                                                                   },
                                                                                   child: Text(
-                                                                                    'Edit',
+                                                                                    'Delete',
                                                                                     style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                  )),
-                                                                            )
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                );
-                                                              },
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                child:
-                                                                    Container(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              5,
-                                                                          horizontal:
-                                                                              15),
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              20),
-                                                                      border: Border.all(
-                                                                          color:
-                                                                              Colors.black)),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Icon(Icons
-                                                                          .edit),
-                                                                      Text(
-                                                                        'Edit',
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'medium',
-                                                                            fontSize:
-                                                                                12,
-                                                                            color:
-                                                                                Colors.black),
-                                                                      ),
-                                                                    ],
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                  child:
+                                                                      SvgPicture
+                                                                          .asset(
+                                                                    'assets/icons/delete_icons.svg',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                    height: 35,
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
-
-                                                            //delete icon
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                showDialog(
-                                                                  barrierDismissible:
-                                                                      false,
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (BuildContext
-                                                                          context) {
-                                                                    return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Are you sure you want to delete\n this item?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
-                                                                            color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Cancel',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                            //delete...
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 10),
-                                                                              child: ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(
-                                                                                  padding: EdgeInsets.symmetric(horizontal: 40),
-                                                                                  backgroundColor: AppTheme.textFieldborderColor,
-                                                                                  elevation: 0,
-                                                                                ),
-                                                                                onPressed: () async {
-                                                                                  var cirId = circularModel.id;
-                                                                                  final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeCircular/DeleteCircular?Id=$cirId';
-
-                                                                                  try {
-                                                                                    final response = await http.delete(
-                                                                                      Uri.parse(url),
-                                                                                      headers: {
-                                                                                        'Content-Type': 'application/json',
-                                                                                        'Authorization': 'Bearer $authToken',
-                                                                                      },
-                                                                                    );
-
-                                                                                    if (response.statusCode == 200) {
-                                                                                      print('id has beeen deleted ${cirId}');
-
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(backgroundColor: Colors.green, content: Text('Circular deleted successfully!')),
-                                                                                      );
-                                                                                    } else {
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete Circular.')),
-                                                                                      );
-                                                                                    }
-                                                                                  } catch (e) {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(content: Text('An error occurred: $e')),
-                                                                                    );
-                                                                                  }
-                                                                                  _fetchCircular();
-
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Delete',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                ),
-                                                                              ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                );
-                                                              },
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/delete_icons.svg',
-                                                                  fit: BoxFit
-                                                                      .contain,
-                                                                  height: 35,
-                                                                ),
-                                                              ),
-                                                            ),
                                                           ],
                                                         ),
                                                       )
@@ -953,11 +987,39 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                             ],
                                           );
                                         }),
+                                    //
                                   ],
                                 ),
                               );
                             }),
                       ),
+                      //
+                      //top arrow..
+                      if (_scrollController.hasClients &&
+                          _scrollController.offset > 50)
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_upward_outlined,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  _scrollController.animateTo(
+                                    0,
+                                    duration: Duration(seconds: 1),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        )
                     ],
                   ));
   }

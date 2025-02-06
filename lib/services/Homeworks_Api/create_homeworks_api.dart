@@ -6,10 +6,10 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 Future<void> postHomework(
-  CreateHomeworkModel homework,
-  PlatformFile selectedFile,
-  BuildContext context,
-) async {
+    CreateHomeworkModel homework,
+    PlatformFile selectedFile,
+    BuildContext context,
+    Function fetchHomework) async {
   const String apiUrl =
       "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/homeWork/postHomeWork";
 
@@ -74,6 +74,15 @@ Future<void> postHomework(
           content: Text('Homework posted successfully!'),
           backgroundColor: Colors.green,
         ),
+      );
+      //
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchHomework();
+
+      Navigator.pop(
+        context,
       );
     } else {
       print('Failed to post homework: ${response.statusCode}');

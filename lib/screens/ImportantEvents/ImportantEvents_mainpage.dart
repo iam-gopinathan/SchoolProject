@@ -5,12 +5,12 @@ import 'package:flutter_application_1/screens/ImportantEvents/Edit_Event_calende
 import 'package:flutter_application_1/services/ImportantEvents_Api/important_event_mainpage_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
-
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class ImportanteventsMainpage extends StatefulWidget {
   const ImportanteventsMainpage({super.key});
@@ -21,6 +21,8 @@ class ImportanteventsMainpage extends StatefulWidget {
 }
 
 class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
+  ScrollController _scrollController = ScrollController();
+
   bool isswitched = false;
   DateTime? _startDate;
   DateTime? _endDate;
@@ -31,6 +33,20 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
     // TODO: implement initState
     super.initState();
     fetchAndDisplayEvents();
+
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   bool isLoading = true;
@@ -41,8 +57,9 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
     allEvents: [],
   );
 
-  void fetchAndDisplayEvents({String date = ''}) async {
+  Future<void> fetchAndDisplayEvents({String date = ''}) async {
     try {
+      isLoading = true;
       final response = await fetchImportantEvents(
         userType: UserSession().userType ?? '',
         rollNumber: UserSession().rollNumber ?? '',
@@ -74,7 +91,21 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
   }
 
   DateTime? selectedDay;
-  DateTime? focusedDay;
+  // DateTime? focusedDay;
+  DateTime focusedDay = DateTime.now();
+
+  // Function to handle month change
+  void onMonthChanged(DateTime focusedDay) {
+    DateTime firstDayOfMonth = DateTime(focusedDay.year, focusedDay.month, 1);
+
+    String formattedDate = DateFormat('01-MM-yyyy').format(firstDayOfMonth);
+
+    fetchAndDisplayEvents(date: formattedDate);
+
+    setState(() {
+      this.focusedDay = focusedDay;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +160,33 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                       ],
                     ),
                     Spacer(),
+                    //add screen....
+                    if (UserSession().userType == 'admin')
+                      Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreateEventCalender(
+                                        fetchAndDisplayEvents:
+                                            fetchAndDisplayEvents)));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -144,6 +202,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
               ),
             )
           : SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 children: [
                   Padding(
@@ -154,75 +213,80 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                         padding: const EdgeInsets.all(10.0),
                         child: TableCalendar(
                           onDayLongPressed: (selectedDay, focusedDay) {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                String formattedDate =
-                                    DateFormat('MMM dd').format(selectedDay);
-                                return AlertDialog(
-                                  insetPadding: EdgeInsets.all(100),
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(15)),
-                                  backgroundColor: Colors.black,
-                                  title: Container(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        IntrinsicWidth(
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 5, horizontal: 10),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(30),
-                                              color:
-                                                  Color.fromRGBO(219, 71, 0, 1),
-                                            ),
-                                            child: Text(
-                                              formattedDate,
-                                              style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 10,
-                                                color: Colors.white,
+                            if (UserSession().userType == "admin")
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  String formattedDate =
+                                      DateFormat('MMM dd').format(selectedDay);
+                                  return AlertDialog(
+                                    insetPadding: EdgeInsets.all(100),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
+                                    backgroundColor: Colors.black,
+                                    title: Container(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          IntrinsicWidth(
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5, horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(30),
+                                                color: Color.fromRGBO(
+                                                    219, 71, 0, 1),
+                                              ),
+                                              child: Text(
+                                                formattedDate,
+                                                style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 10,
+                                                  color: Colors.white,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  content: GestureDetector(
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                CreateEventCalender()),
-                                      );
-                                    },
-                                    child: Text(
-                                      'Add New Event',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14,
-                                        fontFamily: 'regular',
-                                        decoration: TextDecoration.underline,
-                                        decorationColor: Colors.white,
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
+                                    content: GestureDetector(
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  CreateEventCalender(
+                                                    fetchAndDisplayEvents:
+                                                        fetchAndDisplayEvents,
+                                                  )),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Add New Event',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontFamily: 'regular',
+                                          decoration: TextDecoration.underline,
+                                          decorationColor: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
                           },
                           pageAnimationEnabled: true,
                           headerVisible: true,
                           pageJumpingEnabled: true,
                           firstDay: DateTime.utc(2020, 1, 1),
                           lastDay: DateTime.utc(2030, 12, 31),
-                          focusedDay: DateTime.now(),
+                          focusedDay: focusedDay,
                           calendarFormat: _calendarFormat,
                           selectedDayPredicate: (day) {
                             if (_startDate != null && _endDate != null) {
@@ -238,6 +302,14 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                               this.selectedDay = selectedDay;
                               this.focusedDay = focusedDay;
                             });
+                          },
+                          onPageChanged: (focusedDay) {
+                            setState(() {
+                              this.focusedDay =
+                                  focusedDay; // Update focusedDay when month is changed
+                            });
+                            onMonthChanged(
+                                focusedDay); // Call your function to fetch events for the new month
                           },
                           calendarStyle: CalendarStyle(
                             todayTextStyle: TextStyle(
@@ -304,52 +376,39 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                         ),
                         Column(
                           children: [
-                            ...events.todayEvents.map((e) {
-                              return Container(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                decoration: BoxDecoration(
-                                    color: Color.fromRGBO(254, 249, 247, 1)),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 15),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 15),
-                                        decoration: BoxDecoration(
-                                            color: Colors.deepOrange,
-                                            shape: BoxShape.circle),
-                                        child: Text(
-                                          '${e.from}',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 14,
-                                              color: Color.fromRGBO(
-                                                  248, 248, 248, 1)),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Text(
-                                          'to',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Container(
+                            if (events.todayEvents.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 20),
+                                child: Center(
+                                  child: Text(
+                                    "You haven’t made anything yet;\nstart creating now!",
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontFamily: 'regular',
+                                      color: Color.fromRGBO(145, 145, 145, 1),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            else
+                              ...events.todayEvents.map((e) {
+                                return Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(254, 249, 247, 1)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Row(
+                                      children: [
+                                        Container(
                                           padding: EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
+                                              vertical: 10, horizontal: 15),
                                           decoration: BoxDecoration(
                                               color: Colors.deepOrange,
                                               shape: BoxShape.circle),
                                           child: Text(
-                                            '${e.to}',
+                                            '${e.from}',
                                             style: TextStyle(
                                                 fontFamily: 'medium',
                                                 fontSize: 14,
@@ -357,25 +416,53 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                     248, 248, 248, 1)),
                                           ),
                                         ),
-                                      ),
-
-                                      //
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 15),
-                                        child: Text(
-                                          '${e.headLine}',
-                                          style: TextStyle(
-                                              fontFamily: 'regular',
-                                              fontSize: 14,
-                                              color: Colors.black),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            'to',
+                                            style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 14,
+                                                color: Colors.black),
+                                          ),
                                         ),
-                                      )
-                                    ],
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                                color: Colors.deepOrange,
+                                                shape: BoxShape.circle),
+                                            child: Text(
+                                              '${e.to}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 14,
+                                                  color: Color.fromRGBO(
+                                                      248, 248, 248, 1)),
+                                            ),
+                                          ),
+                                        ),
+                                        //
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 15),
+                                          child: Text(
+                                            '${e.headLine}',
+                                            style: TextStyle(
+                                                fontFamily: 'regular',
+                                                fontSize: 14,
+                                                color: Colors.black),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }).toList()
+                                );
+                              }).toList()
                           ],
                         ),
                       ],
@@ -400,63 +487,47 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                         ),
                       ),
                       //
-                      ...events.upComingEvents.map((upcoming) {
-                        return Padding(
-                          padding: const EdgeInsets.only(
-                            left: 25,
-                            top: 15,
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 15),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                              decoration: BoxDecoration(
-                                color: Color.fromRGBO(254, 249, 247, 1),
+                      if (events.upComingEvents.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 20),
+                          child: Center(
+                            child: Text(
+                              "You haven’t made anything yet;\nstart creating now!",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'regular',
+                                color: Color.fromRGBO(145, 145, 145, 1),
                               ),
-                              child: Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 12),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        //fromdate
-                                        Row(
-                                          children: [
-                                            Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 10, horizontal: 15),
-                                              decoration: BoxDecoration(
-                                                color: Colors.deepOrange,
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Text(
-                                                '${upcoming.from}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Color.fromRGBO(
-                                                      248, 248, 248, 1),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: Text(
-                                                'To',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            //
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: Container(
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        )
+                      else
+                        ...events.upComingEvents.map((upcoming) {
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                              left: 25,
+                              top: 15,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 15),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: Color.fromRGBO(254, 249, 247, 1),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 12),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          //fromdate
+                                          Row(
+                                            children: [
+                                              Container(
                                                 padding: EdgeInsets.symmetric(
                                                     vertical: 10,
                                                     horizontal: 15),
@@ -465,7 +536,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                   shape: BoxShape.circle,
                                                 ),
                                                 child: Text(
-                                                  '${upcoming.to}',
+                                                  '${upcoming.from}',
                                                   style: TextStyle(
                                                     fontFamily: 'medium',
                                                     fontSize: 14,
@@ -474,60 +545,98 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 10, left: 10),
-                                          child: Text(
-                                            '${upcoming.headLine}',
-                                            style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                            ),
+                                              if (upcoming.from != upcoming.to)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10),
+                                                  child: Text(
+                                                    'To',
+                                                    style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 12,
+                                                        color: Colors.black),
+                                                  ),
+                                                ),
+                                              //
+                                              if (upcoming.from != upcoming.to)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 10),
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10,
+                                                            horizontal: 15),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.deepOrange,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    child: Text(
+                                                      '${upcoming.to}',
+                                                      style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 14,
+                                                        color: Color.fromRGBO(
+                                                            248, 248, 248, 1),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
                                           ),
-                                        ),
-                                        Row(
-                                          children: [
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.45,
-                                              child: Divider(
-                                                color: Color.fromRGBO(
-                                                    218, 218, 218, 1),
-                                                height: 10,
-                                                thickness: 1,
+
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 10, left: 10),
+                                            child: Text(
+                                              '${upcoming.headLine}',
+                                              style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 12,
+                                                color: Colors.black,
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 5, left: 10),
-                                          child: Text(
-                                            '${upcoming.description}',
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 14,
-                                                color: Colors.black,
-                                                height: 1.5),
                                           ),
-                                        ),
-
-                                        //delete
-                                        GestureDetector(
-                                          onTap: () {
-                                            showDialog(
-                                                barrierDismissible: false,
-                                                context: context,
-                                                builder:
-                                                    (BuildContext context) {
-                                                  return AlertDialog(
+                                          Row(
+                                            children: [
+                                              Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.45,
+                                                child: Divider(
+                                                  color: Color.fromRGBO(
+                                                      218, 218, 218, 1),
+                                                  height: 10,
+                                                  thickness: 1,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 5, left: 10),
+                                            child: Text(
+                                              '${upcoming.description}',
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 14,
+                                                  color: Colors.black,
+                                                  height: 1.5),
+                                            ),
+                                          ),
+                                          if (UserSession().userType == 'admin')
+                                            //delete
+                                            GestureDetector(
+                                              onTap: () {
+                                                showDialog(
+                                                  barrierDismissible: false,
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
                                                       backgroundColor:
                                                           Colors.white,
                                                       shape:
@@ -589,232 +698,291 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                                             10),
                                                                 child:
                                                                     ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          AppTheme
+                                                                              .textFieldborderColor,
+                                                                      elevation:
+                                                                          0,
+                                                                      side: BorderSide
+                                                                          .none),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    var deleteevent =
+                                                                        upcoming
+                                                                            .id;
+
+                                                                    print(
+                                                                        deleteevent);
+                                                                    String url =
+                                                                        'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeEventCalender/DeleteEventCalender?Id=$deleteevent';
+
+                                                                    try {
+                                                                      final response =
+                                                                          await http
+                                                                              .delete(
+                                                                        Uri.parse(
+                                                                            url),
+                                                                        headers: {
+                                                                          'Content-Type':
+                                                                              'application/json',
+                                                                          'Authorization':
+                                                                              'Bearer $authToken',
+                                                                        },
+                                                                      );
+
+                                                                      if (response
+                                                                              .statusCode ==
+                                                                          200) {
+                                                                        print(
+                                                                            'id has beeen deleted ${deleteevent}');
+
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: Colors.green,
+                                                                              content: Text('Event deleted successfully!')),
+                                                                        );
+
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        //
+                                                                        await fetchAndDisplayEvents();
+                                                                      } else {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: Colors.red,
+                                                                              content: Text('Failed to delete Event.')),
+                                                                        );
+                                                                      }
+                                                                    } catch (e) {
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        SnackBar(
+                                                                            content:
+                                                                                Text('An error occurred: $e')),
+                                                                      );
+                                                                    }
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Delete',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontFamily:
+                                                                            'regular'),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ])
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8, left: 10),
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/timetable_delete.svg',
+                                                  fit: BoxFit.contain,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    Spacer(),
+                                    GestureDetector(
+                                      onTap: () {
+                                        var image = upcoming.filePath;
+                                        var video = upcoming.filePath;
+
+                                        if (upcoming.fileType == 'image') {
+                                          _PreviewBottomsheet(
+                                              context, upcoming.filePath, null);
+                                        } else if (upcoming.fileType ==
+                                            'link') {
+                                          _PreviewBottomsheet(
+                                              context, null, upcoming.filePath);
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 20),
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              upcoming.fileType == 'image'
+                                                  ? 'View Image'
+                                                  : upcoming.fileType == 'link'
+                                                      ? 'View Video'
+                                                      : 'Unknown File Type',
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 12,
+                                                  color: Colors.black,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationColor: Colors.black,
+                                                  decorationThickness: 2),
+                                            ),
+                                            //
+                                            if (UserSession().userType ==
+                                                'admin')
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                      barrierDismissible: false,
+                                                      context: context,
+                                                      builder: (BuildContext
+                                                          context) {
+                                                        return AlertDialog(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            10)),
+                                                            content: Text(
+                                                              "Do you really want to make\n changes to this Timetable?",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'regular',
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .black),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                            actions: <Widget>[
+                                                              Row(
+                                                                  mainAxisAlignment:
+                                                                      MainAxisAlignment
+                                                                          .center,
+                                                                  children: [
+                                                                    ElevatedButton(
                                                                         style: ElevatedButton.styleFrom(
-                                                                            backgroundColor: AppTheme
-                                                                                .textFieldborderColor,
+                                                                            backgroundColor: Colors
+                                                                                .white,
                                                                             elevation:
                                                                                 0,
-                                                                            side: BorderSide
-                                                                                .none),
+                                                                            side: BorderSide(
+                                                                                color: Colors
+                                                                                    .black,
+                                                                                width:
+                                                                                    1)),
                                                                         onPressed:
-                                                                            () async {
-                                                                          var deleteevent =
-                                                                              upcoming.id;
-
-                                                                          print(
-                                                                              deleteevent);
-                                                                          String
-                                                                              url =
-                                                                              'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeEventCalender/DeleteEventCalender?Id=$deleteevent';
-
-                                                                          try {
-                                                                            final response =
-                                                                                await http.delete(
-                                                                              Uri.parse(url),
-                                                                              headers: {
-                                                                                'Content-Type': 'application/json',
-                                                                                'Authorization': 'Bearer $authToken',
-                                                                              },
-                                                                            );
-
-                                                                            if (response.statusCode ==
-                                                                                200) {
-                                                                              print('id has beeen deleted ${deleteevent}');
-
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(backgroundColor: Colors.green, content: Text('Event deleted successfully!')),
-                                                                              );
-                                                                            } else {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete Event.')),
-                                                                              );
-                                                                            }
-                                                                          } catch (e) {
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              SnackBar(content: Text('An error occurred: $e')),
-                                                                            );
-                                                                          }
+                                                                            () {
                                                                           Navigator.pop(
                                                                               context);
                                                                         },
                                                                         child:
                                                                             Text(
-                                                                          'Delete',
+                                                                          'Cancel',
                                                                           style: TextStyle(
                                                                               color: Colors.black,
                                                                               fontSize: 16,
                                                                               fontFamily: 'regular'),
                                                                         )),
-                                                              ),
-                                                            ])
-                                                      ]);
-                                                });
-                                          },
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 8, left: 10),
-                                            child: SvgPicture.asset(
-                                              'assets/icons/timetable_delete.svg',
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Spacer(),
-                                  GestureDetector(
-                                    onTap: () {
-                                      var image = upcoming.filePath;
-                                      _PreviewBottomsheet(context, image);
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(right: 20),
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            'View Image',
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 12,
-                                                color: Colors.black,
-                                                decoration:
-                                                    TextDecoration.underline,
-                                                decorationColor: Colors.black,
-                                                decorationThickness: 2),
-                                          ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              showDialog(
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return AlertDialog(
-                                                        backgroundColor:
-                                                            Colors.white,
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10)),
-                                                        content: Text(
-                                                          "Do you really want to make\n changes to this Timetable?",
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'regular',
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.black),
-                                                          textAlign:
-                                                              TextAlign.center,
-                                                        ),
-                                                        actions: <Widget>[
-                                                          Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                ElevatedButton(
-                                                                    style: ElevatedButton.styleFrom(
-                                                                        backgroundColor:
-                                                                            Colors
-                                                                                .white,
-                                                                        elevation:
-                                                                            0,
-                                                                        side: BorderSide(
-                                                                            color: Colors
-                                                                                .black,
-                                                                            width:
-                                                                                1)),
-                                                                    onPressed:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    child: Text(
-                                                                      'Cancel',
-                                                                      style: TextStyle(
-                                                                          color: Colors
-                                                                              .black,
-                                                                          fontSize:
-                                                                              16,
-                                                                          fontFamily:
-                                                                              'regular'),
-                                                                    )),
-                                                                //edit...
-                                                                Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
+                                                                    //edit...
+                                                                    Padding(
+                                                                      padding: const EdgeInsets
                                                                           .only(
                                                                           left:
                                                                               10),
-                                                                  child: ElevatedButton(
-                                                                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                      onPressed: () {
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(
-                                                                                builder: (context) => EditEventCalender(
-                                                                                      id: upcoming.id,
-                                                                                    )));
+                                                                      child: ElevatedButton(
+                                                                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                          onPressed: () {
+                                                                            Navigator.pop(context);
+                                                                            Navigator.push(
+                                                                                context,
+                                                                                MaterialPageRoute(
+                                                                                    builder: (context) => EditEventCalender(
+                                                                                          id: upcoming.id,
+                                                                                          fetchAndDisplayEvents: fetchAndDisplayEvents,
+                                                                                        )));
 
-                                                                        print(upcoming
-                                                                            .id);
-                                                                      },
-                                                                      child: Text(
-                                                                        'Edit',
-                                                                        style: TextStyle(
-                                                                            color: Colors
-                                                                                .black,
-                                                                            fontSize:
-                                                                                16,
-                                                                            fontFamily:
-                                                                                'regular'),
-                                                                      )),
-                                                                ),
-                                                              ])
-                                                        ]);
-                                                  });
-                                            },
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
-                                              child: Text(
-                                                'Edit',
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16,
-                                                    fontFamily: 'regular'),
-                                              ),
-                                            ),
-                                          )
-                                        ],
+                                                                            print(upcoming.id);
+                                                                          },
+                                                                          child: Text(
+                                                                            'Edit',
+                                                                            style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 16,
+                                                                                fontFamily: 'regular'),
+                                                                          )),
+                                                                    ),
+                                                                  ])
+                                                            ]);
+                                                      });
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 5),
+                                                  child: Text(
+                                                    'Edit',
+                                                    style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 16,
+                                                        fontFamily: 'regular'),
+                                                  ),
+                                                ),
+                                              )
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
                     ],
                   ),
                 ],
               ),
             ),
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  ///image bottomsheeet
-
 //preview bottomsheet...
-  void _PreviewBottomsheet(BuildContext context, String image) {
+  void _PreviewBottomsheet(BuildContext context, String? image, String? video) {
     showModalBottomSheet(
-      isDismissible: false,
       backgroundColor: Colors.white,
       context: context,
       isScrollControlled: true,
@@ -824,70 +992,74 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
       builder: (BuildContext modalContext) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: -70,
-                left: 180,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(modalContext);
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: -70,
+                  left: 180,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.pop(modalContext);
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.6,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30),
-                        child: Center(
-                          child: Image.network(
-                            image,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) {
-                                WidgetsBinding.instance!
-                                    .addPostFrameCallback((_) {
-                                  setModalState(() {
-                                    isLoading = false;
-                                  });
-                                });
-                                return child;
-                              } else {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 150),
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 4,
-                                        color: AppTheme.textFieldborderColor),
-                                  ),
-                                );
-                              }
-                            },
+                Container(
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: MediaQuery.of(context).size.height * 0.6,
+                          padding: const EdgeInsets.all(10),
+                          child: Center(
+                            child: image != null
+                                ? Image.network(
+                                    image,
+                                    fit: BoxFit.contain,
+                                  )
+                                : video != null
+                                    ? SizedBox(
+                                        width: double.infinity,
+                                        child: YoutubePlayer(
+                                          controller: YoutubePlayerController(
+                                            initialVideoId:
+                                                YoutubePlayer.convertUrlToId(
+                                                        video)
+                                                    .toString(),
+                                            flags: const YoutubePlayerFlags(
+                                              autoPlay: true,
+                                              mute: false,
+                                            ),
+                                          ),
+                                          showVideoProgressIndicator: true,
+                                          aspectRatio: 16 / 9,
+                                        ),
+                                      )
+                                    : const Text("No content available"),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ]);
+              ],
+            );
           },
         );
       },

@@ -75,6 +75,17 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
       ),
       items: [
         PopupMenuItem<String>(
+          value: 'All Responses',
+          child: SizedBox(
+            width: 100,
+            child: Text(
+              'All Responses',
+              style: TextStyle(
+                  fontFamily: 'regular', fontSize: 14, color: Colors.white),
+            ),
+          ),
+        ),
+        PopupMenuItem<String>(
           value: 'Excellent',
           child: SizedBox(
             width: 100,
@@ -363,11 +374,19 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
                                 backgroundColor: AppTheme.textFieldborderColor,
                               ),
                               onPressed: () {
+                                setModalState(() {
+                                  isloading = true;
+                                });
                                 Navigator.of(context).pop();
+
+                                setModalState(() {
+                                  isloading = false;
+                                });
 
                                 getFeedback(
                                     gradeId: selectedGrade,
-                                    section: selectedSection);
+                                    section: selectedSection,
+                                    date: selectedDate);
                               },
                               child: Padding(
                                 padding:
@@ -401,12 +420,29 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
     // TODO: implement initState
     super.initState();
     getFeedback();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   List<FeedbackData> feedbackList = [];
 
   Future<void> getFeedback(
       {String date = '', String gradeId = '131', String section = 'A1'}) async {
+    setState(() {
+      isloading = true;
+    });
+
     final feedbackResponse = await fetchReceivedFeedback(
       rollNumber: UserSession().rollNumber ?? '',
       userType: UserSession().userType ?? '',
@@ -438,478 +474,581 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100),
-          child: AppBar(
-            backgroundColor: Colors.white,
-            iconTheme: IconThemeData(color: Colors.black),
-            automaticallyImplyLeading: false,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.appBackgroundPrimaryColor,
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30)),
-              ),
-              padding: EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Received Feedback',
+                              style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () async {
+                                await _selectDate(context);
+                                setState(() {
+                                  isloading = true;
+                                });
+                                await getFeedback(date: selectedDate);
+
+                                setState(() {
+                                  isloading = false;
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/Attendancepage_calendar_icon.svg',
+                                      fit: BoxFit.contain,
+                                      height: 20,
+                                    ),
+                                  ),
+                                  Text(
+                                    displayDate,
+                                    style: TextStyle(
+                                      fontFamily: 'medium',
+                                      color: Color.fromRGBO(73, 73, 73, 1),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                      decorationThickness: 2,
+                                      decorationColor:
+                                          Color.fromRGBO(75, 75, 75, 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    //filter icon..
+                    GestureDetector(
+                      onTap: () {
+                        _showFilterBottomSheet(context);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: SvgPicture.asset(
+                          'assets/icons/Filter_icon.svg',
+                          fit: BoxFit.contain,
+                          height: 30,
+                        ),
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateFeedback()));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.Addiconcolor,
+                          shape: BoxShape.circle,
+                        ),
                         child: Icon(
-                          Icons.arrow_back,
+                          Icons.add,
                           color: Colors.black,
+                          size: 30,
                         ),
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Received Feedback',
-                                style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              GestureDetector(
-                                onTap: () async {
-                                  await _selectDate(context);
-                                  setState(() {
-                                    isloading = true;
-                                  });
-                                  await getFeedback(date: selectedDate);
-
-                                  setState(() {
-                                    isloading = false;
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topLeft,
-                                      child: SvgPicture.asset(
-                                        'assets/icons/Attendancepage_calendar_icon.svg',
-                                        fit: BoxFit.contain,
-                                        height: 20,
-                                      ),
-                                    ),
-                                    Text(
-                                      displayDate,
-                                      style: TextStyle(
-                                        fontFamily: 'medium',
-                                        color: Color.fromRGBO(73, 73, 73, 1),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.underline,
-                                        decorationThickness: 2,
-                                        decorationColor:
-                                            Color.fromRGBO(75, 75, 75, 1),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Spacer(),
-
-                      //filter icon..
-                      GestureDetector(
-                        onTap: () {
-                          _showFilterBottomSheet(context);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 30),
-                          child: SvgPicture.asset(
-                            'assets/icons/Filter_icon.svg',
-                            fit: BoxFit.contain,
-                            height: 30,
-                          ),
-                        ),
-                      ),
-
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateFeedback()));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
-        body: isloading
-            ? Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  color: AppTheme.textFieldborderColor,
-                ),
-              )
-            : SingleChildScrollView(
-                child: Column(
-                  children: feedbackList.map((feedbackData) {
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 20, top: 10, bottom: 10),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Posted on : ${feedbackData.postedOnDate} | ${feedbackData.postedOnDay}',
-                                      style: TextStyle(
-                                        fontFamily: 'regular',
-                                        fontSize: 12,
-                                        color: Colors.black,
+      ),
+      body: isloading
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+                color: AppTheme.textFieldborderColor,
+              ),
+            )
+          : feedbackList.isEmpty
+              ? Center(
+                  child: Text(
+                    "You haven’t made anything yet \n start creating now!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'regular',
+                      color: Color.fromRGBO(145, 145, 145, 1),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    children: feedbackList.map((feedbackData) {
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 20, top: 10, bottom: 10),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Posted on : ${feedbackData.postedOnDate} | ${feedbackData.postedOnDay}',
+                                        style: TextStyle(
+                                          fontFamily: 'regular',
+                                          fontSize: 12,
+                                          color: Colors.black,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ...feedbackData.feedBack!.map((fb) {
-                                return Card(
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                                    ],
                                   ),
-                                  child: Container(
-                                    padding: EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
+                                ),
+                                // ...feedbackData.feedBack!.map((fb) {
+                                //   //filter functions...
+                                //   List<FeedbackAnswers> filteredFeedback =
+                                //       fb.feedBackAnswers!.where((answer) {
+                                //     if (_selectedFilter == "All Responses") {
+                                //       return true;
+                                //     }
+                                //     if (_selectedFilter == 'Excellent' &&
+                                //         answer.responses == '4') {
+                                //       return true;
+                                //     } else if (_selectedFilter == 'Good' &&
+                                //         answer.responses == '3') {
+                                //       return true;
+                                //     } else if (_selectedFilter == 'Average' &&
+                                //         answer.responses == '2') {
+                                //       return true;
+                                //     } else if (_selectedFilter == 'Poor' &&
+                                //         answer.responses == '1') {
+                                //       return true;
+                                //     } else if (_selectedFilter == 'Nill' &&
+                                //         (answer.responses == null ||
+                                //             answer.responses == '')) {
+                                //       return true;
+                                //     }
+                                //     return false;
+                                //   }).toList();
+
+                                ...feedbackData.feedBack!.map((fb) {
+                                  // Filter functions
+                                  List<FeedbackAnswers> filteredFeedback =
+                                      fb.feedBackAnswers!.where((answer) {
+                                    if (_selectedFilter == "All Responses") {
+                                      return true;
+                                    }
+                                    if (_selectedFilter == 'Excellent' &&
+                                        answer.responses == '4') {
+                                      return true;
+                                    } else if (_selectedFilter == 'Good' &&
+                                        answer.responses == '3') {
+                                      return true;
+                                    } else if (_selectedFilter == 'Average' &&
+                                        answer.responses == '2') {
+                                      return true;
+                                    } else if (_selectedFilter == 'Poor' &&
+                                        answer.responses == '1') {
+                                      return true;
+                                    } else if (_selectedFilter == 'Nill' &&
+                                        (answer.responses == null ||
+                                            answer.responses == '')) {
+                                      return true;
+                                    }
+                                    return false;
+                                  }).toList();
+
+                                  // Fallback to all responses if no matches are found
+                                  if (filteredFeedback.isEmpty) {
+                                    filteredFeedback = fb.feedBackAnswers!;
+                                  }
+
+                                  return Card(
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                        color: Color.fromRGBO(238, 238, 238, 1),
-                                        width: 1.5,
-                                      ),
                                     ),
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                fb.heading ?? 'No Heading',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 16,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        // Posted by info
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 5),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Posted by : ${fb.userType ?? 'Unknown'} | at : ${fb.time ?? 'Unknown'}',
-                                                style: TextStyle(
-                                                  fontFamily: 'regular',
-                                                  fontSize: 12,
-                                                  color: Color.fromRGBO(
-                                                      89, 89, 89, 1),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Divider(
+                                    child: Container(
+                                      padding: EdgeInsets.all(15),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.white,
+                                        border: Border.all(
                                           color:
-                                              Color.fromRGBO(230, 230, 230, 1),
-                                          thickness: 1,
+                                              Color.fromRGBO(238, 238, 238, 1),
+                                          width: 1.5,
                                         ),
-
-                                        ExpansionTile(
-                                          shape: Border(),
-                                          title: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Text(
-                                                'View Responses',
-                                                style: TextStyle(
-                                                  fontFamily: 'regular',
-                                                  fontSize: 16,
-                                                  color: Color.fromRGBO(
-                                                      230, 1, 84, 1),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 10),
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.8,
+                                                  child: Text(
+                                                    fb.heading ?? 'No Heading',
+                                                    style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 16,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ],
+                                              ],
+                                            ),
                                           ),
-                                          children: [
-                                            ...fb.feedBackAnswers!
-                                                .asMap()
-                                                .entries
-                                                .map((entry) {
-                                              int index = entry.key;
-                                              var answer = entry.value;
+                                          // Posted by info
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  'Posted by : ${fb.userType ?? 'Unknown'} | at : ${fb.time ?? 'Unknown'}',
+                                                  style: TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 12,
+                                                    color: Color.fromRGBO(
+                                                        89, 89, 89, 1),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Divider(
+                                            color: Color.fromRGBO(
+                                                230, 230, 230, 1),
+                                            thickness: 1,
+                                          ),
+                                          ExpansionTile(
+                                            shape: Border(),
+                                            title: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  'View Responses',
+                                                  style: TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 16,
+                                                    color: Color.fromRGBO(
+                                                        230, 1, 84, 1),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            children: [
+                                              //
+                                              // ...fb.feedBackAnswers!
+                                              //     .asMap()
+                                              //     .entries
+                                              //     .map((entry) {
+                                              ...filteredFeedback
+                                                  .asMap()
+                                                  .entries
+                                                  .map((entry) {
+                                                int index = entry.key;
+                                                var answer = entry.value;
 
-                                              return Column(
-                                                children: [
-                                                  // Only show class heading for the first item
-                                                  if (index == 0)
-                                                    Row(
-                                                      children: [
-                                                        // class heading..
-                                                        IntrinsicWidth(
-                                                          child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .only(
-                                                                topRight: Radius
-                                                                    .circular(
-                                                                        10),
-                                                              ),
-                                                              border:
-                                                                  Border.all(
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        234,
-                                                                        234,
-                                                                        234,
-                                                                        1),
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              children: [
-                                                                Container(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              10),
-                                                                  decoration:
-                                                                      BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius
-                                                                            .only(
-                                                                      topLeft: Radius
-                                                                          .circular(
-                                                                              10),
-                                                                    ),
-                                                                    color: Color
-                                                                        .fromRGBO(
-                                                                            31,
-                                                                            106,
-                                                                            163,
-                                                                            1),
-                                                                  ),
-                                                                  child:
-                                                                      Padding(
-                                                                    padding: const EdgeInsets
+                                                return Column(
+                                                  children: [
+                                                    if (index == 0)
+                                                      Row(
+                                                        children: [
+                                                          // class heading..
+                                                          IntrinsicWidth(
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
                                                                         .only(
-                                                                        left:
-                                                                            10,
-                                                                        right:
+                                                                  topRight: Radius
+                                                                      .circular(
+                                                                          10),
+                                                                ),
+                                                                border:
+                                                                    Border.all(
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          234,
+                                                                          234,
+                                                                          234,
+                                                                          1),
+                                                                ),
+                                                              ),
+                                                              child: Row(
+                                                                children: [
+                                                                  Container(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
                                                                             10),
-                                                                    child: Text(
-                                                                      '${answer.studentClass} | ${answer.section}',
-                                                                      style:
-                                                                          TextStyle(
-                                                                        fontFamily:
-                                                                            'medium',
-                                                                        fontSize:
-                                                                            12,
-                                                                        color: Colors
-                                                                            .white,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius
+                                                                              .only(
+                                                                        topLeft:
+                                                                            Radius.circular(10),
+                                                                      ),
+                                                                      color: Color.fromRGBO(
+                                                                          31,
+                                                                          106,
+                                                                          163,
+                                                                          1),
+                                                                    ),
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
+                                                                          .only(
+                                                                          left:
+                                                                              10,
+                                                                          right:
+                                                                              10),
+                                                                      child:
+                                                                          Text(
+                                                                        '${answer.studentClass} | ${answer.section}',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontFamily:
+                                                                              'medium',
+                                                                          fontSize:
+                                                                              12,
+                                                                          color:
+                                                                              Colors.white,
+                                                                        ),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                ),
-                                                              ],
+                                                                ],
+                                                              ),
                                                             ),
                                                           ),
-                                                        ),
-                                                        Spacer(),
-                                                        GestureDetector(
-                                                          onTapDown:
-                                                              (TapDownDetails
-                                                                  details) {
-                                                            _showFilterMenu(
-                                                                context,
-                                                                details);
-                                                          },
-                                                          child: Padding(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    right: 10),
-                                                            child: SvgPicture
-                                                                .asset(
-                                                              'assets/icons/Filter_icon.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ListTile(
-                                                      leading: Image.network(
-                                                          answer.profile ?? ''),
-                                                      title: Text(
-                                                        answer.studentName ??
-                                                            'No Name',
-                                                        style: TextStyle(
-                                                          fontFamily:
-                                                              'semibold',
-                                                          fontSize: 16,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                      subtitle: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: [
-                                                          Text(
-                                                            answer.rollNumber ??
-                                                                '',
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  'medium',
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            '${answer.studentClass ?? ''} - ${answer.section ?? ''}',
-                                                            style: TextStyle(
-                                                              fontFamily:
-                                                                  'regular',
-                                                              fontSize: 14,
-                                                              color:
-                                                                  Colors.black,
+                                                          Spacer(),
+                                                          GestureDetector(
+                                                            onTapDown:
+                                                                (TapDownDetails
+                                                                    details) {
+                                                              _showFilterMenu(
+                                                                  context,
+                                                                  details);
+                                                            },
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right:
+                                                                          10),
+                                                              child: SvgPicture
+                                                                  .asset(
+                                                                'assets/icons/Filter_icon.svg',
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              ),
                                                             ),
                                                           ),
                                                         ],
                                                       ),
-                                                      trailing: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
-                                                        children: [
-                                                          //excellent
-                                                          if (answer
-                                                                  .responses ==
-                                                              'excellent')
-                                                            SvgPicture.asset(
-                                                              'assets/icons/ExcellentEmoji.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
-                                                          //good
-                                                          else if (answer
-                                                                  .responses ==
-                                                              'good')
-                                                            SvgPicture.asset(
-                                                              'assets/icons/GoodEmoji.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
-                                                          //average
-                                                          else if (answer
-                                                                  .responses ==
-                                                              'average')
-                                                            SvgPicture.asset(
-                                                              'assets/icons/AverageEmoji.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
-                                                          //poor
-                                                          else if (answer
-                                                                  .responses ==
-                                                              'poor')
-                                                            SvgPicture.asset(
-                                                              'assets/icons/poorEmoji.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
-                                                          else if (answer
-                                                                  .responses ==
-                                                              null)
-                                                            SvgPicture.asset(
-                                                              'assets/icons/poorEmoji.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                              height: 24,
-                                                            )
-                                                          else
+                                                    ListTile(
+                                                        leading: Image.network(
+                                                            answer.profile ??
+                                                                ''),
+                                                        title: Text(
+                                                          answer.studentName ??
+                                                              'No Name',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'semibold',
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        subtitle: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
                                                             Text(
-                                                              answer.responses ??
-                                                                  '-',
+                                                              answer.rollNumber ??
+                                                                  '',
                                                               style: TextStyle(
                                                                 fontFamily:
                                                                     'medium',
-                                                                fontSize: 20,
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        0,
-                                                                        150,
-                                                                        60,
-                                                                        1),
+                                                                fontSize: 16,
+                                                                color: Colors
+                                                                    .black,
                                                               ),
-                                                            )
-                                                        ],
-                                                      )),
-                                                ],
-                                              );
-                                            }).toList(),
-                                          ],
-                                        ),
-                                      ],
+                                                            ),
+                                                            Text(
+                                                              '${answer.studentClass ?? ''} - ${answer.section ?? ''}',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'regular',
+                                                                fontSize: 14,
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        trailing: Row(
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            //excellent
+                                                            if (answer
+                                                                    .responses ==
+                                                                '4')
+                                                              Text(
+                                                                '😊',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        35),
+                                                              )
+                                                            //good
+                                                            else if (answer
+                                                                    .responses ==
+                                                                '3')
+                                                              Text(
+                                                                '🙂',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        35),
+                                                              )
+
+                                                            //average
+                                                            else if (answer
+                                                                    .responses ==
+                                                                '2')
+                                                              Text(
+                                                                '😐',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        35),
+                                                              )
+
+                                                            //poor
+                                                            else if (answer
+                                                                    .responses ==
+                                                                '1')
+                                                              Text(
+                                                                '😞',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        35),
+                                                              )
+                                                            else
+                                                              Text(
+                                                                answer.responses ??
+                                                                    '-',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'medium',
+                                                                  fontSize: 20,
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          0,
+                                                                          150,
+                                                                          60,
+                                                                          1),
+                                                                ),
+                                                              )
+                                                          ],
+                                                        )),
+                                                  ],
+                                                );
+                                              }).toList(),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }).toList(),
-                            ],
+                                  );
+                                }).toList(),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  }).toList(),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ),
-              ));
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
   }
 }

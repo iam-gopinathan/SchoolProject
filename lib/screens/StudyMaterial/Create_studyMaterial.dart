@@ -273,6 +273,58 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
           });
         });
   }
+  //
+
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return selectedClasses != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -298,7 +350,10 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         widget.fetchstudymaterial();
                         Navigator.pop(context);
                       },
@@ -931,6 +986,6 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
         status: status,
         postedOn: postedOn,
         draftedOn: draftedOn);
-    postStudyMaterial(create, context);
+    postStudyMaterial(create, context, widget.fetchstudymaterial);
   }
 }

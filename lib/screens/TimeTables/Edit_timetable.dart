@@ -36,39 +36,6 @@ class _EditTimetableState extends State<EditTimetable> {
 
   bool isLoading = true;
 
-  //update api calls.....
-  Future<void> _updateTimetable() async {
-    File file = File(selectedFile!.path!);
-
-    String formattedDate =
-        DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
-    // Check if a file is selected
-    if (selectedFile == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No file selected!')),
-      );
-      return;
-    }
-
-    final model = UpdateTimetableModel(
-      id: widget.id,
-      userType: UserSession().userType.toString(),
-      rollNumber: UserSession().rollNumber.toString(),
-      fileType: 'image',
-      file: selectedFile!.extension ?? "image",
-      updatedOn: formattedDate,
-    );
-
-    final timetableService = TimetableService();
-    bool success = await timetableService.updateTimetable(model, file, context);
-
-    if (success) {
-      print("Timetable updated ");
-    } else {
-      print("Failed to update timetable.");
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -161,118 +128,132 @@ class _EditTimetableState extends State<EditTimetable> {
   ///image bottomsheeet
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: -70,
-                left: 180,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
-                    ),
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+          return Stack(clipBehavior: Clip.none, children: [
+            // Close icon
+            Positioned(
+              top: -70,
+              left: 180,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 35,
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          ),
+                        ],
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 2,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
+                    ),
 //heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${_selectedClass}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            "${_selectedClass}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      //selected section..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${_selectedSection}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
+                    //selected section..
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            "${_selectedSection}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
+                    ),
+                    //fetched image shows
+                    if (isFetchedImageVisible)
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Image.network(
+                        imageUrl!,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
 
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
-                      )
-                    ],
-                  ),
+                    ///image section...
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Center(
+                        child:
+                            selectedFile != null && selectedFile!.bytes != null
+                                ? Image.memory(
+                                    selectedFile!.bytes!,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ]);
-          });
+              ),
+            )
+          ]);
         });
+      },
+    );
   }
 
   bool isFetchedImageVisible = true;
@@ -507,8 +488,6 @@ class _EditTimetableState extends State<EditTimetable> {
                       ),
                     ),
                   ),
-
-                  //fetched image...
                   // Display the fetched image if the URL exists
                   if (isFetchedImageVisible &&
                       imageUrl != null &&
@@ -542,7 +521,6 @@ class _EditTimetableState extends State<EditTimetable> {
                     ),
 
                   /// Display selected image...
-
                   if (selectedFile != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -671,5 +649,60 @@ class _EditTimetableState extends State<EditTimetable> {
               ));
   }
 
-  //update timetable...
+  //update api calls................
+
+  Future<void> _updateTimetable() async {
+    File? file;
+
+    String formattedDate =
+        DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+
+    if (selectedFile == null && imageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No file selected!')),
+      );
+      return;
+    }
+
+    String fileType = '';
+    if (selectedFile != null) {
+      final bytes = selectedFile!.bytes;
+      if (bytes == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No data available for the selected file.')),
+        );
+        return;
+      }
+
+      final tempFile =
+          File('${Directory.systemTemp.path}/${selectedFile!.name}');
+      await tempFile.writeAsBytes(bytes);
+
+      file = tempFile;
+      fileType = 'image';
+    } else if (imageUrl != null && imageUrl!.isNotEmpty) {
+      fileType = 'existing';
+      file = null;
+    }
+
+    final model = UpdateTimetableModel(
+      id: widget.id,
+      userType: UserSession().userType ?? '',
+      rollNumber: UserSession().rollNumber ?? '',
+      fileType: fileType,
+      file: selectedFile?.extension ?? "image",
+      updatedOn: formattedDate,
+    );
+
+    final timetableService = TimetableService();
+
+    bool success = await timetableService.updateTimetable(
+        model, file, context, widget.fetchMaintimetable);
+
+    if (success) {
+      print("Timetable updated.");
+    } else {
+      print("Failed to update timetable.");
+    }
+  }
 }

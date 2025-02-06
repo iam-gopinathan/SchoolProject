@@ -11,6 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:http/http.dart' as http;
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class SchoolcalenderMainpage extends StatefulWidget {
   const SchoolcalenderMainpage({super.key});
@@ -20,6 +21,8 @@ class SchoolcalenderMainpage extends StatefulWidget {
 }
 
 class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
+  ScrollController _scrollController = ScrollController();
+
   DateTime? _startDate;
   DateTime? _endDate;
   CalendarFormat _calendarFormat = CalendarFormat.month;
@@ -32,6 +35,19 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
   void initState() {
     super.initState();
     fetchStudentCalendar();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   List<Event> todayEvents = [];
@@ -40,6 +56,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
 
   List<Event> allEvents = [];
 
+//
   Future<void> fetchStudentCalendar({String date = ''}) async {
     setState(() {
       isLoading = true;
@@ -98,7 +115,21 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
   }
 
   DateTime? selectedDay;
-  DateTime? focusedDay;
+  // DateTime? focusedDay;
+  DateTime focusedDay = DateTime.now();
+
+  // Function to handle month change
+  void onMonthChanged(DateTime focusedDay) {
+    DateTime firstDayOfMonth = DateTime(focusedDay.year, focusedDay.month, 1);
+
+    String formattedDate = DateFormat('01-MM-yyyy').format(firstDayOfMonth);
+
+    fetchStudentCalendar(date: formattedDate);
+
+    setState(() {
+      this.focusedDay = focusedDay;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -153,6 +184,33 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                       ],
                     ),
                     Spacer(),
+                    //add screen....
+                    if (UserSession().userType == 'admin')
+                      Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreateSchoolCalender(
+                                        fetchStudentCalendar:
+                                            fetchStudentCalendar)));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ],
@@ -168,20 +226,30 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
               ),
             )
           : SingleChildScrollView(
+              controller: _scrollController,
               child: Column(
                 children: [
+                  //table calender...
                   Padding(
                     padding: const EdgeInsets.all(10.0),
                     child: TableCalendar(
                       firstDay: DateTime.utc(2020, 1, 1),
                       lastDay: DateTime.utc(2030, 12, 31),
-                      focusedDay: DateTime.now(),
+                      focusedDay: focusedDay,
                       calendarFormat: _calendarFormat,
                       onDaySelected: (selectedDay, focusedDay) {
                         setState(() {
                           this.selectedDay = selectedDay;
                           this.focusedDay = focusedDay;
                         });
+                      },
+                      onPageChanged: (focusedDay) {
+                        setState(() {
+                          this.focusedDay =
+                              focusedDay; // Update focusedDay when month is changed
+                        });
+                        onMonthChanged(
+                            focusedDay); // Call your function to fetch events for the new month
                       },
                       calendarStyle: CalendarStyle(
                         todayTextStyle: TextStyle(
@@ -226,65 +294,70 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                         formatButtonVisible: false,
                       ),
                       onDayLongPressed: (selectedDay, focusedDay) {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            String formattedDate =
-                                DateFormat('MMM dd').format(selectedDay);
-                            return AlertDialog(
-                              insetPadding: EdgeInsets.all(100),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              backgroundColor: Colors.black,
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  IntrinsicWidth(
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 10),
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
-                                          color: Color.fromRGBO(219, 71, 0, 1)),
-                                      child: Text(
-                                        formattedDate,
-                                        style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 10,
-                                            color: Colors.white),
+                        if (UserSession().userType == "admin")
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              String formattedDate =
+                                  DateFormat('MMM dd').format(selectedDay);
+                              return AlertDialog(
+                                insetPadding: EdgeInsets.all(100),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15)),
+                                backgroundColor: Colors.black,
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    IntrinsicWidth(
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                            color:
+                                                Color.fromRGBO(219, 71, 0, 1)),
+                                        child: Text(
+                                          formattedDate,
+                                          style: TextStyle(
+                                              fontFamily: 'regular',
+                                              fontSize: 10,
+                                              color: Colors.white),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              content: GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            CreateSchoolCalender()),
-                                  );
-                                },
-                                child: Text(
-                                  'Add New Event',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
-                                      fontFamily: 'regular',
-                                      decoration: TextDecoration.underline,
-                                      decorationColor: Colors.white),
+                                  ],
                                 ),
-                              ),
-                            );
-                          },
-                        );
+                                content: GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              CreateSchoolCalender(
+                                                fetchStudentCalendar:
+                                                    fetchStudentCalendar,
+                                              )),
+                                    );
+                                  },
+                                  child: Text(
+                                    'Add New Event',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontFamily: 'regular',
+                                        decoration: TextDecoration.underline,
+                                        decorationColor: Colors.white),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                       },
                     ),
                   ),
-
+//
                   Column(
                     children: [
                       //today events..
@@ -305,56 +378,43 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                       //
                       Column(
                         children: [
-                          ...todayEvents.map((e) {
-                            final fromDay = e.fromDate.substring(0, 2);
-                            final toDay = e.toDate.substring(0, 2);
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 15),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(vertical: 10),
-                                decoration: BoxDecoration(
-                                    color: Color.fromRGBO(254, 249, 247, 1)),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 15),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 10, horizontal: 15),
-                                        decoration: BoxDecoration(
-                                            color: Colors.deepOrange,
-                                            shape: BoxShape.circle),
-                                        child: Text(
-                                          '${fromDay}',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 14,
-                                              color: Color.fromRGBO(
-                                                  248, 248, 248, 1)),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Text(
-                                          'to',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 10),
-                                        child: Container(
+                          if (todayEvents.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 20),
+                              child: Center(
+                                child: Text(
+                                  "You haven’t made anything yet;\nstart creating now!",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'regular',
+                                    color: Color.fromRGBO(145, 145, 145, 1),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            )
+                          else
+                            ...todayEvents.map((e) {
+                              final fromDay = e.fromDate.substring(0, 2);
+                              final toDay = e.toDate.substring(0, 2);
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(254, 249, 247, 1)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Row(
+                                      children: [
+                                        Container(
                                           padding: EdgeInsets.symmetric(
-                                              vertical: 10, horizontal: 10),
+                                              vertical: 10, horizontal: 15),
                                           decoration: BoxDecoration(
                                               color: Colors.deepOrange,
                                               shape: BoxShape.circle),
                                           child: Text(
-                                            '${toDay}',
+                                            '${fromDay}',
                                             style: TextStyle(
                                                 fontFamily: 'medium',
                                                 fontSize: 14,
@@ -362,26 +422,55 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                     248, 248, 248, 1)),
                                           ),
                                         ),
-                                      ),
-
-                                      //
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 15),
-                                        child: Text(
-                                          '${e.headLine}',
-                                          style: TextStyle(
-                                              fontFamily: 'regular',
-                                              fontSize: 14,
-                                              color: Colors.black),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Text(
+                                            'to',
+                                            style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 14,
+                                                color: Colors.black),
+                                          ),
                                         ),
-                                      )
-                                    ],
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 10),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 10, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                                color: Colors.deepOrange,
+                                                shape: BoxShape.circle),
+                                            child: Text(
+                                              '${toDay}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 14,
+                                                  color: Color.fromRGBO(
+                                                      248, 248, 248, 1)),
+                                            ),
+                                          ),
+                                        ),
+
+                                        //
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(left: 15),
+                                          child: Text(
+                                            '${e.headLine}',
+                                            style: TextStyle(
+                                                fontFamily: 'regular',
+                                                fontSize: 14,
+                                                color: Colors.black),
+                                          ),
+                                        )
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }).toList()
+                              );
+                            }).toList()
                         ],
                       ),
                     ],
@@ -407,56 +496,45 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                             ],
                           ),
                         ),
-                        ...upcomingEvents.map((e) {
-                          return Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 25, top: 15),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 15),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color: Color.fromRGBO(254, 249, 247, 1),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            //from
-                                            Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 15),
-                                                decoration: BoxDecoration(
-                                                    color: Colors.deepOrange,
-                                                    shape: BoxShape.circle),
-                                                child: Text(
-                                                  '${e.from}',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontFamily: 'regular',
-                                                      fontSize: 14),
-                                                )),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 5),
-                                              child: Text(
-                                                'To',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            //
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 5),
-                                              child: Container(
+                        //
+                        if (upcomingEvents.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Center(
+                              child: Text(
+                                "You haven’t made anything yet;\nstart creating now!",
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontFamily: 'regular',
+                                  color: Color.fromRGBO(145, 145, 145, 1),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )
+                        else
+                          ...upcomingEvents.map((e) {
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 25, top: 15),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 15),
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 10),
+                                      decoration: BoxDecoration(
+                                        color: Color.fromRGBO(254, 249, 247, 1),
+                                      ),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              //from
+                                              Container(
                                                   padding: EdgeInsets.symmetric(
                                                       vertical: 10,
                                                       horizontal: 15),
@@ -464,307 +542,399 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                       color: Colors.deepOrange,
                                                       shape: BoxShape.circle),
                                                   child: Text(
-                                                    '${e.to}',
+                                                    '${e.from}',
                                                     style: TextStyle(
                                                         color: Colors.white,
                                                         fontFamily: 'regular',
                                                         fontSize: 14),
                                                   )),
-                                            ),
-                                          ],
-                                        ),
-                                        //
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 12),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '${e.headLine}',
+                                              if (e.from != e.to)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 5),
+                                                  child: Text(
+                                                    'To',
                                                     style: TextStyle(
-                                                      fontFamily: 'medium',
-                                                      fontSize: 12,
-                                                      color: Colors.black,
-                                                    ),
+                                                        fontFamily: 'medium',
+                                                        fontSize: 12,
+                                                        color: Colors.black),
                                                   ),
-                                                  Row(
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.45,
-                                                        child: Divider(
-                                                          color: Color.fromRGBO(
-                                                              218, 218, 218, 1),
-                                                          height: 10,
-                                                          thickness: 1,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 5),
-                                                    child: Text(
-                                                      '${e.description}',
-                                                      style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 14,
-                                                          color: Colors.black,
-                                                          height: 1.5),
-                                                    ),
-                                                  ),
-                                                  //delete
-                                                  GestureDetector(
-                                                    onTap: () async {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            10)),
-                                                                content: Text(
-                                                                  "Do you really want to Delete\n  to this Event?",
-                                                                  style: TextStyle(
-                                                                      fontFamily:
-                                                                          'regular',
-                                                                      fontSize:
-                                                                          16,
-                                                                      color: Colors
-                                                                          .black),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                ),
-                                                                actions: <Widget>[
-                                                                  Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(
-                                                                                backgroundColor: Colors.white,
-                                                                                elevation: 0,
-                                                                                side: BorderSide(color: Colors.black, width: 1)),
-                                                                            onPressed: () {
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child: Text(
-                                                                              'Cancel',
-                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                            )),
-                                                                        //delete...
-                                                                        Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              left: 10),
-                                                                          child: ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                              onPressed: () async {
-                                                                                var deleteUp = e.id;
-
-                                                                                final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeSchoolCalender/DeleteSchoolCalender?Id=$deleteUp';
-
-                                                                                try {
-                                                                                  final response = await http.delete(
-                                                                                    Uri.parse(url),
-                                                                                    headers: {
-                                                                                      'Content-Type': 'application/json',
-                                                                                      'Authorization': 'Bearer $authToken',
-                                                                                    },
-                                                                                  );
-
-                                                                                  if (response.statusCode == 200) {
-                                                                                    print('id has beeen deleted ${deleteUp}');
-
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(backgroundColor: Colors.green, content: Text('Event deleted successfully!')),
-                                                                                    );
-                                                                                  } else {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete Event.')),
-                                                                                    );
-                                                                                  }
-                                                                                } catch (e) {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(content: Text('An error occurred: $e')),
-                                                                                  );
-                                                                                }
-                                                                              },
-                                                                              child: Text(
-                                                                                'Delete',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                        ),
-                                                                      ])
-                                                                ]);
-                                                          });
-                                                    },
-                                                    child: Padding(
+                                                ),
+                                              //
+                                              if (e.from != e.to)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 5),
+                                                  child: Container(
                                                       padding:
-                                                          const EdgeInsets.only(
-                                                              top: 8),
-                                                      child: SvgPicture.asset(
-                                                        'assets/icons/timetable_delete.svg',
-                                                        fit: BoxFit.contain,
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            GestureDetector(
-                                              onTap: () {
-                                                var image = e.filePath;
-                                                _PreviewBottomsheet(
-                                                    context, image);
-                                              },
-                                              child: Padding(
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 10,
+                                                              horizontal: 15),
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              Colors.deepOrange,
+                                                          shape:
+                                                              BoxShape.circle),
+                                                      child: Text(
+                                                        '${e.to}',
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontFamily:
+                                                                'regular',
+                                                            fontSize: 14),
+                                                      )),
+                                                ),
+                                            ],
+                                          ),
+                                          //
+                                          Row(
+                                            children: [
+                                              Padding(
                                                 padding: const EdgeInsets.only(
-                                                    right: 20),
+                                                    left: 12, top: 10),
                                                 child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
-                                                      'View Image',
+                                                      '${e.headLine}',
                                                       style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 12,
-                                                          color: Colors.black,
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .underline,
-                                                          decorationColor:
-                                                              Colors.black,
-                                                          decorationThickness:
-                                                              2),
-                                                    ),
-                                                    //edit
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        showDialog(
-                                                            barrierDismissible:
-                                                                false,
-                                                            context: context,
-                                                            builder:
-                                                                (BuildContext
-                                                                    context) {
-                                                              return AlertDialog(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10)),
-                                                                  content: Text(
-                                                                    "Do you really want to make\n changes to this Event?",
-                                                                    style: TextStyle(
-                                                                        fontFamily:
-                                                                            'regular',
-                                                                        fontSize:
-                                                                            16,
-                                                                        color: Colors
-                                                                            .black),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                  actions: <Widget>[
-                                                                    Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                'Cancel',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                          //edit...
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 10),
-                                                                            child: ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                                onPressed: () {
-                                                                                  var calendarId = e.id;
-                                                                                  Navigator.pop(context);
-                                                                                  Navigator.push(
-                                                                                      context,
-                                                                                      MaterialPageRoute(
-                                                                                          builder: (context) => EditSchoolCalender(
-                                                                                                Id: calendarId,
-                                                                                              )));
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Edit',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                          ),
-                                                                        ])
-                                                                  ]);
-                                                            });
-                                                      },
-                                                      child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(top: 10),
-                                                        child: Text(
-                                                          'Edit',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'regular',
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
+                                                        fontFamily: 'medium',
+                                                        fontSize: 12,
+                                                        color: Colors.black,
                                                       ),
                                                     ),
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.45,
+                                                          child: Divider(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    218,
+                                                                    218,
+                                                                    218,
+                                                                    1),
+                                                            height: 10,
+                                                            thickness: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 5),
+                                                      child: Text(
+                                                        '${e.description}',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'regular',
+                                                            fontSize: 14,
+                                                            color: Colors.black,
+                                                            height: 1.5),
+                                                      ),
+                                                    ),
+                                                    //delete
+                                                    if (UserSession()
+                                                            .userType ==
+                                                        'admin')
+                                                      GestureDetector(
+                                                        onTap: () async {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return AlertDialog(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                10)),
+                                                                    content:
+                                                                        Text(
+                                                                      "Do you really want to Delete\n  to this Event?",
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'regular',
+                                                                          fontSize:
+                                                                              16,
+                                                                          color:
+                                                                              Colors.black),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                    ),
+                                                                    actions: <Widget>[
+                                                                      Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                )),
+                                                                            //delete...
+
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                  onPressed: () async {
+                                                                                    var deleteUp = e.id;
+
+                                                                                    final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeSchoolCalender/DeleteSchoolCalender?Id=$deleteUp';
+
+                                                                                    try {
+                                                                                      final response = await http.delete(
+                                                                                        Uri.parse(url),
+                                                                                        headers: {
+                                                                                          'Content-Type': 'application/json',
+                                                                                          'Authorization': 'Bearer $authToken',
+                                                                                        },
+                                                                                      );
+
+                                                                                      if (response.statusCode == 200) {
+                                                                                        print('id has beeen deleted ${deleteUp}');
+
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.green, content: Text('Event deleted successfully!')),
+                                                                                        );
+                                                                                        //
+                                                                                        Navigator.pop(context);
+                                                                                        //
+                                                                                        await fetchStudentCalendar();
+                                                                                      } else {
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete Event.')),
+                                                                                        );
+                                                                                      }
+                                                                                    } catch (e) {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(content: Text('An error occurred: $e')),
+                                                                                      );
+                                                                                    }
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Delete',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                            ),
+                                                                          ])
+                                                                    ]);
+                                                              });
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(top: 8),
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            'assets/icons/timetable_delete.svg',
+                                                            fit: BoxFit.contain,
+                                                          ),
+                                                        ),
+                                                      )
                                                   ],
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
+                                              Spacer(),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  var image = e.filePath;
+                                                  var videoPath = e.filePath;
+
+                                                  if (e.fileType == 'image') {
+                                                    _PreviewBottomsheet(context,
+                                                        e.filePath, null);
+                                                  } else if (e.fileType ==
+                                                      'link') {
+                                                    _PreviewBottomsheet(context,
+                                                        null, e.filePath);
+                                                  }
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 20),
+                                                  child: Column(
+                                                    children: [
+                                                      Text(
+                                                        e.fileType == 'image'
+                                                            ? 'View Image'
+                                                            : e.fileType ==
+                                                                    'link'
+                                                                ? 'View Video'
+                                                                : '',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'regular',
+                                                            fontSize: 12,
+                                                            color: Colors.black,
+                                                            decoration:
+                                                                TextDecoration
+                                                                    .underline,
+                                                            decorationColor:
+                                                                Colors.black,
+                                                            decorationThickness:
+                                                                2),
+                                                      ),
+                                                      //edit
+                                                      if (UserSession()
+                                                              .userType ==
+                                                          'admin')
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return AlertDialog(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              10)),
+                                                                      content:
+                                                                          Text(
+                                                                        "Do you really want to make\n changes to this Event?",
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'regular',
+                                                                            fontSize:
+                                                                                16,
+                                                                            color:
+                                                                                Colors.black),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                      actions: <Widget>[
+                                                                        Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //edit...
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                    onPressed: () {
+                                                                                      var calendarId = e.id;
+                                                                                      Navigator.pop(context);
+                                                                                      Navigator.push(
+                                                                                          context,
+                                                                                          MaterialPageRoute(
+                                                                                              builder: (context) => EditSchoolCalender(
+                                                                                                    Id: calendarId,
+                                                                                                    fetchStudentCalendar: fetchStudentCalendar,
+                                                                                                  )));
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Edit',
+                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    )),
+                                                                              ),
+                                                                            ])
+                                                                      ]);
+                                                                });
+                                                          },
+                                                          child: Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .only(
+                                                                    top: 10),
+                                                            child: Text(
+                                                              'Edit',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'regular',
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
+                              ],
+                            );
+                          }).toList(),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
 //preview bottomsheet...
-  void _PreviewBottomsheet(BuildContext context, String image) {
+  void _PreviewBottomsheet(
+      BuildContext context, String? image, String? videoPath) {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
@@ -773,6 +943,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (BuildContext modalContext) {
+        print('preview $videoPath');
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Stack(clipBehavior: Clip.none, children: [
@@ -804,34 +975,36 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 30),
+                      //
+                      Container(
+                        width: double.infinity,
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        padding: const EdgeInsets.all(10),
                         child: Center(
-                          child: Image.network(
-                            image,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) {
-                                WidgetsBinding.instance!
-                                    .addPostFrameCallback((_) {
-                                  setModalState(() {
-                                    isLoading = false;
-                                  });
-                                });
-                                return child;
-                              } else {
-                                return Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 150),
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 4,
-                                        color: AppTheme.textFieldborderColor),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
+                          child: image != null
+                              ? Image.network(
+                                  image,
+                                  fit: BoxFit.contain,
+                                )
+                              : videoPath != null
+                                  ? SizedBox(
+                                      width: double.infinity,
+                                      child: YoutubePlayer(
+                                        controller: YoutubePlayerController(
+                                          initialVideoId:
+                                              YoutubePlayer.convertUrlToId(
+                                                      videoPath)
+                                                  .toString(),
+                                          flags: const YoutubePlayerFlags(
+                                            autoPlay: true,
+                                            mute: false,
+                                          ),
+                                        ),
+                                        showVideoProgressIndicator: true,
+                                        aspectRatio: 16 / 9,
+                                      ),
+                                    )
+                                  : const Text("No content available"),
                         ),
                       ),
                     ],

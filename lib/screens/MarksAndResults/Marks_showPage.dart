@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
@@ -7,7 +6,6 @@ import 'package:flutter_application_1/models/Marks_models/Showmarks_model.dart';
 import 'package:flutter_application_1/services/Marks_Api/Showmarks_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -57,17 +55,14 @@ class _MarksShowpageState extends State<MarksShowpage> {
   String? selectedExam;
   final gradeController = Get.find<GradeController>();
   List<String> availableExams = [];
-
   void updateExams(String gradeId) {
     final selectedGrade = gradeController.gradeList.firstWhere(
       (grade) => grade['id'].toString() == gradeId,
       orElse: () => null,
     );
-
     if (selectedGrade != null) {
       setState(() {
         availableExams = List<String>.from(selectedGrade['exams'] ?? []);
-
         if (availableExams.isNotEmpty) {
           selectedExam = availableExams[0];
         } else {
@@ -80,9 +75,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
 //select section....
   void _showFilterBottomSheet(BuildContext context) {
     List<String> sections = [];
-
     final gradeController = Get.find<GradeController>();
-
 //update sections..
     void updateSections(int gradeId) {
       final selectedGrade = gradeController.gradeList.firstWhere(
@@ -95,7 +88,6 @@ class _MarksShowpageState extends State<MarksShowpage> {
     }
 
     updateSections(gradeId);
-
 //section filter...
     showModalBottomSheet(
       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
@@ -283,6 +275,9 @@ class _MarksShowpageState extends State<MarksShowpage> {
     );
   }
 
+  ScrollController _tableScrollController = ScrollController();
+  double _progress = 0.0;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -295,19 +290,35 @@ class _MarksShowpageState extends State<MarksShowpage> {
     gradeId = widget.gradeId;
     gradeController.fetchGrades();
     showw();
-    _linearprogresscontroller.addListener(() {
-      setState(() {
-        double progress = _linearprogresscontroller.offset /
-            (_linearprogresscontroller.position.maxScrollExtent);
+    gradeController.fetchGrades();
+    _scrollController.addListener(_scrollListener);
+    //
+    // Add listener to track horizontal scroll position
+    _tableScrollController.addListener(() {
+      double maxScrollExtent = _tableScrollController.position.maxScrollExtent;
+      double currentScrollPosition = _tableScrollController.position.pixels;
 
-        _progress = progress.clamp(0.0, 1.0);
+      setState(() {
+        _progress = currentScrollPosition / maxScrollExtent;
       });
     });
   }
 
-  ScrollController _linearprogresscontroller = ScrollController();
-  double _progress = 0.0;
+  void _scrollListener() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _tableScrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
+  }
+
   TextEditingController _teachercommmentview = TextEditingController();
+  //scroll
+  ScrollController _scrollController = ScrollController();
 
   //view bottomsheeet...
   void _viewBottomsheet(BuildContext context, String teachercomment) {
@@ -420,7 +431,6 @@ class _MarksShowpageState extends State<MarksShowpage> {
   List<String> subjects = [];
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
   void _initializeNotification() {
     const AndroidInitializationSettings androidInitializationSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -462,7 +472,6 @@ class _MarksShowpageState extends State<MarksShowpage> {
       onlyAlertOnce: true,
       maxProgress: 100,
     );
-
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidDetails);
     await _notificationsPlugin.show(
@@ -477,7 +486,6 @@ class _MarksShowpageState extends State<MarksShowpage> {
       importance: Importance.max,
       priority: Priority.high,
     );
-
     const NotificationDetails notificationDetails =
         NotificationDetails(android: androidDetails);
     await _notificationsPlugin.show(0, 'Export Complete',
@@ -489,12 +497,9 @@ class _MarksShowpageState extends State<MarksShowpage> {
   Future<void> exportToExcel(
       MarksResponse data, List<String> subjects, String selectedSection) async {
     await _showNotification('Export Started', 'Preparing to export data...');
-
     final excel = Excel.createExcel();
-
     // Create a new sheet named 'Sheet1'
     final sheet = excel['Sheet1'];
-
     // Add headers
     List<String> headers = [
       'S.No',
@@ -507,9 +512,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
       'Teacher Notes',
       ...subjects,
     ];
-
     sheet.appendRow(headers.map((header) => TextCellValue(header)).toList());
-
     for (int i = 0; i < data.prekgRequest.length; i++) {
       var e = data.prekgRequest[i];
       List<dynamic> row = [
@@ -522,40 +525,30 @@ class _MarksShowpageState extends State<MarksShowpage> {
         e.remarks,
         ...subjects.map((subject) => subject),
       ];
-
       sheet.appendRow(
           row.map((cell) => TextCellValue(cell.toString())).toList());
     }
-
     excel.setDefaultSheet('Sheet1');
-
     final directory = await getExternalStorageDirectory();
     if (directory == null) {
       print("Failed to get external directory");
       return;
     }
-
     final downloadDir = Directory('${directory.path}/Download');
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
     }
-
     final filePath =
         '${downloadDir.path}/StudentData_${selectedSection}_${DateTime.now().toIso8601String()}.xlsx';
-
     final file = File(filePath);
-
     final bytes = excel.encode();
-
     if (bytes != null) {
       for (int progress = 0; progress <= 100; progress += 25) {
         await Future.delayed(Duration(milliseconds: 500));
         _updateProgressNotification(progress);
       }
-
       await file.writeAsBytes(bytes, flush: true);
       print('File saved at $filePath');
-
       // Finish notification
       await _finishNotification(filePath);
     } else {
@@ -569,18 +562,14 @@ class _MarksShowpageState extends State<MarksShowpage> {
       (student) => student.rollnumber == rollNumber,
       orElse: () => StudentMark.empty(),
     );
-
     if (studentData.rollnumber.isEmpty) {
       print('Student with roll number $rollNumber not found');
       return;
     }
-
     await _showNotification('Export Started',
         'Preparing to export data for student $rollNumber...');
-
     final excel = Excel.createExcel();
     final sheet = excel['Sheet1'];
-
     // Add headers
     List<String> headers = [
       'S.No',
@@ -593,9 +582,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
       'Teacher Notes',
       ...subjects,
     ];
-
     sheet.appendRow(headers.map((header) => TextCellValue(header)).toList());
-
     // Add the individual student row
     List<dynamic> row = [
       1,
@@ -608,179 +595,169 @@ class _MarksShowpageState extends State<MarksShowpage> {
       studentData.teacherNotes,
       ...subjects.map((subject) => subject),
     ];
-
     sheet.appendRow(row.map((cell) => TextCellValue(cell.toString())).toList());
-
     excel.setDefaultSheet('Sheet1');
-
     final directory = await getExternalStorageDirectory();
     if (directory == null) {
       print("Failed to get external directory");
       return;
     }
-
     final downloadDir = Directory('${directory.path}/Download');
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
     }
-
     final filePath =
         '${downloadDir.path}/Student_${rollNumber}_Data_${selectedSection}_${DateTime.now().toIso8601String()}.xlsx';
-
     final file = File(filePath);
-
     final bytes = excel.encode();
-
     if (bytes != null) {
       for (int progress = 0; progress <= 100; progress += 25) {
         await Future.delayed(Duration(milliseconds: 500));
         _updateProgressNotification(progress);
       }
-
       await file.writeAsBytes(bytes, flush: true);
       print('File saved at $filePath');
-
       // Finish notification
       await _finishNotification(filePath);
     } else {
       print('Failed to save file.');
     }
   }
-
 //notification and export code end......
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-          child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
-            backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Text(
-              'Marks / Results',
-              style: TextStyle(
-                fontFamily: 'semibold',
-                fontSize: 16,
-                color: Colors.black,
+        backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+            child: AppBar(
+              iconTheme: IconThemeData(color: Colors.black),
+              backgroundColor: AppTheme.appBackgroundPrimaryColor,
+              leading: GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Icon(Icons.arrow_back)),
+              title: Text(
+                'Marks / Results',
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  //exam dropdownfield..
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.7,
-                    child: DropdownButtonFormField<String>(
-                      dropdownColor: Colors.black,
-                      menuMaxHeight: 150,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                          ),
-                        ),
-                      ),
-                      value: selectedExam,
-                      hint: Text(
-                        "Select Exam",
-                        style: TextStyle(
-                          fontFamily: 'regular',
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedExam = value;
-                        });
-                        showw();
-                      },
-                      items: availableExams.map((exam) {
-                        return DropdownMenuItem<String>(
-                          value: exam,
-                          child: Text(
-                            exam,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'regular',
-                              fontSize: 14,
+        body: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    //exam dropdownfield..
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.7,
+                      child: DropdownButtonFormField<String>(
+                        dropdownColor: Colors.black,
+                        menuMaxHeight: 150,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
                             ),
                           ),
-                        );
-                      }).toList(),
-                      selectedItemBuilder: (BuildContext context) {
-                        return availableExams.map((exam) {
-                          return Align(
-                            alignment: Alignment.centerLeft,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                            ),
+                          ),
+                        ),
+                        value: selectedExam,
+                        hint: Text(
+                          "Select Exam",
+                          style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                        ),
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedExam = value;
+                          });
+                          showw();
+                        },
+                        items: availableExams.map((exam) {
+                          return DropdownMenuItem<String>(
+                            value: exam,
                             child: Text(
                               exam,
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontFamily: 'regular',
                                 fontSize: 14,
                               ),
                             ),
                           );
-                        }).toList();
+                        }).toList(),
+                        selectedItemBuilder: (BuildContext context) {
+                          return availableExams.map((exam) {
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                exam,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            );
+                          }).toList();
+                        },
+                      ),
+                    ),
+                    //filter icon..
+                    GestureDetector(
+                      onTap: () {
+                        _showFilterBottomSheet(context);
                       },
+                      child: SvgPicture.asset(
+                        'assets/icons/Filter_icon.svg',
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
-                  //filter icon..
-                  GestureDetector(
-                    onTap: () {
-                      _showFilterBottomSheet(context);
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/Filter_icon.svg',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  //export icon..
-                  GestureDetector(
-                    onTap: () async {
-                      String selectedSection = 'A1';
-                      _initializeNotification();
-                      exportToExcel(data!, subjects, selectedSection);
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/export_icon.svg',
-                      fit: BoxFit.contain,
-                    ),
-                  )
-                ],
+                    //export icon..
+                    GestureDetector(
+                      onTap: () async {
+                        String selectedSection = 'A1';
+                        _initializeNotification();
+                        exportToExcel(data!, subjects, selectedSection);
+                      },
+                      child: SvgPicture.asset(
+                        'assets/icons/export_icon.svg',
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            //
-            FutureBuilder<MarksResponse>(
+              //
+              FutureBuilder<MarksResponse>(
                 future: marksResponse,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -806,55 +783,57 @@ class _MarksShowpageState extends State<MarksShowpage> {
                           offset: Offset(0, 15),
                           child: Padding(
                             padding: const EdgeInsets.only(left: 25),
-                            child: Row(children: [
-                              IntrinsicWidth(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(10)),
-                                      border: Border.all(
-                                          color: Color.fromRGBO(
-                                              234, 234, 234, 1))),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(10)),
+                            child: Row(
+                              children: [
+                                IntrinsicWidth(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(10)),
+                                        border: Border.all(
                                             color: Color.fromRGBO(
-                                                31, 106, 163, 1)),
-                                        child: Padding(
+                                                234, 234, 234, 1))),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10)),
+                                              color: Color.fromRGBO(
+                                                  31, 106, 163, 1)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10, right: 10),
+                                            child: Text(
+                                              '${data.gradeSection}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 10, right: 10),
+                                              left: 10, right: 5),
                                           child: Text(
-                                            '${data.gradeSection}',
+                                            'Class Teacher - ${data.classTeacher}',
                                             style: TextStyle(
                                                 fontFamily: 'medium',
                                                 fontSize: 12,
-                                                color: Colors.white),
+                                                color: Colors.black),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 5),
-                                        child: Text(
-                                          'Class Teacher - ${data.classTeacher}',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Spacer(),
-                            ]),
+                                Spacer(),
+                              ],
+                            ),
                           ),
                         ),
                         //card sections...
@@ -960,7 +939,6 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                               )
                                             ],
                                           ),
-
                                           //
                                           Column(
                                             mainAxisSize: MainAxisSize.min,
@@ -1006,27 +984,27 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                               //pass..
                                               if (e.remarks.isNotEmpty)
                                                 ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                            backgroundColor:
-                                                                e.remarks ==
-                                                                        'Pass'
-                                                                    ? Color
-                                                                        .fromRGBO(
-                                                                            1,
-                                                                            133,
-                                                                            53,
-                                                                            1)
-                                                                    : Colors
-                                                                        .red),
-                                                    onPressed: () {},
-                                                    child: Text(
-                                                      '${e.remarks}',
-                                                      style: TextStyle(
-                                                          fontFamily: 'medium',
-                                                          fontSize: 16,
-                                                          color: Colors.white),
-                                                    )),
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                          backgroundColor:
+                                                              e.remarks ==
+                                                                      'Pass'
+                                                                  ? Color
+                                                                      .fromRGBO(
+                                                                          1,
+                                                                          133,
+                                                                          53,
+                                                                          1)
+                                                                  : Colors.red),
+                                                  onPressed: () {},
+                                                  child: Text(
+                                                    '${e.remarks}',
+                                                    style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 16,
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
                                             ],
                                           ),
                                         ],
@@ -1058,10 +1036,8 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                               ),
                                             );
                                           }
-
                                           return SingleChildScrollView(
-                                            controller:
-                                                _linearprogresscontroller,
+                                            controller: _tableScrollController,
                                             scrollDirection: Axis.horizontal,
                                             child: Padding(
                                               padding:
@@ -1096,13 +1072,16 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                                           '${e.totalMarks}')),
                                                       ...gradeController
                                                           .filteredSubjects
-                                                          .map((subject) {
-                                                        final value =
-                                                            getSubjectValue(
-                                                                e, subject);
-                                                        return DataCell(
-                                                            Text(value));
-                                                      }).toList(),
+                                                          .map(
+                                                        (subject) {
+                                                          final value =
+                                                              getSubjectValue(
+                                                                  e, subject);
+
+                                                          return DataCell(
+                                                              Text(value));
+                                                        },
+                                                      ).toList(),
                                                     ],
                                                   ),
                                                 ],
@@ -1111,26 +1090,11 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                           );
                                         },
                                       ),
-
                                       //
                                       Divider(
                                         color: Color.fromRGBO(245, 245, 245, 1),
                                         height: 5,
                                         thickness: 3,
-                                      ),
-                                      Container(
-                                        width: 60,
-                                        height: 10,
-                                        child: LinearProgressIndicator(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          backgroundColor:
-                                              Color.fromRGBO(225, 225, 225, 1),
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.black),
-                                          value: _progress,
-                                        ),
                                       ),
 
                                       Row(
@@ -1168,6 +1132,21 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                           )
                                         ],
                                       ),
+                                      // Linear progress bar
+                                      Container(
+                                        width: 60,
+                                        height: 10,
+                                        child: LinearProgressIndicator(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          backgroundColor:
+                                              Color.fromRGBO(225, 225, 225, 1),
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  Colors.black),
+                                          value: _progress,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 );
@@ -1178,11 +1157,36 @@ class _MarksShowpageState extends State<MarksShowpage> {
                       ],
                     );
                   }
-                }),
-          ],
+                },
+              ),
+            ],
+          ),
         ),
-      ),
-    );
+        //top arrow..
+        floatingActionButton:
+            _scrollController.hasClients && _scrollController.offset > 50
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
+                  )
+                : null,
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.centerDocked);
   }
 
   String getSubjectValue(dynamic e, String subject) {
@@ -1193,16 +1197,16 @@ class _MarksShowpageState extends State<MarksShowpage> {
         return '${e.english}';
       case 'hindi':
         return '${e.hindi}';
-      case 'Maths':
+      case 'maths':
         return '${e.maths}';
-      case 'EVS':
-        return '${e.EVS}';
-      case 'Phonics':
-        return '${e.Phonics}';
-      case 'Science':
-        return '${e.Science}';
-      case 'Social':
-        return '${e.Social}';
+      case 'evs':
+        return '${e.evs}';
+      case 'phonics':
+        return '${e.phonics}';
+      case 'science':
+        return '${e.science}';
+      case 'social':
+        return '${e.social}';
       default:
         return '-';
     }

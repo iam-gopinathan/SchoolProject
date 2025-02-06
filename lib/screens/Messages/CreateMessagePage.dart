@@ -6,8 +6,12 @@ import 'package:flutter_application_1/services/Message_Api/Create_message_Api.da
 import 'package:flutter_application_1/services/Message_Api/Grade_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class Createmessagepage extends StatefulWidget {
   final Function messageFetch;
@@ -19,8 +23,10 @@ class Createmessagepage extends StatefulWidget {
 
 class _CreatemessagepageState extends State<Createmessagepage> {
   TextEditingController _heading = TextEditingController();
-  TextEditingController _desc = TextEditingController();
+
   TextEditingController _scheduledDateandtime = TextEditingController();
+
+  QuillController _controller = QuillController.basic();
 
   // Method to show date picker
   Future<void> _pickDate() async {
@@ -100,6 +106,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
   void initState() {
     super.initState();
     _loadGrades();
+    initialHeading = _heading.text;
   }
 
   void _loadGrades() async {
@@ -350,19 +357,15 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                       ),
                       //description..
                       //selected class
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _desc.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            child: htmlContent.isNotEmpty
+                                ? Html(data: htmlContent)
+                                : const Text(''),
+                          ),
+                        ],
                       ),
                       //schedulepost..
                       //selected class
@@ -399,8 +402,30 @@ class _CreatemessagepageState extends State<Createmessagepage> {
     return null;
   }
 
+  late String htmlContent = "";
+
   //create message api call...
   void _submitForm(String status) {
+    //
+
+    final generatedHtml = QuillDeltaToHtmlConverter(
+      _controller.document.toDelta().toJson(),
+    ).convert();
+
+    late String htmlContent = generatedHtml;
+    // Print the generated HTML content for debugging
+    print("Generated HTML Content: $htmlContent");
+
+    if (_heading.text.isEmpty || htmlContent.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
+
     String gradeIds = '';
 
     if (selectedRecipient == 'Students') {
@@ -414,7 +439,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
     }
     CreatemessageModels newMessage = CreatemessageModels(
       headLine: _heading.text,
-      message: _desc.text,
+      message: htmlContent,
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',
       status: status,
@@ -431,7 +456,63 @@ class _CreatemessagepageState extends State<Createmessagepage> {
     );
 
     print("New Message Object: ${newMessage.toJson()}");
-    CreateMessage(newMessage, context);
+    CreateMessage(
+      newMessage,
+      context,
+      widget.messageFetch,
+    );
+  }
+
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return _heading.text != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 
   @override
@@ -458,7 +539,10 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         widget.messageFetch();
                         Navigator.pop(context);
                       },
@@ -704,12 +788,67 @@ class _CreatemessagepageState extends State<Createmessagepage> {
               ),
             ),
 
-            //description field..
+            // //description field..
+            // Padding(
+            //   padding: const EdgeInsets.all(15.0),
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //       color: Colors.transparent,
+            //       boxShadow: [
+            //         BoxShadow(
+            //           color: Colors.black.withOpacity(0.2),
+            //           spreadRadius: 2,
+            //           blurRadius: 5,
+            //           offset: Offset(0, 0),
+            //         ),
+            //       ],
+            //     ),
+            //     child: TextFormField(
+            //       maxLines: 6,
+            //       controller: _desc,
+            //       inputFormatters: [LengthLimitingTextInputFormatter(600)],
+            //       decoration: InputDecoration(
+            //         enabledBorder: OutlineInputBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //           borderSide: BorderSide(color: Colors.white),
+            //         ),
+            //         border: OutlineInputBorder(
+            //           borderRadius: BorderRadius.circular(10),
+            //           borderSide: BorderSide(color: Colors.white),
+            //         ),
+            //         filled: true,
+            //         fillColor: Colors.white,
+            //         focusedBorder: OutlineInputBorder(
+            //           borderSide: BorderSide(color: Colors.white),
+            //           borderRadius: BorderRadius.circular(10),
+            //         ),
+            //       ),
+            //       style: TextStyle(
+            //           color: Colors.black, fontFamily: 'medium', fontSize: 14),
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 15),
+            //   child: Row(
+            //     children: [
+            //       Text(
+            //         '*Max 600 Characters',
+            //         style: TextStyle(
+            //             fontFamily: 'regular',
+            //             fontSize: 12,
+            //             color: Color.fromRGBO(127, 127, 127, 1)),
+            //       )
+            //     ],
+            //   ),
+            // ),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: const EdgeInsets.all(12.0),
               child: Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -719,43 +858,75 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                     ),
                   ],
                 ),
-                child: TextFormField(
-                  maxLines: 6,
-                  controller: _desc,
-                  inputFormatters: [LengthLimitingTextInputFormatter(600)],
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          QuillSimpleToolbar(
+                            controller: _controller,
+                            configurations:
+                                const QuillSimpleToolbarConfigurations(
+                              dialogTheme: QuillDialogTheme(
+                                  labelTextStyle:
+                                      TextStyle(color: Colors.black),
+                                  inputTextStyle: TextStyle(
+                                      color: Colors.black, fontSize: 14)),
+                              showBoldButton: true,
+                              showClearFormat: false,
+                              showAlignmentButtons: false,
+                              showBackgroundColorButton: false,
+                              showFontSize: false,
+                              showColorButton: false,
+                              showCenterAlignment: false,
+                              showClipboardCut: false,
+                              showIndent: false,
+                              showDirection: false,
+                              showDividers: false,
+                              showFontFamily: false,
+                              showItalicButton: false,
+                              showClipboardPaste: false,
+                              showInlineCode: false,
+                              showCodeBlock: false,
+                              showHeaderStyle: false,
+                              showJustifyAlignment: false,
+                              showLeftAlignment: false,
+                              showLineHeightButton: false,
+                              showLink: false,
+                              showListBullets: false,
+                              showListCheck: false,
+                              showListNumbers: false,
+                              showQuote: false,
+                              showRightAlignment: false,
+                              showSearchButton: false,
+                              showRedo: false,
+                              showSmallButton: false,
+                              showSubscript: false,
+                              showStrikeThrough: false,
+                              showUndo: false,
+                              showUnderLineButton: false,
+                              showSuperscript: false,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
+                    // Quill editor
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 5, bottom: 10),
+                          child: quill.QuillEditor.basic(
+                            controller: _controller,
+                          ),
+                        ),
+                      ),
                     ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: Colors.black, fontFamily: 'medium', fontSize: 14),
+                  ],
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  Text(
-                    '*Max 600 Characters',
-                    style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Color.fromRGBO(127, 127, 127, 1)),
-                  )
-                ],
               ),
             ),
             //schedule post...
@@ -861,6 +1032,16 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                   ///preview
                   GestureDetector(
                     onTap: () {
+                      final generatedHtml = QuillDeltaToHtmlConverter(
+                        _controller.document.toDelta().toJson(),
+                      ).convert();
+
+                      setState(() {
+                        htmlContent = generatedHtml;
+                      });
+
+                      print("Generated HTML Content: $htmlContent");
+
                       _PreviewBottomsheet(context);
                     },
                     child: Text(
@@ -887,7 +1068,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                     child: Text(
                       _scheduledDateandtime.text.isEmpty
                           ? 'Publish'
-                          : 'Scheduled',
+                          : 'Schedule',
                       style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'medium',

@@ -6,8 +6,8 @@ import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
-Future<bool> postEventCalendar(
-    CreateImportantEventModel eventCalendar, context) async {
+Future<bool> postEventCalendar(CreateImportantEventModel eventCalendar, context,
+    Function fetchAndDisplayEvents) async {
   final url = Uri.parse(
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/eventCalender/postEventCalender');
 
@@ -40,13 +40,42 @@ Future<bool> postEventCalendar(
     var response = await request.send();
 
     if (response.statusCode == 200) {
+      // Log the fields being added
+      print('Request Fields:');
+
+      print('UserType: ${eventCalendar.userType}');
+
+      print('RollNumber: ${eventCalendar.rollNumber}');
+
+      print('HeadLine: ${eventCalendar.headLine}');
+
+      print('Description: ${eventCalendar.description}');
+
+      print('FileType: ${eventCalendar.fileType}');
+
+      print('Link: ${eventCalendar.link}');
+
+      print('FromDate: ${eventCalendar.fromDate}');
+
+      print('ToDate: ${eventCalendar.toDate}');
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Event posted successfully!'),
+          content: Text('Event Created successfully!'),
           backgroundColor: Colors.green,
         ),
       );
       print("Event posted successfully");
+
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchAndDisplayEvents();
+
+      Navigator.pop(
+        context,
+      );
+
       return true;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

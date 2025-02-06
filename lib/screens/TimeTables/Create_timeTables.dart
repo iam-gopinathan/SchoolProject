@@ -203,6 +203,58 @@ class _CreateTimetablesState extends State<CreateTimetables> {
         });
   }
 
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return selectedGrade != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -227,7 +279,10 @@ class _CreateTimetablesState extends State<CreateTimetables> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         widget.fetchMaintimetable();
                         Navigator.pop(context);
                       },
@@ -529,9 +584,7 @@ class _CreateTimetablesState extends State<CreateTimetables> {
               ),
             ),
 
-            ///display selected image...
             /// Display selected image...
-
             if (selectedFile != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -615,7 +668,6 @@ class _CreateTimetablesState extends State<CreateTimetables> {
                 ),
               ],
             ),
-
             //save as draft
             Padding(
               padding: const EdgeInsets.only(top: 100, bottom: 50),
@@ -680,12 +732,28 @@ class _CreateTimetablesState extends State<CreateTimetables> {
     );
   }
 
+//
   void submitTimetable(String status, String dateTime) async {
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
     String postedOn = status == "post" ? currentDateTime : "";
     String draftedOn = status == "draft" ? currentDateTime : "";
+
+    // Check if selectedFile is null
+    if (selectedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Please Upload Image !",
+            style: TextStyle(
+                fontFamily: 'semibold', fontSize: 14, color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     CreateTimetableModel timeTable = CreateTimetableModel(
       gradeId: selectedGradeId!,
@@ -698,7 +766,6 @@ class _CreateTimetablesState extends State<CreateTimetables> {
       postedOn: postedOn,
       draftedOn: draftedOn,
     );
-
-    postTimeTable(timeTable, selectedFile!, context);
+    postTimeTable(timeTable, selectedFile!, context, widget.fetchMaintimetable);
   }
 }

@@ -5,11 +5,9 @@ import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/models/Homework_models/create_homeworks_model.dart';
 import 'package:flutter_application_1/services/Homeworks_Api/create_homeworks_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
-
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-
 import '../../utils/theme.dart';
 
 class CreateHomeworks extends StatefulWidget {
@@ -279,6 +277,58 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
         });
   }
 
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return selectedGrade != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -303,7 +353,10 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         Navigator.pop(context);
                         widget.fetchHomework();
                       },
@@ -606,7 +659,6 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
               ),
             ),
 
-            ///display selected image...
             /// Display selected image...
 
             if (selectedFile != null)
@@ -796,7 +848,7 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                     child: Text(
                       _scheduledDateandtime.text.isEmpty
                           ? 'Publish'
-                          : 'Scheduled',
+                          : 'Schedule',
                       style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'medium',
@@ -814,6 +866,16 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
 
 //create homework...
   void submitHomework(String status) async {
+    // Check if no image file is selected
+    if (selectedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select an image !'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
@@ -832,6 +894,6 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
       draftedOn: draftedOn,
       scheduleOn: _scheduledDateandtime.text,
     );
-    postHomework(homework, selectedFile!, context);
+    postHomework(homework, selectedFile!, context, widget.fetchHomework);
   }
 }

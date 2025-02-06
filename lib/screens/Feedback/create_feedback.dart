@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/models/Feedback_models/create_feedback_model.dart';
-
 import 'package:flutter_application_1/services/Feedback_Api/create_feedback_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
@@ -10,7 +9,9 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 class CreateFeedback extends StatefulWidget {
-  const CreateFeedback({super.key});
+  const CreateFeedback({
+    super.key,
+  });
 
   @override
   State<CreateFeedback> createState() => _CreateFeedbackState();
@@ -318,6 +319,58 @@ class _CreateFeedbackState extends State<CreateFeedback> {
         });
   }
 
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return selectedRecipient != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -342,7 +395,10 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         Navigator.pop(context);
                       },
                       child: Icon(
@@ -704,7 +760,6 @@ class _CreateFeedbackState extends State<CreateFeedback> {
             ///questions loop...
 
             for (int i = 0; i < textFieldList.length; i++) _buildQuestion(i),
-
             //save as draft
             Padding(
               padding: const EdgeInsets.only(top: 40, bottom: 50),
@@ -768,19 +823,17 @@ class _CreateFeedbackState extends State<CreateFeedback> {
   }
 
   List<String> selected = [];
-
   // Create feedback
   void submitFeedback(String status) {
     // Collect all the questions
     List<String> questions =
         questionControllers.map((controller) => controller.text).toList();
-
     CreateFeedbackModel create = CreateFeedbackModel(
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',
-      recipient: selectedRecipient!,
-      gradeId: selectedGradeId!,
-      section: selectedSection!,
+      recipient: selectedRecipient ?? '',
+      gradeId: selectedGradeId ?? '',
+      section: selectedSection ?? '',
       heading: _heading.text,
       question: questions.join("|"),
       status: status,

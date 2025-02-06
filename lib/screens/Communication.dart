@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/AttendencePage/Attendence_page.dart';
+import 'package:flutter_application_1/screens/AttendencePage/Parent_Attendence_mainPage.dart';
 import 'package:flutter_application_1/screens/ExamTimeTable/examTimetable_mainpage.dart';
+import 'package:flutter_application_1/screens/Feedback/ParentFeedback_Mainpage.dart';
+
 import 'package:flutter_application_1/screens/Feedback/feedback_mainpage.dart';
 import 'package:flutter_application_1/screens/Homeworks/Homework_Mainpage.dart';
 import 'package:flutter_application_1/screens/ImportantEvents/ImportantEvents_mainpage.dart';
 import 'package:flutter_application_1/screens/MarksAndResults/MarksMainpage.dart';
+import 'package:flutter_application_1/screens/MarksAndResults/Parent_MarksandResults.dart';
 import 'package:flutter_application_1/screens/Messages/Message_mainPage.dart';
 import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
 import 'package:flutter_application_1/screens/Schoolcalender/schoolCalender_mainPage.dart';
 import 'package:flutter_application_1/screens/StudyMaterial/studyMaterial_mainpage.dart';
+import 'package:flutter_application_1/screens/TimeTables/Teacher_timetable_create.dart';
 import 'package:flutter_application_1/screens/TimeTables/timeTable_mainpage.dart';
 import 'package:flutter_application_1/screens/circularPage/circular_mainPage.dart';
+import 'package:flutter_application_1/screens/consentFoms/ParentYesOrNo_page.dart';
+
 import 'package:flutter_application_1/screens/consentFoms/consentForm_mainpage.dart';
+import 'package:flutter_application_1/user_Session.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Communication extends StatefulWidget {
@@ -29,6 +38,13 @@ class Communication extends StatefulWidget {
 }
 
 class _CommunicationState extends State<Communication> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print("rollll${UserSession().rollNumber}");
+  }
+
   final List<Map<String, dynamic>> items = [
     {
       "svg": 'assets/icons/Attendancepage_news.svg',
@@ -41,7 +57,9 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(250, 248, 251, 1),
         Color.fromRGBO(250, 248, 251, 1)
       ],
-      "page": Newsmainpage(),
+      "page": Newsmainpage(
+        isswitched: false,
+      ),
     },
     {
       "svg": 'assets/icons/Attendancepage_message.svg',
@@ -54,7 +72,9 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(254, 252, 251, 1),
         Color.fromRGBO(254, 252, 251, 1),
       ],
-      "page": MessageMainpage(),
+      "page": MessageMainpage(
+        isswitched: false,
+      ),
     },
     {
       "svg": 'assets/icons/Attendancepage_notesoutline.svg',
@@ -67,7 +87,9 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(252, 253, 250, 1),
         Color.fromRGBO(252, 253, 250, 1)
       ],
-      "page": CircularMainpage(),
+      "page": CircularMainpage(
+        isswitched: false,
+      ),
     },
     {
       "svg": 'assets/icons/Attendencepage_form.svg',
@@ -80,7 +102,9 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(254, 251, 250, 1),
         Color.fromRGBO(254, 251, 250, 1),
       ],
-      "page": ConsentformMainpage(),
+      "page": UserSession().userType == 'admin'
+          ? ConsentformMainpage()
+          : ParentyesornoPage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_time.svg',
@@ -145,7 +169,10 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(250, 251, 252, 1),
         Color.fromRGBO(250, 251, 252, 1),
       ],
-      "page": Marksmainpage(),
+      "page": UserSession().userType == 'admin' ||
+              UserSession().userType == 'teacher'
+          ? Marksmainpage()
+          : ParentMarksandresults(),
     },
     {
       "svg": 'assets/icons/Attendencepage_calendar.svg',
@@ -173,19 +200,22 @@ class _CommunicationState extends State<Communication> {
       ],
       "page": ImportanteventsMainpage(),
     },
-    {
-      "svg": 'assets/icons/Attendencepage_comment.svg',
-      "label": "Feedback",
-      "color": [
-        Color.fromRGBO(250, 90, 42, 0.1),
-        Color.fromRGBO(204, 47, 0, 0.1)
-      ],
-      "cardcolor": [
-        Color.fromRGBO(254, 251, 250, 1),
-        Color.fromRGBO(254, 251, 250, 1),
-      ],
-      "page": FeedbackMainpage(),
-    },
+    if (UserSession().userType != 'teacher')
+      {
+        "svg": 'assets/icons/Attendencepage_comment.svg',
+        "label": "Feedback",
+        "color": [
+          Color.fromRGBO(250, 90, 42, 0.1),
+          Color.fromRGBO(204, 47, 0, 0.1)
+        ],
+        "cardcolor": [
+          Color.fromRGBO(254, 251, 250, 1),
+          Color.fromRGBO(254, 251, 250, 1),
+        ],
+        "page": UserSession().userType == 'admin'
+            ? FeedbackMainpage()
+            : ParentfeedbackMainpage(),
+      },
     {
       "svg": 'assets/icons/Attendencepage_timeline.svg',
       "label": "Attendance",
@@ -197,11 +227,14 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(253, 250, 252, 1),
         Color.fromRGBO(253, 250, 252, 1),
       ],
-      "page": AttendencePage(
-        imagePath: '',
-        userType: '',
-        username: '',
-      ),
+      "page": UserSession().userType == 'admin' ||
+              UserSession().userType == 'teacher'
+          ? AttendencePage(
+              imagePath: '',
+              userType: '',
+              username: '',
+            )
+          : ParentAttendenceMainpage(),
     },
   ];
 

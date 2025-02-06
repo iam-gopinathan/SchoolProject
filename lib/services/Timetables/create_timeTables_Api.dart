@@ -8,8 +8,8 @@ import 'package:http_parser/http_parser.dart';
 const String apiUrl =
     "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/timetable/postTimeTable";
 
-Future<void> postTimeTable(
-    CreateTimetableModel timeTable, PlatformFile selectedFile, context) async {
+Future<void> postTimeTable(CreateTimetableModel timeTable,
+    PlatformFile selectedFile, context, Function fetchMaintimetable) async {
   try {
     var request = http.MultipartRequest(
       'POST',
@@ -64,6 +64,15 @@ Future<void> postTimeTable(
           content: Text('TimeTable posted successfully!'),
           backgroundColor: Colors.green,
         ),
+      );
+      //
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchMaintimetable();
+
+      Navigator.pop(
+        context,
       );
     } else {
       print('Failed to post TimeTable: ${response.statusCode}');

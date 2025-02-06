@@ -23,12 +23,15 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
   bool isLoading = true;
   ScrollController _scrollController = ScrollController();
   final GradeController gradeController = Get.put(GradeController());
-  bool _isExpanded = false;
+
+  //
+  Map<String, bool> _expandedQuestions = {};
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   bool isswitched = false;
@@ -76,13 +79,21 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
     super.initState();
     gradeController.fetchGrades();
     _fetchconsentform();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
   }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
 
   //fetchdata..
   Future<void> _fetchconsentform(
       {String grade = '131', String section = "A1", String date = ''}) async {
     setState(() {
-      isLoading = true; // Set loading to true before starting the fetch.
+      isLoading = true;
     });
     try {
       final response = await fetchConsentData(
@@ -250,7 +261,6 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                                     ),
                                   ),
                                 ),
-
                                 // Select Section
                                 if (sections.isNotEmpty) ...[
                                   Padding(
@@ -368,484 +378,486 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100),
-          child: AppBar(
-            backgroundColor: Colors.white,
-            iconTheme: IconThemeData(color: Colors.black),
-            automaticallyImplyLeading: false,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.appBackgroundPrimaryColor,
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30)),
-              ),
-              padding: EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Colors.black,
-                        ),
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Consent Form',
-                                style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Consent Form',
+                              style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 16,
+                                color: Colors.black,
                               ),
-                              SizedBox(height: 10),
-                              GestureDetector(
-                                onTap: () async {
-                                  await _selectDate(context);
-
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-
-                                  await _fetchconsentform(date: selectedDate);
-                                },
-                                child: Row(
-                                  children: [
-                                    Align(
-                                      alignment: Alignment.topLeft,
-                                      child: SvgPicture.asset(
-                                        'assets/icons/Attendancepage_calendar_icon.svg',
-                                        fit: BoxFit.contain,
-                                        height: 20,
-                                      ),
-                                    ),
-                                    Text(
-                                      displayDate,
-                                      style: TextStyle(
-                                        fontFamily: 'medium',
-                                        color: Color.fromRGBO(73, 73, 73, 1),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        decoration: TextDecoration.underline,
-                                        decorationThickness: 2,
-                                        decorationColor:
-                                            Color.fromRGBO(75, 75, 75, 1),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'My \n Projects',
-                            style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Switch(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            activeTrackColor: AppTheme.textFieldborderColor,
-                            inactiveTrackColor: Colors.white,
-                            inactiveThumbColor: Colors.black,
-                            value: isswitched,
-                            onChanged: (value) {
-                              setState(() {
-                                isswitched = value;
-                                isLoading = true;
-                              });
+                            SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () async {
+                                await _selectDate(context);
 
-                              _fetchconsentform();
-                            },
-                          ),
-                        ],
-                      ),
-                      //recieved..
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ReceivedConsentform(
-                                        fetch: _fetchconsentform,
-                                      )));
-                        },
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Color.fromRGBO(251, 247, 245, 1)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                '•',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'medium',
-                                    color: Color.fromRGBO(216, 70, 0, 1)),
+                                setState(() {
+                                  isLoading = true;
+                                });
+
+                                await _fetchconsentform(date: selectedDate);
+                              },
+                              child: Row(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topLeft,
+                                    child: SvgPicture.asset(
+                                      'assets/icons/Attendancepage_calendar_icon.svg',
+                                      fit: BoxFit.contain,
+                                      height: 20,
+                                    ),
+                                  ),
+                                  Text(
+                                    displayDate,
+                                    style: TextStyle(
+                                      fontFamily: 'medium',
+                                      color: Color.fromRGBO(73, 73, 73, 1),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline,
+                                      decorationThickness: 2,
+                                      decorationColor:
+                                          Color.fromRGBO(75, 75, 75, 1),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text(
-                                'Recieved',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'medium',
-                                    color: Color.fromRGBO(217, 78, 11, 1)),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ),
-
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateConsentformpage(
-                                        fetch: _fetchconsentform,
-                                      )));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'My \n Projects',
+                          style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 12,
                             color: Colors.black,
-                            size: 30,
+                            fontWeight: FontWeight.bold,
                           ),
+                          textAlign: TextAlign.center,
+                        ),
+                        Switch(
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          activeTrackColor: AppTheme.textFieldborderColor,
+                          inactiveTrackColor: Colors.white,
+                          inactiveThumbColor: Colors.black,
+                          value: isswitched,
+                          onChanged: (value) {
+                            setState(() {
+                              isswitched = value;
+                              isLoading = true;
+                            });
+
+                            _fetchconsentform();
+                          },
+                        ),
+                      ],
+                    ),
+                    //recieved..
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ReceivedConsentform(
+                                      fetch: _fetchconsentform,
+                                    )));
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 5, horizontal: 12),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Color.fromRGBO(251, 247, 245, 1)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              '•',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'medium',
+                                  color: Color.fromRGBO(216, 70, 0, 1)),
+                            ),
+                            Text(
+                              'Recieved',
+                              style: TextStyle(
+                                  fontSize: 14,
+                                  fontFamily: 'medium',
+                                  color: Color.fromRGBO(217, 78, 11, 1)),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+//
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateConsentformpage(
+                                      fetch: _fetchconsentform,
+                                    )));
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppTheme.Addiconcolor,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.black,
+                          size: 30,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
-        body: consentData.isEmpty
-            ? Center(
-                child: CircularProgressIndicator(
-                strokeWidth: 4,
+      ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
                 color: AppTheme.textFieldborderColor,
-              ))
-            : SingleChildScrollView(
-                controller: _scrollController,
-                child: Column(
-                  children: [
-                    // GestureDetector(
-                    //   onTap: () {
-                    //     _showFilterBottomSheet(context);
-                    //   },
-                    //   child: Padding(
-                    //     padding: const EdgeInsets.only(right: 20, top: 20),
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.end,
-                    //       children: [
-                    //         SvgPicture.asset('assets/icons/Filter_icon.svg')
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ),
-
-                    //card sections..
-                    Column(
-                      children: [
-                        ...consentData.map((e) {
-                          return Column(
-                            children: [
-                              //postedon date...
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 20, top: 10),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      'Posted on : ${e.postedOnDate} | ${e.postedOnDay}',
-                                      style: TextStyle(
-                                          fontFamily: 'regular',
-                                          fontSize: 12,
-                                          color: Colors.black),
-                                    ),
-                                    if (e.tag.isNotEmpty)
-                                      Transform.translate(
-                                        offset: Offset(40, 15),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 5, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                              color:
-                                                  AppTheme.textFieldborderColor,
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                  topRight:
-                                                      Radius.circular(10))),
-                                          child: Text(
-                                            '${e.tag}',
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 14,
-                                                color: Colors.black),
+                strokeWidth: 4,
+              ),
+            )
+          : consentData.isEmpty
+              ? Center(
+                  child: Text(
+                    "You haven’t made anything yet;\nstart creating now!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'regular',
+                      color: Color.fromRGBO(145, 145, 145, 1),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    children: [
+                      //card sections..
+                      Column(
+                        children: [
+                          ...consentData.map((e) {
+                            return Column(
+                              children: [
+                                //postedon date...
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 20, top: 10),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Posted on : ${e.postedOnDate} | ${e.postedOnDay}',
+                                        style: TextStyle(
+                                            fontFamily: 'regular',
+                                            fontSize: 12,
+                                            color: Colors.black),
+                                      ),
+                                      if (e.tag.isNotEmpty)
+                                        Transform.translate(
+                                          offset: Offset(40, 15),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 5, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                                color: AppTheme
+                                                    .textFieldborderColor,
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10),
+                                                    topRight:
+                                                        Radius.circular(10))),
+                                            child: Text(
+                                              '${e.tag}',
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 14,
+                                                  color: Colors.black),
+                                            ),
                                           ),
                                         ),
-                                      )
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-
-                              ...e.consentForm.map((consent) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Card(
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: Container(
-                                      padding: EdgeInsets.all(15),
-                                      decoration: BoxDecoration(
+                                ...e.consentForm.map((consent) {
+                                  bool isExpanded =
+                                      _expandedQuestions[consent.question] ??
+                                          false;
+                                  return Padding(
+                                    padding: const EdgeInsets.all(12.0),
+                                    child: Card(
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
                                           borderRadius:
-                                              BorderRadius.circular(12),
-                                          color: Colors.white,
-                                          border: Border.all(
+                                              BorderRadius.circular(12)),
+                                      child: Container(
+                                        padding: EdgeInsets.all(15),
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: Color.fromRGBO(
+                                                    238, 238, 238, 1),
+                                                width: 1.5)),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
+                                              child: Text(
+                                                '${consent.heading}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                            Divider(
                                               color: Color.fromRGBO(
-                                                  238, 238, 238, 1),
-                                              width: 1.5)),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 10),
-                                            child: Text(
-                                              '${consent.heading}',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 16,
-                                                  color: Colors.black),
+                                                  230, 230, 230, 1),
+                                              thickness: 1,
                                             ),
-                                          ),
-                                          Divider(
-                                            color: Color.fromRGBO(
-                                                230, 230, 230, 1),
-                                            thickness: 1,
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 10),
-                                            child: Text(
-                                              '${consent.question}',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 16,
-                                                  color: Colors.black),
-                                              maxLines: _isExpanded ? null : 4,
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 10),
+                                              child: Text(
+                                                '${consent.question}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                                maxLines: isExpanded ? null : 4,
+                                              ),
                                             ),
-                                          ),
-                                          //readmore button...
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 15, bottom: 5),
-                                            child: Row(
-                                              children: [
-                                                ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          Colors.black,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _isExpanded =
-                                                            !_isExpanded;
-                                                      });
-                                                    },
-                                                    child: Text(
-                                                      'Read More...',
-                                                      style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 16,
-                                                          color: Colors.white),
-                                                    )),
-                                                Spacer(),
-                                                //delete
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return AlertDialog(
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10)),
-                                                              content: Text(
-                                                                "Do you really want to Delete\n  to this ExamTimetable?",
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .black),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              ),
-                                                              actions: <Widget>[
-                                                                Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      ElevatedButton(
-                                                                          style: ElevatedButton.styleFrom(
-                                                                              backgroundColor: Colors.white,
-                                                                              elevation: 0,
-                                                                              side: BorderSide(color: Colors.black, width: 1)),
-                                                                          onPressed: () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child: Text(
-                                                                            'Cancel',
-                                                                            style: TextStyle(
-                                                                                color: Colors.black,
-                                                                                fontSize: 16,
-                                                                                fontFamily: 'regular'),
-                                                                          )),
-                                                                      //delete...
-                                                                      Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            left:
-                                                                                10),
-                                                                        child: ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                            onPressed: () async {
-                                                                              var consentDel = consent.questionId;
-                                                                              final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/Consent/DeleteConsentForm?Id=$consentDel';
-
-                                                                              try {
-                                                                                final response = await http.delete(
-                                                                                  Uri.parse(url),
-                                                                                  headers: {
-                                                                                    'Content-Type': 'application/json',
-                                                                                    'Authorization': 'Bearer $authToken',
-                                                                                  },
-                                                                                );
-
-                                                                                if (response.statusCode == 200) {
-                                                                                  print('id has beeen deleted ${consentDel}');
-
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(backgroundColor: Colors.green, content: Text('Consent Form deleted successfully!')),
-                                                                                  );
-                                                                                } else {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete ConsentForm.')),
-                                                                                  );
-                                                                                }
-                                                                              } catch (e) {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  SnackBar(content: Text('An error occurred: $e')),
-                                                                                );
-                                                                              }
-                                                                              _fetchconsentform();
-
+                                            //readmore button...
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 15, bottom: 5),
+                                              child: Row(
+                                                children: [
+                                                  ElevatedButton(
+                                                      style: ElevatedButton
+                                                          .styleFrom(
+                                                        backgroundColor:
+                                                            Colors.black,
+                                                      ),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          _expandedQuestions[
+                                                                  consent
+                                                                      .question] =
+                                                              !isExpanded;
+                                                        });
+                                                      },
+                                                      child: Text(
+                                                        isExpanded
+                                                            ? 'Read Less'
+                                                            : 'Read More',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'regular',
+                                                            fontSize: 16,
+                                                            color:
+                                                                Colors.white),
+                                                      )),
+                                                  Spacer(),
+                                                  //delete
+                                                  GestureDetector(
+                                                    onTap: () {
+                                                      showDialog(
+                                                          barrierDismissible:
+                                                              false,
+                                                          context: context,
+                                                          builder: (BuildContext
+                                                              context) {
+                                                            return AlertDialog(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10)),
+                                                                content: Text(
+                                                                  "Do you really want to Delete\n  to this ExamTimetable?",
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: Colors
+                                                                          .black),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                                actions: <Widget>[
+                                                                  Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        ElevatedButton(
+                                                                            style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: Colors.white,
+                                                                                elevation: 0,
+                                                                                side: BorderSide(color: Colors.black, width: 1)),
+                                                                            onPressed: () {
                                                                               Navigator.pop(context);
                                                                             },
                                                                             child: Text(
-                                                                              'Delete',
+                                                                              'Cancel',
                                                                               style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
                                                                             )),
-                                                                      ),
-                                                                    ])
-                                                              ]);
-                                                        });
-                                                  },
-                                                  child: SvgPicture.asset(
-                                                    'assets/icons/timetable_delete.svg',
-                                                    fit: BoxFit.contain,
-                                                    height: 25,
+                                                                        //delete...
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              left: 10),
+                                                                          child: ElevatedButton(
+                                                                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                              onPressed: () async {
+                                                                                var consentDel = consent.questionId;
+                                                                                final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/Consent/DeleteConsentForm?Id=$consentDel';
+
+                                                                                try {
+                                                                                  final response = await http.delete(
+                                                                                    Uri.parse(url),
+                                                                                    headers: {
+                                                                                      'Content-Type': 'application/json',
+                                                                                      'Authorization': 'Bearer $authToken',
+                                                                                    },
+                                                                                  );
+
+                                                                                  if (response.statusCode == 200) {
+                                                                                    print('id has beeen deleted ${consentDel}');
+
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(backgroundColor: Colors.green, content: Text('Consent Form deleted successfully!')),
+                                                                                    );
+                                                                                  } else {
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete ConsentForm.')),
+                                                                                    );
+                                                                                  }
+                                                                                } catch (e) {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                                                    SnackBar(content: Text('An error occurred: $e')),
+                                                                                  );
+                                                                                }
+                                                                                _fetchconsentform();
+
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: Text(
+                                                                                'Delete',
+                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                              )),
+                                                                        ),
+                                                                      ])
+                                                                ]);
+                                                          });
+                                                    },
+                                                    child: SvgPicture.asset(
+                                                      'assets/icons/timetable_delete.svg',
+                                                      fit: BoxFit.contain,
+                                                      height: 25,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          )
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }).toList()
-                            ],
-                          );
-                        }).toList(),
-                      ],
-                    ),
-
-                    //top arrow..
-                    Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.black,
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.arrow_upward_outlined,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              _scrollController.animateTo(
-                                0,
-                                duration: Duration(seconds: 1),
-                                curve: Curves.easeInOut,
-                              );
-                            },
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
+                                  );
+                                }).toList(),
+                              ],
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                      //
+                    ],
+                  ),
                 ),
-              ));
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
   }
 }

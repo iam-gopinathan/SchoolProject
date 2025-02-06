@@ -1,7 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/News_Models/Create_news_model.dart';
+import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
 
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
@@ -11,8 +11,8 @@ import 'package:intl/intl.dart';
 const String _baseUrl =
     'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/news/postNews';
 
-Future<void> postNews(
-    CreateNewsModel newsPost, String action, BuildContext context) async {
+Future<void> postNews(CreateNewsModel newsPost, String action,
+    BuildContext context, Function onCreateNews) async {
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
 
@@ -75,9 +75,20 @@ Future<void> postNews(
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.green,
-          content: Text('News posted successfully!'),
+          content: Text('News Created Successfully!'),
         ),
       );
+
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      onCreateNews();
+
+      Navigator.pop(
+        context,
+      );
+
+      //
     } else {
       print('Failed to post news: ${response.statusCode}');
       ScaffoldMessenger.of(context).showSnackBar(

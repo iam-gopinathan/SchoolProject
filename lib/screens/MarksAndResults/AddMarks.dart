@@ -680,6 +680,9 @@ class _AddmarksState extends State<Addmarks> {
   }
 
   //
+  ScrollController _scrollController = ScrollController();
+
+  //
   bool isLoading = true;
 
   List<int> totalMarksForStudents = [];
@@ -782,6 +785,22 @@ class _AddmarksState extends State<Addmarks> {
             _horizontalScrollController.position.maxScrollExtent;
       });
     });
+    //
+    gradeController.fetchGrades();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  //
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   List<String> availableExams = [];
@@ -799,622 +818,730 @@ class _AddmarksState extends State<Addmarks> {
   }
 
   GradeMarkss? _gradeData;
+  //
+
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return subjectControllers != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-          child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
-            backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Text(
-              'Add Marks',
-              style: TextStyle(
-                fontFamily: 'semibold',
-                fontSize: 16,
-                color: Colors.black,
+        backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(60),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+            child: AppBar(
+              iconTheme: IconThemeData(color: Colors.black),
+              backgroundColor: AppTheme.appBackgroundPrimaryColor,
+              leading: GestureDetector(
+                  onTap: () async {
+                    if (hasUnsavedChanges()) {
+                      await _showUnsavedChangesDialog();
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: Icon(Icons.arrow_back)),
+              title: Text(
+                'Add Marks',
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text(
-                    'Add Exam Name',
-                    style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Colors.black),
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: DropdownButtonFormField<String>(
-                      dropdownColor: Colors.black,
-                      menuMaxHeight: 150,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                          ),
-                        ),
-                      ),
-                      value: selectedExam,
-                      hint: Text(
-                        "Select Exam",
-                        style: TextStyle(
+        body: SingleChildScrollView(
+          controller: _scrollController,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Add Exam Name',
+                      style: TextStyle(
                           fontFamily: 'regular',
-                          fontSize: 14,
-                          color: Colors.black,
-                        ),
-                      ),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedExam = value;
-                        });
-                      },
-                      items: availableExams.map((exam) {
-                        return DropdownMenuItem<String>(
-                          value: exam,
-                          child: Text(
-                            exam,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontFamily: 'regular',
-                              fontSize: 14,
+                          fontSize: 12,
+                          color: Colors.black),
+                    ),
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: DropdownButtonFormField<String>(
+                        dropdownColor: Colors.black,
+                        menuMaxHeight: 150,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 15),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
                             ),
                           ),
-                        );
-                      }).toList(),
-                      selectedItemBuilder: (BuildContext context) {
-                        return availableExams.map((exam) {
-                          return Align(
-                            alignment: Alignment.centerLeft,
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                            ),
+                          ),
+                        ),
+                        value: selectedExam,
+                        hint: Text(
+                          "Select Exam",
+                          style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                        ),
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedExam = value;
+                          });
+                        },
+                        items: availableExams.map((exam) {
+                          return DropdownMenuItem<String>(
+                            value: exam,
                             child: Text(
                               exam,
                               style: TextStyle(
-                                color: Colors.black,
+                                color: Colors.white,
                                 fontFamily: 'regular',
                                 fontSize: 14,
                               ),
                             ),
                           );
-                        }).toList();
-                      },
-                    ),
-                  ),
-                  //filter icon..
-                  GestureDetector(
-                    onTap: () {
-                      _showFilterBottomSheet(context);
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/Filter_icon.svg',
-                      fit: BoxFit.contain,
-                    ),
-                  ),
-                  //export icon..
-                  GestureDetector(
-                    onTap: () async {
-                      _initializeNotification();
-                      exportToExcel(marksList, subjects, selectedSection);
-                    },
-                    child: SvgPicture.asset(
-                      'assets/icons/export_icon.svg',
-                      fit: BoxFit.contain,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            //
-            FutureBuilder<GradeMarkss>(
-                future: _gradeDataFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: Padding(
-                      padding: const EdgeInsets.only(top: 30),
-                      child: CircularProgressIndicator(
-                        strokeWidth: 4,
-                        color: AppTheme.textFieldborderColor,
+                        }).toList(),
+                        selectedItemBuilder: (BuildContext context) {
+                          return availableExams.map((exam) {
+                            return Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                exam,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                ),
+                              ),
+                            );
+                          }).toList();
+                        },
                       ),
-                    ));
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData) {
-                    return Center(child: Text('No data available'));
-                  } else {
-                    _gradeData = snapshot.data!;
-                    var gradeData = _gradeData!;
-
-                    print('Subjects count: ${gradeData.subjects.length}');
-
-                    print('Students List: ${gradeData.students[0].name}');
-
-                    print('selectedGrade $selectedGrade');
-                    print('selected section $selectedSection');
-
-                    if (subjectControllersForStudents.isEmpty) {
-                      subjectControllersForStudents = List.generate(
-                        gradeData.students.length,
-                        (studentIndex) => List.generate(
-                          gradeData.subjects.length,
-                          (subjectIndex) => TextEditingController(),
-                        ),
-                      );
-                      totalMarksForStudents =
-                          List.filled(gradeData.students.length, 0);
-                      percentageForStudents =
-                          List.filled(gradeData.students.length, 0);
-                      statusForStudents =
-                          List.filled(gradeData.students.length, '');
-                    }
-                    return Column(
-                      children: [
-                        Transform.translate(
-                          offset: Offset(0, 15),
+                    ),
+                    //filter icon..
+                    GestureDetector(
+                      onTap: () {
+                        _showFilterBottomSheet(context);
+                      },
+                      child: SvgPicture.asset(
+                        'assets/icons/Filter_icon.svg',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    //export icon..
+                    GestureDetector(
+                      onTap: () async {
+                        _initializeNotification();
+                        exportToExcel(marksList, subjects, selectedSection);
+                      },
+                      child: SvgPicture.asset(
+                        'assets/icons/export_icon.svg',
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              //
+              FutureBuilder<GradeMarkss>(
+                  future: _gradeDataFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 25),
-                            child: Row(children: [
-                              IntrinsicWidth(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.only(
-                                          topRight: Radius.circular(10)),
-                                      border: Border.all(
-                                          color: Color.fromRGBO(
-                                              234, 234, 234, 1))),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: EdgeInsets.symmetric(
-                                          vertical: 10,
-                                        ),
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(10)),
+                        padding: const EdgeInsets.only(top: 30),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.textFieldborderColor,
+                        ),
+                      ));
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData) {
+                      return Center(child: Text('No data available'));
+                    } else {
+                      _gradeData = snapshot.data!;
+                      var gradeData = _gradeData!;
+
+                      print('Subjects count: ${gradeData.subjects.length}');
+
+                      print('Students List: ${gradeData.students[0].name}');
+
+                      print('selectedGrade $selectedGrade');
+                      print('selected section $selectedSection');
+
+                      if (subjectControllersForStudents.isEmpty) {
+                        subjectControllersForStudents = List.generate(
+                          gradeData.students.length,
+                          (studentIndex) => List.generate(
+                            gradeData.subjects.length,
+                            (subjectIndex) => TextEditingController(),
+                          ),
+                        );
+                        totalMarksForStudents =
+                            List.filled(gradeData.students.length, 0);
+                        percentageForStudents =
+                            List.filled(gradeData.students.length, 0);
+                        statusForStudents =
+                            List.filled(gradeData.students.length, '');
+                      }
+                      return Column(
+                        children: [
+                          Transform.translate(
+                            offset: Offset(0, 15),
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 25),
+                              child: Row(children: [
+                                IntrinsicWidth(
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(10)),
+                                        border: Border.all(
                                             color: Color.fromRGBO(
-                                                31, 106, 163, 1)),
-                                        child: Padding(
+                                                234, 234, 234, 1))),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            vertical: 10,
+                                          ),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10)),
+                                              color: Color.fromRGBO(
+                                                  31, 106, 163, 1)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 10, right: 10),
+                                            child: Text(
+                                              '${gradeData.gradeSection}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
                                           padding: const EdgeInsets.only(
-                                              left: 10, right: 10),
+                                              left: 10, right: 5),
                                           child: Text(
-                                            '${gradeData.gradeSection}',
+                                            'Class Teacher - ${gradeData.classTeacher}',
                                             style: TextStyle(
                                                 fontFamily: 'medium',
                                                 fontSize: 12,
-                                                color: Colors.white),
+                                                color: Colors.black),
                                           ),
                                         ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 10, right: 5),
-                                        child: Text(
-                                          'Class Teacher - ${gradeData.classTeacher}',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Spacer(),
-                            ]),
+                                Spacer(),
+                              ]),
+                            ),
                           ),
-                        ),
-                        for (var studentIndex = 0;
-                            studentIndex < gradeData.students.length;
-                            studentIndex++)
-                          Padding(
-                            padding: const EdgeInsets.all(15.0),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(vertical: 15),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Color.fromRGBO(238, 238, 238, 1),
-                                  )),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Text(
-                                        '${studentIndex + 1}',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'medium',
-                                            color: Colors.black),
+                          for (var studentIndex = 0;
+                              studentIndex < gradeData.students.length;
+                              studentIndex++)
+                            Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: Container(
+                                padding: EdgeInsets.symmetric(vertical: 15),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Color.fromRGBO(238, 238, 238, 1),
+                                    )),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          '${studentIndex + 1}',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontFamily: 'medium',
+                                              color: Colors.black),
+                                        ),
+                                        CircleAvatar(
+                                          radius: 30,
+                                          child: Image.network(
+                                            '${gradeData.students[studentIndex].profile}',
+                                            fit: BoxFit.contain,
+                                          ),
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '${gradeData.students[studentIndex].name}',
+                                              style: TextStyle(
+                                                  fontFamily: 'semibold',
+                                                  fontSize: 16,
+                                                  color: Colors.black),
+                                            ),
+                                            Text(
+                                              '${gradeData.students[studentIndex].rollNumber}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 16,
+                                                  color: Colors.black),
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Percentage',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 12,
+                                                      color: Color.fromRGBO(
+                                                          54, 54, 54, 1)),
+                                                ),
+                                                Text(
+                                                  "${percentageForStudents[studentIndex].toStringAsFixed(0)}%",
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 16,
+                                                      color: Colors.black),
+                                                )
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                        //
+                                        Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Total Marks ',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 10,
+                                                      color: Color.fromRGBO(
+                                                          54, 54, 54, 1)),
+                                                ),
+                                                Text(
+                                                  '${gradeData.subjects.length * 100}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 12,
+                                                      color: Colors.black),
+                                                )
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'Scored Marks ',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 10,
+                                                      color: Color.fromRGBO(
+                                                          54, 54, 54, 1)),
+                                                ),
+                                                Text(
+                                                  '${totalMarksForStudents[studentIndex]}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 12,
+                                                      color: Colors.black),
+                                                )
+                                              ],
+                                            ),
+                                            //pass..
+                                            ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: statusForStudents[
+                                                              studentIndex] ==
+                                                          'Pass'
+                                                      ? Color.fromRGBO(
+                                                          1, 133, 53, 1)
+                                                      : (statusForStudents[
+                                                                  studentIndex] ==
+                                                              'Fail'
+                                                          ? Colors.red
+                                                          : Colors.white),
+                                                ),
+                                                onPressed: () {},
+                                                child: Text(
+                                                  '${statusForStudents[studentIndex]}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                )),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    //
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 10,
+                                          bottom: 10,
+                                          left: 25,
+                                          right: 25),
+                                      child: Divider(
+                                        color: Color.fromRGBO(245, 245, 245, 1),
+                                        height: 5,
+                                        thickness: 3,
                                       ),
-                                      CircleAvatar(
-                                        radius: 30,
-                                        child: Image.network(
-                                          '${gradeData.students[studentIndex].profile}',
-                                          fit: BoxFit.contain,
+                                    ),
+                                    //table.......
+                                    SingleChildScrollView(
+                                      controller: _horizontalScrollController,
+                                      scrollDirection: Axis.horizontal,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: DataTable(
+                                          headingRowColor: MaterialStateProperty
+                                              .resolveWith<Color>(
+                                            (states) => Color.fromRGBO(
+                                                255, 247, 247, 1),
+                                          ),
+                                          border: TableBorder.all(
+                                              color: Colors.black
+                                                  .withOpacity(0.1)),
+                                          columns: [
+                                            DataColumn(
+                                                label: Text('Total Marks')),
+                                            for (var subject
+                                                in gradeData.subjects)
+                                              DataColumn(label: Text(subject)),
+                                          ],
+                                          rows: [
+                                            DataRow(cells: [
+                                              DataCell(Text(
+                                                  '${gradeData.subjects.length * 100}')),
+                                              for (int subjectIndex = 0;
+                                                  subjectIndex <
+                                                      gradeData.subjects.length;
+                                                  subjectIndex++)
+                                                DataCell(
+                                                  TextFormField(
+                                                    inputFormatters: [
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly,
+                                                      LengthLimitingTextInputFormatter(
+                                                          3),
+                                                    ],
+                                                    controller:
+                                                        subjectControllersForStudents[
+                                                                studentIndex]
+                                                            [subjectIndex],
+                                                    keyboardType:
+                                                        TextInputType.number,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      focusedBorder:
+                                                          InputBorder.none,
+                                                      enabledBorder:
+                                                          InputBorder.none,
+                                                      disabledBorder:
+                                                          InputBorder.none,
+                                                    ),
+                                                    onChanged: (value) {
+                                                      int number = int.tryParse(
+                                                              value) ??
+                                                          0; // Convert input to an integer
+                                                      if (number > 100) {
+                                                        // If the number is greater than 100, restrict it
+                                                        subjectControllersForStudents[
+                                                                    studentIndex]
+                                                                [subjectIndex]
+                                                            .text = '100';
+
+                                                        // Move the cursor to the end after update
+                                                        subjectControllersForStudents[
+                                                                        studentIndex]
+                                                                    [subjectIndex]
+                                                                .selection =
+                                                            TextSelection
+                                                                .fromPosition(
+                                                          TextPosition(
+                                                              offset: subjectControllersForStudents[
+                                                                          studentIndex]
+                                                                      [
+                                                                      subjectIndex]
+                                                                  .text
+                                                                  .length),
+                                                        );
+                                                      }
+                                                      print(
+                                                          "Updated value for student $studentIndex, subject $subjectIndex: $value");
+                                                      calculateResults(
+                                                          studentIndex);
+                                                    },
+                                                  ),
+                                                ),
+                                            ]),
+                                          ],
                                         ),
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            '${gradeData.students[studentIndex].name}',
-                                            style: TextStyle(
-                                                fontFamily: 'semibold',
-                                                fontSize: 16,
-                                                color: Colors.black),
-                                          ),
-                                          Text(
-                                            '${gradeData.students[studentIndex].rollNumber}',
-                                            style: TextStyle(
-                                                fontFamily: 'medium',
-                                                fontSize: 16,
-                                                color: Colors.black),
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Percentage',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 12,
-                                                    color: Color.fromRGBO(
-                                                        54, 54, 54, 1)),
-                                              ),
-                                              Text(
-                                                "${percentageForStudents[studentIndex].toStringAsFixed(0)}%",
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      //
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Total Marks ',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 10,
-                                                    color: Color.fromRGBO(
-                                                        54, 54, 54, 1)),
-                                              ),
-                                              Text(
-                                                '${gradeData.subjects.length * 100}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'Scored Marks ',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 10,
-                                                    color: Color.fromRGBO(
-                                                        54, 54, 54, 1)),
-                                              ),
-                                              Text(
-                                                '${totalMarksForStudents[studentIndex]}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              )
-                                            ],
-                                          ),
-                                          //pass..
-                                          ElevatedButton(
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: statusForStudents[
-                                                            studentIndex] ==
-                                                        'Pass'
-                                                    ? Color.fromRGBO(
-                                                        1, 133, 53, 1)
-                                                    : (statusForStudents[
-                                                                studentIndex] ==
-                                                            'Fail'
-                                                        ? Colors.red
-                                                        : Colors.white),
-                                              ),
-                                              onPressed: () {},
-                                              child: Text(
-                                                '${statusForStudents[studentIndex]}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.white),
-                                              )),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  //
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 10,
-                                        bottom: 10,
-                                        left: 25,
-                                        right: 25),
-                                    child: Divider(
+                                    ),
+                                    //
+                                    Divider(
                                       color: Color.fromRGBO(245, 245, 245, 1),
                                       height: 5,
                                       thickness: 3,
                                     ),
-                                  ),
-                                  //table.......
-                                  SingleChildScrollView(
-                                    controller: _horizontalScrollController,
-                                    scrollDirection: Axis.horizontal,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: DataTable(
-                                        headingRowColor: MaterialStateProperty
-                                            .resolveWith<Color>(
-                                          (states) =>
-                                              Color.fromRGBO(255, 247, 247, 1),
-                                        ),
-                                        border: TableBorder.all(
-                                            color:
-                                                Colors.black.withOpacity(0.1)),
-                                        columns: [
-                                          DataColumn(
-                                              label: Text('Total Marks')),
-                                          for (var subject
-                                              in gradeData.subjects)
-                                            DataColumn(label: Text(subject)),
-                                        ],
-                                        rows: [
-                                          DataRow(cells: [
-                                            DataCell(Text(
-                                                '${gradeData.subjects.length * 100}')),
-                                            for (int subjectIndex = 0;
-                                                subjectIndex <
-                                                    gradeData.subjects.length;
-                                                subjectIndex++)
-                                              DataCell(
-                                                TextFormField(
-                                                  inputFormatters: [
-                                                    FilteringTextInputFormatter
-                                                        .digitsOnly,
-                                                    LengthLimitingTextInputFormatter(
-                                                        3),
-                                                  ],
-                                                  controller:
-                                                      subjectControllersForStudents[
-                                                              studentIndex]
-                                                          [subjectIndex],
-                                                  keyboardType:
-                                                      TextInputType.number,
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    focusedBorder:
-                                                        InputBorder.none,
-                                                    enabledBorder:
-                                                        InputBorder.none,
-                                                    disabledBorder:
-                                                        InputBorder.none,
-                                                  ),
-                                                  onChanged: (value) {
-                                                    print(
-                                                        "Updated value for student $studentIndex, subject $subjectIndex: $value");
-                                                    calculateResults(
-                                                        studentIndex);
-                                                  },
-                                                ),
-                                              ),
-                                          ]),
-                                        ],
+                                    //linear indicator...
+                                    Container(
+                                      width: 60,
+                                      height: 10,
+                                      child: LinearProgressIndicator(
+                                        borderRadius: BorderRadius.circular(10),
+                                        backgroundColor:
+                                            Color.fromRGBO(225, 225, 225, 1),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.black),
+                                        value: _progress,
                                       ),
                                     ),
-                                  ),
-                                  //
-                                  Divider(
-                                    color: Color.fromRGBO(245, 245, 245, 1),
-                                    height: 5,
-                                    thickness: 3,
-                                  ),
-                                  //linear indicator...
-                                  Container(
-                                    width: 60,
-                                    height: 10,
-                                    child: LinearProgressIndicator(
-                                      borderRadius: BorderRadius.circular(10),
-                                      backgroundColor:
-                                          Color.fromRGBO(225, 225, 225, 1),
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.black),
-                                      value: _progress,
-                                    ),
-                                  ),
-                                  Row(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 15, top: 10),
-                                        child: Text(
-                                          'Teacher Comment',
-                                          style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                      ),
-                                      Spacer(),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _addBottomsheet(context);
-                                        },
-                                        child: Padding(
+                                    Row(
+                                      children: [
+                                        Padding(
                                           padding: const EdgeInsets.only(
-                                              right: 15, top: 10),
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 2, horizontal: 10),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-                                                border: Border.all(
-                                                    color: Colors.black)),
-                                            child: Row(
-                                              children: [
-                                                Icon(
-                                                  Icons.add,
-                                                  color: Colors.black,
-                                                ),
-                                                Text(
-                                                  'Add',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontFamily: 'regular',
-                                                      color: Colors.black),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          _viewBottomsheet(context);
-                                        },
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              right: 15, top: 10),
+                                              left: 15, top: 10),
                                           child: Text(
-                                            'View',
+                                            'Teacher Comment',
                                             style: TextStyle(
+                                                fontFamily: 'medium',
                                                 fontSize: 14,
-                                                fontFamily: 'regular',
                                                 color: Colors.black),
                                           ),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ],
+                                        Spacer(),
+                                        GestureDetector(
+                                          onTap: () {
+                                            _addBottomsheet(context);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 15, top: 10),
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 2, horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                  border: Border.all(
+                                                      color: Colors.black)),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.add,
+                                                    color: Colors.black,
+                                                  ),
+                                                  Text(
+                                                    'Add',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontFamily: 'regular',
+                                                        color: Colors.black),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            _viewBottomsheet(context);
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 15, top: 10),
+                                            child: Text(
+                                              'View',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: 'regular',
+                                                  color: Colors.black),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                      ],
-                    );
-                  }
-                }),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 40, bottom: 50),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              //draft
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  String status = 'draft';
-                  addMarks(context, selectedExam!, _gradeData!, status,
-                      selectedGrade);
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'semibold',
-                      color: Colors.black),
-                ),
-              ),
-
-              ///publish
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: areAllMarksEntered()
-                          ? AppTheme.textFieldborderColor
-                          : Colors.grey),
-                  onPressed: () {
-                    if (areAllMarksEntered()) {
-                      String status = 'post';
-                      addMarks(context, selectedExam!, _gradeData!, status,
-                          selectedGrade);
-                      print('elevatedexaaaam${selectedExam}');
-                      print('_gradeData!${selectedExam}');
-                      print('ele status ${status}');
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: AppTheme.textFieldborderColor,
-                          content: Text(
-                            'Please enter marks for all students!',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'semibold',
-                                fontSize: 16),
-                          )));
+                        ],
+                      );
                     }
-                  },
-                  child: Text(
-                    'Publish',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'semibold',
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ),
+                  }),
             ],
           ),
         ),
-      ),
-    );
+        bottomNavigationBar: Container(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 40, bottom: 50),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                //draft
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      side: BorderSide(color: Colors.black, width: 1.5)),
+                  onPressed: () {
+                    String status = 'draft';
+                    addMarks(context, selectedExam!, _gradeData!, status,
+                        selectedGrade);
+                  },
+                  child: Text(
+                    'Save as Draft',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'semibold',
+                        color: Colors.black),
+                  ),
+                ),
+
+                ///publish
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: areAllMarksEntered()
+                            ? AppTheme.textFieldborderColor
+                            : Colors.grey),
+                    onPressed: () {
+                      if (areAllMarksEntered()) {
+                        String status = 'post';
+                        addMarks(context, selectedExam!, _gradeData!, status,
+                            selectedGrade);
+                        print('elevatedexaaaam${selectedExam}');
+                        print('_gradeData!${selectedExam}');
+                        print('ele status ${status}');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            backgroundColor: AppTheme.textFieldborderColor,
+                            content: Text(
+                              'Please enter marks for all students!',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'semibold',
+                                  fontSize: 16),
+                            )));
+                      }
+                    },
+                    child: Text(
+                      'Publish',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'semibold',
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        //top arrow..
+        floatingActionButton:
+            _scrollController.hasClients && _scrollController.offset > 50
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
+                  )
+                : null,
+        floatingActionButtonLocation:
+            FloatingActionButtonLocation.centerDocked);
   }
 
   bool areAllMarksEntered() {

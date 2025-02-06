@@ -9,8 +9,8 @@ class TimetableService {
   String apiUrl =
       "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeTimetable/updateTimeTable";
 
-  Future<bool> updateTimetable(
-      UpdateTimetableModel model, File file, context) async {
+  Future<bool> updateTimetable(UpdateTimetableModel model, File? file, context,
+      Function fetchMaintimetable) async {
     try {
       var request = http.MultipartRequest('PUT', Uri.parse(apiUrl))
         ..headers.addAll({
@@ -33,13 +33,24 @@ class TimetableService {
       final response = await request.send();
 
       if (response.statusCode == 200) {
+        print("Request fields added: ");
+        print(
+            "Id: ${model.id}, userType: ${model.userType}, rollNumber: ${model.rollNumber}, fileType: ${model.fileType}, updatedOn: ${model.updatedOn}");
+
         print("Timetable updated successfully");
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               backgroundColor: Colors.green,
               content: Text('Timetable updated successfully.')),
         );
+
+        //Add a delay of 2 seconds before navigating
+        await Future.delayed(Duration(seconds: 2));
+        fetchMaintimetable();
+        Navigator.pop(context);
+        //
         return true;
+        //
       } else {
         print(
             "Failed to update timetable. Status Code: ${response.statusCode}");

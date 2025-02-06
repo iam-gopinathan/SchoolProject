@@ -565,7 +565,8 @@ class _EditHomeworkState extends State<EditHomework> {
                       child: Image.network(
                         homeWorkData!.filePath!,
                         width: double.infinity,
-                        fit: BoxFit.cover,
+                        fit: BoxFit.contain,
+                        height: 150,
                         loadingBuilder: (context, child, progress) {
                           if (progress == null) return child;
                           return Center(
@@ -657,7 +658,6 @@ class _EditHomeworkState extends State<EditHomework> {
                         ],
                       ),
                     ),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -677,7 +677,6 @@ class _EditHomeworkState extends State<EditHomework> {
                       ),
                     ],
                   ),
-
                   //scheduled section....
                   Padding(
                     padding: const EdgeInsets.only(top: 50),
@@ -730,7 +729,7 @@ class _EditHomeworkState extends State<EditHomework> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.only(top: 100, bottom: 50),
+                    padding: const EdgeInsets.only(top: 50, bottom: 50),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -783,6 +782,28 @@ class _EditHomeworkState extends State<EditHomework> {
     );
   }
 
+  // void updateHomeworkExample(String status) async {
+  //   String currentDateTime =
+  //       DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+
+  //   String? postedOn = status == 'post' ? currentDateTime : '';
+  //   String? scheduleOn = status == 'schedule' ? _scheduledDateandtime.text : '';
+
+  //   File file = File(selectedFile!.path!);
+  //   var request = UpdateHomeworkRequest(
+  //     id: widget.id,
+  //     userType: UserSession().userType.toString(),
+  //     rollNumber: UserSession().rollNumber.toString(),
+  //     fileType: 'image',
+  //     file: file,
+  //     status: status,
+  //     updatedOn: currentDateTime,
+  //     postedOn: postedOn,
+  //     scheduleOn: scheduleOn,
+  //   );
+
+  //   await updateHomework(request, context, widget.fetchHomework);
+  // }
   void updateHomeworkExample(String status) async {
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
@@ -790,12 +811,25 @@ class _EditHomeworkState extends State<EditHomework> {
     String? postedOn = status == 'post' ? currentDateTime : '';
     String? scheduleOn = status == 'schedule' ? _scheduledDateandtime.text : '';
 
-    File file = File(selectedFile!.path!);
+    // Determine file type and file to send
+    String fileType = '';
+    File? file;
+
+    if (homeWorkData?.filePath != null && homeWorkData!.filePath!.isNotEmpty) {
+      // Use existing image (filePath is fetched from server)
+      fileType = 'existing';
+      file = null; // Don't send the file when it's an existing one
+    } else if (selectedFile != null) {
+      // Use newly selected file (image)
+      fileType = 'image';
+      file = File(selectedFile!.path!); // Use the selected image file
+    }
+
     var request = UpdateHomeworkRequest(
       id: widget.id,
       userType: UserSession().userType.toString(),
       rollNumber: UserSession().rollNumber.toString(),
-      fileType: 'image',
+      fileType: fileType,
       file: file,
       status: status,
       updatedOn: currentDateTime,
@@ -803,6 +837,7 @@ class _EditHomeworkState extends State<EditHomework> {
       scheduleOn: scheduleOn,
     );
 
-    await updateHomework(request, context);
+    // Call the updateHomework method to send the request
+    await updateHomework(request, context, widget.fetchHomework);
   }
 }

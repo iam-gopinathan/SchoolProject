@@ -1,19 +1,22 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
-
 import 'package:flutter_application_1/models/StudyMaterial/StudyMaterial_MainPage_model.dart';
 import 'package:flutter_application_1/screens/StudyMaterial/Create_studyMaterial.dart';
 import 'package:flutter_application_1/screens/StudyMaterial/Edit_StudymaterialPage.dart';
 import 'package:flutter_application_1/services/StudyMaterial/StudyMaterial_mainPage_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
-
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
-
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 class StudymaterialMainpage extends StatefulWidget {
   const StudymaterialMainpage({super.key});
@@ -24,6 +27,7 @@ class StudymaterialMainpage extends StatefulWidget {
 
 class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
   final GradeController gradeController = Get.put(GradeController());
+  ScrollController _scrollController = ScrollController();
 
   Future<List<StudyMaterialModel>>? futureStudyMaterials;
 
@@ -37,15 +41,31 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
     super.initState();
     _fetchStudyMaterial();
     gradeController.fetchGrades();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
   }
 
-//fetched
-  void _fetchStudyMaterial(
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
+  }
+
+  Future<void> _fetchStudyMaterial(
       {String grade = '131',
       String section = "A1",
       String date = '',
       String subject = ''}) async {
     try {
+      setState(() {
+        isloading = true;
+      });
+
       final int gradeInt = int.parse(grade);
       final response = await fetchStudyMaterials(
         rollNumber: UserSession().rollNumber ?? '',
@@ -58,9 +78,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
       );
       print("Fetching homework with date: $date");
       print('gradId: $grade');
-
       final List<StudyMaterialModel> studyMaterials = response;
-      isloading = true;
 
       setState(() {
         isloading = false;
@@ -68,6 +86,9 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
         print('Fetching study materials with grade: $grade, section: $section');
       });
     } catch (error) {
+      setState(() {
+        isloading = false;
+      });
       print("Error fetching study materials: $error");
     }
   }
@@ -471,75 +492,81 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                       ],
                     ),
                     Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'My \n Projects',
-                            style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
+                    if (UserSession().userType == 'admin')
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'My \n Projects',
+                              style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Switch(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            activeTrackColor: AppTheme.textFieldborderColor,
-                            inactiveTrackColor: Colors.white,
-                            inactiveThumbColor: Colors.black,
-                            value: isswitched,
-                            onChanged: (value) {
-                              setState(() {
-                                isswitched = value;
-                                print("Switch value changed: $isswitched");
-                              });
-                              _fetchStudyMaterial();
-                            },
-                          ),
-                        ],
+                            Switch(
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              activeTrackColor: AppTheme.textFieldborderColor,
+                              inactiveTrackColor: Colors.white,
+                              inactiveThumbColor: Colors.black,
+                              value: isswitched,
+                              onChanged: (value) {
+                                setState(() {
+                                  isloading = true;
+                                  isswitched = value;
+                                  print("Switch value changed: $isswitched");
+                                });
+                                _fetchStudyMaterial();
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
                     //filter icon..
-                    GestureDetector(
-                      onTap: () {
-                        _showFilterBottomSheet(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: SvgPicture.asset(
-                          'assets/icons/Filter_icon.svg',
-                          fit: BoxFit.contain,
-                          height: 30,
+                    if (UserSession().userType == 'admin' ||
+                        UserSession().userType == 'teacher')
+                      GestureDetector(
+                        onTap: () {
+                          _showFilterBottomSheet(context);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 30),
+                          child: SvgPicture.asset(
+                            'assets/icons/Filter_icon.svg',
+                            fit: BoxFit.contain,
+                            height: 30,
+                          ),
                         ),
                       ),
-                    ),
-
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateStudymaterial(
-                                    fetchstudymaterial: _fetchStudyMaterial)));
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.Addiconcolor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.black,
-                          size: 30,
+                    if (UserSession().userType == 'admin' ||
+                        UserSession().userType == 'teacher')
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CreateStudymaterial(
+                                      fetchstudymaterial:
+                                          _fetchStudyMaterial)));
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: AppTheme.Addiconcolor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.black,
+                            size: 30,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],
@@ -547,424 +574,920 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
           ),
         ),
       ),
-      body: studyMaterials.isEmpty
+      body: isloading
           ? Center(
               child: CircularProgressIndicator(
               strokeWidth: 4,
               color: AppTheme.textFieldborderColor,
             ))
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 10),
-                    child: GestureDetector(
-                      onTap: () {
-                        int selectedGradeId = 131;
-                        //filter subject wise
-                        Get.find<GradeController>().filterSubjectsByGrade(131);
-                        showMenu(
-                          context: context,
-                          color: Colors.black,
-                          position: RelativeRect.fromLTRB(100, 180, 0, 0),
-                          items: Get.find<GradeController>()
-                              .filteredSubjects
-                              .map((subject) {
-                            return PopupMenuItem<String>(
-                              value: subject,
-                              child: Text(
-                                subject,
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.white,
-                                    fontFamily: 'regular'),
-                              ),
-                            );
-                          }).toList(),
-                          elevation: 8.0,
-                        ).then((value) {
-                          if (value != null) {
-                            print('Selected subject: $value');
-                          }
-                          _fetchStudyMaterial(subject: value!);
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 25),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/Filter_icon.svg',
-                              fit: BoxFit.contain,
-                              height: 20,
+          : studyMaterials.isEmpty
+              ? Center(
+                  child: Text(
+                    "You haven’t made anything yet \n start creating now!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'regular',
+                      color: Color.fromRGBO(145, 145, 145, 1),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            int selectedGradeId = 131;
+                            //filter subject wise
+                            Get.find<GradeController>()
+                                .filterSubjectsByGrade(131);
+                            showMenu(
+                              context: context,
+                              color: Colors.black,
+                              position: RelativeRect.fromLTRB(100, 180, 0, 0),
+                              items: Get.find<GradeController>()
+                                  .filteredSubjects
+                                  .map((subject) {
+                                return PopupMenuItem<String>(
+                                  value: subject,
+                                  child: Text(
+                                    subject,
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                        fontFamily: 'regular'),
+                                  ),
+                                );
+                              }).toList(),
+                              elevation: 8.0,
+                            ).then((value) {
+                              if (value != null) {
+                                print('Selected subject: $value');
+                              }
+                              _fetchStudyMaterial(subject: value!);
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 25),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/Filter_icon.svg',
+                                  fit: BoxFit.contain,
+                                  height: 20,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 5),
+                                  child: Text(
+                                    'by Subjects',
+                                    style: TextStyle(
+                                        fontFamily: 'regular',
+                                        fontSize: 12,
+                                        color: Color.fromRGBO(47, 47, 47, 1)),
+                                  ),
+                                )
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: Text(
-                                'by Subjects',
-                                style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 12,
-                                    color: Color.fromRGBO(47, 47, 47, 1)),
-                              ),
-                            )
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                  Column(
-                    children: [
-                      ...studyMaterials.map((e) {
-                        int index = studyMaterials.indexOf(e);
-                        return Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 10),
-                              child: Row(
-                                children: [
-                                  Transform.translate(
-                                    offset: Offset(20, 16),
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 5, horizontal: 10),
-                                      decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                              colors: [
-                                                Color.fromRGBO(48, 126, 185, 1),
-                                                Color.fromRGBO(0, 70, 123, 1),
-                                              ],
-                                              begin: Alignment.centerLeft,
-                                              end: Alignment.centerRight),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                          )),
-                                      child: Text(
-                                        '${e.gradeSection}',
-                                        style: TextStyle(
-                                            fontFamily: 'medium',
-                                            fontSize: 12,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Card(
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                                child: Container(
-                                  padding: EdgeInsets.all(15),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color:
-                                              Color.fromRGBO(238, 238, 238, 1),
-                                          width: 1.5)),
-                                  child: Column(
+                      Column(
+                        children: [
+                          ...studyMaterials.map((e) {
+                            int index = studyMaterials.indexOf(e);
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10),
+                                  child: Row(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            left: 15, top: 5),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                              '${e.postedOn} | ${e.day}',
-                                              style: TextStyle(
-                                                  fontFamily: 'regular',
-                                                  fontSize: 12,
-                                                  color: Colors.black),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      ExpansionTile(
-                                        initiallyExpanded:
-                                            initiallyExpandedIndex == index,
-                                        shape: Border(),
-                                        title: Row(
-                                          children: [
-                                            Text(
-                                              '${e.subject}',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 12,
-                                                  color: Colors.black),
-                                            ),
-                                            Spacer(),
-                                          ],
-                                        ),
-                                        children: [
-                                          Center(
-                                            child: Image.network(
-                                              '${e.filePath}',
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 25),
-                                            child: Row(
-                                              children: [
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      'Posted by : ${e.postedBy}',
-                                                      style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 12,
-                                                          color: Color.fromRGBO(
-                                                              138,
-                                                              138,
-                                                              138,
-                                                              1)),
-                                                    ),
+                                      Transform.translate(
+                                        offset: Offset(20, 16),
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: 5, horizontal: 10),
+                                          decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                  colors: [
+                                                    Color.fromRGBO(
+                                                        48, 126, 185, 1),
+                                                    Color.fromRGBO(
+                                                        0, 70, 123, 1),
                                                   ],
-                                                ),
-                                                Spacer(),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return AlertDialog(
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10)),
-                                                              content: Text(
-                                                                "Do you really want to make\n changes to this Study Material?",
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .black),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              ),
-                                                              actions: <Widget>[
-                                                                Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      ElevatedButton(
-                                                                          style: ElevatedButton.styleFrom(
-                                                                              backgroundColor: Colors.white,
-                                                                              elevation: 0,
-                                                                              side: BorderSide(color: Colors.black, width: 1)),
-                                                                          onPressed: () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child: Text(
-                                                                            'Cancel',
-                                                                            style: TextStyle(
-                                                                                color: Colors.black,
-                                                                                fontSize: 16,
-                                                                                fontFamily: 'regular'),
-                                                                          )),
-                                                                      //edit...
-                                                                      Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            left:
-                                                                                10),
-                                                                        child: ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                            onPressed: () {
-                                                                              Navigator.pop(context);
-                                                                              Navigator.push(
-                                                                                  context,
-                                                                                  MaterialPageRoute(
-                                                                                      builder: (context) => EditStudymaterialpage(
-                                                                                            id: e.id,
-                                                                                            fetchstudymaterial: _fetchStudyMaterial,
-                                                                                          )));
-                                                                            },
-                                                                            child: Text(
-                                                                              'Edit',
-                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                            )),
-                                                                      ),
-                                                                    ])
-                                                              ]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 5,
-                                                            horizontal: 8),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(15),
-                                                        border: Border.all(
-                                                            color:
-                                                                Colors.black)),
-                                                    child: Row(
-                                                      children: [
-                                                        SvgPicture.asset(
-                                                            'assets/icons/timetable_upload.svg'),
-                                                        Text(
-                                                          'Reupload',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'medium',
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                //delete icon
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    showDialog(
-                                                        barrierDismissible:
-                                                            false,
-                                                        context: context,
-                                                        builder: (BuildContext
-                                                            context) {
-                                                          return AlertDialog(
-                                                              backgroundColor:
-                                                                  Colors.white,
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              10)),
-                                                              content: Text(
-                                                                "Do you really want to Delete\n to this StudyMaterial?",
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .black),
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                              ),
-                                                              actions: <Widget>[
-                                                                Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      ElevatedButton(
-                                                                          style: ElevatedButton.styleFrom(
-                                                                              backgroundColor: Colors.white,
-                                                                              elevation: 0,
-                                                                              side: BorderSide(color: Colors.black, width: 1)),
-                                                                          onPressed: () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child: Text(
-                                                                            'Cancel',
-                                                                            style: TextStyle(
-                                                                                color: Colors.black,
-                                                                                fontSize: 16,
-                                                                                fontFamily: 'regular'),
-                                                                          )),
-                                                                      //edit...
-                                                                      Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            left:
-                                                                                10),
-                                                                        child: ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                            onPressed: () async {
-                                                                              var studydelete = e.id;
-                                                                              final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeStudyMaterial/DeleteStudyMaterial?Id=$studydelete';
-
-                                                                              try {
-                                                                                final response = await http.delete(
-                                                                                  Uri.parse(url),
-                                                                                  headers: {
-                                                                                    'Content-Type': 'application/json',
-                                                                                    'Authorization': 'Bearer $authToken',
-                                                                                  },
-                                                                                );
-
-                                                                                if (response.statusCode == 200) {
-                                                                                  print('id has beeen deleted ${studydelete}');
-
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(backgroundColor: Colors.green, content: Text('Studymaterial deleted successfully!')),
-                                                                                  );
-                                                                                } else {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete .')),
-                                                                                  );
-                                                                                }
-                                                                              } catch (e) {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  SnackBar(content: Text('An error occurred: $e')),
-                                                                                );
-                                                                              }
-                                                                              _fetchStudyMaterial();
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child: Text(
-                                                                              'Delete',
-                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                            )),
-                                                                      ),
-                                                                    ])
-                                                              ]);
-                                                        });
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10),
-                                                    child: SvgPicture.asset(
-                                                      'assets/icons/timetable_delete.svg',
-                                                      fit: BoxFit.contain,
-                                                      height: 25,
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          )
-                                        ],
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight),
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(10),
+                                              )),
+                                          child: Text(
+                                            '${e.gradeSection}',
+                                            style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 12,
+                                                color: Colors.white),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
+                                Padding(
+                                  padding: const EdgeInsets.all(12.0),
+                                  child: Card(
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
+                                    child: Container(
+                                      padding: EdgeInsets.all(15),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Color.fromRGBO(
+                                                  238, 238, 238, 1),
+                                              width: 1.5)),
+                                      child: Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 15, top: 5),
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                  '${e.postedOn} | ${e.day}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'regular',
+                                                      fontSize: 12,
+                                                      color: Colors.black),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          ExpansionTile(
+                                            initiallyExpanded:
+                                                initiallyExpandedIndex == index,
+                                            shape: Border(),
+                                            title: Row(
+                                              children: [
+                                                Text(
+                                                  '${e.subject}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 12,
+                                                      color: Colors.black),
+                                                ),
+                                                Spacer(),
+                                              ],
+                                            ),
+                                            children: [
+                                              //image section...
+                                              Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  if (e.fileType == 'image')
+                                                    Container(
+                                                      decoration: BoxDecoration(
+                                                          color: Colors
+                                                              .transparent
+                                                              .withOpacity(
+                                                                  0.6)),
+                                                      child: Image.network(
+                                                        e.filePath,
+                                                        fit: BoxFit.cover,
+                                                        width: double.infinity,
+                                                        height: 250,
+                                                      ),
+                                                    ),
+                                                  // PDF SECTION
+                                                  if (e.fileType == 'pdf')
+                                                    Stack(
+                                                      children: [
+                                                        Container(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 250,
+                                                          color: Colors
+                                                              .transparent
+                                                              .withOpacity(0.7),
+                                                        ),
+                                                        // PDF Viewer
+                                                        Container(
+                                                          width:
+                                                              double.infinity,
+                                                          height: 250,
+                                                          child: PDF(
+                                                            swipeHorizontal:
+                                                                false,
+                                                            fitEachPage: true,
+                                                            enableSwipe: false,
+                                                            autoSpacing: false,
+                                                            pageFling: false,
+                                                            backgroundColor:
+                                                                Colors
+                                                                    .transparent
+                                                                    .withOpacity(
+                                                                        0.1),
+                                                            onError: (error) {
+                                                              print(error
+                                                                  .toString());
+                                                            },
+                                                            onPageError:
+                                                                (page, error) {
+                                                              print(
+                                                                  '$page: ${error.toString()}');
+                                                            },
+                                                          ).cachedFromUrl(
+                                                              e.filePath),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  // VIEW BUTTON
+                                                  Center(
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        if (e.fileType ==
+                                                            'image') {
+                                                          _showBottomSheets(
+                                                              context,
+                                                              e.filePath,
+                                                              null);
+                                                        } else {
+                                                          _showBottomSheets(
+                                                              context,
+                                                              null,
+                                                              e.filePath);
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 25,
+                                                                vertical: 7),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: Colors
+                                                              .transparent
+                                                              .withOpacity(0.3),
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.white,
+                                                              width: 1.5),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(30),
+                                                        ),
+                                                        child: Text(
+                                                          e.fileType == 'image'
+                                                              ? 'View Image'
+                                                              : e.fileType ==
+                                                                      'pdf'
+                                                                  ? 'View PDF'
+                                                                  : 'Unknown File Type',
+                                                          style:
+                                                              const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 14,
+                                                            fontFamily:
+                                                                'semibold',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 25),
+                                                child: Row(
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Posted by : ${e.postedBy}',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 12,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      138,
+                                                                      138,
+                                                                      138,
+                                                                      1)),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Spacer(),
+                                                    if (UserSession()
+                                                                .userType ==
+                                                            'admin' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'teacher')
+                                                      if (e.isAlterAvailable ==
+                                                          'Y')
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return AlertDialog(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              10)),
+                                                                      content:
+                                                                          Text(
+                                                                        "Do you really want to make\n changes to this Study Material?",
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'regular',
+                                                                            fontSize:
+                                                                                16,
+                                                                            color:
+                                                                                Colors.black),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                      actions: <Widget>[
+                                                                        Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //edit...
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                      Navigator.push(
+                                                                                          context,
+                                                                                          MaterialPageRoute(
+                                                                                              builder: (context) => EditStudymaterialpage(
+                                                                                                    id: e.id,
+                                                                                                    fetchstudymaterial: _fetchStudyMaterial,
+                                                                                                  )));
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Edit',
+                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    )),
+                                                                              ),
+                                                                            ])
+                                                                      ]);
+                                                                });
+                                                          },
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical: 5,
+                                                                    horizontal:
+                                                                        8),
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .black)),
+                                                            child: Row(
+                                                              children: [
+                                                                SvgPicture.asset(
+                                                                    'assets/icons/timetable_upload.svg'),
+                                                                Text(
+                                                                  'Reupload',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'medium',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    if (UserSession()
+                                                                .userType ==
+                                                            'admin' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'teacher')
+                                                      if (e.isAlterAvailable ==
+                                                          'Y')
+                                                        //delete icon
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            showDialog(
+                                                                barrierDismissible:
+                                                                    false,
+                                                                context:
+                                                                    context,
+                                                                builder:
+                                                                    (BuildContext
+                                                                        context) {
+                                                                  return AlertDialog(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius: BorderRadius.circular(
+                                                                              10)),
+                                                                      content:
+                                                                          Text(
+                                                                        "Do you really want to Delete\n to this StudyMaterial?",
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'regular',
+                                                                            fontSize:
+                                                                                16,
+                                                                            color:
+                                                                                Colors.black),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                      actions: <Widget>[
+                                                                        Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //edit...
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                    onPressed: () async {
+                                                                                      var studydelete = e.id;
+                                                                                      final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeStudyMaterial/DeleteStudyMaterial?Id=$studydelete';
+
+                                                                                      try {
+                                                                                        final response = await http.delete(
+                                                                                          Uri.parse(url),
+                                                                                          headers: {
+                                                                                            'Content-Type': 'application/json',
+                                                                                            'Authorization': 'Bearer $authToken',
+                                                                                          },
+                                                                                        );
+
+                                                                                        if (response.statusCode == 200) {
+                                                                                          print('id has beeen deleted ${studydelete}');
+
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(backgroundColor: Colors.green, content: Text('Studymaterial deleted successfully!')),
+                                                                                          );
+                                                                                          //
+                                                                                          Navigator.pop(context);
+                                                                                          //
+                                                                                          await _fetchStudyMaterial();
+                                                                                        } else {
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete .')),
+                                                                                          );
+                                                                                        }
+                                                                                      } catch (e) {
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(content: Text('An error occurred: $e')),
+                                                                                        );
+                                                                                      }
+                                                                                      _fetchStudyMaterial();
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Delete',
+                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    )),
+                                                                              ),
+                                                                            ])
+                                                                      ]);
+                                                                });
+                                                          },
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    horizontal:
+                                                                        10),
+                                                            child: SvgPicture
+                                                                .asset(
+                                                              'assets/icons/timetable_delete.svg',
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                              height: 25,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    //
+                                                    if (UserSession()
+                                                            .userType ==
+                                                        'student')
+                                                      //download
+                                                      if (UserSession()
+                                                              .userType ==
+                                                          'student')
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            var imagepath =
+                                                                e.filePath;
+
+                                                            var pdf =
+                                                                e.filePath;
+
+                                                            _showBottomSheet(
+                                                                context,
+                                                                imagepath,
+                                                                pdf);
+                                                          },
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical: 5,
+                                                                    horizontal:
+                                                                        20),
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    width:
+                                                                        1.5)),
+                                                            child: Row(
+                                                              children: [
+                                                                SvgPicture
+                                                                    .asset(
+                                                                  'assets/icons/Dwnl_icon.svg',
+                                                                  fit: BoxFit
+                                                                      .contain,
+                                                                  height: 20,
+                                                                ),
+                                                                Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          left:
+                                                                              5),
+                                                                  child: Text(
+                                                                    'Download',
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'medium',
+                                                                        fontSize:
+                                                                            12,
+                                                                        color: Colors
+                                                                            .black),
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  //dwnl
+  void _showBottomSheet(
+      BuildContext context, String? imagePath, String? pdf) async {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: -70,
+                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  padding: const EdgeInsets.all(10),
+                  child: Center(
+                    child: imagePath != null
+                        ? Image.network(
+                            imagePath,
+                            fit: BoxFit.contain,
+                          )
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 5,
+                                  child: Transform.translate(
+                                    offset: Offset(0, -200),
+                                    child: PDF(
+                                      swipeHorizontal: false,
+                                      fitEachPage: true,
+                                      enableSwipe: true,
+                                      autoSpacing: false,
+                                      pageFling: false,
+                                      backgroundColor: Colors.white,
+                                      onError: (error) {
+                                        print(error.toString());
+                                      },
+                                      onPageError: (page, error) {
+                                        print('$page: ${error.toString()}');
+                                      },
+                                    ).cachedFromUrl(pdf.toString()),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+                //dwnl
+                Padding(
+                  padding: const EdgeInsets.only(top: 20),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor),
+                    onPressed: () {
+                      downloadImage(imagePath.toString());
+                    },
+                    child: Text(
+                      'Download',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 16,
+                          color: Colors.black),
+                    ),
+                  ),
+                )
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+//show image bottomsheet code end....
+  Future<void> downloadImage(String imageUrl) async {
+    try {
+      final directory = await getExternalStorageDirectory();
+      if (directory == null) {
+        print("Failed to get external storage directory.");
+        return;
+      }
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      if (!await downloadsDirectory.exists()) {
+        await downloadsDirectory.create(recursive: true);
+      }
+      final filePath =
+          '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        print('Image downloaded to: $filePath');
+        showDownloadNotification(filePath);
+      } else {
+        print('Failed to download image');
+      }
+    } catch (e) {
+      print('Error occurred while downloading image: $e');
+    }
+  }
+
+// Function to show download notification
+  void showDownloadNotification(String filePath) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'download_channel',
+      'Download Notifications',
+      channelDescription: 'Notifications related to downloads',
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: true,
+    );
+    const NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
+    await flutterLocalNotificationsPlugin.show(
+      10,
+      'Download Complete',
+      'Image downloaded successfully to $filePath',
+      platformDetails,
+      payload: filePath,
+    );
+  }
+
+//
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload != null && response.payload!.isNotEmpty) {
+          print("Notification clicked! Opening file: ${response.payload}");
+          openFile(response.payload!);
+        } else {
+          print("Notification clicked, but no payload received.");
+        }
+      },
+    );
+  }
+
+//
+  void openFile(String filePath) {
+    print("Opening file: $filePath");
+    OpenFile.open(filePath);
+  }
+
+  //
+  void _showBottomSheets(
+      BuildContext context, String? imagePath, String? pdf) async {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: -70,
+                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  padding: const EdgeInsets.all(10),
+                  child: Center(
+                    child: imagePath != null
+                        ? Image.network(
+                            imagePath,
+                            fit: BoxFit.contain,
+                          )
+                        : SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Container(
+                                  height:
+                                      MediaQuery.of(context).size.height * 5,
+                                  child: Transform.translate(
+                                    offset: Offset(0, -200),
+                                    child: PDF(
+                                      swipeHorizontal: false,
+                                      fitEachPage: true,
+                                      enableSwipe: true,
+                                      autoSpacing: false,
+                                      pageFling: false,
+                                      backgroundColor: Colors.white,
+                                      onError: (error) {
+                                        print(error.toString());
+                                      },
+                                      onPageError: (page, error) {
+                                        print('$page: ${error.toString()}');
+                                      },
+                                    ).cachedFromUrl(pdf.toString()),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ),
+                //
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

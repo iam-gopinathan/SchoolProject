@@ -14,6 +14,8 @@ class Marksmainpage extends StatefulWidget {
 }
 
 class _MarksmainpageState extends State<Marksmainpage> {
+  ScrollController _scrollController = ScrollController();
+
   bool isswitched = false;
 
   final gradeController = Get.find<GradeController>();
@@ -23,6 +25,19 @@ class _MarksmainpageState extends State<Marksmainpage> {
     // TODO: implement initState
     super.initState();
     gradeController.fetchGrades();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
   @override
@@ -111,6 +126,7 @@ class _MarksmainpageState extends State<Marksmainpage> {
         ),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
@@ -539,6 +555,31 @@ class _MarksmainpageState extends State<Marksmainpage> {
           ),
         ),
       ),
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

@@ -1,7 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/models/Exam_Timetable/create_ExamTimetables.dart';
 import 'package:flutter_application_1/services/ExamTimetables_Api/Create_ExamTimetable_Api.dart';
@@ -28,8 +27,6 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
 
   String? selectedGrade;
 
-  String _dateTime = "";
-
   List<String> examList = [];
   String? selectedExam;
 
@@ -39,7 +36,7 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['jpeg', 'webp', 'pdf', 'png'],
+        allowedExtensions: ['jpeg', 'webp', 'pdf', 'png', 'jpg'],
         withData: true,
       );
 
@@ -266,6 +263,59 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
     }
   }
 
+  //
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return selectedClasses != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,7 +340,10 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
                 Row(
                   children: [
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async {
+                        if (hasUnsavedChanges()) {
+                          await _showUnsavedChangesDialog();
+                        }
                         widget.fetchmainexam();
                         Navigator.pop(context);
                       },
@@ -717,10 +770,7 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
               ),
             ),
 
-            ///display selected image...
-
             /// Display selected image...
-
             if (selectedFile != null)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -869,6 +919,7 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
     );
   }
 
+//
   void CreateExamTimetables(String status) async {
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
@@ -885,7 +936,7 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
       userType: UserSession().userType.toString(),
       rollNumber: UserSession().rollNumber.toString(),
       fileType: 'image',
-      file: selectedFile!.extension ?? "image",
+      file: selectedFile!.extension ?? "",
       status: status,
       postedOn: postedOn,
       draftedOn: draftedOn,
@@ -896,6 +947,7 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
 
     print("Exam TimeTable: ${ExamtimeTable.toJson()}");
 
-    CreateExamTimeTable(ExamtimeTable, selectedFile!, context);
+    CreateExamTimeTable(
+        ExamtimeTable, selectedFile!, context, widget.fetchmainexam);
   }
 }

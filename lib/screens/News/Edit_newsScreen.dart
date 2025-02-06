@@ -5,17 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/News_Models/Edit_news_model.dart';
 import 'package:flutter_application_1/models/News_Models/Update_news.model.dart';
-import 'package:flutter_application_1/models/School_calendar_model/Update_school_calender_model.dart';
 import 'package:flutter_application_1/services/News_Api/Update_news_Api.dart';
 import 'package:flutter_application_1/services/News_Api/Edit_news_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
 import 'package:flutter_quill/flutter_quill.dart';
-
-import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:html/parser.dart' as html_parser;
 
 class EditNewsscreen extends StatefulWidget {
   final int newsId;
@@ -28,89 +29,7 @@ class EditNewsscreen extends StatefulWidget {
 }
 
 class _EditNewsscreenState extends State<EditNewsscreen> {
-// Function to convert Delta to HTML with <b> for bold text
-  String convertDeltaToHtml(Delta delta) {
-    final StringBuffer htmlContent = StringBuffer();
-
-    for (final op in delta.toList()) {
-      final attributes = op.attributes;
-      final text = op.data.toString();
-
-      if (op.isInsert) {
-        if (attributes != null && attributes['bold'] == true) {
-          htmlContent.write('<b>$text</b>');
-        } else {
-          htmlContent.write(text);
-        }
-      }
-    }
-    return htmlContent.toString();
-  }
-
-// Function to extract HTML content from the controller
-  String getHtmlContent() {
-    final delta = _controller.document.toDelta();
-    return convertDeltaToHtml(delta);
-  }
-// Function to convert Delta to HTML with <b> for bold text endddddddd
-
-  TextSpan convertDeltaToTextSpan(Delta delta) {
-    final List<TextSpan> textSpans = [];
-
-    for (final op in delta.toList()) {
-      final attributes = op.attributes;
-      final text = op.data.toString();
-
-      if (op.isInsert) {
-        final isBold = attributes != null && attributes['bold'] == true;
-
-        textSpans.add(
-          TextSpan(
-            text: text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
-            ),
-          ),
-        );
-      }
-    }
-    return TextSpan(children: textSpans);
-  }
-
-  // Function to convert HTML with <b> to Delta with bold formatting
-  Delta htmlToDeltaWithBold(String htmlContent) {
-    final Delta delta = Delta();
-
-    final RegExp boldRegExp = RegExp(r'<b>(.*?)</b>', dotAll: true);
-    final matches = boldRegExp.allMatches(htmlContent);
-
-    int lastIndex = 0;
-
-    for (var match in matches) {
-      // Add text before <b> tag
-      if (match.start > lastIndex) {
-        delta.insert(htmlContent.substring(lastIndex, match.start));
-      }
-
-      // Insert bold text
-      delta.insert(
-        match.group(1)!, // Extract the bold text
-        {'bold': true}, // Apply bold style
-      );
-
-      lastIndex = match.end;
-    }
-
-    // Add any remaining text after the last <b> tag
-    if (lastIndex < htmlContent.length) {
-      delta.insert(htmlContent.substring(lastIndex));
-    }
-
-    return delta;
-  }
-
+  late String htmlContent = "";
   bool isuploadimage = true;
   bool isaddLink = false;
 
@@ -192,16 +111,20 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
 
   ///image bottomsheeet
   void _PreviewBottomsheet(BuildContext context, String imageUrl) {
+    // Extract the latest content directly from the QuillController
+    final String currentHtmlContent =
+        descriptionController.document.toPlainText();
+
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
@@ -270,16 +193,17 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                           ],
                         ),
                       ),
-                      //description...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 20),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: RichText(
-                            text: convertDeltaToTextSpan(
-                                descriptionController.document.toDelta()),
+                      // description...
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            padding: const EdgeInsets.all(10),
+                            child: htmlContent.isNotEmpty
+                                ? Html(data: htmlContent)
+                                : const Text(''),
                           ),
-                        ),
+                        ],
                       ),
                       //fetched image...
                       if (imageUrl.isNotEmpty)
@@ -308,8 +232,10 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                 ),
               )
             ]);
-          });
-        });
+          },
+        );
+      },
+    );
   }
 
   // Define the selectedFile variable
@@ -361,9 +287,9 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
   }
 
   late TextEditingController headingController;
-  late quill.QuillController descriptionController;
   late FocusNode _focusNode;
   late Future<EditNewsModel> _EditNews;
+  late quill.QuillController descriptionController;
 
   @override
   void dispose() {
@@ -381,10 +307,30 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
     _EditNews = fetchEditNews(widget.newsId);
     headingController = TextEditingController();
     descriptionController = quill.QuillController.basic();
+
     _focusNode = FocusNode();
-    // Add the listener
+
     headingController.addListener(() {
       print("Current Text: ${headingController.text}");
+    });
+
+    //
+
+    // Fetch the edit news data
+    _EditNews = fetchEditNews(widget.newsId);
+    _EditNews.then((data) {
+      setState(() {
+        htmlContent = data.news;
+
+        // Parse plain text from HTML for Quill editor
+        final plainText = html_parser.parse(data.news).body?.text ?? "";
+
+        // Initialize the QuillController with a Delta document
+        descriptionController = quill.QuillController(
+          document: quill.Document()..insert(0, plainText),
+          selection: const TextSelection.collapsed(offset: 0),
+        );
+      });
     });
   }
 
@@ -392,84 +338,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
   TextEditingController _linkController = TextEditingController();
   QuillController _controller = QuillController.basic();
   String? imageUrl;
-
-  void _updateNews(EditNewsModel news) async {
-    try {
-      String status = _isScheduled ? 'schedule' : 'post';
-      String? fileToUpload;
-      String? fileTypeToUpload;
-
-// Determine file type and file to upload
-      if (selectedFile != null) {
-        fileToUpload = selectedFile!.path;
-        fileTypeToUpload = 'image';
-      } else if (_linkController.text.isNotEmpty) {
-        fileToUpload = _linkController.text;
-        fileTypeToUpload = 'link';
-      } else if (news.fileType == 'existing' ||
-          (news.file != null && news.file!.isNotEmpty)) {
-        fileToUpload = '';
-        fileTypeToUpload = 'existing';
-      } else {
-        fileToUpload = news.file;
-        fileTypeToUpload = news.fileType;
-      }
-
-// Ensure default values
-      fileToUpload ??= '';
-      fileTypeToUpload ??= '';
-
-      // Debug print the values
-      print("status: $status");
-      print("fileToUpload: $fileToUpload");
-      print("fileTypeToUpload: $fileTypeToUpload");
-      print("Headline: ${headingController.text}");
-      print("News content: ${descriptionController.document.toPlainText()}");
-      print("Link: ${_linkController.text}");
-      print(
-          "Scheduled On: ${_isScheduled ? _scheduledDateandtime.text : null}");
-      print(
-          "Posted On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
-      print(
-          "Updated On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
-
-      // Print the full updatedNews data before sending
-      NewsUpdateModel updatedNews = NewsUpdateModel(
-        id: news.id ?? 0,
-        rollNumber: UserSession().rollNumber.toString(),
-        userType: UserSession().userType.toString(),
-        headLine: headingController.text,
-        news: descriptionController.document.toPlainText(),
-        file: fileToUpload,
-        fileType: fileTypeToUpload,
-        link: _linkController.text,
-        status: status,
-        scheduleOn: _isScheduled ? _scheduledDateandtime.text : '',
-        postedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
-        updatedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
-      );
-
-      print("Updated News: ${updatedNews.toJson()}");
-
-      File? fileToUploadObj =
-          selectedFile != null ? File(selectedFile!.path!) : null;
-
-      bool success = await updateNewsWithFormData(updatedNews, fileToUploadObj);
-
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.green,
-            content: Text('News updated successfully')));
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to update news')));
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
-      print(e);
-    }
-  }
 
   bool isFetchedImageVisible = true;
 
@@ -532,10 +400,8 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                   selection: TextSelection.collapsed(offset: 0),
                 );
               }
-
               //file image...
               final String? imageUrl = news.file;
-
               return SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Padding(
@@ -636,6 +502,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                             ],
                           ),
                         ),
+                        //
                         Padding(
                           padding: const EdgeInsets.all(15.0),
                           child: Container(
@@ -710,7 +577,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                   padding: EdgeInsets.all(10),
                                   child: QuillEditor.basic(
                                     controller: descriptionController,
-                                    focusNode: _focusNode,
                                     configurations:
                                         const QuillEditorConfigurations(
                                             padding:
@@ -985,7 +851,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                             ),
 
                         /// Display Selected File end...
-
                         //addlink tab....
                         if (isaddLink)
                           Padding(
@@ -1153,7 +1018,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'medium',
-                                      color: Colors.white),
+                                      color: Colors.black),
                                 ),
                               ),
                             ],
@@ -1170,5 +1035,108 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
             );
           }),
     );
+  }
+
+  //update news...
+  void _updateNews(EditNewsModel news) async {
+    // Convert the QuillController content to HTML
+    final generatedHtml = QuillDeltaToHtmlConverter(
+      descriptionController.document.toDelta().toJson(),
+    ).convert();
+
+    // Assign the generated HTML to htmlContent
+    late String htmlContent = generatedHtml;
+
+    // Debug print the generated HTML content
+    print("Generated HTML Content: $htmlContent");
+
+    if (headingController.text.isEmpty || htmlContent.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
+
+    try {
+      String status = _isScheduled ? 'schedule' : 'post';
+      String? fileToUpload;
+      String? fileTypeToUpload;
+
+// Determine file type and file to upload
+      if (selectedFile != null) {
+        fileToUpload = selectedFile!.path;
+        fileTypeToUpload = 'image';
+      } else if (_linkController.text.isNotEmpty) {
+        fileToUpload = _linkController.text;
+        fileTypeToUpload = 'link';
+      } else if (news.fileType == 'existing' ||
+          (news.file != null && news.file!.isNotEmpty)) {
+        fileToUpload = '';
+        fileTypeToUpload = 'existing';
+      } else {
+        fileToUpload = news.file;
+        fileTypeToUpload = news.fileType;
+      }
+// Ensure default values
+      fileToUpload ??= '';
+      fileTypeToUpload ??= '';
+
+      // Debug print the values
+      print("status: $status");
+      print("fileToUpload: $fileToUpload");
+      print("fileTypeToUpload: $fileTypeToUpload");
+      print("Headline: ${headingController.text}");
+      print("News content: ${htmlContent}");
+      print("Link: ${_linkController.text}");
+      print(
+          "Scheduled On: ${_isScheduled ? _scheduledDateandtime.text : null}");
+      print(
+          "Posted On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
+      print(
+          "Updated On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
+
+      // Print the full updatedNews data before sending
+      NewsUpdateModel updatedNews = NewsUpdateModel(
+        id: news.id ?? 0,
+        rollNumber: UserSession().rollNumber.toString(),
+        userType: UserSession().userType.toString(),
+        headLine: headingController.text,
+        news: htmlContent,
+        file: fileToUpload,
+        fileType: fileTypeToUpload,
+        link: _linkController.text,
+        status: status,
+        scheduleOn: _isScheduled ? _scheduledDateandtime.text : '',
+        postedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+        updatedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+      );
+
+      print("Updated News: ${updatedNews.toJson()}");
+
+      File? fileToUploadObj =
+          selectedFile != null ? File(selectedFile!.path!) : null;
+
+      bool success = await updateNewsWithFormData(updatedNews, fileToUploadObj);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.green,
+            content: Text('News updated successfully')));
+        // Add a delay of 2 seconds before navigating
+        await Future.delayed(Duration(seconds: 2));
+        widget.onCreateNews();
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to update news')));
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      print(e);
+    }
   }
 }

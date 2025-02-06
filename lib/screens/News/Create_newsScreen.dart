@@ -7,10 +7,12 @@ import 'package:flutter_application_1/models/News_Models/Create_news_model.dart'
 import 'package:flutter_application_1/services/News_Api/Create_news_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill/quill_delta.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class CreateNewsscreen extends StatefulWidget {
   final Function onCreateNews;
@@ -21,6 +23,8 @@ class CreateNewsscreen extends StatefulWidget {
 }
 
 class _CreateNewsscreenState extends State<CreateNewsscreen> {
+  late String htmlContent = "";
+
   TextEditingController _heading = TextEditingController();
   TextEditingController _linkController = TextEditingController();
   QuillController _controller = QuillController.basic();
@@ -223,16 +227,17 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           ],
                         ),
                       ),
-                      //description...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 20),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: RichText(
-                            text: convertDeltaToTextSpan(
-                                _controller.document.toDelta()),
+                      // description...
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.7,
+                            padding: const EdgeInsets.all(10),
+                            child: htmlContent.isNotEmpty
+                                ? Html(data: htmlContent)
+                                : const Text(''),
                           ),
-                        ),
+                        ],
                       ),
 
                       ///image section...
@@ -258,59 +263,61 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
         });
   }
 
-//html converter code....
-  String convertDeltaToHtml(Delta delta) {
-    final StringBuffer htmlContent = StringBuffer();
-
-    for (final op in delta.toList()) {
-      final attributes = op.attributes;
-      final text = op.data.toString();
-
-      if (op.isInsert) {
-        if (attributes != null && attributes['bold'] == true) {
-          htmlContent.write('<b>$text</b>');
-        } else {
-          htmlContent.write(text);
-        }
-      }
-    }
-    return htmlContent.toString();
-  }
-
-  String getHtmlContent() {
-    final delta = _controller.document.toDelta();
-    return convertDeltaToHtml(delta);
-  }
-
-  final FocusNode _focusNode = FocusNode();
-  TextSpan convertDeltaToTextSpan(Delta delta) {
-    final List<TextSpan> textSpans = [];
-    for (final op in delta.toList()) {
-      final attributes = op.attributes;
-      final text = op.data.toString();
-      if (op.isInsert) {
-        final isBold = attributes != null && attributes['bold'] == true;
-        textSpans.add(
-          TextSpan(
-            text: text,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-              color: Colors.black,
-            ),
-          ),
-        );
-      }
-    }
-
-    return TextSpan(children: textSpans);
-  }
+  String initialHeading = "";
 
   @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-    _focusNode.dispose();
+  void initState() {
+    super.initState();
+    initialHeading = _heading.text;
+  }
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return _heading.text != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
   }
 
   @override
@@ -328,7 +335,10 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
             iconTheme: IconThemeData(color: Colors.black),
             backgroundColor: AppTheme.appBackgroundPrimaryColor,
             leading: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  if (hasUnsavedChanges()) {
+                    await _showUnsavedChangesDialog();
+                  }
                   widget.onCreateNews();
                   Navigator.pop(context);
                 },
@@ -442,9 +452,11 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                     ],
                   ),
                 ),
+                //editor...
                 Padding(
-                  padding: const EdgeInsets.all(15.0),
+                  padding: const EdgeInsets.all(12.0),
                   child: Container(
+                    width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.white,
@@ -457,74 +469,79 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                         ),
                       ],
                     ),
-                    width: double.infinity,
                     child: Column(
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            QuillSimpleToolbar(
-                              controller: _controller,
-                              configurations:
-                                  const QuillSimpleToolbarConfigurations(
-                                dialogTheme: QuillDialogTheme(
-                                    labelTextStyle:
-                                        TextStyle(color: Colors.black),
-                                    inputTextStyle: TextStyle(
-                                        color: Colors.black, fontSize: 14)),
-                                showBoldButton: true,
-                                showClearFormat: false,
-                                showAlignmentButtons: false,
-                                showBackgroundColorButton: false,
-                                showFontSize: false,
-                                showColorButton: false,
-                                showCenterAlignment: false,
-                                showClipboardCut: false,
-                                showIndent: false,
-                                showDirection: false,
-                                showDividers: false,
-                                showFontFamily: false,
-                                showItalicButton: false,
-                                showClipboardPaste: false,
-                                showInlineCode: false,
-                                showCodeBlock: false,
-                                showHeaderStyle: false,
-                                showJustifyAlignment: false,
-                                showLeftAlignment: false,
-                                showLineHeightButton: false,
-                                showLink: false,
-                                showListBullets: false,
-                                showListCheck: false,
-                                showListNumbers: false,
-                                showQuote: false,
-                                showRightAlignment: false,
-                                showSearchButton: false,
-                                showRedo: false,
-                                showSmallButton: false,
-                                showSubscript: false,
-                                showStrikeThrough: false,
-                                showUndo: false,
-                                showUnderLineButton: false,
-                                showSuperscript: false,
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              QuillSimpleToolbar(
+                                controller: _controller,
+                                configurations:
+                                    const QuillSimpleToolbarConfigurations(
+                                  dialogTheme: QuillDialogTheme(
+                                      labelTextStyle:
+                                          TextStyle(color: Colors.black),
+                                      inputTextStyle: TextStyle(
+                                          color: Colors.black, fontSize: 14)),
+                                  showBoldButton: true,
+                                  showClearFormat: false,
+                                  showAlignmentButtons: false,
+                                  showBackgroundColorButton: false,
+                                  showFontSize: false,
+                                  showColorButton: false,
+                                  showCenterAlignment: false,
+                                  showClipboardCut: false,
+                                  showIndent: false,
+                                  showDirection: false,
+                                  showDividers: false,
+                                  showFontFamily: false,
+                                  showItalicButton: false,
+                                  showClipboardPaste: false,
+                                  showInlineCode: false,
+                                  showCodeBlock: false,
+                                  showHeaderStyle: false,
+                                  showJustifyAlignment: false,
+                                  showLeftAlignment: false,
+                                  showLineHeightButton: false,
+                                  showLink: false,
+                                  showListBullets: false,
+                                  showListCheck: false,
+                                  showListNumbers: false,
+                                  showQuote: false,
+                                  showRightAlignment: false,
+                                  showSearchButton: false,
+                                  showRedo: false,
+                                  showSmallButton: false,
+                                  showSubscript: false,
+                                  showStrikeThrough: false,
+                                  showUndo: false,
+                                  showUnderLineButton: false,
+                                  showSuperscript: false,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Quill editor
+                        Container(
+                          child: Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 5, bottom: 10),
+                              child: quill.QuillEditor.basic(
+                                controller: _controller,
                               ),
                             ),
-                          ],
-                        ),
-                        // Removed fixed height for QuillEditor
-                        Padding(
-                          padding: EdgeInsets.all(10),
-                          child: QuillEditor.basic(
-                            controller: _controller,
-                            focusNode: _focusNode,
-                            configurations: const QuillEditorConfigurations(
-                                padding: EdgeInsetsDirectional.symmetric(
-                                    vertical: 25)),
                           ),
                         ),
                       ],
                     ),
                   ),
                 ),
+                //
                 Padding(
                   padding: const EdgeInsets.only(left: 15),
                   child: Row(
@@ -746,7 +763,6 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                     ),
 
                 /// Display Selected File end...
-
                 //addlink tab....
                 if (isaddLink)
                   Padding(
@@ -774,7 +790,6 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           )),
                     ),
                   ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -900,6 +915,18 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                       ///preview
                       GestureDetector(
                         onTap: () {
+                          final generatedHtml = QuillDeltaToHtmlConverter(
+                            _controller.document.toDelta().toJson(),
+                          ).convert();
+
+                          setState(() {
+                            htmlContent =
+                                generatedHtml; // Update the class-level variable
+                          });
+
+                          // Print for debugging
+                          print("Generated HTML Content: $htmlContent");
+
                           _PreviewBottomsheet(context);
                         },
                         child: Text(
@@ -926,7 +953,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                         child: Text(
                           _scheduledDateandtime.text.isEmpty
                               ? 'Publish'
-                              : 'Scheduled',
+                              : 'Schedule',
                           style: TextStyle(
                               fontSize: 16,
                               fontFamily: 'medium',
@@ -946,11 +973,18 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
 
   ////create news api call....................................................
   void _publishNews({String? status}) {
+    //
     final String heading = _heading.text;
 
-    final String description = getHtmlContent();
+    final generatedHtml = QuillDeltaToHtmlConverter(
+      _controller.document.toDelta().toJson(),
+    ).convert();
 
-    if (heading.isEmpty || description.isEmpty) {
+    late String htmlContent = generatedHtml;
+    // Print the generated HTML content for debugging
+    print("Generated HTML Content: $htmlContent");
+
+    if (heading.isEmpty || htmlContent.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
@@ -959,6 +993,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
       );
       return;
     }
+
     String fileType = '';
     String file = '';
     String link = '';
@@ -984,7 +1019,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
     }
     final newsPost = CreateNewsModel(
       headline: heading,
-      news: description,
+      news: htmlContent,
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',
       postedOn: status == 'draft' ? '' : postedOn,
@@ -995,6 +1030,6 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
       file: file,
       link: link,
     );
-    postNews(newsPost, status ?? 'post', context);
+    postNews(newsPost, status ?? 'post', context, widget.onCreateNews);
   }
 }

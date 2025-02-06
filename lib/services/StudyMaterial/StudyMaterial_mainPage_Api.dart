@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter_application_1/models/StudyMaterial/StudyMaterial_MainPage_model.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +25,7 @@ Future<List<StudyMaterialModel>> fetchStudyMaterials({
 
     if (response.statusCode == 200) {
       print(url);
+      print('studymaterialutrlllll $url');
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       print('Response bodyyyyy studyyyyyyyy: ${response.body}');

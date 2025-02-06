@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/models/ConsentForm/receivedConsent_model.dart';
-
 import 'package:flutter_application_1/screens/consentFoms/Create_consentFormPage.dart';
 import 'package:flutter_application_1/services/ConsentForm/Received_consentform_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
@@ -21,6 +20,7 @@ class ReceivedConsentform extends StatefulWidget {
 class _ReceivedConsentformState extends State<ReceivedConsentform> {
   ScrollController _scrollController = ScrollController();
   bool isswitched = false;
+  bool isLoading = true;
   //select date
   String selectedDate = '';
   var displayDate = '';
@@ -49,69 +49,11 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
             child: child!,
           );
         });
-
     if (pickedDate != null) {
       setState(() {
         selectedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
       });
       displayDate = DateFormat('EEEE, dd MMMM').format(pickedDate);
-    }
-  }
-
-  //show filter
-  String _selectedFilter = "All Responses";
-
-  void _showFilterMenu(BuildContext context, TapDownDetails details) async {
-    final RenderBox overlay =
-        Overlay.of(context).context.findRenderObject() as RenderBox;
-
-    final result = await showMenu<String>(
-      color: Colors.black,
-      context: context,
-      position: RelativeRect.fromRect(
-        details.globalPosition & Size(40, 40),
-        Offset.zero & overlay.size,
-      ),
-      items: [
-        PopupMenuItem<String>(
-          value: 'All Responses',
-          child: Text(
-            'All Responses',
-            style: TextStyle(
-                fontFamily: 'regular', fontSize: 14, color: Colors.white),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'Yes',
-          child: Text(
-            'Yes',
-            style: TextStyle(
-                fontFamily: 'regular', fontSize: 14, color: Colors.white),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'No',
-          child: Text(
-            'No',
-            style: TextStyle(
-                fontFamily: 'regular', fontSize: 14, color: Colors.white),
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'Nil',
-          child: Text(
-            'Nil',
-            style: TextStyle(
-                fontFamily: 'regular', fontSize: 14, color: Colors.white),
-          ),
-        ),
-      ],
-    );
-
-    if (result != null) {
-      setState(() {
-        _selectedFilter = result;
-      });
     }
   }
 
@@ -350,7 +292,7 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop();
-
+                                isLoading = true;
                                 _recievedconsent(
                                     grade: selectedGrade,
                                     section: selectedSection);
@@ -387,12 +329,15 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
     // TODO: implement initState
     super.initState();
     _recievedconsent();
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
   }
 
   List<ReceivedconsentModel> consentData = [];
-  void _recievedconsent(
+  Future<void> _recievedconsent(
       {String grade = '131', String section = "A1", String date = ''}) async {
     try {
+      isLoading = true;
       final response = await fetchReceivedStudents(
         rollNumber: UserSession().rollNumber ?? '',
         userType: UserSession().userType ?? '',
@@ -401,11 +346,24 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
         section: section,
       );
       setState(() {
+        isLoading = false;
         consentData = response;
       });
     } catch (e) {
+      isLoading = false;
       print('Error fetching consent data: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
   }
 
   @override
@@ -460,7 +418,10 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                             GestureDetector(
                               onTap: () async {
                                 await _selectDate(context);
-                                _recievedconsent(date: selectedDate);
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                await _recievedconsent(date: selectedDate);
                               },
                               child: Row(
                                 children: [
@@ -569,343 +530,484 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
           ),
         ),
       ),
-      body: consentData.isEmpty
+      body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                strokeWidth: 4,
                 color: AppTheme.textFieldborderColor,
+                strokeWidth: 4,
               ),
             )
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  // Loop through consentData and handle each item
-                  ...List.generate(consentData.length, (i) {
-                    var currentConsentData = consentData[i];
+          : consentData.isEmpty
+              ? Center(
+                  child: Text(
+                    "You haven’t made anything yet;\nstart creating now!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'regular',
+                      color: Color.fromRGBO(145, 145, 145, 1),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    children: [
+                      // Loop through consentData and handle each item
+                      ...List.generate(consentData.length, (i) {
+                        var currentConsentData = consentData[i];
 
-                    return Column(
-                      children: [
-                        //posted on date...
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                '${currentConsentData.postedOnDate}| ${currentConsentData.postedOnDay}',
-                                style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 12,
-                                    color: Colors.black),
+                        return Column(
+                          children: [
+                            //posted on date...
+                            Padding(
+                              padding: const EdgeInsets.only(left: 20, top: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    '${currentConsentData.postedOnDate}| ${currentConsentData.postedOnDay}',
+                                    style: TextStyle(
+                                        fontFamily: 'regular',
+                                        fontSize: 12,
+                                        color: Colors.black),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                        // card sections..
-                        if (currentConsentData.consentForms.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.all(12.0),
-                            child: Card(
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: Container(
-                                padding: EdgeInsets.all(15),
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(12),
-                                    color: Colors.white,
-                                    border: Border.all(
-                                        color: Color.fromRGBO(238, 238, 238, 1),
-                                        width: 1.5)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 10),
-                                      child: Text(
-                                        '${currentConsentData.consentForms[0].question}',
-                                        style: TextStyle(
-                                            fontFamily: 'medium',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                      ),
-                                    ),
-                                    //posted by
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            'Posted by : ${currentConsentData.consentForms[0].name} | at : ${currentConsentData.consentForms[0].time}',
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 12,
-                                                color: Color.fromRGBO(
-                                                    89, 89, 89, 1)),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Divider(
-                                      color: Color.fromRGBO(230, 230, 230, 1),
-                                      thickness: 1,
-                                    ),
-                                    // expansion tile..
-                                    ExpansionTile(
-                                      shape: Border(),
-                                      title: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            'View Responses',
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 16,
-                                                color: Color.fromRGBO(
-                                                    230, 1, 84, 1)),
-                                          ),
-                                        ],
-                                      ),
+                            ),
+                            // card sections..
+                            if (currentConsentData.consentForms.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Card(
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
+                                  child: Container(
+                                    padding: EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        color: Colors.white,
+                                        border: Border.all(
+                                            color: Color.fromRGBO(
+                                                238, 238, 238, 1),
+                                            width: 1.5)),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Column(
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Text(
+                                            '${currentConsentData.consentForms[0].question}',
+                                            style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                        //posted by
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Posted by : ${currentConsentData.consentForms[0].name} | at : ${currentConsentData.consentForms[0].time}',
+                                                style: TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 12,
+                                                    color: Color.fromRGBO(
+                                                        89, 89, 89, 1)),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Divider(
+                                          color:
+                                              Color.fromRGBO(230, 230, 230, 1),
+                                          thickness: 1,
+                                        ),
+                                        // expansion tile..
+                                        ExpansionTile(
+                                          shape: Border(),
+                                          title: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                'View Responses',
+                                                style: TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 16,
+                                                    color: Color.fromRGBO(
+                                                        230, 1, 84, 1)),
+                                              ),
+                                            ],
+                                          ),
                                           children: [
-                                            ...List.generate(
-                                                currentConsentData
-                                                    .consentForms[0]
-                                                    .section
-                                                    .length, (index) {
-                                              String sectionName =
-                                                  currentConsentData
-                                                      .consentForms[0]
-                                                      .section[index];
+                                            Column(
+                                              children: [
+                                                ...List.generate(
+                                                    currentConsentData
+                                                        .consentForms[0]
+                                                        .section
+                                                        .length, (index) {
+                                                  String sectionName =
+                                                      currentConsentData
+                                                          .consentForms[0]
+                                                          .section[index];
 
-                                              String classname =
-                                                  currentConsentData
-                                                      .consentForms[0]
-                                                      .responseAnswers[0]
-                                                      .className;
+                                                  String classname =
+                                                      currentConsentData
+                                                          .consentForms[0]
+                                                          .responseAnswers[0]
+                                                          .className;
 
-                                              // Find the responses for the section
-                                              var responsesForSection =
-                                                  currentConsentData
-                                                      .consentForms[0]
-                                                      .responseAnswers
-                                                      .where((response) =>
-                                                          response.section ==
-                                                          sectionName)
-                                                      .toList();
+                                                  // Find the responses for the section
+                                                  var responsesForSection =
+                                                      currentConsentData
+                                                          .consentForms[0]
+                                                          .responseAnswers
+                                                          .where((response) =>
+                                                              response
+                                                                  .section ==
+                                                              sectionName)
+                                                          .toList();
 
-                                              Set<String> displayedSections =
-                                                  {};
+                                                  Set<String>
+                                                      displayedSections = {};
 
-                                              // Display the section header only once
-                                              return Column(
-                                                children: [
-                                                  Row(
+                                                  // Display the section header only once
+                                                  return Column(
                                                     children: [
-                                                      IntrinsicWidth(
-                                                        child: Container(
-                                                          decoration: BoxDecoration(
-                                                              borderRadius: BorderRadius.only(
-                                                                  topRight: Radius
-                                                                      .circular(
-                                                                          10)),
-                                                              border: Border.all(
-                                                                  color: Color
-                                                                      .fromRGBO(
+                                                      Row(
+                                                        children: [
+                                                          IntrinsicWidth(
+                                                            child: Container(
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius: BorderRadius.only(
+                                                                      topRight:
+                                                                          Radius.circular(
+                                                                              10)),
+                                                                  border: Border.all(
+                                                                      color: Color.fromRGBO(
                                                                           234,
                                                                           234,
                                                                           234,
                                                                           1))),
-                                                          child: Row(
-                                                            children: [
-                                                              Container(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
+                                                              child: Row(
+                                                                children: [
+                                                                  Container(
+                                                                    padding: EdgeInsets.symmetric(
                                                                         vertical:
                                                                             10),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius: BorderRadius.only(
-                                                                        topLeft:
-                                                                            Radius.circular(
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius: BorderRadius.only(
+                                                                            topLeft: Radius.circular(
                                                                                 10)),
-                                                                    color: Color
-                                                                        .fromRGBO(
+                                                                        color: Color.fromRGBO(
                                                                             31,
                                                                             106,
                                                                             163,
                                                                             1)),
-                                                                child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: const EdgeInsets
                                                                           .only(
                                                                           left:
                                                                               10,
                                                                           right:
                                                                               10),
-                                                                  child: Text(
-                                                                    '${classname}-${sectionName}',
-                                                                    style: TextStyle(
-                                                                        fontFamily:
-                                                                            'medium',
-                                                                        fontSize:
-                                                                            12,
-                                                                        color: Colors
-                                                                            .white),
+                                                                      child:
+                                                                          Text(
+                                                                        '${classname}-${sectionName}',
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'medium',
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                Colors.white),
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
+                                                                ],
                                                               ),
-                                                            ],
+                                                            ),
                                                           ),
-                                                        ),
+                                                          Spacer(),
+                                                          //
+                                                          GestureDetector(
+                                                            onTapDown:
+                                                                (TapDownDetails
+                                                                    details) {
+                                                              _showFilterMenu(
+                                                                  context,
+                                                                  details);
+                                                            },
+                                                            child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      right:
+                                                                          10),
+                                                              child: SvgPicture
+                                                                  .asset(
+                                                                'assets/icons/Filter_icon.svg',
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              ),
+                                                            ),
+                                                          )
+                                                        ],
                                                       ),
-                                                      Spacer(),
-                                                      GestureDetector(
-                                                        onTapDown:
-                                                            (TapDownDetails
-                                                                details) {
-                                                          _showFilterMenu(
-                                                              context, details);
-                                                        },
-                                                        child: Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  right: 10),
-                                                          child:
-                                                              SvgPicture.asset(
-                                                            'assets/icons/Filter_icon.svg',
-                                                            fit: BoxFit.contain,
-                                                          ),
-                                                        ),
-                                                      )
-                                                    ],
-                                                  ),
-                                                  // List all responses for the section
-                                                  Column(
-                                                    children:
-                                                        responsesForSection
-                                                            .map((response) {
-                                                      String className =
-                                                          response.className;
-                                                      String studentName =
-                                                          response.studentName;
-                                                      String rollNumber =
-                                                          response.rollNumber;
-                                                      String profileImage =
-                                                          response.profile;
-                                                      var responses =
-                                                          response.responses;
+                                                      // List all responses for the section
+                                                      Column(
+                                                        children:
+                                                            responsesForSection
+                                                                .where(
+                                                                    (response) {
+                                                          // String className =
+                                                          //     response
+                                                          //         .className;
+                                                          // String studentName =
+                                                          //     response
+                                                          //         .studentName;
+                                                          // String rollNumber =
+                                                          //     response
+                                                          //         .rollNumber;
+                                                          // String profileImage =
+                                                          //     response.profile;
+                                                          // var responses =
+                                                          //     response
+                                                          //         .responses;
+                                                          // Filter based on the selected filter value
+                                                          if (_selectedFilter ==
+                                                              'All Responses') {
+                                                            return true; // No filter, show all responses
+                                                          } else if (_selectedFilter ==
+                                                                  'Yes' &&
+                                                              response.responses ==
+                                                                  'Y') {
+                                                            return true; // Show only responses with 'Y'
+                                                          } else if (_selectedFilter ==
+                                                                  'No' &&
+                                                              response.responses ==
+                                                                  'N') {
+                                                            return true; // Show only responses with 'N'
+                                                          }
+                                                          return false; // Don't show this response if it doesn't match the filter
+                                                        }).map((response) {
+                                                          String className =
+                                                              response
+                                                                  .className;
+                                                          String studentName =
+                                                              response
+                                                                  .studentName;
+                                                          String rollNumber =
+                                                              response
+                                                                  .rollNumber;
+                                                          String profileImage =
+                                                              response.profile;
+                                                          var responses =
+                                                              response
+                                                                  .responses;
 
-                                                      return ListTile(
-                                                        contentPadding:
-                                                            EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10),
-                                                        shape: RoundedRectangleBorder(
-                                                            side: BorderSide(
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        234,
-                                                                        234,
-                                                                        234,
-                                                                        1),
-                                                                width: 0.5)),
-                                                        leading: Image.network(
-                                                            '$profileImage'),
-                                                        title: Text(
-                                                          '$studentName',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'semibold',
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                        subtitle: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              '$rollNumber',
+                                                          return ListTile(
+                                                            contentPadding:
+                                                                EdgeInsets
+                                                                    .symmetric(
+                                                                        vertical:
+                                                                            10),
+                                                            shape: RoundedRectangleBorder(
+                                                                side: BorderSide(
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            234,
+                                                                            234,
+                                                                            234,
+                                                                            1),
+                                                                    width:
+                                                                        0.5)),
+                                                            leading: Image.network(
+                                                                '$profileImage'),
+                                                            title: Text(
+                                                              '$studentName',
                                                               style: TextStyle(
                                                                   fontFamily:
-                                                                      'medium',
+                                                                      'semibold',
                                                                   fontSize: 16,
                                                                   color: Colors
                                                                       .black),
                                                             ),
-                                                            Text(
-                                                              '$className-$sectionName',
+                                                            subtitle: Column(
+                                                              crossAxisAlignment:
+                                                                  CrossAxisAlignment
+                                                                      .start,
+                                                              children: [
+                                                                Text(
+                                                                  '$rollNumber',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'medium',
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: Colors
+                                                                          .black),
+                                                                ),
+                                                                Text(
+                                                                  '$className-$sectionName',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          14,
+                                                                      color: Colors
+                                                                          .black),
+                                                                )
+                                                              ],
+                                                            ),
+                                                            trailing: Text(
+                                                              '${responses} ',
                                                               style: TextStyle(
-                                                                  fontFamily:
-                                                                      'regular',
-                                                                  fontSize: 14,
-                                                                  color: Colors
-                                                                      .black),
-                                                            )
-                                                          ],
-                                                        ),
-                                                        trailing: Text(
-                                                          '$responses',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'medium',
-                                                              fontSize: 20,
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      0,
-                                                                      150,
-                                                                      60,
-                                                                      1)),
-                                                        ),
-                                                      );
-                                                    }).toList(),
-                                                  ),
-                                                ],
-                                              );
-                                            }),
+                                                                fontFamily:
+                                                                    'medium',
+                                                                fontSize: 20,
+                                                                color: response ==
+                                                                        'Y'
+                                                                    ? Color
+                                                                        .fromRGBO(
+                                                                            0,
+                                                                            150,
+                                                                            60,
+                                                                            1)
+                                                                    : Colors
+                                                                        .red,
+                                                              ),
+                                                            ),
+                                                          );
+                                                        }).toList(),
+                                                      ),
+                                                    ],
+                                                  );
+                                                }),
+                                              ],
+                                            )
                                           ],
-                                        )
+                                        ),
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
+                          ],
+                        );
+                      }),
+                      //top arrow..
+                      //top arrow..
+                      if (_scrollController.hasClients &&
+                          _scrollController.offset > 100)
+                        Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.black,
+                                shape: BoxShape.circle,
+                              ),
+                              child: IconButton(
+                                icon: Icon(
+                                  Icons.arrow_upward_outlined,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  _scrollController.animateTo(
+                                    0,
+                                    duration: Duration(seconds: 1),
+                                    curve: Curves.easeInOut,
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                      ],
-                    );
-                  }),
-                  //top arrow..
-                  Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.black,
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.arrow_upward_outlined,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            _scrollController.animateTo(
-                              0,
-                              duration: Duration(seconds: 1),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        ),
-                      ),
+                          ],
+                        )
                     ],
-                  )
-                ],
-              ),
-            ),
+                  ),
+                ),
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  //show filter
+  String _selectedFilter = "All Responses";
+
+  void _showFilterMenu(BuildContext context, TapDownDetails details) async {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject() as RenderBox;
+
+    final result = await showMenu<String>(
+      color: Colors.black,
+      context: context,
+      position: RelativeRect.fromRect(
+        details.globalPosition & Size(40, 40),
+        Offset.zero & overlay.size,
+      ),
+      items: [
+        PopupMenuItem<String>(
+          value: 'All Responses',
+          child: Text(
+            'All Responses',
+            style: TextStyle(
+                fontFamily: 'regular', fontSize: 14, color: Colors.white),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'Yes',
+          child: Text(
+            'Yes',
+            style: TextStyle(
+                fontFamily: 'regular', fontSize: 14, color: Colors.white),
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'No',
+          child: Text(
+            'No',
+            style: TextStyle(
+                fontFamily: 'regular', fontSize: 14, color: Colors.white),
+          ),
+        ),
+      ],
+    );
+
+    if (result != null) {
+      setState(() {
+        _selectedFilter = result;
+      });
+    }
   }
 }

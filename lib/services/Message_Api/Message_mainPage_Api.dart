@@ -31,6 +31,9 @@ Future<List<Post>> fetchPosts({
 
   if (response.statusCode == 200) {
     print("yyyyyyyyyyyyyyyyyyy ${response.body}");
+    // Debugging: Print rollNumber and userType to verify their values
+    print('Roll Number: $rollNumber');
+    print('User Type: $userType');
 
     final Map<String, dynamic> responseData = json.decode(response.body);
     final PostResponse postResponse = PostResponse.fromJson(responseData);

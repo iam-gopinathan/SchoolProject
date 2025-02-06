@@ -5,7 +5,8 @@ import 'package:http/http.dart' as http;
 
 import '../../models/Homework_models/Update_homework_model.dart';
 
-Future<void> updateHomework(UpdateHomeworkRequest request, context) async {
+Future<void> updateHomework(
+    UpdateHomeworkRequest request, context, Function fetchhomework) async {
   const String url =
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeHomeWork/updateHomeWork';
 
@@ -26,12 +27,24 @@ Future<void> updateHomework(UpdateHomeworkRequest request, context) async {
     var response = await requestBody.send();
 
     if (response.statusCode == 200) {
+      // Print the fields being added to the request
+      print("Request Fields: ${request.toFormData()}");
+
       print("Homework updated successfully!");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Homework updated successfully!'),
           backgroundColor: Colors.green,
         ),
+      );
+
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchhomework();
+
+      Navigator.pop(
+        context,
       );
     } else {
       print("Failed to update homework. Status: ${response.statusCode}");

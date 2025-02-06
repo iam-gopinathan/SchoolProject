@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/models/Exam_Timetable/Exam_timetable_Main_Model.dart';
@@ -7,9 +9,12 @@ import 'package:flutter_application_1/services/ExamTimetables_Api/examTimetable_
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
+import 'package:path_provider/path_provider.dart';
 
 class ExamtimetableMainpage extends StatefulWidget {
   const ExamtimetableMainpage({super.key});
@@ -19,6 +24,8 @@ class ExamtimetableMainpage extends StatefulWidget {
 }
 
 class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
+  ScrollController _scrollController = ScrollController();
+
   bool isLoading = true;
   int initiallyExpandedIndex = 0;
   late Future<List<ExamTimetableMainModel>> ExamtimeTableFuture =
@@ -52,6 +59,20 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
     super.initState();
     _fetchExamMaintimetable();
     gradeController.fetchGrades();
+
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
   }
 
 //bottom sheet code.
@@ -256,55 +277,56 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(100),
-          child: AppBar(
-            backgroundColor: Colors.white,
-            iconTheme: IconThemeData(color: Colors.black),
-            automaticallyImplyLeading: false,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.appBackgroundPrimaryColor,
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30)),
-              ),
-              padding: EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Colors.black,
-                        ),
+      backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: Colors.black,
                       ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Exam Timetable',
-                                style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
+                    ),
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Exam Timetable',
+                              style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 16,
+                                color: Colors.black,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      Spacer(),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Spacer(),
+                    if (UserSession().userType == 'admin')
                       Padding(
                         padding: const EdgeInsets.only(right: 20),
                         child: Column(
@@ -330,6 +352,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                               onChanged: (value) {
                                 setState(() {
                                   isswitched = value;
+                                  isLoading = true;
 
                                   print(
                                       'Switch is: ${isswitched ? "ON (Y)" : "OFF (N)"}');
@@ -340,7 +363,9 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                           ],
                         ),
                       ),
-                      //filter icon..
+                    //filter icon..
+                    if (UserSession().userType == 'admin' ||
+                        UserSession().userType == 'teacher')
                       GestureDetector(
                         onTap: () {
                           _showFilterBottomSheet(context);
@@ -354,7 +379,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                           ),
                         ),
                       ),
-
+                    if (UserSession().userType == 'admin')
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -377,237 +402,271 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
-        body: isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  color: AppTheme.textFieldborderColor,
-                ),
-              )
-            : FutureBuilder(
-                future: ExamtimeTableFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No Exam Timetable available.'));
-                  } else {
-                    var data = snapshot.data!;
-                    return SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          ...data.map((e) {
-                            var classSign =
-                                _getClassSignByGradeId(e.gradeId.toString());
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Row(
-                                    children: [
-                                      Transform.translate(
-                                        offset: Offset(20, 16),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 5, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                              colors: [
-                                                Color.fromRGBO(48, 126, 185, 1),
-                                                Color.fromRGBO(0, 70, 123, 1),
-                                              ],
-                                              begin: Alignment.centerLeft,
-                                              end: Alignment.centerRight,
-                                            ),
-                                            borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10),
-                                            ),
+      ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+                color: AppTheme.textFieldborderColor,
+              ),
+            )
+          : FutureBuilder(
+              future: ExamtimeTableFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No Exam Timetable available.'));
+                } else {
+                  var data = snapshot.data!;
+                  return SingleChildScrollView(
+                    controller: _scrollController,
+                    child: Column(
+                      children: [
+                        ...data.map((e) {
+                          var classSign =
+                              _getClassSignByGradeId(e.gradeId.toString());
+                          return Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Row(
+                                  children: [
+                                    Transform.translate(
+                                      offset: Offset(20, 16),
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 5, horizontal: 10),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Color.fromRGBO(48, 126, 185, 1),
+                                              Color.fromRGBO(0, 70, 123, 1),
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
                                           ),
-                                          child: Text(
-                                            '$classSign',
-                                            style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 12,
-                                              color: Colors.white,
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(10),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '$classSign',
+                                          style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 12,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  gradeController.fetchGrades();
+                                  showMenu(
+                                    context: context,
+                                    color: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    position:
+                                        RelativeRect.fromLTRB(100, 180, 0, 0),
+                                    items: [
+                                      PopupMenuItem<String>(
+                                        enabled: false,
+                                        child: ConstrainedBox(
+                                          constraints: const BoxConstraints(
+                                            maxHeight: 150,
+                                          ),
+                                          child: SingleChildScrollView(
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: gradeController.examList
+                                                  .map((exam) {
+                                                return PopupMenuItem<String>(
+                                                  value: exam,
+                                                  child: Text(
+                                                    exam,
+                                                    style: const TextStyle(
+                                                      fontFamily: 'regular',
+                                                      fontSize: 14,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
                                             ),
                                           ),
                                         ),
                                       ),
                                     ],
+                                    elevation: 8.0,
+                                  ).then((value) {
+                                    if (value != null) {
+                                      print('Selected: $value');
+                                      _fetchExamMaintimetable(exam: value);
+                                    }
+                                  });
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 25),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/Filter_icon.svg',
+                                        fit: BoxFit.contain,
+                                        height: 20,
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 5),
+                                        child: Text(
+                                          'by Exams',
+                                          style: TextStyle(
+                                            fontFamily: 'regular',
+                                            fontSize: 12,
+                                            color:
+                                                Color.fromRGBO(47, 47, 47, 1),
+                                          ),
+                                        ),
+                                      )
+                                    ],
                                   ),
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    gradeController.fetchGrades();
-                                    showMenu(
-                                      context: context,
-                                      color: Colors.black,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Card(
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Container(
+                                    padding: EdgeInsets.all(15),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Color.fromRGBO(238, 238, 238, 1),
+                                        width: 1.5,
                                       ),
-                                      position:
-                                          RelativeRect.fromLTRB(100, 180, 0, 0),
-                                      items: [
-                                        PopupMenuItem<String>(
-                                          enabled: false,
-                                          child: ConstrainedBox(
-                                            constraints: const BoxConstraints(
-                                              maxHeight: 150,
-                                            ),
-                                            child: SingleChildScrollView(
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: gradeController
-                                                    .examList
-                                                    .map((exam) {
-                                                  return PopupMenuItem<String>(
-                                                    value: exam,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 15, top: 5),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'Posted on : ${e.postedOn} | ${e.day}',
+                                                style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 12,
+                                                  color: Colors.black,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        ExpansionTile(
+                                          initiallyExpanded:
+                                              data.indexOf(e) == 0,
+                                          shape: Border(),
+                                          title: Row(
+                                            children: [
+                                              Text(
+                                                '${e.exam}',
+                                                style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              Spacer(),
+                                            ],
+                                          ),
+                                          children: [
+                                            Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Center(
+                                                  child: Opacity(
+                                                    opacity: 0.6,
+                                                    child: Image.network(
+                                                      '${e.filePath}',
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                                //
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    var imagePath = e.filePath;
+                                                    _showBottomSheetss(
+                                                        context, imagePath);
+                                                  },
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.transparent,
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 1.5),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                    ),
                                                     child: Text(
-                                                      exam,
-                                                      style: const TextStyle(
-                                                        fontFamily: 'regular',
-                                                        fontSize: 14,
+                                                      'View Image',
+                                                      style: TextStyle(
                                                         color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontFamily: 'semibold',
                                                       ),
                                                     ),
-                                                  );
-                                                }).toList(),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                      elevation: 8.0,
-                                    ).then((value) {
-                                      if (value != null) {
-                                        print('Selected: $value');
-                                        _fetchExamMaintimetable(exam: value);
-                                      }
-                                    });
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 25),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        SvgPicture.asset(
-                                          'assets/icons/Filter_icon.svg',
-                                          fit: BoxFit.contain,
-                                          height: 20,
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 5),
-                                          child: Text(
-                                            'by Exams',
-                                            style: TextStyle(
-                                              fontFamily: 'regular',
-                                              fontSize: 12,
-                                              color:
-                                                  Color.fromRGBO(47, 47, 47, 1),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(12.0),
-                                  child: Card(
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Container(
-                                      padding: EdgeInsets.all(15),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color:
-                                              Color.fromRGBO(238, 238, 238, 1),
-                                          width: 1.5,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 15, top: 5),
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  'Posted on : ${e.postedOn} | ${e.day}',
-                                                  style: TextStyle(
-                                                    fontFamily: 'regular',
-                                                    fontSize: 12,
-                                                    color: Colors.black,
                                                   ),
                                                 )
                                               ],
                                             ),
-                                          ),
-                                          ExpansionTile(
-                                            initiallyExpanded:
-                                                data.indexOf(e) == 0,
-                                            shape: Border(),
-                                            title: Row(
-                                              children: [
-                                                Text(
-                                                  '${e.exam}',
-                                                  style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 12,
-                                                    color: Colors.black,
-                                                  ),
-                                                ),
-                                                Spacer(),
-                                              ],
-                                            ),
-                                            children: [
-                                              Center(
-                                                child: Image.network(
-                                                  '${e.filePath}',
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 25),
-                                                child: Row(
-                                                  children: [
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                          'Posted by : ${e.postedBy}',
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 12,
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    138,
-                                                                    138,
-                                                                    138,
-                                                                    1),
-                                                          ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 25),
+                                              child: Row(
+                                                children: [
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Posted by : ${e.postedBy}',
+                                                        style: TextStyle(
+                                                          fontFamily: 'regular',
+                                                          fontSize: 12,
+                                                          color: Color.fromRGBO(
+                                                              138, 138, 138, 1),
                                                         ),
-                                                      ],
-                                                    ),
-                                                    Spacer(),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Spacer(),
+                                                  if (UserSession().userType ==
+                                                      'admin')
                                                     GestureDetector(
                                                       onTap: () {
                                                         showDialog(
@@ -709,7 +768,9 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                         ),
                                                       ),
                                                     ),
-                                                    // delete icon
+                                                  // delete icon
+                                                  if (UserSession().userType ==
+                                                      'admin')
                                                     GestureDetector(
                                                       onTap: () {
                                                         showDialog(
@@ -779,6 +840,11 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                                                         SnackBar(backgroundColor: Colors.green, content: Text('Examtimetable deleted successfully!')),
                                                                                       );
+
+                                                                                      // Refresh the news data after deletion
+                                                                                      Navigator.pop(context);
+                                                                                      //
+                                                                                      await _fetchExamMaintimetable();
                                                                                     } else {
                                                                                       ScaffoldMessenger.of(context).showSnackBar(
                                                                                         SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete examtimetable.')),
@@ -812,25 +878,310 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                           height: 25,
                                                         ),
                                                       ),
+                                                    ),
+
+                                                  //
+                                                  //download
+                                                  if (UserSession().userType ==
+                                                      'student')
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        var imagepath =
+                                                            e.filePath;
+
+                                                        _showBottomSheet(
+                                                            context, imagepath);
+                                                      },
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 5,
+                                                                horizontal: 20),
+                                                        decoration: BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .black,
+                                                                width: 1.5)),
+                                                        child: Row(
+                                                          children: [
+                                                            SvgPicture.asset(
+                                                              'assets/icons/Dwnl_icon.svg',
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                              height: 20,
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 5),
+                                                              child: Text(
+                                                                'Download',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'medium',
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
                                                     )
-                                                  ],
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ],
-                            );
-                          }).toList(),
-                        ],
-                      ),
-                    );
-                  }
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  );
+                }
+              },
+            ),
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  ///image bottomsheeet.....
+  void _showBottomSheet(BuildContext context, String imagePath) {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+          return Stack(clipBehavior: Clip.none, children: [
+            // Close icon
+            Positioned(
+              top: -70,
+              left: 180,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
                 },
-              ));
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 35,
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              height: MediaQuery.of(context).size.height * 0.6,
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Container(
+                      width: double.infinity,
+                      child: Image.network(
+                        '${imagePath}',
+                        fit: BoxFit.contain,
+                        height: MediaQuery.of(context).size.height * 0.4,
+                      ),
+                    ),
+                  ),
+                  //dwnl
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.textFieldborderColor),
+                        onPressed: () {
+                          downloadImage(imagePath);
+                        },
+                        child: Text(
+                          'Download',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 16,
+                              color: Colors.black),
+                        )),
+                  )
+                ],
+              ),
+            ),
+          ]);
+        });
+      },
+    );
+  }
+
+  //show image bottomsheet code end....
+//show image bottomsheet code end....
+  Future<void> downloadImage(String imageUrl) async {
+    try {
+      final directory = await getExternalStorageDirectory();
+      if (directory == null) {
+        print("Failed to get external storage directory.");
+        return;
+      }
+      final downloadsDirectory = Directory('/storage/emulated/0/Download');
+      if (!await downloadsDirectory.exists()) {
+        await downloadsDirectory.create(recursive: true);
+      }
+      final filePath =
+          '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        File file = File(filePath);
+        await file.writeAsBytes(response.bodyBytes);
+        print('Image downloaded to: $filePath');
+        showDownloadNotification(filePath);
+      } else {
+        print('Failed to download image');
+      }
+    } catch (e) {
+      print('Error occurred while downloading image: $e');
+    }
+  }
+
+// Function to show download notification
+  void showDownloadNotification(String filePath) async {
+    const AndroidNotificationDetails androidDetails =
+        AndroidNotificationDetails(
+      'download_channel',
+      'Download Notifications',
+      channelDescription: 'Notifications related to downloads',
+      importance: Importance.high,
+      priority: Priority.high,
+      playSound: true,
+    );
+    const NotificationDetails platformDetails =
+        NotificationDetails(android: androidDetails);
+    await flutterLocalNotificationsPlugin.show(
+      10,
+      'Download Complete',
+      'Image downloaded successfully to $filePath',
+      platformDetails,
+      payload: filePath,
+    );
+  }
+
+//
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  void initializeNotifications() async {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        if (response.payload != null && response.payload!.isNotEmpty) {
+          print("Notification clicked! Opening file: ${response.payload}");
+          openFile(response.payload!);
+        } else {
+          print("Notification clicked, but no payload received.");
+        }
+      },
+    );
+  }
+
+  void openFile(String filePath) {
+    print("Opening file: $filePath");
+    OpenFile.open(filePath);
+  }
+
+  //
+  void _showBottomSheetss(BuildContext context, String? imagePath) {
+    showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: -70,
+                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  padding: const EdgeInsets.all(10),
+                  child: Center(
+                    child: Image.network(
+                      imagePath ?? '',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 }

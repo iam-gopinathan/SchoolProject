@@ -1,12 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/services/auth_services.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Name.dart';
 import 'package:flutter_application_1/utils/theme.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Loginpage extends StatefulWidget {
@@ -122,6 +120,16 @@ class _LoginpageState extends State<Loginpage> {
       _isLoginEnabled = _usernamecontroller.text.isNotEmpty &&
           _passwordcontroller.text.isNotEmpty;
     });
+  }
+
+  //
+  String _getLimitedHtmlContent(String content) {
+    // You can set the character limit to simulate the first 3 lines.
+    final maxCharacters =
+        200; // Adjust the number of characters for 3 lines of text
+    return content.length > maxCharacters
+        ? content.substring(0, maxCharacters) + '...'
+        : content;
   }
 
   @override
@@ -322,7 +330,6 @@ class _LoginpageState extends State<Loginpage> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.02,
                   ),
-
                   _isLoading
                       ? CircularProgressIndicator(
                           strokeWidth: 4,
@@ -516,28 +523,19 @@ class _LoginpageState extends State<Loginpage> {
                                                       .height *
                                                   0.006,
                                             ),
-                                            Text(
-                                              article.newsContent,
-                                              style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontFamily: 'regular',
-                                                  color: Colors.black),
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
+                                            Html(
+                                              data: article.newsContent,
+                                              style: {
+                                                "body": Style(
+                                                  color: Colors.black,
+                                                ),
+                                              },
                                             ),
                                             SizedBox(
                                               height: MediaQuery.of(context)
                                                       .size
                                                       .height *
                                                   0.010,
-                                            ),
-                                            Text(
-                                              'Continue Reading...',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold),
                                             ),
                                             SizedBox(
                                               height: MediaQuery.of(context)

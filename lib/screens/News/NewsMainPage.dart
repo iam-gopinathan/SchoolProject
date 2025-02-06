@@ -1,27 +1,34 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/News_Models/NewsMainPage_model.dart';
 import 'package:flutter_application_1/screens/News/Create_newsScreen.dart';
 import 'package:flutter_application_1/screens/News/Edit_newsScreen.dart';
 import 'package:flutter_application_1/services/News_Api/News_mainPage_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class Newsmainpage extends StatefulWidget {
-  const Newsmainpage({super.key});
+  final bool isswitched;
+  const Newsmainpage({super.key, required this.isswitched});
 
   @override
   State<Newsmainpage> createState() => _NewsmainpageState();
 }
 
 class _NewsmainpageState extends State<Newsmainpage> {
+  ScrollController _scrollController = ScrollController();
+  //
+
   TextEditingController searchController = TextEditingController();
   //loading....
   bool isLoading = true;
 
-  bool isdeleteloader = false;
+  bool isDeleting = false;
   //select date
   String selectedDate = '';
   String displayDate = '';
@@ -60,14 +67,36 @@ class _NewsmainpageState extends State<Newsmainpage> {
   }
   //selected date end
 
+  //
+  late bool isswitched;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _fetchNewsData();
+
+    isswitched = widget.isswitched;
+    print("Newsmainpage opened with isswitched: $isswitched");
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchNewsData();
+    });
+    _scrollController.addListener(_scrollListener);
+    print("Newsmainpage opened with isswitched: ${widget.isswitched}");
   }
 
-  bool isswitched = false;
+  void _scrollListener() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    _scrollController.removeListener(_scrollListener);
+  }
+
+  // bool isswitched = false;
 
 // Fetch the news data............
   List<NewsResponse> newsList = [];
@@ -78,7 +107,6 @@ class _NewsmainpageState extends State<Newsmainpage> {
       setState(() {
         isLoading = true;
       });
-
       String isMyProject = isswitched ? 'Y' : 'N';
       final fetchedNews =
           await fetchMainNews(date: selectedDate, isMyProject: isMyProject);
@@ -91,7 +119,7 @@ class _NewsmainpageState extends State<Newsmainpage> {
 
       print("Fetched news data: $newsList");
       print("Selected Date: $selectedDate");
-      print("Switch Status: $isswitched");
+      print("Switch Status: ${widget.isswitched}");
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -123,187 +151,155 @@ class _NewsmainpageState extends State<Newsmainpage> {
     });
   }
 
-  TextSpan _parseNewsContent(String content) {
-    final RegExp tagPattern =
-        RegExp(r"<(/?)(\w+)([^>]*?)>(.*?)</\2>|<([^>]+)>");
-    final List<TextSpan> spans = [];
-    int currentIndex = 0;
-
-    for (final match in tagPattern.allMatches(content)) {
-      if (match.start > currentIndex) {
-        spans.add(TextSpan(
-          text: content.substring(currentIndex, match.start),
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            color: Colors.black,
-          ),
-        ));
-      }
-
-      String tagName = match.group(2) ?? '';
-      String tagContent = match.group(4) ?? '';
-
-      if (tagName == 'b') {
-        spans.add(TextSpan(
-          text: tagContent,
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ));
-      } else if (tagName == 'i') {
-        spans.add(TextSpan(
-          text: tagContent,
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            fontStyle: FontStyle.italic,
-            color: Colors.black,
-          ),
-        ));
-      } else if (tagName == 'u') {
-        spans.add(TextSpan(
-          text: tagContent,
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            decoration: TextDecoration.underline,
-            color: Colors.black,
-          ),
-        ));
-      } else if (tagName == 'a') {
-        String href =
-            match.group(3)?.replaceFirst('href="', '').replaceFirst('"', '') ??
-                '';
-        spans.add(TextSpan(
-          text: tagContent,
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            color: Colors.blue,
-            decoration: TextDecoration.underline,
-          ),
-          recognizer: TapGestureRecognizer()
-            ..onTap = () {
-              if (href.isNotEmpty) {
-                print("Opening URL: $href");
-              }
-            },
-        ));
-      } else if (tagName == 'p') {
-        spans.add(TextSpan(
-          text: tagContent,
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            color: Colors.black,
-          ),
-        ));
-      } else if (tagName == 'div' &&
-          match.group(3)?.contains('class="table"') == true) {
-        spans.add(TextSpan(
-          text: "Table content: $tagContent",
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            color: Colors.blue,
-          ),
-        ));
-      } else if (tagName == 'br') {
-        spans.add(TextSpan(
-          text: "\n",
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            color: Colors.black,
-          ),
-        ));
-      } else {
-        spans.add(TextSpan(
-          text: tagContent,
-          style: TextStyle(
-            fontFamily: 'medium',
-            fontSize: 12,
-            color: Colors.black,
-          ),
-        ));
-      }
-
-      currentIndex = match.end;
-    }
-
-    if (currentIndex < content.length) {
-      spans.add(TextSpan(
-        text: content.substring(currentIndex),
-        style: TextStyle(
-          fontFamily: 'medium',
-          fontSize: 12,
-          color: Colors.black,
-        ),
-      ));
-    }
-
-    return TextSpan(children: spans);
-  }
-
-//bold text function end...
-
   ///image bottomsheeet.....
-  void _showBottomSheet(BuildContext context, String imagePath) {
+  // void _showBottomSheet(
+  //     BuildContext context, String imagePath, String videopath) {
+  //   showModalBottomSheet(
+  //     backgroundColor: Colors.white,
+  //     context: context,
+  //     isScrollControlled: true,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+  //     ),
+  //     builder: (BuildContext context) {
+  //       return StatefulBuilder(
+  //         builder: (BuildContext context, StateSetter setModalState) {
+  //           return Stack(
+  //             clipBehavior: Clip.none,
+  //             children: [
+  //               // Close icon
+  //               Positioned(
+  //                 top: -70,
+  //                 left: 180,
+  //                 child: GestureDetector(
+  //                   onTap: () {
+  //                     Navigator.of(context).pop();
+  //                   },
+  //                   child: CircleAvatar(
+  //                     radius: 28,
+  //                     backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+  //                     child: Icon(
+  //                       Icons.close,
+  //                       color: Colors.white,
+  //                       size: 35,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               Container(
+  //                 width: double.infinity,
+  //                 height: MediaQuery.of(context).size.height * 0.6,
+  //                 padding: const EdgeInsets.all(10),
+  //                 child: Column(
+  //                   mainAxisAlignment: MainAxisAlignment.center,
+  //                   children: [
+  //                     Center(
+  //                       child: Image.network(
+  //                         '${imagePath}',
+  //                         fit: BoxFit.cover,
+  //                       ),
+  //                     ),
+  //                     Center(
+  //                       child: SizedBox(
+  //                         height: 250,
+  //                         width: double.infinity,
+  //                         child: YoutubePlayer(
+  //                           controller: YoutubePlayerController(
+  //                             initialVideoId:
+  //                                 YoutubePlayer.convertUrlToId(videopath)
+  //                                     .toString(),
+  //                             flags: YoutubePlayerFlags(
+  //                               autoPlay: true,
+  //                               mute: false,
+  //                             ),
+  //                           ),
+  //                           showVideoProgressIndicator: true,
+  //                           width: 150,
+  //                           aspectRatio: 16 / 9,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+  void _showBottomSheet(
+      BuildContext context, String? imagePath, String? videoPath) {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
       isScrollControlled: true,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (BuildContext context) {
         return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModalState) {
-          return Stack(clipBehavior: Clip.none, children: [
-            // Close icon
-            Positioned(
-              top: -70,
-              left: 180,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                  child: Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 35,
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.6,
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Image.network(
-                      '${imagePath}',
-                      fit: BoxFit.cover,
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: -70,
+                  left: MediaQuery.of(context).size.width / 2 - 28,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
                     ),
                   ),
-                ],
-              ),
-            ),
-          ]);
-        });
+                ),
+                Container(
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  padding: const EdgeInsets.all(10),
+                  child: Center(
+                    child: imagePath != null
+                        ? Image.network(
+                            imagePath,
+                            fit: BoxFit.contain,
+                          )
+                        : videoPath != null
+                            ? SizedBox(
+                                width: double.infinity,
+                                child: YoutubePlayer(
+                                  controller: YoutubePlayerController(
+                                    initialVideoId:
+                                        YoutubePlayer.convertUrlToId(videoPath)
+                                            .toString(),
+                                    flags: const YoutubePlayerFlags(
+                                      autoPlay: true,
+                                      mute: false,
+                                    ),
+                                  ),
+                                  showVideoProgressIndicator: true,
+                                  aspectRatio: 16 / 9,
+                                ),
+                              )
+                            : const Text("No content available"),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
-  //show image bottomsheet code end....
 
   @override
   Widget build(BuildContext context) {
@@ -398,68 +394,69 @@ class _NewsmainpageState extends State<Newsmainpage> {
                       ],
                     ),
                     Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'My \n Projects',
-                            style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
+                    if (UserSession().userType == 'admin')
+                      Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'My \n Projects',
+                              style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Switch(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            activeTrackColor: AppTheme.textFieldborderColor,
-                            inactiveTrackColor: Colors.white,
-                            inactiveThumbColor: Colors.black,
-                            value: isswitched,
-                            onChanged: (value) {
-                              setState(() {
-                                isswitched = value;
-                                isLoading = true;
-                                newsList = [];
-                                filteredNewsList = [];
-                              });
-
-                              _fetchNewsData();
-                            },
-                          ),
-                        ],
+                            Switch(
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              activeTrackColor: AppTheme.textFieldborderColor,
+                              inactiveTrackColor: Colors.white,
+                              inactiveThumbColor: Colors.black,
+                              value: isswitched,
+                              onChanged: (value) {
+                                setState(() {
+                                  isswitched = value;
+                                  isLoading = true;
+                                  newsList = [];
+                                  filteredNewsList = [];
+                                });
+                                _fetchNewsData();
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 //add screen....
-                    Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateNewsscreen(
-                                    onCreateNews: _fetchNewsData)),
-                          );
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
+                    if (UserSession().userType == 'admin')
+                      Padding(
+                        padding: const EdgeInsets.only(right: 30),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CreateNewsscreen(
+                                      onCreateNews: _fetchNewsData)),
+                            );
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],
@@ -540,6 +537,7 @@ class _NewsmainpageState extends State<Newsmainpage> {
                     //
                     Expanded(
                       child: ListView.builder(
+                          controller: _scrollController,
                           itemCount: filteredNewsList.length,
                           itemBuilder: (context, index) {
                             final newsResponse = filteredNewsList[index];
@@ -715,23 +713,24 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                   ///textparagraph...
                                                   Row(
                                                     children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.8,
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(8.0),
                                                         child: Container(
                                                           width: MediaQuery.of(
                                                                       context)
                                                                   .size
                                                                   .width *
-                                                              0.8,
-                                                          child: RichText(
-                                                            text:
-                                                                _parseNewsContent(
-                                                                    news.news),
-                                                          ),
+                                                              0.7,
+                                                          child: news.news !=
+                                                                      null &&
+                                                                  news.news!
+                                                                      .isNotEmpty
+                                                              ? Html(
+                                                                  data:
+                                                                      '${news.news}')
+                                                              : const Text(''),
                                                         ),
                                                       ),
                                                     ],
@@ -751,15 +750,52 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                       alignment:
                                                           Alignment.center,
                                                       children: [
+                                                        // if (news.filePath ==
+                                                        //     'image')
+                                                        //image
                                                         SizedBox(
                                                           height: 250,
                                                           width:
                                                               double.infinity,
-                                                          child: Image.network(
-                                                            '${news.filePath}',
-                                                            fit: BoxFit.cover,
+                                                          child: Opacity(
+                                                            opacity: 0.5,
+                                                            child:
+                                                                Image.network(
+                                                              '${news.filePath}',
+                                                              fit: BoxFit.cover,
+                                                            ),
                                                           ),
                                                         ),
+                                                        //video
+                                                        if (news.fileType ==
+                                                            'link')
+                                                          SizedBox(
+                                                            height: 250,
+                                                            width:
+                                                                double.infinity,
+                                                            child:
+                                                                YoutubePlayer(
+                                                              controller:
+                                                                  YoutubePlayerController(
+                                                                initialVideoId:
+                                                                    YoutubePlayer.convertUrlToId(
+                                                                            news.filePath ??
+                                                                                '')
+                                                                        .toString(),
+                                                                flags:
+                                                                    YoutubePlayerFlags(
+                                                                  autoPlay:
+                                                                      false,
+                                                                  mute: false,
+                                                                ),
+                                                              ),
+                                                              showVideoProgressIndicator:
+                                                                  true,
+                                                              width: 150,
+                                                              aspectRatio:
+                                                                  16 / 9,
+                                                            ),
+                                                          ),
                                                         Container(
                                                           decoration: BoxDecoration(
                                                               color: Colors
@@ -779,20 +815,28 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                           child:
                                                               GestureDetector(
                                                             onTap: () {
+                                                              //imagepath
                                                               String?
                                                                   imagePath =
                                                                   news.filePath;
-                                                              if (imagePath !=
-                                                                      null &&
-                                                                  imagePath
-                                                                      .isNotEmpty) {
+                                                              //videopath
+                                                              String videopath =
+                                                                  news.filePath
+                                                                      .toString();
+
+                                                              if (news.fileType ==
+                                                                  'image') {
                                                                 _showBottomSheet(
                                                                     context,
-                                                                    imagePath);
-                                                              } else {
+                                                                    news.filePath,
+                                                                    null);
+                                                              } else if (news
+                                                                      .fileType ==
+                                                                  'link') {
                                                                 _showBottomSheet(
                                                                     context,
-                                                                    'assets/images/default_image.png');
+                                                                    null,
+                                                                    news.filePath);
                                                               }
                                                             },
                                                             child: Container(
@@ -817,7 +861,13 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                                             30),
                                                               ),
                                                               child: Text(
-                                                                'View Image',
+                                                                news.fileType ==
+                                                                        'image'
+                                                                    ? 'View Image'
+                                                                    : news.fileType ==
+                                                                            'link'
+                                                                        ? 'View Video'
+                                                                        : 'Unknown File Type',
                                                                 style:
                                                                     TextStyle(
                                                                   color: Colors
@@ -872,271 +922,289 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                           ],
                                                         ),
                                                         Spacer(),
+                                                        if (UserSession()
+                                                                .userType ==
+                                                            'admin')
 
-                                                        //edit icon
+                                                          //edit icon
+                                                          if (newsResponse
+                                                                  .news[index]
+                                                                  .isAlterAvailable ==
+                                                              'Y')
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                showDialog(
+                                                                  barrierDismissible:
+                                                                      false,
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return AlertDialog(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(10)),
+                                                                      content:
+                                                                          Text(
+                                                                        "Do you really want to make\n changes to this news?",
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'regular',
+                                                                            fontSize:
+                                                                                16,
+                                                                            color:
+                                                                                Colors.black),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                      actions: <Widget>[
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                )),
+                                                                            //edit...
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                    padding: EdgeInsets.symmetric(horizontal: 40),
+                                                                                    backgroundColor: AppTheme.textFieldborderColor,
+                                                                                    elevation: 0,
+                                                                                  ),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                    Navigator.push(
+                                                                                        context,
+                                                                                        MaterialPageRoute(
+                                                                                            builder: (context) => EditNewsscreen(
+                                                                                                  newsId: news.id,
+                                                                                                  onCreateNews: _fetchNewsData,
+                                                                                                )));
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Edit',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                            )
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                              child: Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        right:
+                                                                            10),
+                                                                child:
+                                                                    Container(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          vertical:
+                                                                              5,
+                                                                          horizontal:
+                                                                              15),
+                                                                  decoration: BoxDecoration(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20),
+                                                                      border: Border.all(
+                                                                          color:
+                                                                              Colors.black)),
+                                                                  child: Row(
+                                                                    children: [
+                                                                      Icon(Icons
+                                                                          .edit),
+                                                                      Text(
+                                                                        'Edit',
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'medium',
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                Colors.black),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
                                                         if (newsResponse
                                                                 .news[index]
                                                                 .isAlterAvailable ==
                                                             'Y')
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              showDialog(
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10)),
-                                                                    content:
-                                                                        Text(
-                                                                      "Do you really want to make\n changes to this news?",
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              'regular',
-                                                                          fontSize:
-                                                                              16,
-                                                                          color:
-                                                                              Colors.black),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                    ),
-                                                                    actions: <Widget>[
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                'Cancel',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                          //edit...
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 10),
-                                                                            child: ElevatedButton(
+                                                          if (UserSession()
+                                                                  .userType ==
+                                                              'admin')
+                                                            //delete icon
+                                                            GestureDetector(
+                                                              onTap: () {
+                                                                final int
+                                                                    newsId =
+                                                                    news.id;
+
+                                                                showDialog(
+                                                                  barrierDismissible:
+                                                                      false,
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return AlertDialog(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      shape: RoundedRectangleBorder(
+                                                                          borderRadius:
+                                                                              BorderRadius.circular(10)),
+                                                                      content:
+                                                                          Text(
+                                                                        "Are you sure you want to delete\n this news item?",
+                                                                        style: TextStyle(
+                                                                            fontFamily:
+                                                                                'regular',
+                                                                            fontSize:
+                                                                                16,
+                                                                            color:
+                                                                                Colors.black),
+                                                                        textAlign:
+                                                                            TextAlign.center,
+                                                                      ),
+                                                                      actions: <Widget>[
+                                                                        Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                )),
+                                                                            //delete...
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: ElevatedButton(
                                                                                 style: ElevatedButton.styleFrom(
                                                                                   padding: EdgeInsets.symmetric(horizontal: 40),
                                                                                   backgroundColor: AppTheme.textFieldborderColor,
                                                                                   elevation: 0,
                                                                                 ),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                  Navigator.push(
-                                                                                      context,
-                                                                                      MaterialPageRoute(
-                                                                                          builder: (context) => EditNewsscreen(
-                                                                                                newsId: news.id,
-                                                                                                onCreateNews: _fetchNewsData,
-                                                                                              )));
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Edit',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                          )
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              );
-                                                            },
-                                                            child: Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      right:
-                                                                          10),
-                                                              child: Container(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        vertical:
-                                                                            5,
-                                                                        horizontal:
-                                                                            15),
-                                                                decoration: BoxDecoration(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            20),
-                                                                    border: Border.all(
-                                                                        color: Colors
-                                                                            .black)),
-                                                                child: Row(
-                                                                  children: [
-                                                                    Icon(Icons
-                                                                        .edit),
-                                                                    Text(
-                                                                      'Edit',
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              'medium',
-                                                                          fontSize:
-                                                                              12,
-                                                                          color:
-                                                                              Colors.black),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        if (newsResponse
-                                                                .news[index]
-                                                                .isAlterAvailable ==
-                                                            'Y')
-                                                          //delete icon
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              final int newsId =
-                                                                  news.id;
+                                                                                onPressed: isDeleting
+                                                                                    ? null
+                                                                                    : () async {
+                                                                                        try {
+                                                                                          setState(() {
+                                                                                            isDeleting = true;
+                                                                                          });
+                                                                                          final response = await http.delete(
+                                                                                            Uri.parse('https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeNews/DeleteNews?Id=$newsId'),
+                                                                                            headers: {
+                                                                                              'Authorization': 'Bearer $authToken',
+                                                                                              'Content-Type': 'application/json',
+                                                                                            },
+                                                                                          );
 
-                                                              showDialog(
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    shape: RoundedRectangleBorder(
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10)),
-                                                                    content:
-                                                                        Text(
-                                                                      "Are you sure you want to delete\n this news item?",
-                                                                      style: TextStyle(
-                                                                          fontFamily:
-                                                                              'regular',
-                                                                          fontSize:
-                                                                              16,
-                                                                          color:
-                                                                              Colors.black),
-                                                                      textAlign:
-                                                                          TextAlign
-                                                                              .center,
-                                                                    ),
-                                                                    actions: <Widget>[
-                                                                      Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                'Cancel',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                          //delete...
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 10),
-                                                                            child:
-                                                                                ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(
-                                                                                padding: EdgeInsets.symmetric(horizontal: 40),
-                                                                                backgroundColor: AppTheme.textFieldborderColor,
-                                                                                elevation: 0,
-                                                                              ),
-                                                                              onPressed: () async {
-                                                                                isdeleteloader = true;
-                                                                                try {
-                                                                                  const authToken = '123';
+                                                                                          if (response.statusCode == 200) {
+                                                                                            if (mounted) {
+                                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                                SnackBar(
+                                                                                                  backgroundColor: Colors.green,
+                                                                                                  content: Text('News item deleted suczxcessfully'),
+                                                                                                ),
+                                                                                              );
+                                                                                            }
+                                                                                            print('News item with ID $newsId has been successfully deleted.');
+                                                                                            setState(() {
+                                                                                              newsResponse.news.removeWhere((item) => item.id == newsId);
+                                                                                            });
 
-                                                                                  final response = await http.delete(
-                                                                                    Uri.parse('https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeNews/DeleteNews?Id=$newsId'),
-                                                                                    headers: {
-                                                                                      'Authorization': 'Bearer $authToken',
-                                                                                      'Content-Type': 'application/json',
-                                                                                    },
-                                                                                  );
+                                                                                            // Refresh the news data after deletion
+                                                                                            Navigator.pop(context);
+                                                                                            //
+                                                                                            await _fetchNewsData();
+                                                                                          } else {
+                                                                                            print('Failed to delete news. Status code: ${response.statusCode}');
+                                                                                            print('Response body: ${response.body}');
 
-                                                                                  if (response.statusCode == 200) {
-                                                                                    if (mounted) {
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(
-                                                                                          backgroundColor: Colors.green,
-                                                                                          content: Text('News item deleted successfully'),
-                                                                                        ),
-                                                                                      );
-                                                                                    }
+                                                                                            if (mounted) {
+                                                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                                                SnackBar(
+                                                                                                  backgroundColor: Colors.red,
+                                                                                                  content: Text(
+                                                                                                    'Failed to delete news item. Status code: ${response.statusCode}',
+                                                                                                  ),
+                                                                                                ),
+                                                                                              );
+                                                                                            }
+                                                                                          }
+                                                                                        } catch (error) {
+                                                                                          print('Error during deletion: $error');
+                                                                                          if (mounted) {
+                                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                                              SnackBar(
+                                                                                                backgroundColor: Colors.red,
+                                                                                                content: Text('Error: Unable to delete news item.'),
+                                                                                              ),
+                                                                                            );
+                                                                                          }
+                                                                                        } finally {
+                                                                                          isLoading = false;
+                                                                                          _fetchNewsData();
+                                                                                          setState(() {
+                                                                                            isDeleting = false;
+                                                                                          });
 
-                                                                                    print('News item with ID $newsId has been successfully deleted.');
-                                                                                    setState(() {
-                                                                                      newsResponse.news.removeWhere((item) => item.id == newsId);
-                                                                                    });
-                                                                                  } else {
-                                                                                    print('Failed to delete news. Status code: ${response.statusCode}');
-                                                                                    print('Response body: ${response.body}');
-
-                                                                                    if (mounted) {
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(
-                                                                                          backgroundColor: Colors.red,
-                                                                                          content: Text(
-                                                                                            'Failed to delete news item. Status code: ${response.statusCode}',
-                                                                                          ),
-                                                                                        ),
-                                                                                      );
-                                                                                    }
-                                                                                  }
-                                                                                } catch (error) {
-                                                                                  print('Error during deletion: $error');
-
-                                                                                  if (mounted) {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(
-                                                                                        backgroundColor: Colors.red,
-                                                                                        content: Text('Error: Unable to delete news item.'),
+                                                                                          Navigator.pop(context);
+                                                                                        }
+                                                                                      },
+                                                                                child: isDeleting
+                                                                                    ? CircularProgressIndicator(
+                                                                                        color: Colors.white,
+                                                                                        strokeWidth: 4.0,
+                                                                                      )
+                                                                                    : Text(
+                                                                                        'Delete',
+                                                                                        style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
                                                                                       ),
-                                                                                    );
-                                                                                  }
-                                                                                } finally {
-                                                                                  isLoading = false;
-                                                                                  Navigator.pop(context);
-                                                                                }
-                                                                              },
-                                                                              child: Text(
-                                                                                'Delete',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
                                                                               ),
                                                                             ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ],
-                                                                  );
-                                                                },
-                                                              );
-                                                            },
-                                                            child: SvgPicture
-                                                                .asset(
-                                                              'assets/icons/delete_icons.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                              height: 35,
+                                                                          ],
+                                                                        ),
+                                                                      ],
+                                                                    );
+                                                                  },
+                                                                );
+                                                              },
+                                                              child: SvgPicture
+                                                                  .asset(
+                                                                'assets/icons/delete_icons.svg',
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                                height: 35,
+                                                              ),
                                                             ),
-                                                          ),
                                                       ],
                                                     ),
                                                   ),
@@ -1154,6 +1222,33 @@ class _NewsmainpageState extends State<Newsmainpage> {
                             }
                           }),
                     ),
+                    //
+                    //top arrow..
+                    if (_scrollController.hasClients &&
+                        _scrollController.offset > 50)
+                      Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.arrow_upward_outlined,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                _scrollController.animateTo(
+                                  0,
+                                  duration: Duration(seconds: 1),
+                                  curve: Curves.easeInOut,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      )
                   ],
                 ),
     );

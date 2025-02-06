@@ -1,11 +1,9 @@
 import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
-import 'package:flutter_application_1/models/StudyMaterial/Edit_studyMaterial_model.dart';
 import 'package:flutter_application_1/models/StudyMaterial/Update_studymaterial_model.dart';
 import 'package:flutter_application_1/services/StudyMaterial/Edit_studymaterial_api.dart';
 import 'package:flutter_application_1/services/StudyMaterial/Update_studymaterial_api.dart';
@@ -788,7 +786,6 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                   ),
 
                   //fetched image show..
-
                   if (isFetchedImageVisible &&
                       imageUrl != null &&
                       imageUrl!.isNotEmpty)
@@ -821,7 +818,6 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                     ),
 
                   /// Display selected image...
-
                   if (selectedFile != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -953,9 +949,15 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
     );
   }
 
-  //update
+//update study material.........
   void _updatestudymaterial() {
-    File file = File(selectedFile!.path!);
+    if (selectedFile == null && imageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Please select a file or ensure an image exists.')),
+      );
+      return;
+    }
     String fileType = "";
     String filePath = "";
 
@@ -973,19 +975,32 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
         );
         return;
       }
+    } else if (imageUrl != null && imageUrl!.isNotEmpty) {
+      fileType = 'existing';
+      filePath = imageUrl!;
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Please select a file or ensure an image exists.')),
+      );
+      return;
     }
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
     UpdateStudymaterialModel updatestudy = UpdateStudymaterialModel(
-        id: widget.id,
-        userType: UserSession().userType.toString(),
-        rollNumber: UserSession().rollNumber.toString(),
-        subject: selectedSubject.toString(),
-        heading: _heading.text,
-        fileType: fileType,
-        file: filePath,
-        updatedOn: currentDateTime);
-
-    updateStudyMaterial(updatestudy, file, context);
+      id: widget.id,
+      userType: UserSession().userType.toString(),
+      rollNumber: UserSession().rollNumber.toString(),
+      subject: selectedSubject.toString(),
+      heading: _heading.text,
+      fileType: fileType,
+      file: filePath,
+      updatedOn: currentDateTime,
+    );
+    updateStudyMaterial(
+        updatestudy,
+        selectedFile != null ? File(selectedFile!.path!) : null,
+        context,
+        widget.fetchstudymaterial);
   }
 }

@@ -10,8 +10,13 @@ import 'package:flutter_application_1/services/Circular_Api/Update_circular_Api.
 import 'package:flutter_application_1/services/Message_Api/Grade_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:html/parser.dart' as html_parser;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class EditCircularpage extends StatefulWidget {
   final int Id;
@@ -24,12 +29,14 @@ class EditCircularpage extends StatefulWidget {
 }
 
 class _EditCircularpageState extends State<EditCircularpage> {
+  late String htmlContent = "";
+
   bool isLoading = true;
   List<String> dropdownItems = ['Everyone', 'Students', 'Teachers'];
   String? selectedRecipient;
   List<int> selectedGrades = [];
   TextEditingController _heading = TextEditingController();
-  TextEditingController _desc = TextEditingController();
+
   TextEditingController _scheduledDateandtime = TextEditingController();
 
   TextEditingController _linkController = TextEditingController();
@@ -197,22 +204,17 @@ class _EditCircularpageState extends State<EditCircularpage> {
                         ),
                       ),
                       //description...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: Text(
-                                _desc.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
+                      // description...
+                      Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            padding: const EdgeInsets.all(10),
+                            child: htmlContent.isNotEmpty
+                                ? Html(data: htmlContent)
+                                : const Text(''),
+                          ),
+                        ],
                       ),
                       //fetched image..
                       if (isFetchedImageVisible && image.isNotEmpty)
@@ -265,6 +267,7 @@ class _EditCircularpageState extends State<EditCircularpage> {
   void initState() {
     super.initState();
     fetchEditCircular();
+    descriptionController = quill.QuillController.basic();
     fetchGrades();
     _editcircular = fetchCircularById(widget.Id).then((data) {
       setState(() {
@@ -296,7 +299,16 @@ class _EditCircularpageState extends State<EditCircularpage> {
         setState(() {
           isLoading = false;
           _heading.text = data.headLine;
-          _desc.text = data.circular;
+          htmlContent = data.circular;
+
+          // Parse plain text from HTML for Quill editor
+          final plainText = html_parser.parse(data.circular).body?.text ?? "";
+
+          // Initialize the QuillController with a Delta document
+          descriptionController = quill.QuillController(
+            document: quill.Document()..insert(0, plainText),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
           selectedRecipient = data.recipient;
           selectedGrades = List<int>.from(data.gradeIds);
           grades = fetchedGrades;
@@ -517,6 +529,8 @@ class _EditCircularpageState extends State<EditCircularpage> {
     );
   }
 
+  late quill.QuillController descriptionController;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -589,7 +603,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                               fontSize: 14,
                               color: Color.fromRGBO(38, 38, 38, 1)),
                         ),
-
                         //dropdown field.......
                         Container(
                           width: MediaQuery.of(context).size.width * 0.5,
@@ -670,7 +683,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                                 fontSize: 14,
                                 color: Color.fromRGBO(38, 38, 38, 1)),
                           ),
-
                           //dropdown field.......
                           Container(
                             width: MediaQuery.of(context).size.width * 0.5,
@@ -714,7 +726,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                         ],
                       ),
                     ),
-
                   //heading...
                   Padding(
                     padding: const EdgeInsets.only(left: 20, top: 45),
@@ -802,13 +813,13 @@ class _EditCircularpageState extends State<EditCircularpage> {
                       ],
                     ),
                   ),
-
                   //description field..
                   Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
@@ -818,35 +829,74 @@ class _EditCircularpageState extends State<EditCircularpage> {
                           ),
                         ],
                       ),
-                      child: TextFormField(
-                        maxLines: 6,
-                        controller: _desc,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(600)
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              QuillSimpleToolbar(
+                                controller: descriptionController,
+                                configurations:
+                                    const QuillSimpleToolbarConfigurations(
+                                  dialogTheme: QuillDialogTheme(
+                                      labelTextStyle:
+                                          TextStyle(color: Colors.black),
+                                      inputTextStyle: TextStyle(
+                                          color: Colors.black, fontSize: 14)),
+                                  showBoldButton: true,
+                                  showClearFormat: false,
+                                  showAlignmentButtons: false,
+                                  showBackgroundColorButton: false,
+                                  showFontSize: false,
+                                  showColorButton: false,
+                                  showCenterAlignment: false,
+                                  showClipboardCut: false,
+                                  showIndent: false,
+                                  showDirection: false,
+                                  showDividers: false,
+                                  showFontFamily: false,
+                                  showItalicButton: false,
+                                  showClipboardPaste: false,
+                                  showInlineCode: false,
+                                  showCodeBlock: false,
+                                  showHeaderStyle: false,
+                                  showJustifyAlignment: false,
+                                  showLeftAlignment: false,
+                                  showLineHeightButton: false,
+                                  showLink: false,
+                                  showListBullets: false,
+                                  showListCheck: false,
+                                  showListNumbers: false,
+                                  showQuote: false,
+                                  showRightAlignment: false,
+                                  showSearchButton: false,
+                                  showRedo: false,
+                                  showSmallButton: false,
+                                  showSubscript: false,
+                                  showStrikeThrough: false,
+                                  showUndo: false,
+                                  showUnderLineButton: false,
+                                  showSuperscript: false,
+                                ),
+                              ),
+                            ],
+                          ),
+                          //quill controller.....
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            child: QuillEditor.basic(
+                              controller: descriptionController,
+                              configurations: const QuillEditorConfigurations(
+                                  padding: EdgeInsetsDirectional.symmetric(
+                                      vertical: 25)),
+                            ),
+                          ),
                         ],
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'medium',
-                            fontSize: 14),
                       ),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
                     child: Row(
@@ -888,34 +938,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                                   fontSize: 12,
                                   fontFamily: 'medium',
                                   color: Colors.black),
-                            ),
-                          ),
-                        ),
-                        // Add Link Button
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isuploadimage = false;
-                              isaddLink = true;
-                            });
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 20),
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(20),
-                                  color: isaddLink
-                                      ? Color.fromRGBO(246, 246, 246, 1)
-                                      : Colors.transparent),
-                              child: Text(
-                                'Add Link',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    fontFamily: 'medium',
-                                    color: Colors.black),
-                              ),
                             ),
                           ),
                         ),
@@ -1115,17 +1137,10 @@ class _EditCircularpageState extends State<EditCircularpage> {
                     ),
 
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'Supported Format : JPEG,Webp PNG, PDF',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
-                      Text(
-                        '*Upload either an image or a link',
                         style: TextStyle(
                             fontFamily: 'regular',
                             fontSize: 9,
@@ -1265,6 +1280,27 @@ class _EditCircularpageState extends State<EditCircularpage> {
 
 //update circular.......
   void _updateCircular(String status, BuildContext context) async {
+    //
+    // Convert the QuillController content to HTML
+    final generatedHtml = QuillDeltaToHtmlConverter(
+      descriptionController.document.toDelta().toJson(),
+    ).convert();
+
+    // Assign the generated HTML to htmlContent
+    late String htmlContent = generatedHtml;
+
+    // Debug print the generated HTML content
+    print("Generated HTML Content: $htmlContent");
+
+    if (_heading.text.isEmpty || htmlContent.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
     List<int> selectedGradeIds = selected
         .map((selectedGradeName) {
           final grade = grades.firstWhere(
@@ -1299,10 +1335,10 @@ class _EditCircularpageState extends State<EditCircularpage> {
 
     CircularUpdateRequest update = CircularUpdateRequest(
         id: widget.Id,
-        rollNumber: UserSession().userType ?? '',
-        userType: UserSession().rollNumber ?? '',
+        rollNumber: UserSession().rollNumber ?? '',
+        userType: UserSession().userType ?? '',
         headLine: _heading.text,
-        circular: _desc.text,
+        circular: htmlContent,
         fileType: fileType,
         link: _linkController.text,
         status: status,
@@ -1328,6 +1364,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
     print("Recipient: ${update.recipient}");
     print("Grade IDs: ${update.gradeIds}");
 
-    await updateCircular(update, context);
+    await updateCircular(update, context, widget.fetchcircular);
   }
 }

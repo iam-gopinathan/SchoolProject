@@ -8,8 +8,13 @@ import 'package:flutter_application_1/services/Message_Api/Grade_Api.dart';
 import 'package:flutter_application_1/services/Message_Api/Update_message_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:flutter_quill/flutter_quill.dart' as quill;
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 class Editmessagepage extends StatefulWidget {
   final int Id;
@@ -21,105 +26,105 @@ class Editmessagepage extends StatefulWidget {
 }
 
 class _EditmessagepageState extends State<Editmessagepage> {
+  late String htmlContent = "";
+
   ///image bottomsheeet
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: -70,
-                left: 180,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
-                    ),
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+          return Stack(clipBehavior: Clip.none, children: [
+            // Close icon
+            Positioned(
+              top: -70,
+              left: 180,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 35,
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          ),
+                        ],
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 2,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
+                    ),
 //heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _heading.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            _heading.text,
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
-                      //description...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _desc.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
+                    ),
+                    // description...
+                    Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          padding: const EdgeInsets.all(10),
+                          child: htmlContent.isNotEmpty
+                              ? Html(data: htmlContent)
+                              : const Text(''),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                 ),
-              )
-            ]);
-          });
+              ),
+            )
+          ]);
         });
+      },
+    );
   }
 
   @override
@@ -127,7 +132,10 @@ class _EditmessagepageState extends State<Editmessagepage> {
     // TODO: implement initState
     super.initState();
     fetchMessageDetails();
+    descriptionController = quill.QuillController.basic();
   }
+
+  late quill.QuillController descriptionController;
 
   TextEditingController _heading = TextEditingController();
   TextEditingController _desc = TextEditingController();
@@ -143,6 +151,14 @@ class _EditmessagepageState extends State<Editmessagepage> {
   List<String> gradeNames = [];
   List<String> selected = [];
 
+  @override
+  void dispose() {
+    super.dispose();
+
+    descriptionController.dispose();
+  }
+
+  //edit fetch..
   void fetchMessageDetails() async {
     try {
       final data = await fetchMessageById(widget.Id);
@@ -155,6 +171,15 @@ class _EditmessagepageState extends State<Editmessagepage> {
           isLoading = false;
           _heading.text = data.headLine;
           _desc.text = data.message;
+
+          htmlContent = data.message;
+
+          final plainText = html_parser.parse(data.message).body?.text ?? "";
+
+          descriptionController = quill.QuillController(
+            document: quill.Document()..insert(0, plainText),
+            selection: const TextSelection.collapsed(offset: 0),
+          );
           selectedRecipient = data.recipient;
           selectedGrades = List<int>.from(data.gradeIds);
           grades = fetchedGrades;
@@ -651,13 +676,13 @@ class _EditmessagepageState extends State<Editmessagepage> {
                       ],
                     ),
                   ),
-
                   //description field..
                   Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.white,
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
@@ -667,35 +692,74 @@ class _EditmessagepageState extends State<Editmessagepage> {
                           ),
                         ],
                       ),
-                      child: TextFormField(
-                        maxLines: 6,
-                        controller: _desc,
-                        inputFormatters: [
-                          LengthLimitingTextInputFormatter(600)
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              QuillSimpleToolbar(
+                                controller: descriptionController,
+                                configurations:
+                                    const QuillSimpleToolbarConfigurations(
+                                  dialogTheme: QuillDialogTheme(
+                                      labelTextStyle:
+                                          TextStyle(color: Colors.black),
+                                      inputTextStyle: TextStyle(
+                                          color: Colors.black, fontSize: 14)),
+                                  showBoldButton: true,
+                                  showClearFormat: false,
+                                  showAlignmentButtons: false,
+                                  showBackgroundColorButton: false,
+                                  showFontSize: false,
+                                  showColorButton: false,
+                                  showCenterAlignment: false,
+                                  showClipboardCut: false,
+                                  showIndent: false,
+                                  showDirection: false,
+                                  showDividers: false,
+                                  showFontFamily: false,
+                                  showItalicButton: false,
+                                  showClipboardPaste: false,
+                                  showInlineCode: false,
+                                  showCodeBlock: false,
+                                  showHeaderStyle: false,
+                                  showJustifyAlignment: false,
+                                  showLeftAlignment: false,
+                                  showLineHeightButton: false,
+                                  showLink: false,
+                                  showListBullets: false,
+                                  showListCheck: false,
+                                  showListNumbers: false,
+                                  showQuote: false,
+                                  showRightAlignment: false,
+                                  showSearchButton: false,
+                                  showRedo: false,
+                                  showSmallButton: false,
+                                  showSubscript: false,
+                                  showStrikeThrough: false,
+                                  showUndo: false,
+                                  showUnderLineButton: false,
+                                  showSuperscript: false,
+                                ),
+                              ),
+                            ],
+                          ),
+                          //quill controller.....
+                          Padding(
+                            padding: EdgeInsets.all(10),
+                            child: QuillEditor.basic(
+                              controller: descriptionController,
+                              configurations: const QuillEditorConfigurations(
+                                  padding: EdgeInsetsDirectional.symmetric(
+                                      vertical: 25)),
+                            ),
+                          ),
                         ],
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          filled: true,
-                          fillColor: Colors.white,
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontFamily: 'medium',
-                            fontSize: 14),
                       ),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
                     child: Row(
@@ -841,6 +905,26 @@ class _EditmessagepageState extends State<Editmessagepage> {
   }
 
   void _submitUpdateForm(String status) {
+    // Convert the QuillController content to HTML
+    final generatedHtml = QuillDeltaToHtmlConverter(
+      descriptionController.document.toDelta().toJson(),
+    ).convert();
+
+    // Assign the generated HTML to htmlContent
+    late String htmlContent = generatedHtml;
+
+    // Debug print the generated HTML content
+    print("Generated HTML Content: $htmlContent");
+
+    if (_heading.text.isEmpty || htmlContent.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
     List<int> selectedGradeIds = selected
         .map((selectedGradeName) {
           final grade = grades.firstWhere(
@@ -857,7 +941,7 @@ class _EditmessagepageState extends State<Editmessagepage> {
     UpdateMessageModel updatedMessage = UpdateMessageModel(
       id: widget.Id,
       headLine: _heading.text,
-      message: _desc.text,
+      message: htmlContent,
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',
       status: status,
@@ -870,6 +954,6 @@ class _EditmessagepageState extends State<Editmessagepage> {
       updatedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
     );
 
-    updateMessage(updatedMessage);
+    updateMessage(updatedMessage, context, widget.messageFetch);
   }
 }

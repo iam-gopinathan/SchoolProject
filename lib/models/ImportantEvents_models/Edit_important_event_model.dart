@@ -27,17 +27,17 @@ class EditImportantEventModel {
 
   factory EditImportantEventModel.fromJson(Map<String, dynamic> json) {
     return EditImportantEventModel(
-      id: json['id'],
-      userType: json['userType'],
-      rollNumber: json['rollNumber'],
-      headLine: json['headLine'],
-      description: json['description'],
-      fileType: json['filetype'],
-      fileName: json['filename'],
-      filePath: json['filepath'],
-      fromDate: json['fromDate'],
-      toDate: json['toDate'],
-      updatedOn: json['updatedOn'],
+      id: json['id'] ?? '',
+      userType: json['userType'] ?? '',
+      rollNumber: json['rollNumber'] ?? '',
+      headLine: json['headLine'] ?? '',
+      description: json['description'] ?? '',
+      fileType: json['filetype'] ?? '',
+      fileName: json['filename'] ?? '',
+      filePath: json['filepath'] ?? '',
+      fromDate: json['fromDate'] ?? '',
+      toDate: json['toDate'] ?? '',
+      updatedOn: json['updatedOn'] ?? '',
     );
   }
 }

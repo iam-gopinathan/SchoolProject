@@ -33,20 +33,20 @@ class HomeworksMainModel {
 
   factory HomeworksMainModel.fromJson(Map<String, dynamic> json) {
     return HomeworksMainModel(
-      id: json['id'] as int,
-      postedOn: json['postedOn'] as String,
-      scheduleOn: json['scheduleOn'] as String?,
-      rollNumber: json['rollNumber'] as String,
-      postedBy: json['postedBy'] as String,
-      day: json['day'] as String,
-      gradeId: json['gradeId'] as int,
-      section: json['section'] as String,
-      gradeSection: json['gradeSection'] as String,
-      fileType: json['fileType'] as String,
-      filePath: json['filePath'] as String,
+      id: json['id'] ?? '',
+      postedOn: json['postedOn'] ?? '',
+      scheduleOn: json['scheduleOn'] ?? '',
+      rollNumber: json['rollNumber'] ?? '',
+      postedBy: json['postedBy'] ?? '',
+      day: json['day'] ?? '',
+      gradeId: json['gradeId'] ?? '',
+      section: json['section'] ?? '',
+      gradeSection: json['gradeSection'] ?? '',
+      fileType: json['fileType'] ?? '',
+      filePath: json['filePath'] ?? '',
       status: json['status'] as String,
-      isAlterAvailable: json['isAlterAvailable'] as String,
-      updatedOn: json['updatedOn'] as String?,
+      isAlterAvailable: json['isAlterAvailable'] ?? '',
+      updatedOn: json['updatedOn'] ?? '',
     );
   }
 }

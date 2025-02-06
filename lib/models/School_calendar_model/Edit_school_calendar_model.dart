@@ -28,17 +28,17 @@ class EditSchoolCalendarModel {
   // Factory method to create a EditSchoolCalendarModel from a JSON map
   factory EditSchoolCalendarModel.fromJson(Map<String, dynamic> json) {
     return EditSchoolCalendarModel(
-      id: json['id'],
-      userType: json['userType'],
-      rollNumber: json['rollNumber'],
-      headLine: json['headLine'],
-      description: json['description'],
-      filetype: json['filetype'],
-      filename: json['filename'],
-      filepath: json['filepath'],
-      fromDate: json['fromDate'],
-      toDate: json['toDate'],
-      updatedOn: json['updatedOn'],
+      id: json['id'] ?? 0,
+      userType: json['userType'] ?? '',
+      rollNumber: json['rollNumber'] ?? '',
+      headLine: json['headLine'] ?? '',
+      description: json['description'] ?? '',
+      filetype: json['filetype'] ?? '',
+      filename: json['filename'] ?? '',
+      filepath: json['filepath'] ?? '',
+      fromDate: json['fromDate'] ?? '',
+      toDate: json['toDate'] ?? '',
+      updatedOn: json['updatedOn'] ?? '',
     );
   }
 

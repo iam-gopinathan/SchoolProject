@@ -10,7 +10,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 
 class CreateSchoolCalender extends StatefulWidget {
-  const CreateSchoolCalender({super.key});
+  final Function fetchStudentCalendar;
+  const CreateSchoolCalender({super.key, required this.fetchStudentCalendar});
 
   @override
   State<CreateSchoolCalender> createState() => _CreateSchoolCalenderState();
@@ -135,6 +136,58 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
     }
   }
 
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return _startdate.text != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,8 +203,12 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
             iconTheme: IconThemeData(color: Colors.black),
             backgroundColor: AppTheme.appBackgroundPrimaryColor,
             leading: GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  if (hasUnsavedChanges()) {
+                    await _showUnsavedChangesDialog();
+                  }
                   Navigator.pop(context);
+                  widget.fetchStudentCalendar();
                 },
                 child: Icon(Icons.arrow_back)),
             title: Text(
@@ -281,6 +338,14 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                       setState(() {
                         _isChecked = newValue!;
                       });
+                      //
+                      if (_isChecked) {
+                        // Set "To Date" to match "From Date" when checkbox is checked
+                        _enddate.text = _startdate.text;
+                      } else {
+                        // Optionally clear the "To Date" field when unchecked
+                        _enddate.clear();
+                      }
                     },
                   ),
                   Text(
@@ -630,8 +695,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                   ),
                 ),
 
-            /// Display Selected File end...
-
             //addlink tab....
             if (isaddLink)
               Padding(
@@ -679,7 +742,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                 ),
               ],
             ),
-
             //save as draft
             Padding(
               padding: const EdgeInsets.only(top: 40, bottom: 50),
@@ -730,6 +792,18 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
 
   //create school calendar.............
   void _createschoolcalender() {
+    if (_startdate.text.isEmpty ||
+        _heading.text.isEmpty ||
+        _desc.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Please fill in both heading and description'),
+        ),
+      );
+      return;
+    }
+
     String fileType = '';
     String? filePath;
     String? link;
@@ -756,6 +830,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
         fromDate: _startdate.text,
         toDate: _enddate.text);
 
-    postSchoolCalendar(create, context);
+    postSchoolCalendar(create, context, widget.fetchStudentCalendar);
   }
 }

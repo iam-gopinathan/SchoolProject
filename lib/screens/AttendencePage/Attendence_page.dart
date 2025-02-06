@@ -11,6 +11,7 @@ import 'package:flutter_application_1/screens/AttendencePage/IrregularAttendenci
 import 'package:flutter_application_1/services/Attendance_Api/First_student_Attendence.dart';
 import 'package:flutter_application_1/services/Attendance_Api/Sectionwise_Barchart.dart';
 import 'package:flutter_application_1/services/Attendance_Api/Show_student_details.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -35,6 +36,8 @@ class AttendencePage extends StatefulWidget {
 }
 
 class _AttendencePageState extends State<AttendencePage> {
+  ScrollController _scrollController = ScrollController();
+
   bool isLoading = true;
   //date picker....for total attendence....
   DateTime _selectedDate = DateTime.now();
@@ -96,6 +99,9 @@ class _AttendencePageState extends State<AttendencePage> {
     super.initState();
     _loadAttendanceData();
     fetchsectionwiseData(selectedDate);
+    //
+    // Add a listener to the ScrollController to monitor scroll changes.
+    _scrollController.addListener(_scrollListener);
 
     _chartScrollController.addListener(() {
       if (_chartScrollController.offset !=
@@ -319,6 +325,11 @@ class _AttendencePageState extends State<AttendencePage> {
     _chartScrollController.dispose();
     _searchController.dispose();
     super.dispose();
+    _scrollController.removeListener(_scrollListener);
+  }
+
+  void _scrollListener() {
+    setState(() {}); // Trigger UI update when scroll position changes
   }
 
   //static left side...
@@ -1935,7 +1946,6 @@ class _AttendencePageState extends State<AttendencePage> {
                               ],
                             ),
                           ),
-
                           //listtile top sections...
                           Transform.translate(
                             offset: Offset(0, 12),
@@ -1996,7 +2006,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             ),
                           ),
 //listtile code.....
-
                           Container(
                             child: isLoading
                                 ? Container(
@@ -2193,6 +2202,7 @@ class _AttendencePageState extends State<AttendencePage> {
         ),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         scrollDirection: Axis.vertical,
         child: Column(
           children: [
@@ -2212,31 +2222,32 @@ class _AttendencePageState extends State<AttendencePage> {
                           color: Colors.black),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AddAttendencePage()));
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: Align(
-                        alignment: Alignment.topRight,
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              color: AppTheme.Addiconcolor,
-                              shape: BoxShape.circle),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
+                  if (UserSession().userType == 'admin')
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => AddAttendencePage()));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Align(
+                          alignment: Alignment.topRight,
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
                 ],
               ),
             ),
@@ -3781,6 +3792,31 @@ class _AttendencePageState extends State<AttendencePage> {
           ],
         ),
       ),
+      //
+      //top arrow..
+      floatingActionButton:
+          _scrollController.hasClients && _scrollController.offset > 50
+              ? Container(
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.arrow_upward_outlined,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _scrollController.animateTo(
+                        0,
+                        duration: Duration(seconds: 1),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                  ),
+                )
+              : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

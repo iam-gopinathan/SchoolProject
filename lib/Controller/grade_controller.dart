@@ -5,7 +5,6 @@ class GradeController extends GetxController {
   var gradeList = [].obs;
   var examList = <String>[].obs;
   var subjectList = <String>[].obs;
-
   var filteredSubjects = <String>[].obs;
 
   Future<void> fetchGrades() async {
@@ -29,7 +28,6 @@ class GradeController extends GetxController {
             .cast<String>();
 
         //subjects..
-
         subjectList.value = gradeList
             .expand((grade) => grade['subjects'])
             .toSet()

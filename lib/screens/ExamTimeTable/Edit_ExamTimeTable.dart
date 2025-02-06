@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +33,7 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
   bool isLoading = true;
   String? _selectedExam;
 
-  // edit exam timetable..
+  /// edit exam timetable..
   Future<void> EditExamTimetableData() async {
     try {
       isLoading = true;
@@ -63,9 +62,18 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
         );
 
         _selectedClass = selectedGrade['sign'];
-        _selectedExam = data.exam;
 
         availableExams = List<String>.from(selectedGrade['exams'] ?? []);
+        availableExams = availableExams.toSet().toList();
+
+        if (!availableExams.contains(data.exam)) {
+          _selectedExam = '';
+        } else {
+          _selectedExam = data.exam;
+        }
+
+        print("Available Exams: $availableExams");
+        print("Selected Exam: $_selectedExam");
 
         // Set initial file details
         initialFilePath = data.filepath;
@@ -91,7 +99,7 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['jpeg', 'webp', 'pdf', 'png'],
+        allowedExtensions: ['jpeg', 'webp', 'pdf', 'png', 'jpg'],
         withData: true,
       );
 
@@ -224,7 +232,6 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                           ],
                         ),
                       ),
-
                       //fethed image..
                       Padding(
                         padding: const EdgeInsets.only(top: 15),
@@ -384,7 +391,7 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                               fontSize: 14,
                               color: Color.fromRGBO(38, 38, 38, 1)),
                         ),
-                        // Exam dropdown...
+                        // Exam dropdown.......
                         Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           child: DropdownButtonFormField<String>(
@@ -667,7 +674,7 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                               backgroundColor: AppTheme.textFieldborderColor,
                               side: BorderSide.none),
                           onPressed: () {
-                            onUpdateExamTimeTable(selectedFile!, context);
+                            onUpdateExamTimeTable(selectedFile, context);
                           },
                           child: Text(
                             'Update',
@@ -686,34 +693,77 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
     );
   }
 
+//
+  // Future<void> onUpdateExamTimeTable(
+  //     PlatformFile selectedFile, BuildContext context) async {
+  //   String formattedDate =
+  //       DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
+
+  //   String? fileType;
+  //   String? filePath;
+
+  //   if (selectedFile != null) {
+  //     fileType = 'image';
+  //     filePath = selectedFile.extension!;
+  //   } else {
+  //     fileType = 'existing';
+  //     filePath = '';
+  //   }
+
+  //   final examTimeTable = UpdateExamTimetableModel(
+  //     id: widget.id.toString(),
+  //     userType: UserSession().userType.toString(),
+  //     rollNumber: UserSession().rollNumber.toString(),
+  //     headLine: '',
+  //     description: '',
+  //     exam: _selectedExam.toString(),
+  //     fileType: fileType.toString(),
+  //     file: filePath,
+  //     updatedOn: formattedDate,
+  //   );
+
+  //   await updateExamTimeTable(examTimeTable, selectedFile, context);
+  // }
   Future<void> onUpdateExamTimeTable(
-      PlatformFile selectedFile, BuildContext context) async {
+      PlatformFile? selectedFile, BuildContext context) async {
     String formattedDate =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
     String? fileType;
     String? filePath;
 
-    if (selectedFile != null) {
+    if (selectedFile != null && selectedFile.extension != null) {
       fileType = 'image';
-      filePath = selectedFile.extension!;
-    } else {
+      filePath = selectedFile.extension;
+    } else if (isFetchedImageVisible && initialFilePath != null) {
       fileType = 'existing';
-      filePath = '';
+      filePath = initialFilePath;
+    }
+
+    // Validate fileType and filePath before proceeding
+    if (fileType == null || filePath == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select or use an existing file!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
     }
 
     final examTimeTable = UpdateExamTimetableModel(
       id: widget.id.toString(),
-      userType: UserSession().userType.toString(),
-      rollNumber: UserSession().rollNumber.toString(),
+      userType: UserSession().userType ?? 'unknown',
+      rollNumber: UserSession().rollNumber ?? 'unknown',
       headLine: '',
       description: '',
-      exam: _selectedExam.toString(),
-      fileType: fileType.toString(),
+      exam: _selectedExam ?? 'unknown',
+      fileType: fileType,
       file: filePath,
       updatedOn: formattedDate,
     );
 
-    await updateExamTimeTable(examTimeTable, selectedFile, context);
+    await updateExamTimeTable(
+        examTimeTable, selectedFile, context, widget.fetchmainexam);
   }
 }

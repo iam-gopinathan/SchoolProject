@@ -3,8 +3,8 @@ import 'package:flutter_application_1/models/ImportantEvents_models/Update_event
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
-Future<void> updateEventCalendar(
-    UpdateEventCalendarModel model, context) async {
+Future<void> updateEventCalendar(UpdateEventCalendarModel model, context,
+    Function fetchAndDisplayEvents) async {
   String _url =
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeEventCalender/updateEventCalender';
 
@@ -33,6 +33,16 @@ Future<void> updateEventCalendar(
         ),
       );
       print('Event updated successfully');
+      //
+
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchAndDisplayEvents();
+
+      Navigator.pop(
+        context,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to Update Event. Please try again.'),

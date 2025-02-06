@@ -8,7 +8,8 @@ import 'package:http/http.dart' as http;
 String apiUrl =
     "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeCircular/updateCircular";
 
-Future<void> updateCircular(CircularUpdateRequest request, context) async {
+Future<void> updateCircular(
+    CircularUpdateRequest request, context, Function fetchcircular) async {
   try {
     var uri = Uri.parse(apiUrl);
     var requestHttp = http.MultipartRequest(
@@ -48,6 +49,14 @@ Future<void> updateCircular(CircularUpdateRequest request, context) async {
       var responseData = await response.stream.bytesToString();
       print(responseData);
       print("Circular updated successfully: $responseData");
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchcircular();
+
+      Navigator.pop(
+        context,
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to Updated Circular. Please try again.'),

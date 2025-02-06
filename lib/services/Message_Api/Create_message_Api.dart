@@ -2,11 +2,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Message_models/CreateMessage_Models.dart';
 import 'package:http/http.dart' as http;
-
 import '../../utils/Api_Endpoints.dart';
 
 Future<void> CreateMessage(
-    CreatemessageModels newMessage, BuildContext context) async {
+  CreatemessageModels newMessage,
+  BuildContext context,
+  Function messageFetch,
+) async {
   const String url =
       'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/Message/postMessage';
 
@@ -41,6 +43,11 @@ Future<void> CreateMessage(
           duration: Duration(seconds: 3),
         ),
       );
+      //
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+      messageFetch();
+      Navigator.pop(context);
     } else if (response.statusCode == 404) {
       print(
           'Error: Endpoint not found. Check the API URL or backend configuration.');

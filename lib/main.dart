@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/Firebase_api.dart';
 import 'package:flutter_application_1/firebase_options.dart';
+import 'package:flutter_application_1/internetchecker.dart';
 import 'package:flutter_application_1/screens/splashScreen.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'dart:io';
 import 'package:get/get.dart';
 
@@ -22,6 +24,9 @@ void main() async {
 
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
 
+  // Initialize the FlutterDownloader plugin
+  await FlutterDownloader.initialize(debug: true);
+
   runApp(new MyApp());
 }
 
@@ -36,21 +41,28 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final GradeController gradeController = Get.put(GradeController());
 
     gradeController.fetchGrades();
-    return GetMaterialApp(
-      //theme code..
-      themeMode: ThemeMode.system,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      debugShowCheckedModeBanner: false,
-      home: Splashscreen(),
+    return InternetChecker(
+      child: GetMaterialApp(
+        //theme code..
+        themeMode: ThemeMode.system,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        debugShowCheckedModeBanner: false,
+        home: Splashscreen(),
+      ),
     );
   }
 }

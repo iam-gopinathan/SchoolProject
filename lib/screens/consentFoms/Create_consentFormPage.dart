@@ -421,6 +421,66 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
     );
   }
 
+  //
+  String initialHeading = "";
+
+  // Check if there are unsaved changes
+  bool hasUnsavedChanges() {
+    return _heading.text != initialHeading ||
+        selectedClasses != initialHeading ||
+        selectedSection != initialHeading;
+  }
+
+  // Function to show the unsaved changes dialog
+  Future<void> _showUnsavedChangesDialog() async {
+    bool discard = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                "Unsaved Changes !",
+                style: TextStyle(
+                  fontFamily: 'semibold',
+                  fontSize: 16,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "You have unsaved changes. Are you sure you want to discard them?",
+                style: TextStyle(
+                    fontFamily: 'medium', fontSize: 14, color: Colors.black),
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text(
+                    "Discard",
+                    style: TextStyle(
+                        fontFamily: 'semibold',
+                        fontSize: 14,
+                        color: Colors.black),
+                  ),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialHeading = _heading.text;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -445,7 +505,10 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          if (hasUnsavedChanges()) {
+                            await _showUnsavedChangesDialog();
+                          }
                           widget.fetch();
                           Navigator.pop(context);
                         },
@@ -792,6 +855,6 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
         postedOn: postedOn,
         draftedOn: draftedOn);
 
-    CreateConsentForm(create, context);
+    CreateConsentForm(create, context, widget.fetch);
   }
 }
