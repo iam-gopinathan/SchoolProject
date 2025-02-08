@@ -3,7 +3,7 @@ import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Attendence_models/ClassSendGetSectionModel.dart';
 import 'package:flutter_application_1/models/Attendence_models/IrRegularmodels.dart';
-import 'package:flutter_application_1/models/Attendence_models/show_studentDetails.dart';
+
 import 'package:flutter_application_1/services/Attendance_Api/ClassSendGetSectionApi.dart';
 import 'package:flutter_application_1/services/Attendance_Api/IrRegularAttendence.dart';
 import 'package:flutter_application_1/utils/theme.dart';
@@ -735,7 +735,8 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                       onTap: () {
                         print('export clicked');
                         _initializeNotification();
-                        requestPermission(filteredStudents);
+                        // requestPermission(filteredStudents);
+                        exportToExcel(filteredStudents);
                       },
                       child: Padding(
                         padding: const EdgeInsets.only(left: 10),
@@ -773,9 +774,8 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Color.fromRGBO(250, 246, 252, 1),
-                        ),
+                            borderRadius: BorderRadius.circular(30),
+                            color: AppTheme.appBackgroundPrimaryColor),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -822,7 +822,6 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                   islate = false;
                                   selectedTab = 'Leave';
                                   displayedTeachers.clear();
-
                                   _fetchIrregularAttendanceData(
                                       selectedClass, selectedSection, 'leave');
                                 });
@@ -834,7 +833,7 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                     color: isleave
                                         ? Colors.black
                                         : Color.fromRGBO(250, 246, 252, 1),
-                                    borderRadius: BorderRadius.circular(15)),
+                                    borderRadius: BorderRadius.circular(30)),
                                 child: Text(
                                   'Leave',
                                   style: TextStyle(

@@ -818,11 +818,8 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                                     'student')
                                                   GestureDetector(
                                                     onTap: () {
-                                                      var imagepath =
-                                                          e.filePath;
-
-                                                      _showBottomSheet(
-                                                          context, imagepath);
+                                                      var imageUrl = e.filePath;
+                                                      downloadImage(imageUrl);
                                                     },
                                                     child: Container(
                                                       padding:

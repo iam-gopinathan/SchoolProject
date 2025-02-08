@@ -729,7 +729,15 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                                       .isNotEmpty
                                                               ? Html(
                                                                   data:
-                                                                      '${news.news}')
+                                                                      '${news.news}',
+                                                                  style: {
+                                                                    "body":
+                                                                        Style(
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  },
+                                                                )
                                                               : const Text(''),
                                                         ),
                                                       ),

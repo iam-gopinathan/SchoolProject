@@ -712,7 +712,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                             maxY: 100,
                                             gridData: FlGridData(
                                                 horizontalInterval: 25,
-                                                drawVerticalLine: false,
+                                                drawVerticalLine: true,
                                                 show: true,
                                                 drawHorizontalLine: true),
                                             titlesData: FlTitlesData(
@@ -738,7 +738,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                                           fontSize: 12,
                                                           color: Color.fromRGBO(
                                                               85, 85, 85, 1),
-                                                          fontFamily: 'medium',
+                                                          fontFamily: 'regular',
                                                         ),
                                                       ),
                                                     );
@@ -2494,8 +2494,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                                 value.toInt().toString(),
                                                 style: TextStyle(
                                                     color: Colors.black,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 14),
+                                                    fontSize: 14,
+                                                    fontFamily: 'regular'),
                                               );
                                             },
                                           ),
@@ -2533,9 +2533,14 @@ class _AttendencePageState extends State<AttendencePage> {
                                             sideTitles:
                                                 SideTitles(showTitles: false)),
                                       ),
-                                      borderData: FlBorderData(show: false),
+                                      borderData: FlBorderData(
+                                        show: false,
+                                      ),
                                       gridData: FlGridData(
-                                          show: true, horizontalInterval: 20),
+                                          show: true,
+                                          horizontalInterval: 20,
+                                          drawHorizontalLine: true,
+                                          drawVerticalLine: true),
                                     ),
                                   ),
                                 ),

@@ -9,6 +9,7 @@ import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -280,6 +281,8 @@ class _MarksShowpageState extends State<MarksShowpage> {
 
   @override
   void initState() {
+    print("subjects $subjects"); // To ensure that subjects list has values
+
     // TODO: implement initState
     super.initState();
     _initializeNotification();
@@ -515,6 +518,14 @@ class _MarksShowpageState extends State<MarksShowpage> {
     sheet.appendRow(headers.map((header) => TextCellValue(header)).toList());
     for (int i = 0; i < data.prekgRequest.length; i++) {
       var e = data.prekgRequest[i];
+
+      List<dynamic> subjectMarks = subjects.map((subject) {
+        var value = getSubjectValue(e, subject);
+        print(
+            'Subject: $subject, Value: $value'); // Debug: Check the value for each subject
+        return value;
+      }).toList();
+
       List<dynamic> row = [
         i + 1,
         e.studentName,
@@ -522,8 +533,9 @@ class _MarksShowpageState extends State<MarksShowpage> {
         e.totalMarks,
         e.marksScored,
         "${e.percentage}%",
+        e.teacherNotes,
         e.remarks,
-        ...subjects.map((subject) => subject),
+        ...subjectMarks,
       ];
       sheet.appendRow(
           row.map((cell) => TextCellValue(cell.toString())).toList());
@@ -538,8 +550,11 @@ class _MarksShowpageState extends State<MarksShowpage> {
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
     }
+
+    final formattedTimestamp =
+        DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
     final filePath =
-        '${downloadDir.path}/StudentData_${selectedSection}_${DateTime.now().toIso8601String()}.xlsx';
+        '${downloadDir.path}/StudentData_${selectedSection}_$formattedTimestamp.xlsx';
     final file = File(filePath);
     final bytes = excel.encode();
     if (bytes != null) {
@@ -555,7 +570,9 @@ class _MarksShowpageState extends State<MarksShowpage> {
       print('Failed to save file.');
     }
   }
+  ////export to excel..
 
+  //individual student export...
   Future<void> exportIndividualStudentToExcel(MarksResponse data,
       List<String> subjects, String selectedSection, String rollNumber) async {
     var studentData = data.prekgRequest.firstWhere(
@@ -593,7 +610,14 @@ class _MarksShowpageState extends State<MarksShowpage> {
       "${studentData.percentage}%",
       studentData.remarks,
       studentData.teacherNotes,
-      ...subjects.map((subject) => subject),
+      // ...subjects.map((subject) => subject),
+      // Map over the subjects and fetch the corresponding marks for each subject
+      ...subjects.map((subject) {
+        var value = getSubjectValue(studentData, subject);
+        print(
+            'Subject: $subject, Value: $value'); // Debug: Check the value for each subject
+        return value; // Return the mark for the subject
+      }).toList(),
     ];
     sheet.appendRow(row.map((cell) => TextCellValue(cell.toString())).toList());
     excel.setDefaultSheet('Sheet1');
@@ -606,8 +630,10 @@ class _MarksShowpageState extends State<MarksShowpage> {
     if (!await downloadDir.exists()) {
       await downloadDir.create(recursive: true);
     }
+    final formattedTimestamp =
+        DateFormat('yyyy-MM-dd_HH-mm-ss').format(DateTime.now());
     final filePath =
-        '${downloadDir.path}/Student_${rollNumber}_Data_${selectedSection}_${DateTime.now().toIso8601String()}.xlsx';
+        '${downloadDir.path}/${studentData.studentName}_$formattedTimestamp.xlsx';
     final file = File(filePath);
     final bytes = excel.encode();
     if (bytes != null) {
@@ -623,7 +649,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
       print('Failed to save file.');
     }
   }
-//notification and export code end......
+  //individual student export end...
 
   @override
   Widget build(BuildContext context) {
@@ -746,7 +772,8 @@ class _MarksShowpageState extends State<MarksShowpage> {
                       onTap: () async {
                         String selectedSection = 'A1';
                         _initializeNotification();
-                        exportToExcel(data!, subjects, selectedSection);
+                        exportToExcel(data!, gradeController.filteredSubjects,
+                            selectedSection);
                       },
                       child: SvgPicture.asset(
                         'assets/icons/export_icon.svg',
@@ -869,7 +896,8 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                                     e.rollnumber;
                                                 await exportIndividualStudentToExcel(
                                                     data,
-                                                    subjects,
+                                                    gradeController
+                                                        .filteredSubjects,
                                                     selectedSection,
                                                     rollNumber);
                                               },

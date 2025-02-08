@@ -552,7 +552,14 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                   .isNotEmpty
                                                           ? Html(
                                                               data:
-                                                                  '${message.message}')
+                                                                  '${message.message}',
+                                                              style: {
+                                                                "body": Style(
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                              },
+                                                            )
                                                           : const Text(''),
                                                     ),
                                                     Padding(

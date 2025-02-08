@@ -346,7 +346,13 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
     // Loop through filteredStudents
     for (var student in filteredStudents) {
       for (var detail in student.details) {
-        // Append each detail row with incremented index
+        // Check if attendance status is empty or null and set it to "Present"
+        String attendanceStatus = (detail.currentStatus == null ||
+                detail.currentStatus.toLowerCase() == 'no data' ||
+                detail.currentStatus.isEmpty)
+            ? "Present"
+            : detail.currentStatus;
+
         sheet.appendRow([
           TextCellValue(index.toString()),
           TextCellValue(student.grade),
@@ -355,7 +361,7 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
           TextCellValue(detail.studentName),
           TextCellValue(detail.rollNumber),
           TextCellValue('${detail.attendancePercent}%'),
-          TextCellValue(detail.currentStatus),
+          TextCellValue(attendanceStatus),
         ]);
         index++;
       }
@@ -1011,7 +1017,7 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                         List<AddAttendenceGetModel> attendanceModels =
                             convertDetailsToAttendanceModels(filteredStudents);
 
-                        await requestPermission(attendanceModels);
+                        exportAttendanceToExcel(attendanceModels);
                       },
                       child: SvgPicture.asset(
                         'assets/icons/export_icon.svg',

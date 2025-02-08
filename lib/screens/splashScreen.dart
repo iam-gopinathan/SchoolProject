@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter_application_1/screens/loginscreen.dart';
 import 'package:flutter_application_1/services/Login_Api/loginpage_news.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:lottie/lottie.dart';
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
@@ -63,44 +64,47 @@ class _SplashscreenState extends State<Splashscreen> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Center(
-            child: Image.asset(
-              AppTheme.appLogoImage,
-              width: 150,
-              height: 150,
-              fit: BoxFit.contain,
-            ),
-          ),
-          AnimatedOpacity(
-            opacity: _showText ? 1.0 : 0.0,
-            duration: Duration(seconds: 1),
-            child: Column(
-              children: [
-                Center(
-                  child: Text(
-                    AppTheme.appLogoName,
-                    style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'semibold',
-                        color: Colors.black),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.002,
-                ),
-                Text(
-                  AppTheme.appSubtitle.toUpperCase(),
-                  style: TextStyle(
-                    fontFamily: 'medium',
-                    fontSize: 12,
-                    color: Color.fromRGBO(17, 101, 109, 1),
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
+          // Center(
+          //   child: Image.asset(
+          //     AppTheme.appLogoImage,
+          //     width: 150,
+          //     height: 150,
+          //     fit: BoxFit.contain,
+          //   ),
+          // ),
+          // AnimatedOpacity(
+          //   opacity: _showText ? 1.0 : 0.0,
+          //   duration: Duration(seconds: 1),
+          //   child: Column(
+          //     children: [
+          //       Center(
+          //         child: Text(
+          //           AppTheme.appLogoName,
+          //           style: TextStyle(
+          //               fontSize: 24,
+          //               fontFamily: 'semibold',
+          //               color: Colors.black),
+          //           textAlign: TextAlign.center,
+          //         ),
+          //       ),
+          //       SizedBox(
+          //         height: MediaQuery.of(context).size.height * 0.002,
+          //       ),
+          //       Text(
+          //         AppTheme.appSubtitle.toUpperCase(),
+          //         style: TextStyle(
+          //           fontFamily: 'medium',
+          //           fontSize: 12,
+          //           color: Color.fromRGBO(17, 101, 109, 1),
+          //         ),
+          //         textAlign: TextAlign.center,
+          //       ),
+          //     ],
+          //   ),
+          // ),
+
+          Lottie.asset('assets/images/Msms_splashvideo.json',
+              fit: BoxFit.cover),
         ],
       ),
     );

@@ -1,12 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:excel/excel.dart' hide Border;
+import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:open_file/open_file.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Marks_models/ParentMarks_model.dart';
 import 'package:flutter_application_1/services/Marks_Api/Parents_marks_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
-import 'package:flutter_application_1/utils/theme.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
+
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -73,86 +76,20 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
     }
   }
 
-  //pdf dwnloader...
-  Future<void> generateStudentPDF() async {
-    if (_parent == null) return;
-
-    final student = _parent!.data;
-
-    final imageBytes = await _fetchImageBytes(student.profile);
-
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
-            children: [
-              pw.Text(
-                'Student Profile',
-                style: pw.TextStyle(
-                  fontSize: 20,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-              pw.Image(pw.MemoryImage(imageBytes), width: 100, height: 100),
-              pw.Text(student.name),
-              pw.Text(student.rollNumber),
-              pw.Text(student.gradeAndSection),
-              pw.SizedBox(height: 20),
-              pw.Table.fromTextArray(
-                context: context,
-                data: <List<String>>[
-                  ['Subject', 'Marks'],
-                  ..._parent!.exams.entries.map((examEntry) {
-                    return [examEntry.key, examEntry.value.marksScored];
-                  }).toList(),
-                ],
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    final directory = await getExternalStorageDirectory();
-    if (directory == null) {
-      print("Failed to get directory");
-      return;
-    }
-
-    final downloadFolder = Directory('${directory.path}/Downloads');
-    if (!await downloadFolder.exists()) {
-      await downloadFolder.create(recursive: true);
-    }
-
-    final filePath =
-        '${downloadFolder.path}/student_${student.name}_results.pdf';
-    final file = File(filePath);
-
-    await file.writeAsBytes(await pdf.save());
-
-    // Optionally, you can open the file with a package like open_file
-    // await OpenFile.open(filePath);
-
-    await FlutterDownloader.enqueue(
-      url: 'file://$filePath',
-      savedDir: downloadFolder.path,
-      fileName: 'student_${student.name}_results.pdf',
-      showNotification: true,
-      openFileFromNotification: true,
-    );
-  }
-
+// Function to fetch image bytes from a URL
   Future<Uint8List> _fetchImageBytes(String imageUrl) async {
-    final response = await http.get(Uri.parse(imageUrl));
-    if (response.statusCode == 200) {
-      return Uint8List.fromList(response.bodyBytes);
-    } else {
-      throw Exception("Failed to load image");
+    try {
+      final response = await http.get(Uri.parse(imageUrl));
+      if (response.statusCode == 200) {
+        return Uint8List.fromList(response.bodyBytes);
+      } else {
+        throw Exception("Failed to load image");
+      }
+    } catch (e) {
+      print("Error loading image: $e");
+      return Uint8List(0);
     }
   }
-  //
 
   @override
   Widget build(BuildContext context) {
@@ -515,13 +452,19 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                                           DataCell(
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 15),
-                                                                              child: Text(subject),
+                                                                              child: Text(
+                                                                                subject,
+                                                                                style: TextStyle(fontFamily: 'semibold', fontSize: 16, color: Colors.black),
+                                                                              ),
                                                                             ),
                                                                           ),
                                                                           DataCell(
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 15),
-                                                                              child: Text(marks),
+                                                                              child: Text(
+                                                                                marks,
+                                                                                style: TextStyle(fontFamily: 'semibold', fontSize: 16, color: Colors.black),
+                                                                              ),
                                                                             ),
                                                                           ),
                                                                         ],
@@ -758,8 +701,127 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                                     Colors
                                                                         .black,
                                                               ),
-                                                              onPressed: () {
-                                                                generateStudentPDF();
+                                                              onPressed:
+                                                                  () async {
+                                                                var excel = Excel
+                                                                    .createExcel();
+                                                                Sheet
+                                                                    sheetObject =
+                                                                    excel[
+                                                                        'Sheet1'];
+
+                                                                // Base headers
+                                                                List<CellValue>
+                                                                    headers = [
+                                                                  TextCellValue(
+                                                                      'Name'),
+                                                                  TextCellValue(
+                                                                      'Roll Number'),
+                                                                  TextCellValue(
+                                                                      'Attendance %'),
+                                                                  TextCellValue(
+                                                                      'Status'),
+                                                                ];
+
+                                                                // Dynamically add subject names as column headers
+                                                                if (_parent !=
+                                                                        null &&
+                                                                    _parent!
+                                                                        .subjects
+                                                                        .isNotEmpty) {
+                                                                  headers.addAll(_parent!
+                                                                      .subjects
+                                                                      .map((subject) =>
+                                                                          TextCellValue(
+                                                                              subject)));
+                                                                }
+
+                                                                // Append headers row
+                                                                sheetObject
+                                                                    .appendRow(
+                                                                        headers);
+
+                                                                // Adding data
+                                                                if (_parent !=
+                                                                        null &&
+                                                                    _parent!
+                                                                        .exams
+                                                                        .isNotEmpty) {
+                                                                  for (var examEntry
+                                                                      in _parent!
+                                                                          .exams
+                                                                          .entries) {
+                                                                    String studentName = _parent
+                                                                            ?.data
+                                                                            .name ??
+                                                                        'Unknown';
+                                                                    String
+                                                                        rollNumber =
+                                                                        _parent?.data.rollNumber ??
+                                                                            'N/A';
+                                                                    String
+                                                                        percentage =
+                                                                        examEntry.value.percentage ??
+                                                                            '0%';
+                                                                    String status = examEntry
+                                                                            .value
+                                                                            .remarks ??
+                                                                        'Not Available';
+
+                                                                    // Create row with student details
+                                                                    List<CellValue>
+                                                                        row = [
+                                                                      TextCellValue(
+                                                                          studentName),
+                                                                      TextCellValue(
+                                                                          rollNumber),
+                                                                      TextCellValue(
+                                                                          percentage),
+                                                                      TextCellValue(
+                                                                          status),
+                                                                    ];
+
+                                                                    // Add marks for each subject in the correct column
+                                                                    row.addAll(
+                                                                      _parent!
+                                                                          .subjects
+                                                                          .map((subject) =>
+                                                                              TextCellValue(examEntry.value.subjectMarks[subject.toLowerCase()] ?? '0')),
+                                                                    );
+
+                                                                    // Append the row
+                                                                    sheetObject
+                                                                        .appendRow(
+                                                                            row);
+                                                                  }
+                                                                }
+
+                                                                // Save file to device
+                                                                var fileBytes =
+                                                                    excel
+                                                                        .encode();
+                                                                if (fileBytes !=
+                                                                    null) {
+                                                                  Directory?
+                                                                      directory =
+                                                                      await getExternalStorageDirectory();
+                                                                  String
+                                                                      filePath =
+                                                                      '${directory!.path}/exam_results.xlsx';
+                                                                  File file = File(
+                                                                      filePath);
+                                                                  await file
+                                                                      .writeAsBytes(
+                                                                          fileBytes);
+
+                                                                  // Show success notification
+                                                                  showDownloadNotification(
+                                                                      filePath);
+
+                                                                  // Open the file
+                                                                  OpenFile.open(
+                                                                      filePath);
+                                                                }
                                                               },
                                                               child: Text(
                                                                 'Download Result',
@@ -823,6 +885,55 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
+}
+//
+
+// Function to show download notification
+void showDownloadNotification(String filePath) async {
+  const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    'download_channel',
+    'Download Notifications',
+    channelDescription: 'Notifications related to downloads',
+    importance: Importance.high,
+    priority: Priority.high,
+    playSound: true,
+  );
+  const NotificationDetails platformDetails =
+      NotificationDetails(android: androidDetails);
+  await flutterLocalNotificationsPlugin.show(
+    10,
+    'Download Complete',
+    'Export excel Data Successfully to $filePath',
+    platformDetails,
+    payload: filePath,
+  );
+}
+
+//
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+void initializeNotifications() async {
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings =
+      InitializationSettings(android: initializationSettingsAndroid);
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) {
+      if (response.payload != null && response.payload!.isNotEmpty) {
+        print("Notification clicked! Opening file: ${response.payload}");
+        openFile(response.payload!);
+      } else {
+        print("Notification clicked, but no payload received.");
+      }
+    },
+  );
+}
+
+//
+void openFile(String filePath) {
+  print("Opening file: $filePath");
+  OpenFile.open(filePath);
 }
 
 TextEditingController _teachercommmentview = TextEditingController();

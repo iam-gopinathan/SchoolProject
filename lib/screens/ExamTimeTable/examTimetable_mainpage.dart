@@ -886,11 +886,9 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                       'student')
                                                     GestureDetector(
                                                       onTap: () {
-                                                        var imagepath =
+                                                        var imageUrl =
                                                             e.filePath;
-
-                                                        _showBottomSheet(
-                                                            context, imagepath);
+                                                        downloadImage(imageUrl);
                                                       },
                                                       child: Container(
                                                         padding: EdgeInsets

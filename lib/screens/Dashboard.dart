@@ -301,7 +301,6 @@ class _DashboardState extends State<Dashboard> {
           print(
               'Section: ${section.section}, Present: ${section.present}, Total: ${section.total}, Percentage: ${section.percentage}');
         }
-
         barGroups.add(
           BarChartGroupData(
             barsSpace: 10,
@@ -432,7 +431,7 @@ class _DashboardState extends State<Dashboard> {
   String _getLimitedHtmlContent(String content) {
     // You can set the character limit to simulate the first 3 lines.
     final maxCharacters =
-        90; // Adjust the number of characters for 3 lines of text
+        80; // Adjust the number of characters for 3 lines of text
     return content.length > maxCharacters
         ? content.substring(0, maxCharacters) + '...'
         : content;
@@ -627,7 +626,7 @@ class _DashboardState extends State<Dashboard> {
               if (_activeIndex == 0)
                 Container(
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 25, top: 20),
+                    padding: const EdgeInsets.only(left: 20, top: 20),
                     child: Row(
                       children: [
                         Text(
@@ -648,7 +647,7 @@ class _DashboardState extends State<Dashboard> {
                   children: [
                     //curriculam title..
                     Padding(
-                      padding: const EdgeInsets.only(left: 25, top: 10),
+                      padding: const EdgeInsets.only(left: 15, top: 10),
                       child: Row(
                         children: [
                           Container(
@@ -656,7 +655,7 @@ class _DashboardState extends State<Dashboard> {
                               children: [
                                 Container(
                                   width: 8,
-                                  height: 60,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -764,7 +763,7 @@ class _DashboardState extends State<Dashboard> {
                                   children: [
                                     Container(
                                       width: 8,
-                                      height: 60,
+                                      height: 65,
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
@@ -875,7 +874,7 @@ class _DashboardState extends State<Dashboard> {
                 Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 25, top: 10),
+                      padding: const EdgeInsets.only(left: 15, top: 18),
                       child: Row(
                         children: [
                           Container(
@@ -883,7 +882,7 @@ class _DashboardState extends State<Dashboard> {
                               children: [
                                 Container(
                                   width: 8,
-                                  height: 60,
+                                  height: 65,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -980,7 +979,7 @@ class _DashboardState extends State<Dashboard> {
                         Padding(
                           padding: const EdgeInsets.only(
                             left: 16,
-                            top: 10,
+                            top: 18,
                           ),
                           child: Row(
                             children: [
@@ -989,7 +988,7 @@ class _DashboardState extends State<Dashboard> {
                                   children: [
                                     Container(
                                       width: 8,
-                                      height: 60,
+                                      height: 65,
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
@@ -1093,7 +1092,7 @@ class _DashboardState extends State<Dashboard> {
               if (_activeIndex == 0)
                 Padding(
                   padding: const EdgeInsets.only(
-                      left: 25, top: 25, right: 25, bottom: 10),
+                      left: 20, top: 25, right: 20, bottom: 10),
                   child: Row(
                     children: [
                       Text(
@@ -1333,7 +1332,7 @@ class _DashboardState extends State<Dashboard> {
                 UserSession().userType == 'teacher')
               if (_activeIndex == 0)
                 Padding(
-                  padding: const EdgeInsets.only(left: 25, top: 15, right: 25),
+                  padding: const EdgeInsets.only(left: 20, top: 15, right: 20),
                   child: Row(
                     children: [
                       Text(
@@ -1495,7 +1494,7 @@ class _DashboardState extends State<Dashboard> {
                                         //
                                         Padding(
                                           padding:
-                                              const EdgeInsets.only(top: 10),
+                                              const EdgeInsets.only(top: 0),
                                           child: Container(
                                               width: double.infinity,
                                               child: Html(
@@ -1557,7 +1556,7 @@ class _DashboardState extends State<Dashboard> {
                 UserSession().userType == 'teacher')
               if (_activeIndex == 0)
                 Padding(
-                  padding: const EdgeInsets.only(left: 25, top: 25, right: 25),
+                  padding: const EdgeInsets.only(left: 20, top: 25, right: 20),
                   child: Row(
                     children: [
                       Column(
@@ -1632,35 +1631,38 @@ class _DashboardState extends State<Dashboard> {
                         },
                         child: Container(
                           decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                   color: selectedButton == "Students"
                                       ? AppTheme.textFieldborderColor
                                       : AppTheme.textFieldborderColor,
                                   width: 1.5)),
-                          child: SpeechBalloon(
-                            nipLocation: NipLocation.bottomRight,
-                            color: selectedButton == "Students"
-                                ? AppTheme.textFieldborderColor
-                                : Colors.white ?? Colors.white,
-                            height: 37,
-                            width: 160,
-                            offset: Offset(-10, 0),
-                            nipHeight: selectedButton == "Students" ? 15 : 0,
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    "Students",
-                                    style: TextStyle(
-                                        color: AppTheme.menuTextColor,
-                                        fontSize: 16.0,
-                                        fontFamily: 'medium'),
-                                  )
-                                ]),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: SpeechBalloon(
+                              nipLocation: NipLocation.bottomRight,
+                              color: selectedButton == "Students"
+                                  ? AppTheme.textFieldborderColor
+                                  : Colors.white ?? Colors.white,
+                              height: 37,
+                              width: 160,
+                              offset: Offset(-10, 0),
+                              nipHeight: selectedButton == "Students" ? 15 : 0,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text(
+                                      "Students",
+                                      style: TextStyle(
+                                          color: AppTheme.menuTextColor,
+                                          fontSize: 16.0,
+                                          fontFamily: 'medium'),
+                                    )
+                                  ]),
+                            ),
                           ),
                         ),
                       ),
-
                       //staffs button..........
                       GestureDetector(
                         onTap: () {
@@ -1669,32 +1671,27 @@ class _DashboardState extends State<Dashboard> {
                           });
                         },
                         child: Container(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 50),
                           decoration: BoxDecoration(
+                              color: selectedButton == "Staffs"
+                                  ? AppTheme.textFieldborderColor
+                                  : Colors.white ?? Colors.white,
+                              borderRadius: BorderRadius.circular(10),
                               border: Border.all(
-                                  color: selectedButton == "Staffs"
-                                      ? AppTheme.textFieldborderColor
-                                      : AppTheme.textFieldborderColor,
+                                  color: AppTheme.textFieldborderColor,
                                   width: 1.5)),
-                          child: SpeechBalloon(
-                            color: selectedButton == "Staffs"
-                                ? AppTheme.textFieldborderColor
-                                : Colors.white ?? Colors.white,
-                            nipHeight: 0,
-                            height: 37,
-                            width: 160,
-                            offset: Offset(-10, 0),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(
-                                    "Staffs",
-                                    style: TextStyle(
-                                        color: AppTheme.menuTextColor,
-                                        fontSize: 16.0,
-                                        fontFamily: 'medium'),
-                                  ),
-                                ]),
-                          ),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text(
+                                  "Staffs",
+                                  style: TextStyle(
+                                      color: AppTheme.menuTextColor,
+                                      fontSize: 16.0,
+                                      fontFamily: 'medium'),
+                                ),
+                              ]),
                         ),
                       ),
                     ],
@@ -1710,7 +1707,7 @@ class _DashboardState extends State<Dashboard> {
                   ///nursery secondary primary text......
                   Padding(
                     padding:
-                        const EdgeInsets.only(left: 20, right: 20, top: 15),
+                        const EdgeInsets.only(left: 10, right: 10, top: 15),
                     child: Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -1823,9 +1820,17 @@ class _DashboardState extends State<Dashboard> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Card(
-                      elevation: 1,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(
+                              color: Color.fromRGBO(225, 225, 225, 1))),
+                      elevation: 0,
                       child: Container(
-                        color: Colors.white,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                                color: Color.fromRGBO(225, 225, 225, 1))),
                         child: Row(
                           children: [
                             // Static Left Titles...
@@ -1844,7 +1849,6 @@ class _DashboardState extends State<Dashboard> {
                                         color: Colors.black,
                                         fontFamily: 'medium',
                                         fontSize: 10,
-                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   );
@@ -1895,17 +1899,26 @@ class _DashboardState extends State<Dashboard> {
                                                   return Text(
                                                     value.toInt().toString(),
                                                     style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 14,
-                                                    ),
+                                                        color: Colors.black,
+                                                        fontSize: 14,
+                                                        fontFamily: 'regular'),
                                                   );
                                                 },
                                               ),
                                             ),
                                           ),
                                           gridData: FlGridData(
+                                              drawVerticalLine:
+                                                  true, // Enable vertical lines
+                                              getDrawingVerticalLine: (value) {
+                                                return FlLine(
+                                                  color: Colors.black.withOpacity(
+                                                      0.1), // Adjust opacity (0.0 - 1.0)
+                                                  strokeWidth:
+                                                      1, // Adjust thickness
+                                                  dashArray: [5, 5],
+                                                );
+                                              },
                                               show: true,
                                               horizontalInterval: 5),
                                           backgroundColor:
@@ -2195,215 +2208,267 @@ class _DashboardState extends State<Dashboard> {
                 if (selectedButton == 'Staffs')
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      padding: EdgeInsets.all(8),
-                      color: Colors.white,
-                      height: MediaQuery.of(context).size.height * 0.23,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: List.generate(5, (index) {
-                              final value = (4 - index) * 25;
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 20.0),
-                                child: Text(
-                                  value.toString(),
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'medium',
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
+                    child: Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              color: Color.fromRGBO(225, 225, 225, 1)),
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.all(8),
+                        // color: Colors.white,
+                        height: MediaQuery.of(context).size.height * 0.23,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(5, (index) {
+                                final value = (4 - index) * 25;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 20.0),
+                                  child: Text(
+                                    value.toString(),
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontFamily: 'medium',
+                                      fontSize: 10,
+                                    ),
                                   ),
-                                ),
-                              );
-                            }),
-                          ),
-                          // Scrollable bar chart....................
-                          Expanded(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.horizontal,
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: attendanceData.length * 90,
-                                    child: BarChart(
-                                      BarChartData(
-                                        backgroundColor: Colors.white,
-                                        maxY: 100,
-                                        barTouchData: BarTouchData(
-                                          enabled: true,
-                                          touchTooltipData: BarTouchTooltipData(
-                                            tooltipRoundedRadius: 10,
-                                            tooltipPadding: EdgeInsets.only(
-                                                left: 45, right: 45),
-                                            fitInsideHorizontally: true,
-                                            fitInsideVertically: true,
-                                            getTooltipItem: (group, groupIndex,
-                                                rod, rodIndex) {
-                                              String presentText =
-                                                  'Present: ${attendanceData[groupIndex].present}';
-                                              String absentText =
-                                                  'Absent: ${attendanceData[groupIndex].absent}';
-                                              String lateText =
-                                                  'Late: ${attendanceData[groupIndex].late}';
-                                              String leaveText =
-                                                  'Leave: ${attendanceData[groupIndex].leave}';
-                                              String percentageText =
-                                                  '${attendanceData[groupIndex].percentage}%';
-                                              return BarTooltipItem(
-                                                '',
-                                                TextStyle(
-                                                  color: Colors.white,
-                                                  fontFamily: 'medium',
-                                                  fontSize: 10,
-                                                ),
-                                                textAlign: TextAlign.left,
-                                                children: [
-                                                  TextSpan(
-                                                    text: '• ',
-                                                    style: TextStyle(
-                                                        color: Color.fromRGBO(
-                                                            99, 42, 179, 1),
-                                                        fontSize: 18),
-                                                  ),
-                                                  TextSpan(
-                                                    text: presentText + '\n',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  TextSpan(
-                                                    text: '• ',
-                                                    style: TextStyle(
-                                                        color: Color.fromRGBO(
-                                                            0, 150, 60, 1),
-                                                        fontSize: 18),
-                                                  ),
-                                                  TextSpan(
-                                                    text: absentText + '\n',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  TextSpan(
-                                                    text: '• ',
-                                                    style: TextStyle(
-                                                        color: Color.fromRGBO(
-                                                          255,
-                                                          212,
-                                                          0,
-                                                          1,
-                                                        ),
-                                                        fontSize: 18),
-                                                  ),
-                                                  TextSpan(
-                                                    text: lateText + '\n',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  TextSpan(
-                                                    text: '• ',
-                                                    style: TextStyle(
-                                                      color: Color.fromRGBO(
-                                                        255,
-                                                        0,
-                                                        4,
-                                                        1,
-                                                      ),
-                                                      fontSize: 18,
+                                );
+                              }),
+                            ),
+                            // Scrollable bar chart....................
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 15),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: attendanceData.length * 90,
+                                        child: BarChart(
+                                          BarChartData(
+                                            backgroundColor: Color.fromRGBO(
+                                                254, 247, 255, 1),
+                                            maxY: 100,
+                                            barTouchData: BarTouchData(
+                                              enabled: true,
+                                              touchTooltipData:
+                                                  BarTouchTooltipData(
+                                                tooltipRoundedRadius: 10,
+                                                tooltipPadding: EdgeInsets.only(
+                                                    left: 45, right: 45),
+                                                fitInsideHorizontally: true,
+                                                fitInsideVertically: true,
+                                                getTooltipItem: (group,
+                                                    groupIndex, rod, rodIndex) {
+                                                  String presentText =
+                                                      'Present: ${attendanceData[groupIndex].present}';
+                                                  String absentText =
+                                                      'Absent: ${attendanceData[groupIndex].absent}';
+                                                  String lateText =
+                                                      'Late: ${attendanceData[groupIndex].late}';
+                                                  String leaveText =
+                                                      'Leave: ${attendanceData[groupIndex].leave}';
+                                                  String percentageText =
+                                                      '${attendanceData[groupIndex].percentage}%';
+                                                  return BarTooltipItem(
+                                                    '',
+                                                    TextStyle(
+                                                      color: Colors.white,
+                                                      fontFamily: 'medium',
+                                                      fontSize: 10,
                                                     ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: leaveText + '\n',
-                                                    style: TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                  TextSpan(
-                                                    text: percentageText,
-                                                    style: TextStyle(
-                                                        color: Colors.white,
+                                                    textAlign: TextAlign.left,
+                                                    children: [
+                                                      TextSpan(
+                                                        text: '• ',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    99,
+                                                                    42,
+                                                                    179,
+                                                                    1),
+                                                            fontSize: 18),
+                                                      ),
+                                                      TextSpan(
+                                                        text:
+                                                            presentText + '\n',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '• ',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    0,
+                                                                    150,
+                                                                    60,
+                                                                    1),
+                                                            fontSize: 18),
+                                                      ),
+                                                      TextSpan(
+                                                        text: absentText + '\n',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '• ',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                              255,
+                                                              212,
+                                                              0,
+                                                              1,
+                                                            ),
+                                                            fontSize: 18),
+                                                      ),
+                                                      TextSpan(
+                                                        text: lateText + '\n',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      TextSpan(
+                                                        text: '• ',
+                                                        style: TextStyle(
+                                                          color: Color.fromRGBO(
+                                                            255,
+                                                            0,
+                                                            4,
+                                                            1,
+                                                          ),
+                                                          fontSize: 18,
+                                                        ),
+                                                      ),
+                                                      TextSpan(
+                                                        text: leaveText + '\n',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Colors.white),
+                                                      ),
+                                                      TextSpan(
+                                                        text: percentageText,
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 10,
+                                                            backgroundColor:
+                                                                Color.fromRGBO(
+                                                                    0,
+                                                                    150,
+                                                                    60,
+                                                                    1),
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            letterSpacing: 1.5,
+                                                            height: 1.5),
+                                                      ),
+                                                    ],
+                                                  );
+                                                },
+                                                getTooltipColor: (group) {
+                                                  return Colors.black;
+                                                },
+                                              ),
+                                            ),
+                                            titlesData: FlTitlesData(
+                                              leftTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  showTitles: false,
+                                                ),
+                                              ),
+                                              bottomTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                  reservedSize: 25,
+                                                  showTitles: true,
+                                                  getTitlesWidget:
+                                                      (value, meta) {
+                                                    return Text(
+                                                      attendanceData[
+                                                              value.toInt()]
+                                                          .subUserType,
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        fontFamily: 'medium',
                                                         fontSize: 10,
-                                                        backgroundColor:
-                                                            Color.fromRGBO(
-                                                                0, 150, 60, 1),
                                                         fontWeight:
                                                             FontWeight.bold,
-                                                        letterSpacing: 1.5,
-                                                        height: 1.5),
+                                                      ),
+                                                    );
+                                                  },
+                                                  interval: 1,
+                                                ),
+                                              ),
+                                              rightTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                    showTitles: false),
+                                              ),
+                                              topTitles: AxisTitles(
+                                                sideTitles: SideTitles(
+                                                    showTitles: false),
+                                              ),
+                                            ),
+                                            borderData: FlBorderData(
+                                              show: false,
+                                            ),
+                                            barGroups: attendanceData
+                                                .asMap()
+                                                .entries
+                                                .map((entry) {
+                                              int index = entry.key;
+                                              TeacherAttendance data =
+                                                  entry.value;
+                                              return BarChartGroupData(
+                                                x: index,
+                                                barsSpace: 15,
+                                                barRods: [
+                                                  BarChartRodData(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0),
+                                                    toY: data.percentage,
+                                                    gradient:
+                                                        getGradientForSubUserType(
+                                                            data.subUserType),
+                                                    width: 25,
                                                   ),
                                                 ],
                                               );
-                                            },
-                                            getTooltipColor: (group) {
-                                              return Colors.black;
-                                            },
-                                          ),
-                                        ),
-                                        titlesData: FlTitlesData(
-                                          leftTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: false,
-                                            ),
-                                          ),
-                                          bottomTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              reservedSize: 25,
-                                              showTitles: true,
-                                              getTitlesWidget: (value, meta) {
-                                                return Text(
-                                                  attendanceData[value.toInt()]
-                                                      .subUserType,
-                                                  style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontFamily: 'medium',
-                                                    fontSize: 10,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                            }).toList(),
+                                            gridData: FlGridData(
+                                              show: true, // Show grid lines
+                                              drawHorizontalLine: false,
+                                              getDrawingVerticalLine: (value) {
+                                                return FlLine(
+                                                  color: Colors.black.withOpacity(
+                                                      0.1), // Adjust opacity (0.0 - 1.0)
+                                                  strokeWidth:
+                                                      1, // Adjust thickness
+                                                  dashArray: [5, 5],
                                                 );
                                               },
-                                              interval: 1,
                                             ),
                                           ),
-                                          rightTitles: AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          topTitles: AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
                                         ),
-                                        borderData: FlBorderData(show: false),
-                                        barGroups: attendanceData
-                                            .asMap()
-                                            .entries
-                                            .map((entry) {
-                                          int index = entry.key;
-                                          TeacherAttendance data = entry.value;
-                                          return BarChartGroupData(
-                                            x: index,
-                                            barsSpace: 15,
-                                            barRods: [
-                                              BarChartRodData(
-                                                borderRadius:
-                                                    BorderRadius.circular(0),
-                                                toY: data.percentage,
-                                                gradient:
-                                                    getGradientForSubUserType(
-                                                        data.subUserType),
-                                                width: 25,
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -2661,8 +2726,6 @@ class _DashboardState extends State<Dashboard> {
               ),
             ),
             //
-
-            //
             if (UserSession().userType == 'admin')
               ListTile(
                 title: Text(
@@ -2877,18 +2940,19 @@ class _DashboardState extends State<Dashboard> {
             Padding(
               padding: const EdgeInsets.only(bottom: 10),
               child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.textFieldborderColor),
-                  onPressed: () {
-                    _showLogoutConfirmationDialog(context);
-                  },
-                  child: Text(
-                    'Logout',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 16,
-                        color: Colors.black),
-                  )),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor),
+                onPressed: () {
+                  _showLogoutConfirmationDialog(context);
+                },
+                child: Text(
+                  'Logout',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
             )
           ],
         ),
@@ -2896,23 +2960,26 @@ class _DashboardState extends State<Dashboard> {
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_upward_outlined,
-                      color: Colors.white,
+              ? Transform.translate(
+                  offset: Offset(0, -40),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
                 )
               : null,

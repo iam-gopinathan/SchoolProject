@@ -1124,17 +1124,15 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                                               .userType ==
                                                           'student')
                                                         GestureDetector(
-                                                          onTap: () {
-                                                            var imagepath =
-                                                                e.filePath;
-
-                                                            var pdf =
-                                                                e.filePath;
-
-                                                            _showBottomSheet(
-                                                                context,
-                                                                imagepath,
-                                                                pdf);
+                                                          onTap: () async {
+                                                            if (e.filePath
+                                                                .isNotEmpty) {
+                                                              await downloadFile(
+                                                                  e.filePath);
+                                                            } else {
+                                                              print(
+                                                                  "Invalid file path");
+                                                            }
                                                           },
                                                           child: Container(
                                                             padding: EdgeInsets
@@ -1227,7 +1225,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
     );
   }
 
-  //dwnl
+  //download bottomsheeet...
   void _showBottomSheet(
       BuildContext context, String? imagePath, String? pdf) async {
     showModalBottomSheet(
@@ -1266,61 +1264,63 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.6,
                   padding: const EdgeInsets.all(10),
-                  child: Center(
-                    child: imagePath != null
-                        ? Image.network(
-                            imagePath,
-                            fit: BoxFit.contain,
-                          )
-                        : SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                Container(
-                                  height:
-                                      MediaQuery.of(context).size.height * 5,
-                                  child: Transform.translate(
-                                    offset: Offset(0, -200),
-                                    child: PDF(
-                                      swipeHorizontal: false,
-                                      fitEachPage: true,
-                                      enableSwipe: true,
-                                      autoSpacing: false,
-                                      pageFling: false,
-                                      backgroundColor: Colors.white,
-                                      onError: (error) {
-                                        print(error.toString());
-                                      },
-                                      onPageError: (page, error) {
-                                        print('$page: ${error.toString()}');
-                                      },
-                                    ).cachedFromUrl(pdf.toString()),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        imagePath != null
+                            ? Image.network(
+                                imagePath,
+                                fit: BoxFit.contain,
+                              )
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    height:
+                                        MediaQuery.of(context).size.height * 5,
+                                    child: Transform.translate(
+                                      offset: Offset(0, -200),
+                                      child: PDF(
+                                        swipeHorizontal: false,
+                                        fitEachPage: true,
+                                        enableSwipe: true,
+                                        autoSpacing: false,
+                                        pageFling: false,
+                                        backgroundColor: Colors.white,
+                                        onError: (error) {
+                                          print(error.toString());
+                                        },
+                                        onPageError: (page, error) {
+                                          print('$page: ${error.toString()}');
+                                        },
+                                      ).cachedFromUrl(pdf.toString()),
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                        //dwnl
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.textFieldborderColor),
+                          onPressed: () {
+                            downloadFile(pdf != null
+                                ? pdf.toString()
+                                : imagePath.toString());
+                          },
+                          child: Text(
+                            'Download',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Colors.black),
                           ),
-                  ),
-                ),
-                //dwnl
-                Padding(
-                  padding: const EdgeInsets.only(top: 20),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.textFieldborderColor),
-                    onPressed: () {
-                      downloadImage(imagePath.toString());
-                    },
-                    child: Text(
-                      'Download',
-                      style: TextStyle(
-                          fontFamily: 'medium',
-                          fontSize: 16,
-                          color: Colors.black),
+                        ),
+                      ],
                     ),
                   ),
-                )
+                ),
               ],
             );
           },
@@ -1330,30 +1330,66 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
   }
 
 //show image bottomsheet code end....
-  Future<void> downloadImage(String imageUrl) async {
+  // Future<void> downloadImage(String imageUrl) async {
+  //   try {
+  //     final directory = await getExternalStorageDirectory();
+  //     if (directory == null) {
+  //       print("Failed to get external storage directory.");
+  //       return;
+  //     }
+  //     final downloadsDirectory = Directory('/storage/emulated/0/Download');
+  //     if (!await downloadsDirectory.exists()) {
+  //       await downloadsDirectory.create(recursive: true);
+  //     }
+  //     final filePath =
+  //         '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+  //     final response = await http.get(Uri.parse(imageUrl));
+  //     if (response.statusCode == 200) {
+  //       File file = File(filePath);
+  //       await file.writeAsBytes(response.bodyBytes);
+  //       print('Image downloaded to: $filePath');
+  //       showDownloadNotification(filePath);
+  //     } else {
+  //       print('Failed to download image');
+  //     }
+  //   } catch (e) {
+  //     print('Error occurred while downloading image: $e');
+  //   }
+  // }
+
+  Future<void> downloadFile(String fileUrl) async {
     try {
       final directory = await getExternalStorageDirectory();
       if (directory == null) {
         print("Failed to get external storage directory.");
         return;
       }
+
       final downloadsDirectory = Directory('/storage/emulated/0/Download');
       if (!await downloadsDirectory.exists()) {
         await downloadsDirectory.create(recursive: true);
       }
-      final filePath =
-          '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final response = await http.get(Uri.parse(imageUrl));
+
+      // Determine file type based on the URL
+      String extension = fileUrl.split('.').last.toLowerCase();
+      String fileType =
+          (extension == 'jpg' || extension == 'png' || extension == 'jpeg')
+              ? 'image'
+              : 'pdf';
+      String filePath =
+          '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.$extension';
+
+      final response = await http.get(Uri.parse(fileUrl));
       if (response.statusCode == 200) {
         File file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
-        print('Image downloaded to: $filePath');
+        print('$fileType downloaded to: $filePath');
         showDownloadNotification(filePath);
       } else {
-        print('Failed to download image');
+        print('Failed to download $fileType');
       }
     } catch (e) {
-      print('Error occurred while downloading image: $e');
+      print('Error occurred while downloading file: $e');
     }
   }
 
@@ -1406,7 +1442,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
     OpenFile.open(filePath);
   }
 
-  //
+  //preview bottomsheet..
   void _showBottomSheets(
       BuildContext context, String? imagePath, String? pdf) async {
     showModalBottomSheet(

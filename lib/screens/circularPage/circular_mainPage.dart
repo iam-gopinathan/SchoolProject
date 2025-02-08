@@ -610,7 +610,14 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                     .isNotEmpty
                                                             ? Html(
                                                                 data:
-                                                                    '${circularModel.circular}')
+                                                                    '${circularModel.circular}',
+                                                                style: {
+                                                                  "body": Style(
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                },
+                                                              )
                                                             : const Text(''),
                                                       ),
                                                       //image section...

@@ -185,7 +185,7 @@ class _LoginpageState extends State<Loginpage> {
                   //username textfield...
                   Container(
                     color: Color.fromRGBO(255, 255, 255, 0.7),
-                    width: MediaQuery.of(context).size.width * 0.6,
+                    width: MediaQuery.of(context).size.width * 0.7,
                     child: TextFormField(
                       style: TextStyle(
                         color: Colors.black,
@@ -252,7 +252,7 @@ class _LoginpageState extends State<Loginpage> {
                   //password textfield....
                   Container(
                     color: Color.fromRGBO(255, 255, 255, 0.7),
-                    width: MediaQuery.of(context).size.width * 0.6,
+                    width: MediaQuery.of(context).size.width * 0.7,
                     child: TextFormField(
                       style: TextStyle(
                         color: Colors.black,
@@ -336,7 +336,7 @@ class _LoginpageState extends State<Loginpage> {
                           color: AppTheme.textFieldborderColor,
                         )
                       : Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
+                          width: MediaQuery.of(context).size.width * 0.5,
                           height: MediaQuery.of(context).size.height * 0.04,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -376,63 +376,24 @@ class _LoginpageState extends State<Loginpage> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(10),
-                          topRight: Radius.circular(10)),
-                      color: Color.fromRGBO(242, 247, 249, 1),
-                    ),
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10)),
+                        color: AppTheme.textFieldborderColor),
                     width: double.infinity,
                     child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 30, right: 30, top: 15),
+                      padding: const EdgeInsets.only(
+                          left: 30, right: 30, top: 10, bottom: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text(
-                            'News',
+                            'Latest News',
                             style: TextStyle(
                                 fontSize: 16,
                                 fontFamily: 'bold',
                                 color: Colors.black),
                           ),
-                          // GestureDetector(
-                          //   onTap: () async {
-                          //     DateTime? selectedDate = await showDatePicker(
-                          //         context: context,
-                          //         initialDate: DateTime.now(),
-                          //         firstDate: DateTime(2000),
-                          //         lastDate: DateTime(2101),
-                          //         builder:
-                          //             (BuildContext context, Widget? child) {
-                          //           return Theme(
-                          //             data: ThemeData.dark().copyWith(
-                          //                 colorScheme: ColorScheme.dark(
-                          //                   primary:
-                          //                       AppTheme.textFieldborderColor,
-                          //                   onPrimary: Colors.black,
-                          //                   surface: Colors.black,
-                          //                   onSurface: Colors.white,
-                          //                 ),
-                          //                 dialogBackgroundColor: Colors.black,
-                          //                 textButtonTheme: TextButtonThemeData(
-                          //                     style: TextButton.styleFrom(
-                          //                   foregroundColor: Colors.white,
-                          //                 ))),
-                          //             child: child!,
-                          //           );
-                          //         });
-
-                          //     if (selectedDate != null) {
-                          //       String formattedDate = DateFormat('yyyy-MM-dd')
-                          //           .format(selectedDate);
-                          //       print("Selected date: $formattedDate");
-                          //     }
-                          //   },
-                          //   child: SvgPicture.asset(
-                          //     'assets/images/Calender_icon.svg',
-                          //     fit: BoxFit.contain,
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -442,7 +403,7 @@ class _LoginpageState extends State<Loginpage> {
                   Expanded(
                     child: SingleChildScrollView(
                       child: Container(
-                        color: Color.fromRGBO(242, 247, 249, 1),
+                        color: AppTheme.appBackgroundPrimaryColor,
                         child: Padding(
                           padding: const EdgeInsets.only(top: 1),
                           child: Column(
@@ -450,7 +411,7 @@ class _LoginpageState extends State<Loginpage> {
                               for (var article in widget.newsArticles)
                                 Padding(
                                   padding: const EdgeInsets.only(
-                                      left: 20, right: 20, top: 12),
+                                      left: 20, right: 20, top: 12, bottom: 10),
                                   child: Card(
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -467,108 +428,105 @@ class _LoginpageState extends State<Loginpage> {
                                         padding: const EdgeInsets.all(10),
                                         child: Column(
                                           children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.6,
-                                                  child: Text(
-                                                    article.headline,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        fontFamily: 'medium',
-                                                        color: Colors.black,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      article.postedOn,
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 10),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.6,
+                                                    child: Text(
+                                                      article.headline,
                                                       style: TextStyle(
+                                                          fontSize: 14,
                                                           fontFamily: 'medium',
-                                                          fontSize: 12,
-                                                          color: Colors.black),
+                                                          color: Colors.black,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                      maxLines: 2,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
                                                     ),
-                                                    SizedBox(width: 5),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.009,
+                                                  ),
+                                                  Row(
+                                                    children: [
+                                                      Text(
+                                                        article.postedOn,
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                      SizedBox(width: 5),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
                                             ),
                                             Divider(
                                               height: 1,
                                               color: Colors.black,
                                               thickness: 0.5,
                                             ),
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.006,
-                                            ),
-                                            Html(
-                                              data: article.newsContent,
-                                              style: {
-                                                "body": Style(
-                                                  color: Colors.black,
-                                                ),
-                                              },
-                                            ),
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.010,
-                                            ),
-                                            SizedBox(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.010,
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 0),
+                                              child: Html(
+                                                data: article.newsContent,
+                                                style: {
+                                                  "body": Style(
+                                                    color: Colors.black,
+                                                  ),
+                                                },
+                                              ),
                                             ),
                                             if (article.filePath
                                                     .contains('youtube.com') ||
                                                 article.filePath
                                                     .contains('youtu.be'))
-                                              YoutubePlayer(
-                                                controller:
-                                                    YoutubePlayerController(
-                                                  initialVideoId: YoutubePlayer
-                                                      .convertUrlToId(
-                                                          article.filePath)!,
-                                                  flags: YoutubePlayerFlags(
-                                                    autoPlay: false,
-                                                    mute: false,
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 20),
+                                                child: YoutubePlayer(
+                                                  controller:
+                                                      YoutubePlayerController(
+                                                    initialVideoId:
+                                                        YoutubePlayer
+                                                            .convertUrlToId(
+                                                                article
+                                                                    .filePath)!,
+                                                    flags: YoutubePlayerFlags(
+                                                      autoPlay: false,
+                                                      mute: false,
+                                                    ),
                                                   ),
+                                                  showVideoProgressIndicator:
+                                                      true,
                                                 ),
-                                                showVideoProgressIndicator:
-                                                    true,
                                               )
                                             else
-                                              Image.network(
-                                                article.filePath,
-                                                fit: BoxFit.cover,
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return const Text("");
-                                                },
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 20),
+                                                child: Image.network(
+                                                  article.filePath,
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return const Text("");
+                                                  },
+                                                ),
                                               ),
                                           ],
                                         ),
