@@ -99,7 +99,7 @@ class _AttendencePageState extends State<AttendencePage> {
     super.initState();
     _loadAttendanceData();
     fetchsectionwiseData(selectedDate);
-    //
+
     // Add a listener to the ScrollController to monitor scroll changes.
     _scrollController.addListener(_scrollListener);
 
@@ -437,18 +437,19 @@ class _AttendencePageState extends State<AttendencePage> {
     showModalBottomSheet(
       backgroundColor: Colors.white,
       context: context,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25), topRight: Radius.circular(25))),
       isScrollControlled: true,
       builder: (BuildContext context) {
-        String? tempSelectedSection =
-            selectedSection; // Local copy for BottomSheet
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: -MediaQuery.of(context).size.height *
+                    0.08, // 8% of screen height
+                left: MediaQuery.of(context).size.width * 0.42,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -465,16 +466,20 @@ class _AttendencePageState extends State<AttendencePage> {
                 ),
               ),
               Container(
-                height:
-                    MediaQuery.of(context).size.height * 0.8, //overall height
-                padding: EdgeInsets.all(16),
+                height: MediaQuery.of(context).size.height * 0.8,
+                padding: EdgeInsets.all(
+                  MediaQuery.of(context).size.width *
+                      0.04, // 4% of screen width
+                ),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.01,
+                            left: MediaQuery.of(context).size.width * 0.01),
                         child: Text(
                           'Detailed Attendance',
                           style: TextStyle(
@@ -486,7 +491,9 @@ class _AttendencePageState extends State<AttendencePage> {
 
                       /// Date picker.......
                       Padding(
-                        padding: const EdgeInsets.only(top: 5),
+                        padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.01,
+                            left: MediaQuery.of(context).size.width * 0.01),
                         child: GestureDetector(
                           onTap: () async {
                             DateTime? pickedDate = await showDatePicker(
@@ -545,11 +552,6 @@ class _AttendencePageState extends State<AttendencePage> {
                                     fontFamily: 'medium',
                                     color: Color.fromRGBO(73, 73, 73, 1),
                                     fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    decoration: TextDecoration.underline,
-                                    decorationThickness: 2,
-                                    decorationColor:
-                                        Color.fromRGBO(75, 75, 75, 1),
                                   ),
                                 ),
                               )
@@ -560,141 +562,164 @@ class _AttendencePageState extends State<AttendencePage> {
                       // Section-wise bar chart
                       if (attendanceDataSections != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * 0.02),
                           child: Card(
-                            elevation: 1,
+                            shape: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                    color: Color.fromRGBO(225, 225, 225, 1),
+                                    width: 1)),
+                            elevation: 0,
                             child: Container(
                               color: Colors.white,
                               child: Padding(
-                                padding: const EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.03),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Total Attendance Graph',
-                                          style: TextStyle(
-                                              fontFamily: 'semibold',
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
-                                        //section dropdown code......
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 15),
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.4,
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.04,
-                                            child:
-                                                DropdownButtonFormField<String>(
-                                              dropdownColor: Colors.black,
-                                              menuMaxHeight: 150,
-                                              value: selectedSection ?? 'A1',
-                                              onChanged:
-                                                  (String? newSection) async {
-                                                if (newSection != null) {
-                                                  setModalState(() {
-                                                    selectedSection =
-                                                        newSection;
-                                                  });
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.01,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'Total Attendance Graph',
+                                            style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 14,
+                                                color: Colors.black),
+                                          ),
+                                          //section dropdown code......
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.02),
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.04,
+                                              child: DropdownButtonFormField<
+                                                  String>(
+                                                dropdownColor: Colors.black,
+                                                menuMaxHeight: 150,
+                                                value: selectedSection ?? 'A1',
+                                                onChanged:
+                                                    (String? newSection) async {
+                                                  if (newSection != null) {
+                                                    setModalState(() {
+                                                      selectedSection =
+                                                          newSection;
+                                                    });
 
-                                                  final AttendanceDataModel
-                                                      data =
-                                                      await fetchsectionwise(
-                                                    DateFormat('dd-MM-yyyy')
-                                                        .format(selectedDate ??
-                                                            DateTime.now()),
-                                                    selectedClass!,
-                                                    newSection,
-                                                  );
+                                                    final AttendanceDataModel
+                                                        data =
+                                                        await fetchsectionwise(
+                                                      DateFormat('dd-MM-yyyy')
+                                                          .format(
+                                                              selectedDate ??
+                                                                  DateTime
+                                                                      .now()),
+                                                      selectedClass!,
+                                                      newSection,
+                                                    );
 
-                                                  setModalState(() {
-                                                    attendanceDataSections =
-                                                        data;
-                                                  });
-                                                }
-                                              },
-                                              items: attendanceDataSections
-                                                      ?.detailedAttendance
-                                                      .map((e) =>
-                                                          DropdownMenuItem<
-                                                              String>(
-                                                            value: e.section,
-                                                            child: Text(
-                                                              e.section,
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontFamily:
-                                                                    'regular',
-                                                                fontSize: 14,
+                                                    setModalState(() {
+                                                      attendanceDataSections =
+                                                          data;
+                                                    });
+                                                  }
+                                                },
+                                                items: attendanceDataSections
+                                                        ?.detailedAttendance
+                                                        .map((e) =>
+                                                            DropdownMenuItem<
+                                                                String>(
+                                                              value: e.section,
+                                                              child: Text(
+                                                                e.section,
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontFamily:
+                                                                      'regular',
+                                                                  fontSize: 14,
+                                                                ),
                                                               ),
-                                                            ),
-                                                          ))
-                                                      .toList() ??
-                                                  [],
-                                              decoration: InputDecoration(
-                                                contentPadding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 10),
-                                                enabledBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  borderSide: BorderSide(
-                                                    color: Color.fromRGBO(
-                                                        169, 169, 169, 1),
+                                                            ))
+                                                        .toList() ??
+                                                    [],
+                                                decoration: InputDecoration(
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                          horizontal: 10),
+                                                  enabledBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color: Color.fromRGBO(
+                                                          169, 169, 169, 1),
+                                                    ),
+                                                  ),
+                                                  focusedBorder:
+                                                      OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    borderSide: BorderSide(
+                                                      color: Color.fromRGBO(
+                                                          169, 169, 169, 1),
+                                                    ),
                                                   ),
                                                 ),
-                                                focusedBorder:
-                                                    OutlineInputBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  borderSide: BorderSide(
-                                                    color: Color.fromRGBO(
-                                                        169, 169, 169, 1),
+                                                hint: Text(
+                                                  'Select Section',
+                                                  style: TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 14,
+                                                    color: Colors.black,
                                                   ),
                                                 ),
-                                              ),
-                                              hint: Text(
-                                                'Select Section',
-                                                style: TextStyle(
-                                                  fontFamily: 'regular',
-                                                  fontSize: 14,
+                                                icon: Icon(
+                                                  Icons.arrow_drop_down,
                                                   color: Colors.black,
                                                 ),
+                                                selectedItemBuilder:
+                                                    (BuildContext context) {
+                                                  return attendanceDataSections
+                                                          ?.detailedAttendance
+                                                          .map((e) {
+                                                        return Text(
+                                                          e.section,
+                                                          style: TextStyle(
+                                                            color: Colors.black,
+                                                            fontFamily:
+                                                                'regular',
+                                                            fontSize: 14,
+                                                          ),
+                                                        );
+                                                      }).toList() ??
+                                                      [];
+                                                },
                                               ),
-                                              icon: Icon(
-                                                Icons.arrow_drop_down,
-                                                color: Colors.black,
-                                              ),
-                                              selectedItemBuilder:
-                                                  (BuildContext context) {
-                                                return attendanceDataSections
-                                                        ?.detailedAttendance
-                                                        .map((e) {
-                                                      return Text(
-                                                        e.section,
-                                                        style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontFamily: 'regular',
-                                                          fontSize: 14,
-                                                        ),
-                                                      );
-                                                    }).toList() ??
-                                                    [];
-                                              },
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                     Text(
                                       'Attendance History',
@@ -704,11 +729,19 @@ class _AttendencePageState extends State<AttendencePage> {
                                           color: Colors.black),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 25),
+                                      padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.03),
                                       child: Container(
-                                        height: 150,
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.2,
                                         child: BarChart(
                                           BarChartData(
+                                            backgroundColor: Color.fromRGBO(
+                                                254, 247, 255, 1),
                                             maxY: 100,
                                             gridData: FlGridData(
                                                 horizontalInterval: 25,
@@ -818,7 +851,11 @@ class _AttendencePageState extends State<AttendencePage> {
                                       ),
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 5),
+                                      padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.0005),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -842,17 +879,29 @@ class _AttendencePageState extends State<AttendencePage> {
 
                       ///section details show details.......
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.02),
                         child: Card(
-                          elevation: 1,
+                          shape: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(225, 225, 225, 1),
+                                  width: 1)),
+                          elevation: 0,
                           child: Container(
-                            height: 250,
-                            color: Colors.white,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                  color: Color.fromRGBO(225, 225, 225, 1),
+                                  width: 1),
+                            ),
+                            height: MediaQuery.of(context).size.height * 0.3,
                             child: Row(
                               children: [
                                 //purple border....
                                 Container(
-                                  width: 10,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.02,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(10),
@@ -869,14 +918,19 @@ class _AttendencePageState extends State<AttendencePage> {
                                 ),
                                 Expanded(
                                   child: Container(
-                                    padding: EdgeInsets.all(10),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.03),
                                     color: Colors.white,
                                     child: Column(
                                       children: [
                                         //section..
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 5),
+                                          padding: EdgeInsets.only(
+                                              left: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.02),
                                           child: Row(
                                             children: [
                                               Text(
@@ -899,12 +953,23 @@ class _AttendencePageState extends State<AttendencePage> {
                                           ),
                                         ),
                                         //row section end...
-
                                         Padding(
-                                          padding: const EdgeInsets.all(8.0),
+                                          padding: EdgeInsets.all(
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.02),
                                           child: Container(
                                             padding: EdgeInsets.only(
-                                                top: 5, bottom: 5),
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.01, // 1% of screen height
+                                              bottom: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.01,
+                                            ),
                                             decoration: BoxDecoration(
                                                 color: Color.fromRGBO(
                                                         176, 93, 208, 1)
@@ -927,10 +992,22 @@ class _AttendencePageState extends State<AttendencePage> {
                                         Transform.translate(
                                           offset: Offset(0, -10),
                                           child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
+                                            padding: EdgeInsets.all(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.02),
                                             child: Container(
                                               padding: EdgeInsets.only(
-                                                  top: 5, bottom: 5),
+                                                top: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.005, // 0.5% of screen height
+                                                bottom: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.005, // 0.5% of screen height
+                                              ),
                                               decoration: BoxDecoration(
                                                   color: Color.fromRGBO(
                                                       250, 245, 252, 1)),
@@ -961,8 +1038,16 @@ class _AttendencePageState extends State<AttendencePage> {
 
                                         //bullets points section....
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 5, left: 20),
+                                          padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.005, // 0.5% of screen height
+                                            left: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05, // 5% of screen width
+                                          ),
                                           child: Row(
                                             children: [
                                               //present
@@ -1010,8 +1095,12 @@ class _AttendencePageState extends State<AttendencePage> {
                                                             .bottomCenter)),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.03, // 3% of screen width
+                                                ),
                                                 child: Text(
                                                   'Leave - ${attendanceDataSections!.sectionDetails.leave}',
                                                   style: TextStyle(
@@ -1021,39 +1110,33 @@ class _AttendencePageState extends State<AttendencePage> {
                                                 ),
                                               ),
                                               //present container...
-                                              Transform.translate(
-                                                offset: Offset(0, 10),
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 20),
-                                                  child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(12),
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        gradient: LinearGradient(
-                                                            colors: [
-                                                              Color.fromRGBO(0,
-                                                                  150, 60, 1),
-                                                              Color.fromRGBO(
-                                                                  0, 130, 52, 1)
-                                                            ],
-                                                            begin: Alignment
-                                                                .topCenter,
-                                                            end: Alignment
-                                                                .bottomCenter),
-                                                      ),
-                                                      child: Text(
-                                                        '${(attendanceDataSections!.sectionDetails.presentPercentage ?? 0)}%',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontFamily:
-                                                                'medium',
-                                                            fontSize: 20),
-                                                      )),
-                                                ),
-                                              ),
+                                              Container(
+                                                  padding: EdgeInsets.all(
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.01),
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    gradient: LinearGradient(
+                                                        colors: [
+                                                          Color.fromRGBO(
+                                                              0, 150, 60, 1),
+                                                          Color.fromRGBO(
+                                                              0, 130, 52, 1)
+                                                        ],
+                                                        begin:
+                                                            Alignment.topCenter,
+                                                        end: Alignment
+                                                            .bottomCenter),
+                                                  ),
+                                                  child: Text(
+                                                    '${(attendanceDataSections!.sectionDetails.presentPercentage ?? 0).toStringAsFixed(3)}%',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontFamily: 'medium',
+                                                        fontSize: 20),
+                                                  )),
                                             ],
                                           ),
                                         ),
@@ -1074,8 +1157,12 @@ class _AttendencePageState extends State<AttendencePage> {
                                                         218, 0, 0, 1)),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.02,
+                                                ),
                                                 child: Text(
                                                   'Absent - ${attendanceDataSections!.sectionDetails.absent}',
                                                   style: TextStyle(
@@ -1100,8 +1187,12 @@ class _AttendencePageState extends State<AttendencePage> {
                                                         61, 73, 214, 1)),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.02,
+                                                ),
                                                 child: Text(
                                                   'Late - ${attendanceDataSections!.sectionDetails.late}',
                                                   style: TextStyle(
@@ -1130,7 +1221,9 @@ class _AttendencePageState extends State<AttendencePage> {
                       ),
                       //show students details.....
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.02,
+                        ),
                         child: Center(
                           child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -1182,27 +1275,21 @@ class _AttendencePageState extends State<AttendencePage> {
   List<Student> filteredStudents = [];
 
   //showstudent bottom sheet section...............................................................
-
   void _showStudentDetailsBottomSheet(BuildContext context, String grade,
       String section, DateTime selectedDate) {
     var formattedDate = DateFormat('dd-MM-yyyy').format(selectedDate);
-
     //attendence bool........
     bool isoverall = true;
     bool isbelow75 = false;
     bool isabove75 = false;
-
     //selected color on show menu
     String _selectedFilter = "Overall";
-
     ////apicall code for overalll
     String percentage = "overall";
     String status = "overall";
 //api calls
     ShowStudentdetails? showStudentdetails;
-
     bool isLoading = true;
-
     // Fetch initial data
     void fetchInitialData(Function setModalState) {
       fetchShowStudentDetails(
@@ -1217,10 +1304,12 @@ class _AttendencePageState extends State<AttendencePage> {
           filteredStudents = showStudentdetails?.data ?? [];
           isLoading = false;
         });
-      }).catchError((error) {
-        isLoading = false;
-        print("Error fetching initial data: $error");
-      });
+      }).catchError(
+        (error) {
+          isLoading = false;
+          print("Error fetching initial data: $error");
+        },
+      );
     }
 
     ///menu item section end....
@@ -1239,7 +1328,6 @@ class _AttendencePageState extends State<AttendencePage> {
       }
     }
 
-    //search
     // Filter students based on search query
     void _filterStudents(String query, Function setModalState) {
       final List<Student> allStudents = showStudentdetails?.data ?? [];
@@ -1273,7 +1361,6 @@ class _AttendencePageState extends State<AttendencePage> {
             if (isoverall && showStudentdetails == null) {
               fetchInitialData(setModalState);
             }
-
             // Function to show the filter menu
             void _showFilterMenu(BuildContext context) {
               showMenu(
@@ -1295,7 +1382,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             _selectedFilter = "Overall";
                             status = "overall";
                             isLoading = true;
-
                             // Ensure the data is fetched again after filter change
                             print('Fetching data with status: $status');
                             print('heloooooo');
@@ -1371,9 +1457,7 @@ class _AttendencePageState extends State<AttendencePage> {
                             showStudentdetails = null;
                             _selectedFilter = "Present";
                             status = 'present';
-
                             showStudentdetails = null;
-
                             fetchShowStudentDetails(
                               date: formattedDate,
                               grade: grade,
@@ -1392,7 +1476,6 @@ class _AttendencePageState extends State<AttendencePage> {
                               print("Error fetching data: $error");
                             });
                           });
-
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -1442,7 +1525,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             showStudentdetails = null;
                             _selectedFilter = "Absent";
                             status = 'absent';
-
                             fetchShowStudentDetails(
                               date: formattedDate,
                               grade: grade,
@@ -1461,7 +1543,6 @@ class _AttendencePageState extends State<AttendencePage> {
                               print("Error fetching data: $error");
                             });
                           });
-
                           Navigator.pop(context);
                         },
                         child: Container(
@@ -1649,7 +1730,8 @@ class _AttendencePageState extends State<AttendencePage> {
                   Container(
                     width: double.infinity,
                     height: MediaQuery.of(context).size.height * 0.8,
-                    padding: EdgeInsets.all(16),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.vertical,
                       child: Column(
@@ -1670,8 +1752,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                           'Student by Name or Roll Number',
                                       hintStyle: TextStyle(
                                           fontFamily: 'regular',
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
                                           color: Color.fromRGBO(94, 94, 94, 1)),
                                       prefixIcon: Icon(Icons.search,
                                           color: Color.fromRGBO(94, 94, 94, 1)),
@@ -1696,7 +1777,10 @@ class _AttendencePageState extends State<AttendencePage> {
                               ),
                               //filter icons...
                               Padding(
-                                padding: const EdgeInsets.only(left: 14),
+                                padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                ),
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
@@ -1716,10 +1800,13 @@ class _AttendencePageState extends State<AttendencePage> {
                                 onTap: () {
                                   print('export clicked');
                                   _initializeNotification();
-                                  requestPermission(filteredStudents);
+                                  // requestPermission(filteredStudents);
+                                  exportToExcel(filteredStudents);
                                 },
                                 child: Padding(
-                                  padding: const EdgeInsets.only(left: 14),
+                                  padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.03),
                                   child: SvgPicture.asset(
                                     'assets/icons/export_icon.svg',
                                     fit: BoxFit.contain,
@@ -1734,7 +1821,8 @@ class _AttendencePageState extends State<AttendencePage> {
 
                           ///nextsection.........
                           Padding(
-                            padding: const EdgeInsets.only(top: 18),
+                            padding: EdgeInsets.only(
+                                top: MediaQuery.of(context).size.height * 0.03),
                             child: Row(
                               children: [
                                 Text(
@@ -1744,8 +1832,11 @@ class _AttendencePageState extends State<AttendencePage> {
                                       fontSize: 14,
                                       color: Colors.black),
                                 ),
+                                //
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 10),
+                                  padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.01),
                                   child: Container(
                                     width:
                                         MediaQuery.of(context).size.width * 0.7,
@@ -1753,12 +1844,12 @@ class _AttendencePageState extends State<AttendencePage> {
                                       vertical: 5,
                                     ),
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                          color:
-                                              Color.fromRGBO(150, 150, 150, 1),
-                                        )),
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                        color: Color.fromRGBO(150, 150, 150, 1),
+                                      ),
+                                    ),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceEvenly,
@@ -1772,10 +1863,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                                 isbelow75 = false;
                                                 isabove75 = false;
                                                 isLoading = true;
-
                                                 percentage = "overall";
                                                 status = "overall";
-
                                                 // Fetch data for "Overall"
                                                 fetchShowStudentDetails(
                                                   date: formattedDate,
@@ -1814,7 +1903,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                               'Overall',
                                               style: TextStyle(
                                                   fontFamily: 'medium',
-                                                  fontSize: 14,
+                                                  fontSize: 12,
                                                   color: isoverall
                                                       ? Color.fromRGBO(
                                                           255, 247, 247, 1)
@@ -1872,7 +1961,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                               'Below 75%',
                                               style: TextStyle(
                                                   fontFamily: 'medium',
-                                                  fontSize: 14,
+                                                  fontSize: 12,
                                                   color: isbelow75
                                                       ? Color.fromRGBO(
                                                           255, 247, 247, 1)
@@ -1930,7 +2019,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                               'Above 75%',
                                               style: TextStyle(
                                                   fontFamily: 'medium',
-                                                  fontSize: 14,
+                                                  fontSize: 12,
                                                   color: isabove75
                                                       ? Color.fromRGBO(
                                                           255, 247, 247, 1)
@@ -1950,7 +2039,9 @@ class _AttendencePageState extends State<AttendencePage> {
                           Transform.translate(
                             offset: Offset(0, 12),
                             child: Padding(
-                              padding: const EdgeInsets.only(top: 10),
+                              padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).size.height *
+                                      0.02),
                               child: Container(
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.only(
@@ -1965,7 +2056,11 @@ class _AttendencePageState extends State<AttendencePage> {
                                     children: [
                                       if (showStudentdetails != null)
                                         Container(
-                                          padding: EdgeInsets.all(6),
+                                          padding: EdgeInsets.all(
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.02),
                                           decoration: BoxDecoration(
                                               borderRadius: BorderRadius.only(
                                                   topLeft: Radius.circular(10)),
@@ -1989,14 +2084,22 @@ class _AttendencePageState extends State<AttendencePage> {
                                       if (showStudentdetails != null)
                                         //class teacher....
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 15, right: 10),
+                                          padding: EdgeInsets.only(
+                                            left: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.02, // 2% of screen width for left padding
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05,
+                                          ),
                                           child: Text(
                                             'Class Teacher - ${showStudentdetails?.classTeacher}',
                                             style: TextStyle(
                                                 color: Colors.black,
                                                 fontFamily: 'medium',
-                                                fontSize: 14),
+                                                fontSize: 12),
                                           ),
                                         )
                                     ],
@@ -2161,8 +2264,9 @@ class _AttendencePageState extends State<AttendencePage> {
 
                   // Close icon
                   Positioned(
-                    top: -70,
-                    left: 180,
+                    top: -MediaQuery.of(context).size.height *
+                        0.08, // 8% of screen height
+                    left: MediaQuery.of(context).size.width * 0.42,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.of(context).pop();
@@ -2208,9 +2312,11 @@ class _AttendencePageState extends State<AttendencePage> {
           children: [
             //student attendence first section..
             Padding(
-              padding: const EdgeInsets.only(left: 15, top: 10),
+              padding: EdgeInsets.only(
+                left: MediaQuery.sizeOf(context).width * 0.04,
+                top: MediaQuery.sizeOf(context).height * 0.015,
+              ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Align(
                     alignment: Alignment.topLeft,
@@ -2222,32 +2328,40 @@ class _AttendencePageState extends State<AttendencePage> {
                           color: Colors.black),
                     ),
                   ),
-                  if (UserSession().userType == 'admin')
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AddAttendencePage()));
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                                color: AppTheme.Addiconcolor,
-                                shape: BoxShape.circle),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 30,
-                            ),
+                  if (UserSession().userType == 'admin' ||
+                      UserSession().userType == 'superadmin' ||
+                      UserSession().userType == 'staff' ||
+                      UserSession().userType == 'teacher')
+                    //
+                    Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => AddAttendencePage()));
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: MediaQuery.sizeOf(context).width * 0.04,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topRight,
+                        child: Container(
+                          padding: EdgeInsets.all(
+                              MediaQuery.sizeOf(context).width * 0.03),
+                          decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle),
+                          child: Icon(
+                            Icons.add,
+                            color: Colors.black,
+                            size: 30,
                           ),
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -2255,9 +2369,8 @@ class _AttendencePageState extends State<AttendencePage> {
             GestureDetector(
               onTap: () => _pickDate(context),
               child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 15,
-                ),
+                padding: EdgeInsets.only(
+                    left: MediaQuery.sizeOf(context).width * 0.04),
                 child: Row(
                   children: [
                     Align(
@@ -2276,10 +2389,6 @@ class _AttendencePageState extends State<AttendencePage> {
                           fontFamily: 'medium',
                           color: Color.fromRGBO(73, 73, 73, 1),
                           fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                          decoration: TextDecoration.underline,
-                          decorationThickness: 2,
-                          decorationColor: Color.fromRGBO(75, 75, 75, 1),
                         ),
                       ),
                     )
@@ -2289,20 +2398,25 @@ class _AttendencePageState extends State<AttendencePage> {
             ),
             //total students graph.............
             Padding(
-              padding: const EdgeInsets.only(top: 10),
+              padding: EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.02),
               child: Card(
-                elevation: 1,
+                shape: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        color: Color.fromRGBO(225, 225, 225, 1), width: 1)),
+                elevation: 0,
                 child: Container(
                   color: Colors.white,
                   child: Column(
                     children: [
                       SizedBox(
-                        height: 20,
+                        height: MediaQuery.sizeOf(context).height * 0.02,
                       ),
                       Row(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 10),
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.sizeOf(context).width * 0.05),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -2312,93 +2426,89 @@ class _AttendencePageState extends State<AttendencePage> {
                                       'Total Attendance Graph',
                                       style: TextStyle(
                                           fontFamily: 'semibold',
-                                          fontSize: 12,
+                                          fontSize: 14,
                                           color: Colors.black),
+                                    ),
+                                    SizedBox(
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.02,
                                     ),
 
                                     ///dropdown code...
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.only(left: 52, right: 10),
-                                      child: Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.04,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.4,
-                                        child: DropdownButtonFormField<String>(
-                                          value: selectedClass,
-                                          onChanged: (newValue) {
-                                            setState(() {
-                                              selectedClass = newValue;
-                                              fetchsectionwiseData(
-                                                  selectedDate!);
-                                            });
-                                          },
-                                          decoration: InputDecoration(
-                                            contentPadding:
-                                                EdgeInsets.symmetric(
-                                                    horizontal: 25),
-                                            enabledBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                borderSide: BorderSide(
-                                                    color: Color.fromRGBO(
-                                                        169, 169, 169, 1))),
-                                            focusedBorder: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                                borderSide: BorderSide(
-                                                    color: Color.fromRGBO(
-                                                        169, 169, 169, 1))),
-                                          ),
-                                          dropdownColor: Colors.black,
-                                          menuMaxHeight: 150,
-                                          items: classes.map((className) {
-                                            return DropdownMenuItem<String>(
-                                              value: className,
-                                              child: Text(
-                                                className,
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontFamily: 'regular'),
+                                    Container(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.04,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.4,
+                                      child: DropdownButtonFormField<String>(
+                                        value: selectedClass,
+                                        onChanged: (newValue) {
+                                          setState(() {
+                                            selectedClass = newValue;
+                                            fetchsectionwiseData(selectedDate!);
+                                          });
+                                        },
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              horizontal: 25),
+                                          enabledBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                      169, 169, 169, 1))),
+                                          focusedBorder: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                      169, 169, 169, 1))),
+                                        ),
+                                        dropdownColor: Colors.black,
+                                        menuMaxHeight: 150,
+                                        items: classes.map((className) {
+                                          return DropdownMenuItem<String>(
+                                            value: className,
+                                            child: Text(
+                                              className,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14,
+                                                  fontFamily: 'regular'),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        hint: Text(
+                                          "Select Class",
+                                          style: TextStyle(
+                                              fontFamily: 'regular',
+                                              fontSize: 14,
+                                              color: Colors.black),
+                                        ),
+                                        icon: Icon(
+                                          Icons.arrow_drop_down,
+                                          color: Colors.black,
+                                        ),
+                                        selectedItemBuilder:
+                                            (BuildContext context) {
+                                          return classes.map((className) {
+                                            return Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 4, horizontal: 8),
+                                                child: Text(
+                                                  className,
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                      fontFamily: 'regular'),
+                                                ),
                                               ),
                                             );
-                                          }).toList(),
-                                          hint: Text(
-                                            "Select Class",
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 14,
-                                                color: Colors.black),
-                                          ),
-                                          icon: Icon(
-                                            Icons.arrow_drop_down,
-                                            color: Colors.black,
-                                          ),
-                                          selectedItemBuilder:
-                                              (BuildContext context) {
-                                            return classes.map((className) {
-                                              return Align(
-                                                alignment: Alignment.centerLeft,
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 4,
-                                                      horizontal: 8),
-                                                  child: Text(
-                                                    className,
-                                                    style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.black,
-                                                        fontFamily: 'regular'),
-                                                  ),
-                                                ),
-                                              );
-                                            }).toList();
-                                          },
-                                        ),
+                                          }).toList();
+                                        },
                                       ),
                                     ),
                                   ],
@@ -2413,7 +2523,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                           color: Colors.black),
                                     ),
                                     SizedBox(
-                                      width: 2,
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.005,
                                     ),
                                     Icon(
                                       Icons.arrow_forward_ios,
@@ -2429,14 +2540,16 @@ class _AttendencePageState extends State<AttendencePage> {
                         ],
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 18),
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.sizeOf(context).height * 0.02,
+                        ),
                         child: Row(
                           children: [
                             Transform.translate(
                               offset: Offset(0, -15),
                               child: Container(
                                 decoration: BoxDecoration(color: Colors.white),
-                                width: 60,
+                                width: MediaQuery.sizeOf(context).width * 0.16,
                                 child: Column(
                                   children: leftTitles.map((title) {
                                     return Padding(
@@ -2446,8 +2559,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                         title,
                                         style: TextStyle(
                                           color: Colors.black,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
+                                          fontFamily: 'regular',
+                                          fontSize: 12,
                                         ),
                                       ),
                                     );
@@ -2460,11 +2573,13 @@ class _AttendencePageState extends State<AttendencePage> {
                                 controller: _chartScrollController,
                                 scrollDirection: Axis.horizontal,
                                 child: Container(
-                                  height: 200,
+                                  height:
+                                      MediaQuery.sizeOf(context).height * 0.25,
                                   width: 700,
                                   color: Colors.white,
                                   child: BarChart(
                                     BarChartData(
+                                      maxY: 100,
                                       alignment: BarChartAlignment.spaceEvenly,
                                       barGroups: attendanceData.map((e) {
                                         int index = attendanceData.indexOf(e);
@@ -2486,7 +2601,6 @@ class _AttendencePageState extends State<AttendencePage> {
                                       titlesData: FlTitlesData(
                                         leftTitles: AxisTitles(
                                           sideTitles: SideTitles(
-                                            interval: 1,
                                             showTitles: false,
                                             reservedSize: 45,
                                             getTitlesWidget: (value, meta) {
@@ -2536,9 +2650,27 @@ class _AttendencePageState extends State<AttendencePage> {
                                       borderData: FlBorderData(
                                         show: false,
                                       ),
+                                      backgroundColor:
+                                          Color.fromRGBO(254, 247, 255, 1),
                                       gridData: FlGridData(
+                                          getDrawingVerticalLine: (value) {
+                                            return FlLine(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              strokeWidth: 1,
+                                              dashArray: [5, 5],
+                                            );
+                                          },
+                                          getDrawingHorizontalLine: (value) {
+                                            return FlLine(
+                                              color:
+                                                  Colors.black.withOpacity(0.1),
+                                              strokeWidth: 1,
+                                              dashArray: [5, 5],
+                                            );
+                                          },
                                           show: true,
-                                          horizontalInterval: 20,
+                                          horizontalInterval: 25,
                                           drawHorizontalLine: true,
                                           drawVerticalLine: true),
                                     ),
@@ -2553,7 +2685,7 @@ class _AttendencePageState extends State<AttendencePage> {
                         children: [
                           Container(
                             color: Colors.white,
-                            width: 60,
+                            width: MediaQuery.sizeOf(context).width * 0.15,
                           ),
                           Expanded(
                             child: SingleChildScrollView(
@@ -2562,7 +2694,8 @@ class _AttendencePageState extends State<AttendencePage> {
                               child: Row(
                                 children: [
                                   SizedBox(
-                                    width: 50,
+                                    width:
+                                        MediaQuery.sizeOf(context).width * 0.1,
                                   ),
                                   //nursery...
                                   Container(
@@ -2596,8 +2729,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                   //primary
                                   SizedBox(
-                                    width: 150,
-                                  ),
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.4),
                                   Container(
                                     height: 8,
                                     width: 8,
@@ -2631,8 +2764,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                   //secondary
                                   SizedBox(
-                                    width: 150,
-                                  ),
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.4),
                                   Container(
                                     height: 8,
                                     width: 8,
@@ -2663,8 +2796,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                         color: Colors.black),
                                   ),
                                   SizedBox(
-                                    width: 150,
-                                  ),
+                                      width: MediaQuery.sizeOf(context).width *
+                                          0.4),
                                 ],
                               ),
                             ),
@@ -2672,7 +2805,7 @@ class _AttendencePageState extends State<AttendencePage> {
                         ],
                       ),
                       SizedBox(
-                        height: 10,
+                        height: MediaQuery.sizeOf(context).height * 0.02,
                       ),
                       Center(
                         child: Container(
@@ -2688,7 +2821,7 @@ class _AttendencePageState extends State<AttendencePage> {
                         ),
                       ),
                       SizedBox(
-                        height: 15,
+                        height: MediaQuery.of(context).size.height * 0.02,
                       )
                     ],
                   ),
@@ -2697,16 +2830,23 @@ class _AttendencePageState extends State<AttendencePage> {
             ),
             //Irregular attendeessection....
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(MediaQuery.sizeOf(context).width * 0.02),
               child: Card(
-                elevation: 1,
+                shape: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        color: Color.fromRGBO(225, 225, 225, 1), width: 1)),
+                elevation: 0,
                 child: Container(
                   width: double.infinity,
                   color: Colors.white,
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 5, top: 15),
+                        padding: EdgeInsets.only(
+                          left: MediaQuery.sizeOf(context).width * 0.04,
+                          top: MediaQuery.sizeOf(context).height * 0.02,
+                        ),
                         child: Row(
                           children: [
                             Text(
@@ -2717,7 +2857,9 @@ class _AttendencePageState extends State<AttendencePage> {
                                   color: Colors.black),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(left: 5),
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.sizeOf(context).width * 0.02,
+                              ),
                               child: Text(
                                 'Overall',
                                 style: TextStyle(
@@ -2728,10 +2870,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             )
                           ],
                         ),
-                      ),
-                      //
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.03,
                       ),
                       //absent student...
                       GestureDetector(
@@ -2746,7 +2884,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                       )));
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: EdgeInsets.all(
+                              MediaQuery.sizeOf(context).width * 0.03),
                           child: Container(
                             decoration: BoxDecoration(
                                 color: Color.fromRGBO(255, 0, 4, 0.05),
@@ -2764,7 +2903,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10),
                                             bottomLeft: Radius.circular(10))),
-                                    width: 8,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.02,
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width *
@@ -2779,7 +2919,10 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                   Spacer(),
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 15),
+                                    padding: EdgeInsets.only(
+                                        right:
+                                            MediaQuery.sizeOf(context).width *
+                                                0.05),
                                     child: Icon(
                                       Icons.arrow_forward,
                                       size: 30,
@@ -2791,9 +2934,6 @@ class _AttendencePageState extends State<AttendencePage> {
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(
-                        height: 10,
                       ),
                       //leave student...
                       GestureDetector(
@@ -2808,7 +2948,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                       )));
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: EdgeInsets.all(
+                              MediaQuery.sizeOf(context).width * 0.03),
                           child: Container(
                             decoration: BoxDecoration(
                                 color: Color.fromRGBO(89, 100, 219, 0.04),
@@ -2826,7 +2967,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10),
                                             bottomLeft: Radius.circular(10))),
-                                    width: 8,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.02,
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width *
@@ -2841,7 +2983,10 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                   Spacer(),
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 15),
+                                    padding: EdgeInsets.only(
+                                      right: MediaQuery.of(context).size.width *
+                                          0.05,
+                                    ),
                                     child: Icon(
                                       Icons.arrow_forward,
                                       size: 30,
@@ -2854,9 +2999,7 @@ class _AttendencePageState extends State<AttendencePage> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
+
                       //late students..
                       GestureDetector(
                         onTap: () {
@@ -2870,7 +3013,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                       )));
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(3.0),
+                          padding: EdgeInsets.all(
+                              MediaQuery.sizeOf(context).width * 0.03),
                           child: Container(
                             decoration: BoxDecoration(
                                 color: Color.fromRGBO(176, 93, 208, 0.05),
@@ -2888,7 +3032,8 @@ class _AttendencePageState extends State<AttendencePage> {
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10),
                                             bottomLeft: Radius.circular(10))),
-                                    width: 8,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.02,
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width *
@@ -2903,7 +3048,10 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                   Spacer(),
                                   Padding(
-                                    padding: const EdgeInsets.only(right: 15),
+                                    padding: EdgeInsets.only(
+                                      right: MediaQuery.of(context).size.width *
+                                          0.05,
+                                    ),
                                     child: Icon(
                                       Icons.arrow_forward,
                                       size: 30,
@@ -2928,10 +3076,19 @@ class _AttendencePageState extends State<AttendencePage> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Card(
+                shape: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                        color: Color.fromRGBO(225, 225, 225, 1), width: 1)),
+                elevation: 0,
                 child: Container(
                   color: Colors.white,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 5, top: 15),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.05, // 5% of screen width
+                      top: MediaQuery.of(context).size.height * 0.02,
+                    ),
                     child: Column(
                       children: [
                         Row(
@@ -2955,6 +3112,7 @@ class _AttendencePageState extends State<AttendencePage> {
                             )
                           ],
                         ),
+                        //
                         FutureBuilder<AttendanceData>(
                           future: _attendanceData,
                           builder: (context, snapshot) {
@@ -2970,9 +3128,7 @@ class _AttendencePageState extends State<AttendencePage> {
                             } else if (!snapshot.hasData) {
                               return Center(child: Text('No Data Available'));
                             }
-
                             final data = snapshot.data!;
-
                             return Column(
                               children: [
                                 Row(
@@ -3272,8 +3428,12 @@ class _AttendencePageState extends State<AttendencePage> {
                                                                   BoxDecoration(
                                                                 color: touchedIndex ==
                                                                         0
-                                                                    ? Colors
-                                                                        .green
+                                                                    ? const Color
+                                                                        .fromRGBO(
+                                                                        76,
+                                                                        175,
+                                                                        80,
+                                                                        1)
                                                                     : touchedIndex ==
                                                                             1
                                                                         ? Color.fromRGBO(
@@ -3684,11 +3844,11 @@ class _AttendencePageState extends State<AttendencePage> {
                           },
                         ),
 
-                        ///
-
                         ///bullets points row...
                         Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height * 0.02,
+                          ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
@@ -3797,27 +3957,30 @@ class _AttendencePageState extends State<AttendencePage> {
           ],
         ),
       ),
-      //
+
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_upward_outlined,
-                      color: Colors.white,
+              ? Transform.translate(
+                  offset: Offset(0, -10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
                 )
               : null,

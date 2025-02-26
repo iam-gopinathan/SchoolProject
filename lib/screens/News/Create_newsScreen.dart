@@ -23,6 +23,17 @@ class CreateNewsscreen extends StatefulWidget {
 }
 
 class _CreateNewsscreenState extends State<CreateNewsscreen> {
+  // Function to paste clipboard text
+  Future<void> _pasteFromClipboard() async {
+    ClipboardData? clipboardData =
+        await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData != null && clipboardData.text != null) {
+      _controller.document
+          .insert(_controller.selection.baseOffset, clipboardData.text!);
+    }
+  }
+
+  //
   late String htmlContent = "";
 
   TextEditingController _heading = TextEditingController();
@@ -165,8 +176,8 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: MediaQuery.of(context).size.height * (-70 / 800),
+                left: MediaQuery.of(context).size.width * 0.4,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -219,10 +230,8 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           children: [
                             Text(
                               _heading.text ?? '',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.black),
                             ),
                           ],
                         ),
@@ -323,32 +332,66 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      backgroundColor: Color.fromRGBO(253, 253, 253, 1),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
+        preferredSize: Size.fromHeight(100),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(30),
             bottomRight: Radius.circular(30),
           ),
           child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
+            titleSpacing: 0,
             backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () async {
-                  if (hasUnsavedChanges()) {
-                    await _showUnsavedChangesDialog();
-                  }
-                  widget.onCreateNews();
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Text(
-              'Create News',
-              style: TextStyle(
-                fontFamily: 'semibold',
-                fontSize: 16,
-                color: Colors.black,
+            iconTheme: IconThemeData(color: Colors.black),
+            automaticallyImplyLeading: false,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.appBackgroundPrimaryColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              padding:
+                  EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.02),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            if (hasUnsavedChanges()) {
+                              await _showUnsavedChangesDialog();
+                            }
+                            widget.onCreateNews();
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.025),
+                          child: Text(
+                            'Create News',
+                            style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -387,10 +430,12 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                   padding: const EdgeInsets.all(15.0),
                   child: Container(
                     decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
                       color: Colors.transparent,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: const Color.fromARGB(255, 173, 172, 172)
+                              .withOpacity(0.2),
                           spreadRadius: 2,
                           blurRadius: 5,
                           offset: Offset(0, 0),
@@ -462,7 +507,8 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                       color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: const Color.fromARGB(255, 173, 172, 172)
+                              .withOpacity(0.2),
                           spreadRadius: 2,
                           blurRadius: 5,
                           offset: Offset(0, 0),
@@ -486,6 +532,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                       inputTextStyle: TextStyle(
                                           color: Colors.black, fontSize: 14)),
                                   showBoldButton: true,
+                                  showClipboardCopy: false,
                                   showClearFormat: false,
                                   showAlignmentButtons: false,
                                   showBackgroundColorButton: false,
@@ -521,6 +568,13 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                   showSuperscript: false,
                                 ),
                               ),
+                              IconButton(
+                                  icon: Icon(Icons.paste, color: Colors.black),
+                                  onPressed: () {
+                                    setState(() {
+                                      _pasteFromClipboard();
+                                    });
+                                  }),
                             ],
                           ),
                         ),
@@ -533,6 +587,18 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                   const EdgeInsets.only(top: 5, bottom: 10),
                               child: quill.QuillEditor.basic(
                                 controller: _controller,
+                                configurations: QuillEditorConfigurations(
+                                    customStyles: DefaultStyles(
+                                  paragraph: quill.DefaultTextBlockStyle(
+                                    TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 16), // Text color black
+                                    quill.HorizontalSpacing(0, 0),
+                                    quill.VerticalSpacing.zero,
+                                    quill.VerticalSpacing(0, 0),
+                                    null, // TextAlign (null if not needed)
+                                  ),
+                                )),
                               ),
                             ),
                           ),
@@ -541,24 +607,24 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                     ),
                   ),
                 ),
-                //
-                Padding(
-                  padding: const EdgeInsets.only(left: 15),
-                  child: Row(
-                    children: [
-                      Text(
-                        '*Max 600 Characters',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 12,
-                            color: Color.fromRGBO(127, 127, 127, 1)),
-                      )
-                    ],
-                  ),
-                ),
+                // //
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 15),
+                //   child: Row(
+                //     children: [
+                //       Text(
+                //         '*Max 600 Characters',
+                //         style: TextStyle(
+                //             fontFamily: 'regular',
+                //             fontSize: 12,
+                //             color: Color.fromRGBO(127, 127, 127, 1)),
+                //       )
+                //     ],
+                //   ),
+                // ),
                 // Upload Image and Add Link Section
                 Padding(
-                  padding: const EdgeInsets.only(left: 15, top: 30),
+                  padding: const EdgeInsets.only(left: 15, top: 15),
                   child: Row(
                     children: [
                       GestureDetector(
@@ -653,13 +719,11 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                     child: Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           'Click Here to',
                                           style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 12,
                                               fontFamily: 'medium',
                                               color: Color.fromRGBO(
                                                   93, 93, 93, 1)),
@@ -790,16 +854,25 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           )),
                     ),
                   ),
+                Transform.translate(
+                  offset: Offset(0, -5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                    ],
+                  ),
+                ),
+                //
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      'Supported Format : JPEG,Webp PNG, PDF',
-                      style: TextStyle(
-                          fontFamily: 'regular',
-                          fontSize: 9,
-                          color: Color.fromRGBO(168, 168, 168, 1)),
-                    ),
                     Text(
                       '*Upload either an image or a link',
                       style: TextStyle(
@@ -826,23 +899,23 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                   ),
                 ),
                 //
-                Padding(
-                  padding: const EdgeInsets.only(left: 20, top: 10),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Set Date',
-                        style: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 14,
-                            color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 20, top: 10),
+                //   child: Row(
+                //     children: [
+                //       Text(
+                //         'Set Date',
+                //         style: TextStyle(
+                //             fontFamily: 'medium',
+                //             fontSize: 14,
+                //             color: Colors.black),
+                //       ),
+                //     ],
+                //   ),
+                // ),
                 //scheduled section....
                 Padding(
-                  padding: const EdgeInsets.only(top: 10),
+                  padding: const EdgeInsets.only(top: 10, bottom: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -890,81 +963,173 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                     ],
                   ),
                 ),
-                //save as draft
-                Padding(
-                  padding: const EdgeInsets.only(top: 30, bottom: 50),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            side: BorderSide(color: Colors.black, width: 1.5)),
-                        onPressed: () {
-                          _publishNews(status: 'draft');
-                        },
-                        child: Text(
-                          'Save as Draft',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'medium',
-                              color: Colors.black),
-                        ),
-                      ),
-
-                      ///preview
-                      GestureDetector(
-                        onTap: () {
-                          final generatedHtml = QuillDeltaToHtmlConverter(
-                            _controller.document.toDelta().toJson(),
-                          ).convert();
-
-                          setState(() {
-                            htmlContent =
-                                generatedHtml; // Update the class-level variable
-                          });
-
-                          // Print for debugging
-                          print("Generated HTML Content: $htmlContent");
-
-                          _PreviewBottomsheet(context);
-                        },
-                        child: Text(
-                          'Preview',
-                          style: TextStyle(
-                              fontFamily: 'semibold',
-                              fontSize: 16,
-                              color: Colors.black),
-                        ),
-                      ),
-
-                      ///scheduled
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.textFieldborderColor,
-                            side: BorderSide.none),
-                        onPressed: () {
-                          final String status =
-                              _scheduledDateandtime.text.isEmpty
-                                  ? 'post'
-                                  : 'schedule';
-                          _publishNews(status: status);
-                        },
-                        child: Text(
-                          _scheduledDateandtime.text.isEmpty
-                              ? 'Publish'
-                              : 'Schedule',
-                          style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'medium',
-                              color: Colors.black),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
+          ),
+        ),
+      ),
+      //
+      bottomNavigationBar: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.black, width: 1.5)),
+                onPressed: () {
+                  _publishNews(status: 'draft');
+                },
+                child: Text(
+                  'Save as Draft',
+                  style: TextStyle(
+                      fontSize: 14, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+
+              ///preview
+              GestureDetector(
+                onTap: () {
+                  final generatedHtml = QuillDeltaToHtmlConverter(
+                    _controller.document.toDelta().toJson(),
+                  ).convert();
+                  setState(() {
+                    htmlContent = generatedHtml;
+                  });
+                  print("Generated HTML Content: $htmlContent");
+                  _PreviewBottomsheet(context);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 14,
+                      color: Colors.black),
+                ),
+              ),
+
+              ///scheduled or post button..
+              if (UserSession().userType == 'superadmin')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      backgroundColor: AppTheme.textFieldborderColor,
+                      side: BorderSide.none),
+                  onPressed: () {
+                    final String status = _scheduledDateandtime.text.isEmpty
+                        ? 'post'
+                        : 'schedule';
+                    _publishNews(status: status);
+                  },
+                  child: Text(
+                    _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'medium',
+                        color: Colors.black),
+                  ),
+                ),
+              ////request now button..
+              if (UserSession().userType == 'admin' ||
+                  UserSession().userType == 'staff')
+                Builder(builder: (context) {
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      backgroundColor: AppTheme.textFieldborderColor,
+                      side: BorderSide.none,
+                    ),
+                    onPressed: () {
+                      if (_heading.text.isEmpty ||
+                          _controller.document.isEmpty()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Text(
+                                'Please fill in both heading and description'),
+                          ),
+                        );
+                        return;
+                      }
+//
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: Text(
+                              "Confirm Request !",
+                              style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            content: Text(
+                              "Are you sure you want to create a new request?",
+                              style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                            actions: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side:
+                                      BorderSide(color: Colors.black, width: 1),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 14,
+                                      color: Colors.black),
+                                ),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.amber),
+                                onPressed: () {
+                                  final String status =
+                                      _scheduledDateandtime.text.isEmpty
+                                          ? 'post'
+                                          : 'schedule';
+                                  _publishNews(status: status);
+                                  //
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Yes Send",
+                                  style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 14,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      'Request Now',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'medium',
+                        color: Colors.black,
+                      ),
+                    ),
+                  );
+                }),
+            ],
           ),
         ),
       ),
@@ -1031,5 +1196,8 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
       link: link,
     );
     postNews(newsPost, status ?? 'post', context, widget.onCreateNews);
+
+    // Print the newsPost object for debugging
+    print("News Postttttttt: ${newsPost.toJson()}");
   }
 }

@@ -655,7 +655,6 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
   Widget build(BuildContext context) {
     //mediaquery
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
       appBar: AppBar(
@@ -693,7 +692,6 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                             hintStyle: TextStyle(
                                 fontFamily: 'regular',
                                 fontSize: 14,
-                                fontWeight: FontWeight.bold,
                                 color: Color.fromRGBO(94, 94, 94, 1)),
                             prefixIcon: Icon(Icons.search,
                                 color: Color.fromRGBO(94, 94, 94, 1)),
@@ -716,7 +714,8 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                     ),
                     //filter icons...
                     Padding(
-                      padding: const EdgeInsets.only(left: 10),
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * 0.03),
                       child: GestureDetector(
                         onTap: () {
                           setState(() {
@@ -739,7 +738,8 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                         exportToExcel(filteredStudents);
                       },
                       child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * 0.03),
                         child: SvgPicture.asset(
                           'assets/icons/export_icon.svg',
                           fit: BoxFit.contain,
@@ -755,9 +755,11 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
 
               ///nextsection.........
               Padding(
-                padding: const EdgeInsets.only(top: 18),
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.03,
+                  left: MediaQuery.of(context).size.width * 0.05,
+                ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                       'Notify All',
@@ -767,15 +769,18 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                           color: Colors.black),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 10),
+                      padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width * 0.03,
+                      ),
                       child: Container(
                         width: MediaQuery.of(context).size.width * 0.6,
                         padding: EdgeInsets.symmetric(
                           vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: AppTheme.appBackgroundPrimaryColor),
+                          borderRadius: BorderRadius.circular(30),
+                          color: Color.fromRGBO(250, 246, 252, 1),
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
@@ -787,9 +792,7 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                   isleave = false;
                                   islate = false;
                                   selectedTab = 'Absent';
-
                                   displayedTeachers.clear();
-
                                   _fetchIrregularAttendanceData(
                                       selectedClass, selectedSection, 'absent');
                                 });
@@ -878,9 +881,6 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                 ),
                               ),
                             ),
-                            SizedBox(
-                              width: screenWidth * 0.02,
-                            ),
                           ],
                         ),
                       ),
@@ -903,7 +903,6 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                       children: filteredStudents.asMap().entries.map((entry) {
                         int index = entry.key;
                         Irregularmodels student = entry.value;
-
                         // Check if the teacher has already been displayed for this grade/section
                         String teacherKey =
                             '${student.grade}-${student.section}-${student.classTeacher}';
@@ -914,17 +913,22 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                         if (!isTeacherAlreadyDisplayed) {
                           displayedTeachers.add(teacherKey);
                         }
-
                         return Column(
                           children: [
                             if (!isTeacherAlreadyDisplayed)
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 15, top: 15),
+                                padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.05,
+                                ),
                                 child: Row(
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 10),
+                                      padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.02,
+                                      ),
                                       child: Container(
                                         decoration: BoxDecoration(
                                           borderRadius: BorderRadius.only(
@@ -941,7 +945,11 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               Container(
-                                                padding: EdgeInsets.all(6),
+                                                padding: EdgeInsets.all(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.02),
                                                 decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.only(
@@ -962,8 +970,11 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                               ),
                                               // Grade
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 10),
+                                                padding: EdgeInsets.only(
+                                                    left: MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.03),
                                                 child: Text(
                                                   '${student.grade} - ${student.section}',
                                                   style: TextStyle(
@@ -975,8 +986,16 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                               ),
                                               // Class Teacher
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 15, right: 10),
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.04,
+                                                  right: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.03,
+                                                ),
                                                 child: Text(
                                                   student.classTeacher,
                                                   style: TextStyle(
@@ -994,110 +1013,108 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
                                   ],
                                 ),
                               ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 10),
-                              child: ListTile(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 10),
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                      color: Color.fromRGBO(238, 238, 238, 1)),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                tileColor: Colors.white,
-                                leading: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      '${index + 1}',
-                                      style: TextStyle(
-                                        fontFamily: 'medium',
-                                        fontSize: 16,
-                                        color: Colors.black,
+                            ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 10),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color: Color.fromRGBO(238, 238, 238, 1)),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              tileColor: Colors.white,
+                              leading: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    '${index + 1}',
+                                    style: TextStyle(
+                                      fontFamily: 'medium',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.03,
+                                    ),
+                                    child: CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(
+                                        student.studentPicture,
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 10),
-                                      child: CircleAvatar(
-                                        radius: 30,
-                                        backgroundImage: NetworkImage(
-                                          student.studentPicture,
-                                        ),
-                                      ),
+                                  ),
+                                ],
+                              ),
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    student.studentName,
+                                    style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 16,
+                                      color: Colors.black,
                                     ),
-                                  ],
-                                ),
-                                title: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      student.studentName,
-                                      style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
+                                  ),
+                                  Text(
+                                    student.rollNumber,
+                                    style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 16,
+                                      color: Colors.black,
                                     ),
-                                    Text(
-                                      student.rollNumber,
-                                      style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'Student History',
-                                          style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 14,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios,
-                                          size: 14,
-                                          color: Colors.black,
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                trailing: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.27,
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                  ),
+                                  Row(
                                     children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 5),
-                                        child: Container(
-                                          padding:
-                                              EdgeInsets.symmetric(vertical: 5),
-                                          decoration: BoxDecoration(
-                                            color: _getStatusColor(
-                                                student.currentStatus),
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              student.currentStatus,
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontFamily: 'medium',
-                                              ),
-                                            ),
-                                          ),
+                                      Text(
+                                        'Student History',
+                                        style: TextStyle(
+                                          fontFamily: 'regular',
+                                          fontSize: 14,
+                                          color: Colors.black,
                                         ),
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios,
+                                        size: 14,
+                                        color: Colors.black,
                                       )
                                     ],
                                   ),
+                                ],
+                              ),
+                              trailing: Container(
+                                width: MediaQuery.of(context).size.width * 0.27,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: Container(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 5),
+                                        decoration: BoxDecoration(
+                                          color: _getStatusColor(
+                                              student.currentStatus),
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            student.currentStatus,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 16,
+                                              fontFamily: 'medium',
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
                                 ),
                               ),
                             ),
@@ -1110,7 +1127,6 @@ class _IrregularattendenciesState extends State<Irregularattendencies> {
         ),
       ),
       //notifie absentiees...
-
       bottomNavigationBar: Padding(
         padding: EdgeInsets.only(top: 15, bottom: 15),
         child: Row(

@@ -175,8 +175,11 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // 8% of screen height (negative)
+                left: MediaQuery.of(context).size.width *
+                    0.45, // 45% of screen width
+
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -228,11 +231,16 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                         child: Row(
                           children: [
                             Text(
-                              selectedClasses.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                              selectedGradeId != null
+                                  ? gradeController.gradeList
+                                      .firstWhere(
+                                        (grade) =>
+                                            grade['id'].toString() ==
+                                            selectedGradeId,
+                                        orElse: () => {'sign': 'N/A'},
+                                      )['sign']
+                                      .toString()
+                                  : "Select a class",
                             ),
                           ],
                         ),
@@ -291,6 +299,7 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: Text(
                 "Unsaved Changes !",
                 style: TextStyle(
@@ -398,7 +407,6 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                         fontSize: 14,
                         color: Color.fromRGBO(38, 38, 38, 1)),
                   ),
-
                   //dropdown field.......
                   Container(
                     width: MediaQuery.of(context).size.width * 0.5,
@@ -414,6 +422,12 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                             contentPadding: EdgeInsets.symmetric(
                                 vertical: 10, horizontal: 15),
                             border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                               borderSide: BorderSide(
                                 color: Color.fromRGBO(203, 203, 203, 1),
@@ -496,83 +510,101 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      'Select Section',
-                      style: TextStyle(
-                          fontFamily: 'medium',
-                          fontSize: 14,
-                          color: Color.fromRGBO(38, 38, 38, 1)),
-                    ),
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: DropdownButtonFormField<String>(
-                        dropdownColor: Colors.black,
-                        menuMaxHeight: 150,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                            ),
-                          ),
-                        ),
-                        value: selectedSection,
-                        hint: Text(
-                          "Select Section",
-                          style: TextStyle(
-                            fontFamily: 'regular',
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width * 0.0125),
+                      child: Text(
+                        'Select Section',
+                        style: TextStyle(
+                            fontFamily: 'medium',
                             fontSize: 14,
-                            color: Colors.black,
-                          ),
-                        ),
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedSection = value;
-                          });
-                        },
-                        items: sections.map((String section) {
-                          return DropdownMenuItem<String>(
-                            value: section,
-                            child: Text(
-                              section,
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'regular',
-                                fontSize: 14,
+                            color: Color.fromRGBO(38, 38, 38, 1)),
+                      ),
+                    ),
+                    Transform.translate(
+                      offset: Offset(-3, 0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.5,
+                        child: DropdownButtonFormField<String>(
+                          dropdownColor: Colors.black,
+                          menuMaxHeight: 150,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 15),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
                               ),
                             ),
-                          );
-                        }).toList(),
-                        selectedItemBuilder: (BuildContext context) {
-                          return sections.map((String section) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                              ),
+                            ),
+                          ),
+                          value: selectedSection,
+                          hint: Text(
+                            "Select Section",
+                            style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          onChanged: (String? value) {
+                            setState(() {
+                              selectedSection = value;
+                            });
+                          },
+                          items: sections.map((String section) {
+                            return DropdownMenuItem<String>(
+                              value: section,
                               child: Text(
                                 section,
                                 style: TextStyle(
-                                  color: Colors.black,
+                                  color: Colors.white,
                                   fontFamily: 'regular',
                                   fontSize: 14,
                                 ),
                               ),
                             );
-                          }).toList();
-                        },
+                          }).toList(),
+                          selectedItemBuilder: (BuildContext context) {
+                            return sections.map((String section) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  section,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'regular',
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              );
+                            }).toList();
+                          },
+                        ),
                       ),
                     ),
                   ],
                 )),
 //upload image...
             Padding(
-              padding: const EdgeInsets.only(top: 40, left: 15),
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height *
+                    0.05, // 5% of screen height
+                left: MediaQuery.of(context).size.width *
+                    0.05, // 4% of screen width
+              ),
               child: Row(
                 children: [
                   Container(
@@ -592,7 +624,9 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(
+                MediaQuery.of(context).size.width * 0.05, // 4% of screen width
+              ),
               child: Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: DottedBorder(
@@ -621,12 +655,12 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                               padding: const EdgeInsets.only(left: 15),
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   Text(
                                     'Click Here to',
                                     style: TextStyle(
-                                        fontSize: 14,
+                                        fontSize: 12,
                                         fontFamily: 'medium',
                                         color: Color.fromRGBO(93, 93, 93, 1)),
                                   ),
@@ -735,24 +769,41 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                       fontSize: 9,
                       color: Color.fromRGBO(168, 168, 168, 1)),
                 ),
-                Text(
-                  '*Upload either an image or a link',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
               ],
             ),
             //scheduled post...
-
+            //schedule post...
             Padding(
-              padding: const EdgeInsets.only(top: 50),
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width *
+                    0.08, // 5% of screen width
+                top: MediaQuery.of(context).size.height *
+                    0.04, // 3% of screen height
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    'Schedule Post',
+                    style: TextStyle(
+                        fontFamily: 'medium',
+                        fontSize: 14,
+                        color: Color.fromRGBO(38, 38, 38, 1)),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.02,
+                left: MediaQuery.of(context).size.width *
+                    0.03, // 3% of screen width
+                right: MediaQuery.of(context).size.width * 0.04,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
+                    width: MediaQuery.of(context).size.width * 0.87,
                     child: TextFormField(
                       controller: _scheduledDateandtime,
                       readOnly: true,
@@ -760,7 +811,12 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                         contentPadding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                         suffixIcon: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10),
+                          padding: EdgeInsets.only(
+                            top: MediaQuery.of(context).size.height *
+                                0.015, // 1.5% of screen height
+                            bottom: MediaQuery.of(context).size.height *
+                                0.015, // 1.5% of screen height
+                          ),
                           child: SvgPicture.asset(
                             'assets/icons/NewsPage_timepicker.svg',
                             fit: BoxFit.contain,
@@ -794,71 +850,64 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                 ],
               ),
             ),
-
-            //save as draft..
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 80,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: Colors.black, width: 1.5)),
-                    onPressed: () {
-                      String status = "draft";
-                      submitHomework(status);
-                    },
-                    child: Text(
-                      'Save as Draft',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black),
-                    ),
-                  ),
-                  //preview..
-                  GestureDetector(
-                    onTap: () {
-                      _PreviewBottomsheet(context);
-                    },
-                    child: Text(
-                      'Preview',
-                      style: TextStyle(
-                          fontFamily: 'semibold',
-                          fontSize: 16,
-                          color: Colors.black),
-                    ),
-                  ),
-
-                  ///scheduled..
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.textFieldborderColor,
-                        side: BorderSide.none),
-                    onPressed: () {
-                      String status = _scheduledDateandtime.text.isEmpty
-                          ? 'post'
-                          : 'schedule';
-
-                      submitHomework(status);
-                    },
-                    child: Text(
-                      _scheduledDateandtime.text.isEmpty
-                          ? 'Publish'
-                          : 'Schedule',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        child: //save as draft..
+            Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 30),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.black, width: 1.5)),
+                onPressed: () {
+                  String status = "draft";
+                  submitHomework(status);
+                },
+                child: Text(
+                  'Save as Draft',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+              //preview..
+              GestureDetector(
+                onTap: () {
+                  _PreviewBottomsheet(context);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
+
+              ///scheduled..
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () {
+                  String status =
+                      _scheduledDateandtime.text.isEmpty ? 'post' : 'schedule';
+
+                  submitHomework(status);
+                },
+                child: Text(
+                  _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/services/auth_services.dart';
@@ -479,16 +480,19 @@ class _LoginpageState extends State<Loginpage> {
                                               color: Colors.black,
                                               thickness: 0.5,
                                             ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 0),
-                                              child: Html(
-                                                data: article.newsContent,
-                                                style: {
-                                                  "body": Style(
-                                                    color: Colors.black,
-                                                  ),
-                                                },
+                                            Transform.translate(
+                                              offset: Offset(-6, 0),
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 0),
+                                                child: Html(
+                                                  data: article.newsContent,
+                                                  style: {
+                                                    "body": Style(
+                                                      color: Colors.black,
+                                                    ),
+                                                  },
+                                                ),
                                               ),
                                             ),
                                             if (article.filePath
@@ -498,21 +502,40 @@ class _LoginpageState extends State<Loginpage> {
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     bottom: 20),
-                                                child: YoutubePlayer(
-                                                  controller:
-                                                      YoutubePlayerController(
-                                                    initialVideoId:
-                                                        YoutubePlayer
-                                                            .convertUrlToId(
-                                                                article
-                                                                    .filePath)!,
-                                                    flags: YoutubePlayerFlags(
-                                                      autoPlay: false,
-                                                      mute: false,
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    // Navigate to LoginVideo page
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            LoginVideo(
+                                                                videoUrl: article
+                                                                    .filePath),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child: YoutubePlayer(
+                                                    controller:
+                                                        YoutubePlayerController(
+                                                      initialVideoId:
+                                                          YoutubePlayer
+                                                              .convertUrlToId(
+                                                                  article
+                                                                      .filePath)!,
+                                                      flags: YoutubePlayerFlags(
+                                                          hideThumbnail: false,
+                                                          autoPlay: false,
+                                                          mute: false,
+                                                          showLiveFullscreenButton:
+                                                              false,
+                                                          controlsVisibleAtStart:
+                                                              false,
+                                                          hideControls: true),
                                                     ),
+                                                    showVideoProgressIndicator:
+                                                        true,
                                                   ),
-                                                  showVideoProgressIndicator:
-                                                      true,
                                                 ),
                                               )
                                             else
@@ -543,6 +566,90 @@ class _LoginpageState extends State<Loginpage> {
                 ],
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LoginVideo extends StatefulWidget {
+  final String videoUrl;
+
+  const LoginVideo({super.key, required this.videoUrl});
+
+  @override
+  _VideoScreenState createState() => _VideoScreenState();
+}
+
+class _VideoScreenState extends State<LoginVideo> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(widget.videoUrl) ?? '',
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+      ),
+    );
+
+    // Reset to portrait mode when exiting fullscreen
+    _controller.addListener(() {
+      if (!_controller.value.isFullScreen) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6), // Apply same opacity color
+        ),
+        child: Center(
+          child: YoutubePlayerBuilder(
+            onEnterFullScreen: () {
+              // Allow rotation in fullscreen only
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeRight,
+              ]);
+            },
+            onExitFullScreen: () {
+              // Lock back to portrait when exiting fullscreen
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.portraitUp,
+                DeviceOrientation.portraitDown,
+              ]);
+            },
+            player: YoutubePlayer(
+              controller: _controller,
+              showVideoProgressIndicator: true,
+              aspectRatio: 16 / 9,
+            ),
+            builder: (context, player) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  player, // Video Player centered
+                ],
+              );
+            },
           ),
         ),
       ),

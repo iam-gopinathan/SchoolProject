@@ -140,8 +140,11 @@ class _EditTimetableState extends State<EditTimetable> {
           return Stack(clipBehavior: Clip.none, children: [
             // Close icon
             Positioned(
-              top: -70,
-              left: 180,
+              top: MediaQuery.of(context).size.height *
+                  -0.08, // 8% of screen height (negative)
+              left: MediaQuery.of(context).size.width *
+                  0.45, // 45% of screen width
+
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();
@@ -183,41 +186,41 @@ class _EditTimetableState extends State<EditTimetable> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Divider(
-                        thickness: 2,
+                        thickness: 1,
                         color: Color.fromRGBO(243, 243, 243, 1),
                       ),
                     ),
 //heading...
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            "${_selectedClass}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 15, top: 10),
+                    //   child: Row(
+                    //     children: [
+                    //       Text(
+                    //         "${_selectedClass}",
+                    //         style: TextStyle(
+                    //             fontWeight: FontWeight.bold,
+                    //             fontSize: 16,
+                    //             color: Colors.black),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
 
                     //selected section..
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            "${_selectedSection}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Padding(
+                    //   padding: const EdgeInsets.only(left: 15, top: 10),
+                    //   child: Row(
+                    //     children: [
+                    //       Text(
+                    //         "${_selectedSection}",
+                    //         style: TextStyle(
+                    //             fontWeight: FontWeight.bold,
+                    //             fontSize: 16,
+                    //             color: Colors.black),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     //fetched image shows
                     if (isFetchedImageVisible)
                       SizedBox(
@@ -261,21 +264,24 @@ class _EditTimetableState extends State<EditTimetable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromRGBO(253, 253, 253, 1),
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-          child: AppBar(
-            backgroundColor: Colors.white,
-            iconTheme: IconThemeData(color: Colors.black),
-            automaticallyImplyLeading: false,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                color: AppTheme.appBackgroundPrimaryColor,
-                borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30)),
-              ),
-              padding: EdgeInsets.all(10),
+      backgroundColor: Color.fromRGBO(253, 253, 253, 1),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.02),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -308,15 +314,17 @@ class _EditTimetableState extends State<EditTimetable> {
             ),
           ),
         ),
-        body: isLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  strokeWidth: 4,
-                  color: AppTheme.textFieldborderColor,
-                ),
-              )
-            : SingleChildScrollView(
-                child: Column(children: [
+      ),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+                color: AppTheme.textFieldborderColor,
+              ),
+            )
+          : SingleChildScrollView(
+              child: Column(
+                children: [
                   //select class
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
@@ -334,10 +342,29 @@ class _EditTimetableState extends State<EditTimetable> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           child: DropdownButtonFormField<String>(
+                            hint: Text(
+                              "Select Class",
+                              style: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
                             decoration: InputDecoration(
-                              labelText: 'Select class',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
                               ),
                             ),
                             value: _selectedClass,
@@ -356,7 +383,12 @@ class _EditTimetableState extends State<EditTimetable> {
 
                   //select sections.....
                   Padding(
-                    padding: const EdgeInsets.only(top: 20),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height *
+                          0.025, // 2.5% of screen height
+                      left: MediaQuery.of(context).size.width *
+                          0.005, // 0.5% of screen width
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -369,23 +401,45 @@ class _EditTimetableState extends State<EditTimetable> {
                         ),
 
                         // Section dropdown code
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Select Section',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
+                        Transform.translate(
+                          offset: Offset(-3, 0),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.5,
+                            child: DropdownButtonFormField<String>(
+                              hint: Text(
+                                "Select Section",
+                                style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
                               ),
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(203, 203, 203, 1),
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(203, 203, 203, 1),
+                                  ),
+                                ),
+                              ),
+                              value: _selectedSection,
+                              items: sectionList.map((section) {
+                                return DropdownMenuItem<String>(
+                                  value: section,
+                                  child: Text(section),
+                                );
+                              }).toList(),
+                              onChanged: null,
                             ),
-                            value: _selectedSection,
-                            items: sectionList.map((section) {
-                              return DropdownMenuItem<String>(
-                                value: section,
-                                child: Text(section),
-                              );
-                            }).toList(),
-                            onChanged: null,
                           ),
                         ),
                       ],
@@ -393,8 +447,14 @@ class _EditTimetableState extends State<EditTimetable> {
                   ),
 
 //upload image......
+
                   Padding(
-                    padding: const EdgeInsets.only(top: 40, left: 15),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height *
+                          0.05, // 5% of screen height
+                      left: MediaQuery.of(context).size.width *
+                          0.05, // 4% of screen width
+                    ),
                     child: Row(
                       children: [
                         Container(
@@ -589,6 +649,7 @@ class _EditTimetableState extends State<EditTimetable> {
 
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         'Supported Format : JPEG,Webp PNG, PDF',
@@ -597,56 +658,57 @@ class _EditTimetableState extends State<EditTimetable> {
                             fontSize: 9,
                             color: Color.fromRGBO(168, 168, 168, 1)),
                       ),
-                      Text(
-                        '*Upload either an image or a link',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
+                      // Text(
+                      //   '*Upload either an image or a link',
+                      //   style: TextStyle(
+                      //       fontFamily: 'regular',
+                      //       fontSize: 9,
+                      //       color: Color.fromRGBO(168, 168, 168, 1)),
+                      // ),
                     ],
                   ),
+                ],
+              ),
+            ),
+      bottomNavigationBar: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 100, bottom: 50),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              //preview
+              GestureDetector(
+                onTap: () {
+                  _PreviewBottomsheet(context);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
 
-                  Padding(
-                    padding: const EdgeInsets.only(top: 100, bottom: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        //preview
-                        GestureDetector(
-                          onTap: () {
-                            _PreviewBottomsheet(context);
-                          },
-                          child: Text(
-                            'Preview',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ),
-
-                        ///publish
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.textFieldborderColor,
-                              side: BorderSide.none),
-                          onPressed: () {
-                            _updateTimetable();
-                          },
-                          child: Text(
-                            'Update',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'medium',
-                                color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ]),
-              ));
+              ///publish
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () {
+                  _updateTimetable();
+                },
+                child: Text(
+                  'Update',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   //update api calls................

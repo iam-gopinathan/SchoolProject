@@ -111,28 +111,32 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.04),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Create Timetable',
-                        style: TextStyle(
-                            fontFamily: 'semibold',
-                            fontSize: 16,
-                            color: Colors.black),
-                      ),
-                    )
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'Create Timetable',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -168,29 +172,35 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                               controller: searchController,
                               textAlign: TextAlign.center,
                               decoration: InputDecoration(
-                                  prefixIcon: Transform.translate(
-                                    offset: Offset(75, 0),
-                                    child: Icon(Icons.search,
-                                        color:
-                                            Color.fromRGBO(178, 178, 178, 1)),
-                                  ),
-                                  hintText: 'Search News by Heading',
-                                  hintStyle: TextStyle(
-                                      fontFamily: 'regular',
-                                      fontSize: 14,
+                                prefixIcon: Transform.translate(
+                                  offset: Offset(60, 0),
+                                  child: Icon(Icons.search,
                                       color: Color.fromRGBO(178, 178, 178, 1)),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                    borderSide: BorderSide(
-                                        color: Color.fromRGBO(245, 245, 245, 1),
-                                        width: 2),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                    borderSide: BorderSide(
-                                        color: Color.fromRGBO(245, 245, 245, 1),
-                                        width: 2),
-                                  )),
+                                ),
+                                hintText: 'Search News by Heading',
+                                hintStyle: TextStyle(
+                                    fontFamily: 'regular',
+                                    fontSize: 14,
+                                    color: Color.fromRGBO(178, 178, 178, 1)),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(245, 245, 245, 1),
+                                      width: 1.5),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(245, 245, 245, 1),
+                                      width: 1.5),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(245, 245, 245, 1),
+                                      width: 1.5),
+                                ),
+                              ),
                               onChanged: (value) {},
                             ),
                           ),
@@ -202,11 +212,12 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                     ),
                     //
                     Transform.translate(
-                      offset: Offset(30, 10),
+                      offset: Offset(30, 12),
                       child: Row(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(8),
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.width * 0.02),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(10)),
@@ -235,14 +246,15 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                         itemBuilder: (context, index) {
                           var teacher = _teachersList[index];
                           return Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.width * 0.02),
                             child: Card(
                               shape: RoundedRectangleBorder(
                                   side: BorderSide(
                                     color: Color.fromRGBO(238, 238, 238, 1),
                                   ),
                                   borderRadius: BorderRadius.circular(15)),
-                              elevation: 1,
+                              elevation: 0,
                               child: Container(
                                 width: double.infinity,
                                 decoration: BoxDecoration(
@@ -251,7 +263,8 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                     ),
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(15)),
-                                padding: EdgeInsets.all(15),
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.04),
                                 child: Column(
                                   children: [
                                     //
@@ -265,8 +278,12 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                               color: Colors.black),
                                         ),
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
+                                          padding: EdgeInsets.only(
+                                            left: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.025,
+                                          ),
                                           child: CircleAvatar(
                                             radius: 30,
                                             backgroundImage:
@@ -275,8 +292,12 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                         ),
                                         //
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 20),
+                                          padding: EdgeInsets.only(
+                                            left: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05, // 5% of screen width
+                                          ),
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
@@ -289,8 +310,12 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                                     color: Colors.black),
                                               ),
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 5),
+                                                padding: EdgeInsets.only(
+                                                  top: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.005,
+                                                ),
                                                 child: Text(
                                                   '${teacher.employeeCode}',
                                                   style: TextStyle(
@@ -306,7 +331,11 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                     ),
                                     //
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 10),
+                                      padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.01,
+                                      ),
                                       child: Divider(
                                         color: Color.fromRGBO(
                                           245,
@@ -314,12 +343,16 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                           245,
                                           1,
                                         ),
-                                        thickness: 2,
+                                        thickness: 1,
                                       ),
                                     ),
                                     //
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 5),
+                                      padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.01,
+                                      ),
                                       child: ElevatedButton(
                                           style: ElevatedButton.styleFrom(
                                             padding: EdgeInsets.symmetric(
@@ -346,7 +379,11 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                     ),
                                     //
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 10),
+                                      padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.01,
+                                      ),
                                       child: Divider(
                                         color: Color.fromRGBO(
                                           245,
@@ -354,12 +391,16 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
                                           245,
                                           1,
                                         ),
-                                        thickness: 2,
+                                        thickness: 1,
                                       ),
                                     ),
                                     //
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 5),
+                                      padding: EdgeInsets.only(
+                                        top:
+                                            MediaQuery.of(context).size.height *
+                                                0.005,
+                                      ),
                                       child: Row(
                                         children: [
                                           //
@@ -736,7 +777,7 @@ class _TeacherTimetableCreateState extends State<TeacherTimetableCreate> {
               children: [
                 // Close icon
                 Positioned(
-                  top: -70,
+                  top: MediaQuery.of(context).size.height * -0.08,
                   left: MediaQuery.of(context).size.width / 2 - 28,
                   child: GestureDetector(
                     onTap: () {

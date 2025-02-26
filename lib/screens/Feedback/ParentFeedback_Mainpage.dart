@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Feedback_models/ParentFeedback_main_model.dart';
-
+import 'dart:ui' as ui;
 import 'package:flutter_application_1/screens/Feedback/Parent_feedback_CreatePage.dart';
 import 'package:flutter_application_1/screens/Feedback/Parent_feedback_editPage.dart';
 import 'package:flutter_application_1/services/Feedback_Api/ParentFeedback_Main_Api.dart';
@@ -111,98 +111,107 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Feedback',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
                         ),
-                      ],
-                    ),
-                    Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Text(
+                        'Feedback',
+                        style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                            'My \n Projects',
-                            style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          Switch(
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            activeTrackColor: AppTheme.textFieldborderColor,
-                            inactiveTrackColor: Colors.white,
-                            inactiveThumbColor: Colors.black,
-                            value: isswitched,
-                            onChanged: (value) {
-                              setState(() {
-                                isswitched = value;
-                              });
-                              fetchparentData();
-                            },
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                            ],
                           ),
                         ],
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      ParentFeedbackCreatepage(
-                                        fetchparentData: fetchparentData,
-                                        updateparent: updateIsMyProject,
-                                      )));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
+                      Spacer(),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.08),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'My Projects',
+                              style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Switch(
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              activeTrackColor: AppTheme.textFieldborderColor,
+                              inactiveTrackColor: Colors.white,
+                              inactiveThumbColor: Colors.black,
+                              value: isswitched,
+                              activeColor: Colors.white,
+                              onChanged: (value) {
+                                setState(() {
+                                  isswitched = value;
+                                });
+                                fetchparentData();
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.02),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        ParentFeedbackCreatepage(
+                                          fetchparentData: fetchparentData,
+                                          updateparent: updateIsMyProject,
+                                        )));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -237,8 +246,14 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 10, right: 15),
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width *
+                                    0.05, // 5% of screen width
+                                top: MediaQuery.of(context).size.height *
+                                    0.015, // 1.5% of screen height
+                                right: MediaQuery.of(context).size.width *
+                                    0.04, // 4% of screen width
+                              ),
                               child: Row(
                                 children: [
                                   Text(
@@ -254,20 +269,23 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                             ),
                             ...e.fromParents.map((parent) {
                               return Padding(
-                                padding: const EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.03),
                                 child: Card(
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Container(
-                                    padding: EdgeInsets.all(15),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.04),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       color: Colors.white,
                                       border: Border.all(
                                         color: Color.fromRGBO(238, 238, 238, 1),
-                                        width: 1.5,
+                                        width: 1,
                                       ),
                                     ),
                                     child: Column(
@@ -292,51 +310,86 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                             ),
                                           ],
                                         ),
-                                        Divider(
-                                          color:
-                                              Color.fromRGBO(230, 230, 230, 1),
-                                          thickness: 1,
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Divider(
+                                            color: Color.fromRGBO(
+                                                230, 230, 230, 1),
+                                            thickness: 1,
+                                          ),
                                         ),
                                         Padding(
                                           padding:
                                               const EdgeInsets.only(top: 10),
-                                          child: Text(
-                                            parent.question,
-                                            style: TextStyle(
-                                              fontFamily: 'medium',
-                                              fontSize: 16,
-                                              color: Colors.black,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.8,
+                                            child: Text(
+                                              parent.question,
+                                              style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
                                             ),
                                           ),
                                         ),
                                         //emoji feedback.......
-                                        Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: EmojiFeedback(
-                                            maxRating: 4,
-                                            enableFeedback: true,
-                                            inactiveElementBlendColor:
-                                                Colors.amber,
-                                            showLabel: true,
-                                            labelTextStyle: TextStyle(
-                                                fontFamily: 'semibold',
-                                                fontSize: 12,
-                                                color: Colors.black),
-                                            animDuration: const Duration(
-                                                milliseconds: 300),
-                                            curve: Curves.bounceInOut,
-                                            inactiveElementScale: .6,
-                                            onChanged: (value) async {
-                                              print(value);
-                                              print(
-                                                  'Feedback for Parent ID: ${parent.id}, Emoji Rating: $value');
+                                        if (parent.answer == null)
+                                          Padding(
+                                            padding: EdgeInsets.all(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
+                                            child: EmojiFeedback(
+                                              maxRating: 4,
+                                              enableFeedback: true,
+                                              inactiveElementBlendColor:
+                                                  Colors.amber,
+                                              showLabel: true,
+                                              labelTextStyle: TextStyle(
+                                                  fontFamily: 'semibold',
+                                                  fontSize: 12,
+                                                  color: Colors.black),
+                                              animDuration: const Duration(
+                                                  milliseconds: 300),
+                                              curve: Curves.bounceInOut,
+                                              inactiveElementScale: .6,
+                                              onChanged: (value) async {
+                                                print(value);
+                                                print(
+                                                    'Feedback for Parent ID: ${parent.id}, Emoji Rating: $value');
+                                                // await fetchparentData();
+                                                await sendEmojiFeedback(
+                                                    parent.id,
+                                                    value.toString(),
+                                                    context);
 
-                                              await sendEmojiFeedback(parent.id,
-                                                  value.toString(), context);
-                                            },
-                                            onChangeWaitForAnimation: true,
+                                                await fetchparentData();
+                                              },
+                                              onChangeWaitForAnimation: true,
+                                            ),
                                           ),
-                                        ),
+                                        //
+                                        if (parent.answer != null)
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                top: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.02),
+                                            child: Text(
+                                              'Thank You for your Response 😊 !',
+                                              style: TextStyle(
+                                                  fontFamily: 'semibold',
+                                                  fontSize: 16,
+                                                  color: Colors.green),
+                                            ),
+                                          )
                                       ],
                                     ),
                                   ),
@@ -351,18 +404,40 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                         return Column(
                           children: [
                             ...y!.feedbackList.map((e) {
+                              TextPainter textPainter = TextPainter(
+                                text: TextSpan(
+                                  text: e.question,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'medium',
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                maxLines: 4,
+                                textDirection: ui.TextDirection.ltr,
+                              )..layout(
+                                  maxWidth:
+                                      MediaQuery.of(context).size.width * 0.8);
+
+                              //
+                              bool showReadMore = textPainter.didExceedMaxLines;
+                              //
                               bool isExpanded =
                                   _expandedQuestions[e.question] ?? false;
                               return Column(
                                 children: [
                                   //createdon date..
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 25, top: 20),
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.06, // 6% of screen width
+                                      top: MediaQuery.of(context).size.height *
+                                          0.025,
+                                    ), // 2.5% of screen height),
                                     child: Row(
                                       children: [
                                         Text(
-                                          '${e.createdOnDate} | ${e.day}',
+                                          'Posted On ${e.createdOnDate} | ${e.day}',
                                           style: TextStyle(
                                             fontFamily: 'regular',
                                             fontSize: 12,
@@ -374,7 +449,9 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                   ),
                                   //
                                   Padding(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.03),
                                     child: Card(
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
@@ -389,30 +466,38 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                           border: Border.all(
                                             color: Color.fromRGBO(
                                                 238, 238, 238, 1),
-                                            width: 1.5,
+                                            width: 1,
                                           ),
                                         ),
                                         child: Column(
                                           children: [
                                             //
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.8,
-                                              child: Text(
-                                                '${e.heading}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 16,
-                                                  color: Colors.black,
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.8,
+                                                child: Text(
+                                                  '${e.heading}',
+                                                  style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                            Divider(
-                                              color: Color.fromRGBO(
-                                                  230, 230, 230, 1),
-                                              thickness: 1,
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.only(top: 5),
+                                              child: Divider(
+                                                color: Color.fromRGBO(
+                                                    230, 230, 230, 1),
+                                                thickness: 1,
+                                              ),
                                             ),
                                             //
                                             Container(
@@ -441,29 +526,30 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                                   bottom: 5),
                                               child: Row(
                                                 children: [
-                                                  ElevatedButton(
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.black,
-                                                      ),
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _isExpanded =
-                                                              !_isExpanded;
-                                                        });
-                                                      },
-                                                      child: Text(
-                                                        isExpanded
-                                                            ? 'Read Less'
-                                                            : 'Read More',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 16,
-                                                            color:
-                                                                Colors.white),
-                                                      )),
+                                                  if (showReadMore)
+                                                    ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              Colors.black,
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _isExpanded =
+                                                                !_isExpanded;
+                                                          });
+                                                        },
+                                                        child: Text(
+                                                          isExpanded
+                                                              ? 'Read Less'
+                                                              : 'Read More',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.white),
+                                                        )),
                                                   //
                                                   Spacer(),
                                                   Padding(
@@ -579,8 +665,11 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                                                           .black)),
                                                               child: Row(
                                                                 children: [
-                                                                  Icon(Icons
-                                                                      .edit),
+                                                                  Icon(
+                                                                    Icons.edit,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
                                                                   Text(
                                                                     'Edit',
                                                                     style: TextStyle(
@@ -722,7 +811,7 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                     }).toList(),
                   ),
                 ),
-      //
+
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50

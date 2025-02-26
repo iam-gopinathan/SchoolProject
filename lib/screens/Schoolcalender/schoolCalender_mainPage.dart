@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/School_calendar_model/Main_fetch_school_calendar_model.dart';
 import 'package:flutter_application_1/screens/Schoolcalender/Create_school_calender.dart';
 import 'package:flutter_application_1/screens/Schoolcalender/Edit_school_calender.dart';
@@ -23,8 +23,6 @@ class SchoolcalenderMainpage extends StatefulWidget {
 class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
   ScrollController _scrollController = ScrollController();
 
-  DateTime? _startDate;
-  DateTime? _endDate;
   CalendarFormat _calendarFormat = CalendarFormat.month;
 
   List<String> studentCalendarImages = [];
@@ -148,70 +146,84 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'School Calender',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Icon(
+                                      Icons.arrow_back,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    'School Calender',
+                                    style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    //add screen....
-                    if (UserSession().userType == 'admin')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CreateSchoolCalender(
-                                        fetchStudentCalendar:
-                                            fetchStudentCalendar)));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.Addiconcolor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 30,
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      //add screen....
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.05,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          CreateSchoolCalender(
+                                              fetchStudentCalendar:
+                                                  fetchStudentCalendar)));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -231,7 +243,8 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                 children: [
                   //table calender...
                   Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.025),
                     child: TableCalendar(
                       firstDay: DateTime.utc(2020, 1, 1),
                       lastDay: DateTime.utc(2030, 12, 31),
@@ -245,11 +258,9 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                       },
                       onPageChanged: (focusedDay) {
                         setState(() {
-                          this.focusedDay =
-                              focusedDay; // Update focusedDay when month is changed
+                          this.focusedDay = focusedDay;
                         });
-                        onMonthChanged(
-                            focusedDay); // Call your function to fetch events for the new month
+                        onMonthChanged(focusedDay);
                       },
                       calendarStyle: CalendarStyle(
                         todayTextStyle: TextStyle(
@@ -294,7 +305,9 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                         formatButtonVisible: false,
                       ),
                       onDayLongPressed: (selectedDay, focusedDay) {
-                        if (UserSession().userType == "admin")
+                        if (UserSession().userType == "admin" ||
+                            UserSession().userType == 'staff' ||
+                            UserSession().userType == 'superadmin')
                           showDialog(
                             context: context,
                             builder: (BuildContext context) {
@@ -362,7 +375,12 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                     children: [
                       //today events..
                       Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 20),
+                        padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width *
+                              0.05, // 5% of screen width
+                          top: MediaQuery.of(context).size.height *
+                              0.025, // 2.5% of screen height
+                        ),
                         child: Row(
                           children: [
                             Text(
@@ -385,7 +403,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                 child: Text(
                                   "You haven’t made anything yet;\nstart creating now!",
                                   style: TextStyle(
-                                    fontSize: 22,
+                                    fontSize: 16,
                                     fontFamily: 'regular',
                                     color: Color.fromRGBO(145, 145, 145, 1),
                                   ),
@@ -422,36 +440,38 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                     248, 248, 248, 1)),
                                           ),
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            'to',
-                                            style: TextStyle(
-                                                fontFamily: 'medium',
-                                                fontSize: 14,
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 10),
-                                            decoration: BoxDecoration(
-                                                color: Colors.deepOrange,
-                                                shape: BoxShape.circle),
+                                        if (e.from != e.to)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${toDay}',
+                                              'to',
                                               style: TextStyle(
                                                   fontFamily: 'medium',
                                                   fontSize: 14,
-                                                  color: Color.fromRGBO(
-                                                      248, 248, 248, 1)),
+                                                  color: Colors.black),
                                             ),
                                           ),
-                                        ),
+                                        if (e.from != e.to)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.deepOrange,
+                                                  shape: BoxShape.circle),
+                                              child: Text(
+                                                '${toDay}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 14,
+                                                    color: Color.fromRGBO(
+                                                        248, 248, 248, 1)),
+                                              ),
+                                            ),
+                                          ),
 
                                         //
                                         Padding(
@@ -475,15 +495,20 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                       ),
                     ],
                   ),
-
                   //upcoming events...
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, top: 25, bottom: 25),
+                          padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width *
+                                0.05, // 5% of screen width
+                            top: MediaQuery.of(context).size.height *
+                                0.03, // 3% of screen height
+                            bottom: MediaQuery.of(context).size.height *
+                                0.03, // 3% of screen height
+                          ),
                           child: Row(
                             children: [
                               Text(
@@ -504,7 +529,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                               child: Text(
                                 "You haven’t made anything yet;\nstart creating now!",
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize: 16,
                                   fontFamily: 'regular',
                                   color: Color.fromRGBO(145, 145, 145, 1),
                                 ),
@@ -517,10 +542,17 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                             return Column(
                               children: [
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 25, top: 15),
+                                  padding: EdgeInsets.only(
+                                    left: MediaQuery.of(context).size.width *
+                                        0.06, // 6% of screen width
+                                    top: MediaQuery.of(context).size.height *
+                                        0.02, // 2% of screen height
+                                  ),
                                   child: Padding(
-                                    padding: const EdgeInsets.only(right: 15),
+                                    padding: EdgeInsets.only(
+                                      right: MediaQuery.of(context).size.width *
+                                          0.04, // 4% of screen width
+                                    ),
                                     child: Container(
                                       padding:
                                           EdgeInsets.symmetric(vertical: 10),
@@ -531,69 +563,85 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: [
-                                              //from
-                                              Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                      horizontal: 15),
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.deepOrange,
-                                                      shape: BoxShape.circle),
-                                                  child: Text(
-                                                    '${e.from}',
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontFamily: 'regular',
-                                                        fontSize: 14),
-                                                  )),
-                                              if (e.from != e.to)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 5),
-                                                  child: Text(
-                                                    'To',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black),
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 7),
+                                            child: Row(
+                                              children: [
+                                                //from
+                                                Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10,
+                                                            horizontal: 15),
+                                                    decoration: BoxDecoration(
+                                                        color:
+                                                            Colors.deepOrange,
+                                                        shape: BoxShape.circle),
+                                                    child: Text(
+                                                      '${e.from}',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontFamily: 'regular',
+                                                          fontSize: 14),
+                                                    )),
+                                                if (e.from != e.to)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 5),
+                                                    child: Text(
+                                                      'To',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    ),
                                                   ),
-                                                ),
-                                              //
-                                              if (e.from != e.to)
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 5),
-                                                  child: Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 10,
-                                                              horizontal: 15),
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              Colors.deepOrange,
-                                                          shape:
-                                                              BoxShape.circle),
-                                                      child: Text(
-                                                        '${e.to}',
-                                                        style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 14),
-                                                      )),
-                                                ),
-                                            ],
+                                                //
+                                                if (e.from != e.to)
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 5),
+                                                    child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 10,
+                                                                horizontal: 15),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: Colors
+                                                                    .deepOrange,
+                                                                shape: BoxShape
+                                                                    .circle),
+                                                        child: Text(
+                                                          '${e.to}',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 14),
+                                                        )),
+                                                  ),
+                                              ],
+                                            ),
                                           ),
                                           //
                                           Row(
                                             children: [
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 12, top: 10),
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.03, // 3% of screen width
+                                                  top: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.012, // 1.2% of screen height
+                                                ),
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
@@ -642,9 +690,13 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                       ),
                                                     ),
                                                     //delete
-                                                    if (UserSession()
-                                                            .userType ==
-                                                        'admin')
+                                                    if (UserSession().userType == 'admin' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'staff' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'superadmin')
                                                       GestureDetector(
                                                         onTap: () async {
                                                           showDialog(
@@ -761,12 +813,19 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                   var videoPath = e.filePath;
 
                                                   if (e.fileType == 'image') {
-                                                    _PreviewBottomsheet(context,
-                                                        e.filePath, null);
+                                                    _PreviewBottomsheet(
+                                                        context, image, null);
                                                   } else if (e.fileType ==
                                                       'link') {
-                                                    _PreviewBottomsheet(context,
-                                                        null, e.filePath);
+                                                    Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            videoschoolv(
+                                                                videoUrl:
+                                                                    videoPath),
+                                                      ),
+                                                    );
                                                   }
                                                 },
                                                 child: Padding(
@@ -796,77 +855,97 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                                 2),
                                                       ),
                                                       //edit
-                                                      if (UserSession()
-                                                              .userType ==
-                                                          'admin')
+                                                      if (UserSession().userType == 'admin' ||
+                                                          UserSession()
+                                                                  .userType ==
+                                                              'staff' ||
+                                                          UserSession()
+                                                                  .userType ==
+                                                              'superadmin')
                                                         GestureDetector(
                                                           onTap: () {
                                                             showDialog(
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.circular(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return AlertDialog(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
                                                                               10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Do you really want to make\n changes to this Event?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
-                                                                            color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            children: [
+                                                                  content: Text(
+                                                                    "Do you really want to make\n changes to this Event?",
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'regular',
+                                                                        fontSize:
+                                                                            16,
+                                                                        color: Colors
+                                                                            .black),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                  actions: <Widget>[
+                                                                    Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .center,
+                                                                      children: [
+                                                                        ElevatedButton(
+                                                                            style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: Colors.white,
+                                                                                elevation: 0,
+                                                                                side: BorderSide(color: Colors.black, width: 1)),
+                                                                            onPressed: () {
+                                                                              Navigator.pop(context);
+                                                                            },
+                                                                            child: Text(
+                                                                              'Cancel',
+                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                            )),
+                                                                        //edit...
+                                                                        Padding(
+                                                                          padding: const EdgeInsets
+                                                                              .only(
+                                                                              left: 10),
+                                                                          child:
                                                                               ElevatedButton(
-                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                                  onPressed: () {
-                                                                                    Navigator.pop(context);
-                                                                                  },
-                                                                                  child: Text(
-                                                                                    'Cancel',
-                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                  )),
-                                                                              //edit...
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(left: 10),
-                                                                                child: ElevatedButton(
-                                                                                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                                    onPressed: () {
-                                                                                      var calendarId = e.id;
-                                                                                      Navigator.pop(context);
-                                                                                      Navigator.push(
-                                                                                          context,
-                                                                                          MaterialPageRoute(
-                                                                                              builder: (context) => EditSchoolCalender(
-                                                                                                    Id: calendarId,
-                                                                                                    fetchStudentCalendar: fetchStudentCalendar,
-                                                                                                  )));
-                                                                                    },
-                                                                                    child: Text(
-                                                                                      'Edit',
-                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                    )),
-                                                                              ),
-                                                                            ])
-                                                                      ]);
-                                                                });
+                                                                            style: ElevatedButton.styleFrom(
+                                                                                backgroundColor: AppTheme.textFieldborderColor,
+                                                                                elevation: 0,
+                                                                                side: BorderSide.none),
+                                                                            onPressed:
+                                                                                () {
+                                                                              var calendarId = e.id;
+                                                                              Navigator.pop(context);
+                                                                              Navigator.push(
+                                                                                  context,
+                                                                                  MaterialPageRoute(
+                                                                                      builder: (context) => EditSchoolCalender(
+                                                                                            Id: calendarId,
+                                                                                            fetchStudentCalendar: fetchStudentCalendar,
+                                                                                          )));
+                                                                            },
+                                                                            child:
+                                                                                Text(
+                                                                              'Edit',
+                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                            ),
+                                                                          ),
+                                                                        ),
+                                                                      ],
+                                                                    )
+                                                                  ],
+                                                                );
+                                                              },
+                                                            );
                                                           },
                                                           child: Padding(
                                                             padding:
@@ -904,7 +983,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                 ],
               ),
             ),
-      //
+
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
@@ -1015,6 +1094,91 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
           },
         );
       },
+    );
+  }
+}
+//
+
+class videoschoolv extends StatefulWidget {
+  final String videoUrl;
+
+  const videoschoolv({super.key, required this.videoUrl});
+
+  @override
+  _VideoScreenState createState() => _VideoScreenState();
+}
+
+class _VideoScreenState extends State<videoschoolv> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(widget.videoUrl) ?? '',
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+      ),
+    );
+
+    // Reset to portrait mode when exiting fullscreen
+    _controller.addListener(() {
+      if (!_controller.value.isFullScreen) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6), // Apply same opacity color
+        ),
+        child: Center(
+          child: YoutubePlayerBuilder(
+            onEnterFullScreen: () {
+              // Allow rotation in fullscreen only
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeRight,
+              ]);
+            },
+            onExitFullScreen: () {
+              // Lock back to portrait when exiting fullscreen
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.portraitUp,
+                DeviceOrientation.portraitDown,
+              ]);
+            },
+            player: YoutubePlayer(
+              controller: _controller,
+              showVideoProgressIndicator: true,
+              aspectRatio: 16 / 9,
+            ),
+            builder: (context, player) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  player, // Video Player centered
+                ],
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }

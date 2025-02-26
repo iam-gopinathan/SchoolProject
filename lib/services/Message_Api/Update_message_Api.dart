@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Message_models/Update_message_Models.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,17 +27,26 @@ Future<void> updateMessage(
     if (response.statusCode == 200) {
       print("Message updated successfully!");
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Message Updated Successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      // Add a delay of 2 seconds before navigating
+      String snackBarMessage = '';
+      if (UserSession().userType == 'superadmin') {
+        snackBarMessage = 'Message Updated Successfully!';
+      } else if (UserSession().userType == 'admin' ||
+          UserSession().userType == 'staff') {
+        snackBarMessage = 'Message Update Request Sent Successfully!';
+      }
+      if (snackBarMessage.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(snackBarMessage),
+          ),
+        );
+      }
+      // Delay before navigation
       await Future.delayed(Duration(seconds: 2));
-      //
       messageFetch();
       Navigator.pop(context);
+      //
       print(response.body);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -47,8 +57,18 @@ Future<void> updateMessage(
       );
       print("Failed to update message: ${response.statusCode}");
       print("Response: ${response.body}");
+      // Delay before navigation
+      await Future.delayed(Duration(seconds: 2));
+      messageFetch();
+      Navigator.pop(context);
+      //
     }
   } catch (e) {
     print("Error occurred: $e");
+    // Delay before navigation
+    await Future.delayed(Duration(seconds: 2));
+    messageFetch();
+    Navigator.pop(context);
+    //
   }
 }

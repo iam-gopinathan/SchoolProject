@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/Firebase_api.dart';
 import 'package:flutter_application_1/firebase_options.dart';
@@ -26,6 +27,8 @@ void main() async {
 
   // Initialize the FlutterDownloader plugin
   await FlutterDownloader.initialize(debug: true);
+
+  //
 
   runApp(new MyApp());
 }

@@ -36,37 +36,13 @@ Future<void> sendEmojiFeedback(int parentId, String emojiValue, context) async {
 
       String message =
           responseData['message'] ?? 'Response updated successfully!';
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Center(
-                child: Text(
-              'Success!',
-              style: TextStyle(
-                  fontFamily: 'semibold', fontSize: 16, color: Colors.black),
-            )),
-            content: Text(
-              message,
-              style: TextStyle(
-                  fontSize: 14, color: Colors.black, fontFamily: 'semibold'),
-            ),
-            actions: [
-              TextButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontFamily: 'regular', fontSize: 16, color: Colors.black),
-                ),
-              ),
-            ],
-          );
-        },
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          duration: Duration(seconds: 2), // Snackbar duration
+          backgroundColor: Colors.green, // Customize the background color
+        ),
       );
 
       print('Feedback updated successfully');
@@ -82,48 +58,7 @@ Future<void> sendEmojiFeedback(int parentId, String emojiValue, context) async {
         backgroundColor: Colors.red,
       ));
       print('Failed to update feedback ${response.body}');
-      // Show failure alert dialog
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Center(
-                child: Text(
-              'Oops!',
-              style: TextStyle(
-                  fontFamily: 'semibold', fontSize: 16, color: Colors.red),
-            )),
-            content: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "${message}!",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontFamily: 'semibold',
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                style: TextButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  'OK',
-                  style: TextStyle(
-                      fontFamily: 'regular', fontSize: 16, color: Colors.black),
-                ),
-              ),
-            ],
-          );
-        },
-      );
+      //
     }
   } catch (error) {
     print('Error: $error');

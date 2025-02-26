@@ -41,6 +41,9 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
     print("Fetching homework with date: $date");
 
     print('kbjh${gradeId}');
+    setState(() {
+      isLoading = true;
+    });
     try {
       final fetchedData = await fetchHomework(
         rollNumber: UserSession().rollNumber.toString(),
@@ -115,7 +118,7 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
       setState(() {
         selectedDate = DateFormat('dd-MM-yyyy').format(pickedDate);
       });
-      displayDate = DateFormat('EEEE, dd MMMM').format(pickedDate);
+      displayDate = DateFormat('EE, dd MMMM').format(pickedDate);
     }
   }
 
@@ -159,7 +162,7 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   child: Column(
                     children: [
@@ -173,7 +176,9 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                         ),
                         padding: EdgeInsets.symmetric(vertical: 15),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 20),
+                          padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * 0.05,
+                          ),
                           child: Row(
                             children: [
                               Text(
@@ -189,7 +194,10 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                          MediaQuery.of(context).size.width *
+                              0.02, // 2% of screen width
+                        ),
                         child: Card(
                           elevation: 0,
                           child: Container(
@@ -198,8 +206,12 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                               children: [
                                 // Select Class
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 30, left: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.04, // 4% of screen height
+                                    left: MediaQuery.of(context).size.width *
+                                        0.05, // 5% of screen width
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -215,7 +227,10 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                 ),
                                 // Classes
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.025,
+                                  ),
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
@@ -274,8 +289,12 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                 // Select Section
                                 if (sections.isNotEmpty) ...[
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 30, left: 20),
+                                    padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.04, // 4% of screen height
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05,
+                                    ),
                                     child: Row(
                                       children: [
                                         Text(
@@ -291,7 +310,10 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20),
+                                    padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.025,
+                                    ),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
@@ -347,7 +369,9 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.0150,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -406,155 +430,169 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.04),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Homeworks',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Homeworks',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () async {
-                                await _selectDate(context);
+                              SizedBox(height: 10),
+                              GestureDetector(
+                                onTap: () async {
+                                  await _selectDate(context);
+                                  print("Selected Date: $selectedDate");
 
-                                if (selectedDate.isNotEmpty) {
-                                  _fetchHomework(date: selectedDate);
-                                }
-                              },
-                              child: Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/Attendancepage_calendar_icon.svg',
-                                      fit: BoxFit.contain,
-                                      height: 20,
+                                  await _fetchHomework(date: selectedDate);
+                                },
+                                child: Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/Attendancepage_calendar_icon.svg',
+                                        fit: BoxFit.contain,
+                                        height: 20,
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    displayDate,
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      color: Color.fromRGBO(73, 73, 73, 1),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 2,
-                                      decorationColor:
-                                          Color.fromRGBO(75, 75, 75, 1),
+                                    Text(
+                                      displayDate,
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        color: Color.fromRGBO(73, 73, 73, 1),
+                                        fontSize: 12,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'teacher' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.04,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'My Projects',
+                                style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Switch(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeTrackColor: AppTheme.textFieldborderColor,
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.black,
+                                value: isswitched,
+                                activeColor: Colors.white,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isswitched = value;
+                                    isLoading = true;
+                                  });
+                                  _fetchHomework();
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                    Spacer(),
-                    if (UserSession().userType == 'admin' ||
-                        UserSession().userType == 'teacher')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'My \n Projects',
-                              style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 12,
+                      //filter icon..
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'teacher' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        GestureDetector(
+                          onTap: () {
+                            _showFilterBottomSheet(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              right: MediaQuery.of(context).size.width * 0.04,
+                            ),
+                            child: SvgPicture.asset(
+                              'assets/icons/Filter_icon.svg',
+                              fit: BoxFit.contain,
+                              height: 30,
+                            ),
+                          ),
+                        ),
+                      //create....
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'teacher' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.03,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CreateHomeworks(
+                                            fetchHomework: _fetchHomework,
+                                          )));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
                                 color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                                size: 30,
                               ),
-                              textAlign: TextAlign.center,
                             ),
-                            Switch(
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeTrackColor: AppTheme.textFieldborderColor,
-                              inactiveTrackColor: Colors.white,
-                              inactiveThumbColor: Colors.black,
-                              value: isswitched,
-                              onChanged: (value) {
-                                setState(() {
-                                  isswitched = value;
-                                  isLoading = true;
-                                });
-                                _fetchHomework();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    //filter icon..
-                    if (UserSession().userType == 'admin' ||
-                        UserSession().userType == 'teacher')
-                      GestureDetector(
-                        onTap: () {
-                          _showFilterBottomSheet(context);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 30),
-                          child: SvgPicture.asset(
-                            'assets/icons/Filter_icon.svg',
-                            fit: BoxFit.contain,
-                            height: 30,
                           ),
                         ),
-                      ),
-                    //create....
-                    if (UserSession().userType == 'admin' ||
-                        UserSession().userType == 'teacher')
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateHomeworks(
-                                        fetchHomework: _fetchHomework,
-                                      )));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -612,11 +650,14 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                           return Column(
                             children: [
                               Transform.translate(
-                                offset: Offset(30, 18),
+                                offset: Offset(30, 20),
                                 child: Row(
                                   children: [
                                     Container(
-                                      padding: EdgeInsets.all(5),
+                                      padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.0125, // 1.25% of screen width
+                                      ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10)),
@@ -641,13 +682,19 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                 ),
                               ),
                               Padding(
-                                padding: const EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width *
+                                      0.04, // 4% of screen width
+                                ),
                                 child: Card(
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
                                   child: Container(
-                                    padding: EdgeInsets.all(15),
+                                    padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width *
+                                          0.04, // 4% of screen width
+                                    ),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       color: Colors.white,
@@ -703,6 +750,7 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                               ],
                                             ),
                                             children: [
+                                              //
                                               Stack(
                                                 alignment: Alignment.center,
                                                 children: [
@@ -801,234 +849,242 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                                       ],
                                                     ),
                                                     Spacer(),
-                                                    if (UserSession()
-                                                                .userType ==
-                                                            'admin' ||
+                                                    if (UserSession().userType == 'admin' ||
                                                         UserSession()
                                                                 .userType ==
-                                                            'teacher')
-                                                      if (e.isAlterAvailable ==
-                                                          'Y')
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            showDialog(
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.circular(
-                                                                              10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Do you really want to make\n changes to this Homework?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
-                                                                            color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            children: [
-                                                                              ElevatedButton(
-                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                            'teacher' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'staff' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'superadmin')
+                                                      // if (e.isAlterAvailable ==
+                                                      //     'Y')
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return AlertDialog(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                10)),
+                                                                    content:
+                                                                        Text(
+                                                                      "Do you really want to make\n changes to this Homework?",
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'regular',
+                                                                          fontSize:
+                                                                              16,
+                                                                          color:
+                                                                              Colors.black),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                    ),
+                                                                    actions: <Widget>[
+                                                                      Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                )),
+                                                                            //edit...
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
                                                                                   onPressed: () {
                                                                                     Navigator.pop(context);
+                                                                                    Navigator.push(
+                                                                                        context,
+                                                                                        MaterialPageRoute(
+                                                                                            builder: (context) => EditHomework(
+                                                                                                  id: e.id,
+                                                                                                  fetchHomework: _fetchHomework,
+                                                                                                )));
                                                                                   },
                                                                                   child: Text(
-                                                                                    'Cancel',
+                                                                                    'Edit',
                                                                                     style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
                                                                                   )),
-                                                                              //edit...
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(left: 10),
-                                                                                child: ElevatedButton(
-                                                                                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                                    onPressed: () {
-                                                                                      Navigator.pop(context);
-                                                                                      Navigator.push(
-                                                                                          context,
-                                                                                          MaterialPageRoute(
-                                                                                              builder: (context) => EditHomework(
-                                                                                                    id: e.id,
-                                                                                                    fetchHomework: _fetchHomework,
-                                                                                                  )));
-                                                                                    },
-                                                                                    child: Text(
-                                                                                      'Edit',
-                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                    )),
-                                                                              ),
-                                                                            ])
-                                                                      ]);
-                                                                });
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical: 5,
-                                                                    horizontal:
-                                                                        8),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15),
-                                                              border:
-                                                                  Border.all(
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
-                                                            ),
-                                                            child: Row(
-                                                              children: [
-                                                                SvgPicture.asset(
-                                                                    'assets/icons/timetable_upload.svg'),
-                                                                Text(
-                                                                  'Reupload',
-                                                                  style: TextStyle(
-                                                                      fontFamily:
-                                                                          'medium',
-                                                                      fontSize:
-                                                                          12,
-                                                                      color: Colors
-                                                                          .black),
-                                                                ),
-                                                              ],
+                                                                            ),
+                                                                          ])
+                                                                    ]);
+                                                              });
+                                                        },
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      8),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        15),
+                                                            border: Border.all(
+                                                              color:
+                                                                  Colors.black,
                                                             ),
                                                           ),
+                                                          child: Row(
+                                                            children: [
+                                                              SvgPicture.asset(
+                                                                  'assets/icons/timetable_upload.svg'),
+                                                              Text(
+                                                                'Reupload',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'medium',
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
-                                                    if (UserSession()
-                                                                .userType ==
-                                                            'admin' ||
+                                                      ),
+                                                    if (UserSession().userType == 'admin' ||
                                                         UserSession()
                                                                 .userType ==
-                                                            'teacher')
-                                                      if (e.isAlterAvailable ==
-                                                          'Y')
-                                                        GestureDetector(
-                                                          onTap: () {
-                                                            showDialog(
-                                                                barrierDismissible:
-                                                                    false,
-                                                                context:
-                                                                    context,
-                                                                builder:
-                                                                    (BuildContext
-                                                                        context) {
-                                                                  return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius: BorderRadius.circular(
-                                                                              10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Do you really want to delete\n  to this Homework?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
-                                                                            color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                            mainAxisAlignment:
-                                                                                MainAxisAlignment.center,
-                                                                            children: [
-                                                                              ElevatedButton(
-                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                                  onPressed: () {
-                                                                                    Navigator.pop(context);
-                                                                                  },
-                                                                                  child: Text(
-                                                                                    'Cancel',
-                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                  )),
-                                                                              //delete...
-                                                                              Padding(
-                                                                                padding: const EdgeInsets.only(left: 10),
-                                                                                child: ElevatedButton(
-                                                                                    style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                                    onPressed: () async {
-                                                                                      var homeworkID = e.id;
-                                                                                      final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeHomeWork/DeleteHomeWork?Id=$homeworkID';
+                                                            'teacher' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'staff' ||
+                                                        UserSession()
+                                                                .userType ==
+                                                            'superadmin')
+                                                      // if (e.isAlterAvailable ==
+                                                      //     'Y')
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          showDialog(
+                                                              barrierDismissible:
+                                                                  false,
+                                                              context: context,
+                                                              builder:
+                                                                  (BuildContext
+                                                                      context) {
+                                                                return AlertDialog(
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .white,
+                                                                    shape: RoundedRectangleBorder(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                10)),
+                                                                    content:
+                                                                        Text(
+                                                                      "Do you really want to delete\n  to this Homework?",
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'regular',
+                                                                          fontSize:
+                                                                              16,
+                                                                          color:
+                                                                              Colors.black),
+                                                                      textAlign:
+                                                                          TextAlign
+                                                                              .center,
+                                                                    ),
+                                                                    actions: <Widget>[
+                                                                      Row(
+                                                                          mainAxisAlignment:
+                                                                              MainAxisAlignment.center,
+                                                                          children: [
+                                                                            ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Cancel',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                )),
+                                                                            //delete...
+                                                                            Padding(
+                                                                              padding: const EdgeInsets.only(left: 10),
+                                                                              child: ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                  onPressed: () async {
+                                                                                    var homeworkID = e.id;
+                                                                                    final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeHomeWork/DeleteHomeWork?Id=$homeworkID';
 
-                                                                                      try {
-                                                                                        final response = await http.delete(
-                                                                                          Uri.parse(url),
-                                                                                          headers: {
-                                                                                            'Content-Type': 'application/json',
-                                                                                            'Authorization': 'Bearer $authToken',
-                                                                                          },
-                                                                                        );
+                                                                                    try {
+                                                                                      final response = await http.delete(
+                                                                                        Uri.parse(url),
+                                                                                        headers: {
+                                                                                          'Content-Type': 'application/json',
+                                                                                          'Authorization': 'Bearer $authToken',
+                                                                                        },
+                                                                                      );
 
-                                                                                        if (response.statusCode == 200) {
-                                                                                          print('id has beeen deleted ${homeworkID}');
+                                                                                      if (response.statusCode == 200) {
+                                                                                        print('id has beeen deleted ${homeworkID}');
 
-                                                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                                                            SnackBar(backgroundColor: Colors.green, content: Text('Message deleted successfully!')),
-                                                                                          );
-                                                                                          //
-                                                                                          Navigator.pop(context);
-                                                                                          //
-                                                                                          await _fetchHomework();
-                                                                                        } else {
-                                                                                          ScaffoldMessenger.of(context).showSnackBar(
-                                                                                            SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete message.')),
-                                                                                          );
-                                                                                        }
-                                                                                      } catch (e) {
                                                                                         ScaffoldMessenger.of(context).showSnackBar(
-                                                                                          SnackBar(content: Text('An error occurred: $e')),
+                                                                                          SnackBar(backgroundColor: Colors.green, content: Text('Message deleted successfully!')),
+                                                                                        );
+                                                                                        //
+                                                                                        Navigator.pop(context);
+                                                                                        //
+                                                                                        await _fetchHomework();
+                                                                                      } else {
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete message.')),
                                                                                         );
                                                                                       }
-                                                                                      _fetchHomework();
-                                                                                      Navigator.pop(context);
-                                                                                    },
-                                                                                    child: Text(
-                                                                                      'Delete',
-                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                    )),
-                                                                              ),
-                                                                            ])
-                                                                      ]);
-                                                                });
-                                                          },
-                                                          child: Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        10),
-                                                            child: SvgPicture
-                                                                .asset(
-                                                              'assets/icons/timetable_delete.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                              height: 25,
-                                                            ),
+                                                                                    } catch (e) {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(content: Text('An error occurred: $e')),
+                                                                                      );
+                                                                                    }
+                                                                                    _fetchHomework();
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Delete',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                            ),
+                                                                          ])
+                                                                    ]);
+                                                              });
+                                                        },
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      10),
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            'assets/icons/timetable_delete.svg',
+                                                            fit: BoxFit.contain,
+                                                            height: 25,
                                                           ),
                                                         ),
+                                                      ),
                                                     if (UserSession()
                                                             .userType ==
                                                         'student')
@@ -1236,6 +1292,8 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
         await file.writeAsBytes(response.bodyBytes);
         print('Image downloaded to: $filePath');
         showDownloadNotification(filePath);
+        await Future.delayed(Duration(seconds: 3));
+        openFile(filePath);
       } else {
         print('Failed to download image');
       }
@@ -1254,6 +1312,7 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
+      icon: '@mipmap/ic_launcher',
     );
     const NotificationDetails platformDetails =
         NotificationDetails(android: androidDetails);

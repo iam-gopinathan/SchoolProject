@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/News_Models/Create_news_model.dart';
-import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
-
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
@@ -15,11 +13,9 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
     BuildContext context, Function onCreateNews) async {
   final String rollNumber = UserSession().rollNumber ?? '';
   final String userType = UserSession().userType ?? '';
-
   String? postedOn;
   String? scheduleOn;
   String? draftedOn;
-
   if (action == 'post') {
     postedOn = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
   } else if (action == 'draft') {
@@ -29,7 +25,6 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
         ? newsPost.scheduleOn
         : DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
   }
-
   final Map<String, String> fields = {
     'Headline': newsPost.headline,
     'News': newsPost.news,
@@ -72,22 +67,25 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
     if (response.statusCode == 200) {
       print('News posted successfully!');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          backgroundColor: Colors.green,
-          content: Text('News Created Successfully!'),
-        ),
-      );
+      String snackBarMessage = '';
+      if (userType == 'superadmin') {
+        snackBarMessage = 'News Created Successfully!';
+      } else if (userType == 'admin' || userType == 'staff') {
+        snackBarMessage = 'News Creation Request Was Sent Successfully!';
+      }
 
-      // Add a delay of 2 seconds before navigating
+      if (snackBarMessage.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(snackBarMessage),
+          ),
+        );
+      }
+      // Delay before navigation
       await Future.delayed(Duration(seconds: 2));
-
       onCreateNews();
-
-      Navigator.pop(
-        context,
-      );
-
+      Navigator.pop(context);
       //
     } else {
       print('Failed to post news: ${response.statusCode}');
@@ -97,6 +95,10 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
           content: Text('Failed to post news.'),
         ),
       );
+      onCreateNews();
+      Navigator.pop(
+        context,
+      );
     }
   } catch (e) {
     print('Error posting news: $e');
@@ -105,6 +107,10 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
         backgroundColor: Colors.red,
         content: Text('Error posting news: $e'),
       ),
+    );
+    onCreateNews();
+    Navigator.pop(
+      context,
     );
   }
 }

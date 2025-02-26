@@ -159,8 +159,9 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -70,
-                  left: 180,
+                  top: -MediaQuery.of(context).size.height *
+                      0.08, // 8% of screen height
+                  left: MediaQuery.of(context).size.width * 0.45,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -177,7 +178,7 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   child: Column(
                     children: [
@@ -488,115 +489,125 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width * 0.03,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Received Feedback',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () async {
-                                await _selectDate(context);
-                                setState(() {
-                                  isloading = true;
-                                });
-                                await getFeedback(date: selectedDate);
-
-                                setState(() {
-                                  isloading = false;
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/Attendancepage_calendar_icon.svg',
-                                      fit: BoxFit.contain,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    displayDate,
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      color: Color.fromRGBO(73, 73, 73, 1),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 2,
-                                      decorationColor:
-                                          Color.fromRGBO(75, 75, 75, 1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    //filter icon..
-                    GestureDetector(
-                      onTap: () {
-                        _showFilterBottomSheet(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: SvgPicture.asset(
-                          'assets/icons/Filter_icon.svg',
-                          fit: BoxFit.contain,
-                          height: 30,
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateFeedback()));
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.Addiconcolor,
-                          shape: BoxShape.circle,
-                        ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ), // 3% of screen height),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
                         child: Icon(
-                          Icons.add,
+                          Icons.arrow_back,
                           color: Colors.black,
-                          size: 30,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Received Feedback',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              GestureDetector(
+                                onTap: () async {
+                                  await _selectDate(context);
+                                  setState(() {
+                                    isloading = true;
+                                  });
+                                  await getFeedback(date: selectedDate);
+
+                                  setState(() {
+                                    isloading = false;
+                                  });
+                                },
+                                child: Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/Attendancepage_calendar_icon.svg',
+                                        fit: BoxFit.contain,
+                                        height: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      displayDate,
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        color: Color.fromRGBO(73, 73, 73, 1),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      //filter icon..
+                      GestureDetector(
+                        onTap: () {
+                          _showFilterBottomSheet(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.08,
+                          ),
+                          child: SvgPicture.asset(
+                            'assets/icons/Filter_icon.svg',
+                            fit: BoxFit.contain,
+                            height: 30,
+                          ),
+                        ),
+                      ),
+                      //
+                      Padding(
+                        padding: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width * 0.02,
+                        ),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreateFeedback()));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -633,8 +644,14 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
                             child: Column(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 20, top: 10, bottom: 10),
+                                  padding: EdgeInsets.only(
+                                    left: MediaQuery.of(context).size.width *
+                                        0.03, // 5% of screen width
+                                    top: MediaQuery.of(context).size.height *
+                                        0.015, // 1.5% of screen height
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.015, // 1.5% of screen height
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -713,14 +730,17 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Container(
-                                      padding: EdgeInsets.all(15),
+                                      padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.04, // 4% of screen width
+                                      ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         color: Colors.white,
                                         border: Border.all(
                                           color:
                                               Color.fromRGBO(238, 238, 238, 1),
-                                          width: 1.5,
+                                          width: 1,
                                         ),
                                       ),
                                       child: Column(

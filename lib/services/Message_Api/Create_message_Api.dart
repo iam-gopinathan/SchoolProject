@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Message_models/CreateMessage_Models.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:http/http.dart' as http;
 import '../../utils/Api_Endpoints.dart';
 
@@ -36,14 +37,22 @@ Future<void> CreateMessage(
     if (response.statusCode == 200) {
       print('Message posted successfully: ${response.body}');
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Message Created Successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 3),
-        ),
-      );
-      //
+      String snackBarMessage = '';
+      if (UserSession().userType == 'superadmin') {
+        snackBarMessage = 'Message Created Successfully!';
+      } else if (UserSession().userType == 'admin' ||
+          UserSession().userType == 'staff') {
+        snackBarMessage = 'Message Creation Request Was Sent Successfully!';
+      }
+      if (snackBarMessage.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.green,
+            content: Text(snackBarMessage),
+          ),
+        );
+      }
+
       // Add a delay of 2 seconds before navigating
       await Future.delayed(Duration(seconds: 2));
       messageFetch();
@@ -51,13 +60,19 @@ Future<void> CreateMessage(
     } else if (response.statusCode == 404) {
       print(
           'Error: Endpoint not found. Check the API URL or backend configuration.');
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to Create Message!'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 3),
         ),
+      );
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+      messageFetch();
+
+      Navigator.pop(
+        context,
       );
     } else {
       print('Failed to post message: ${response.statusCode}');
@@ -69,6 +84,13 @@ Future<void> CreateMessage(
           duration: Duration(seconds: 3),
         ),
       );
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+      messageFetch();
+
+      Navigator.pop(
+        context,
+      );
     }
   } catch (e) {
     print('Error posting message: $e');
@@ -79,6 +101,13 @@ Future<void> CreateMessage(
         backgroundColor: Colors.red,
         duration: Duration(seconds: 3),
       ),
+    );
+    // Add a delay of 2 seconds before navigating
+    await Future.delayed(Duration(seconds: 2));
+    messageFetch();
+
+    Navigator.pop(
+      context,
     );
   }
 }

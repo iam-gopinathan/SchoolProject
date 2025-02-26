@@ -295,114 +295,138 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Exam Timetable',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.04),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
                         ),
-                      ],
-                    ),
-                    Spacer(),
-                    if (UserSession().userType == 'admin')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'My \n Projects',
-                              style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Exam Timetable',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Switch(
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeTrackColor: AppTheme.textFieldborderColor,
-                              inactiveTrackColor: Colors.white,
-                              inactiveThumbColor: Colors.black,
-                              value: isswitched,
-                              onChanged: (value) {
-                                setState(() {
-                                  isswitched = value;
-                                  isLoading = true;
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width *
+                                0.05, // 5% of screen width
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'My Projects',
+                                style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Switch(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeTrackColor: AppTheme.textFieldborderColor,
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.black,
+                                value: isswitched,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isswitched = value;
+                                    isLoading = true;
 
-                                  print(
-                                      'Switch is: ${isswitched ? "ON (Y)" : "OFF (N)"}');
-                                });
-                                _fetchExamMaintimetable();
-                              },
+                                    print(
+                                        'Switch is: ${isswitched ? "ON (Y)" : "OFF (N)"}');
+                                  });
+                                  _fetchExamMaintimetable();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      //filter icon..
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        GestureDetector(
+                          onTap: () {
+                            _showFilterBottomSheet(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              right: MediaQuery.of(context).size.width *
+                                  0.05, // 5% of screen width
                             ),
-                          ],
-                        ),
-                      ),
-                    //filter icon..
-                    if (UserSession().userType == 'admin' ||
-                        UserSession().userType == 'teacher')
-                      GestureDetector(
-                        onTap: () {
-                          _showFilterBottomSheet(context);
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 30),
-                          child: SvgPicture.asset(
-                            'assets/icons/Filter_icon.svg',
-                            fit: BoxFit.contain,
-                            height: 30,
+                            child: SvgPicture.asset(
+                              'assets/icons/Filter_icon.svg',
+                              fit: BoxFit.contain,
+                              height: 30,
+                            ),
                           ),
                         ),
-                      ),
-                    if (UserSession().userType == 'admin')
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateExamTimetables(
-                                        fetchmainexam: _fetchExamMaintimetable,
-                                      )));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
+                      //
+
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.025,
                           ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          CreateExamTimetables(
+                                            fetchmainexam:
+                                                _fetchExamMaintimetable,
+                                          )));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -416,540 +440,609 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                 color: AppTheme.textFieldborderColor,
               ),
             )
-          : FutureBuilder(
-              future: ExamtimeTableFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No Exam Timetable available.'));
-                } else {
-                  var data = snapshot.data!;
-                  return SingleChildScrollView(
-                    controller: _scrollController,
-                    child: Column(
-                      children: [
-                        ...data.map((e) {
-                          var classSign =
-                              _getClassSignByGradeId(e.gradeId.toString());
-                          return Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 10),
-                                child: Row(
-                                  children: [
-                                    Transform.translate(
-                                      offset: Offset(20, 16),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 5, horizontal: 10),
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Color.fromRGBO(48, 126, 185, 1),
-                                              Color.fromRGBO(0, 70, 123, 1),
-                                            ],
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                          ),
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                          ),
+          : SingleChildScrollView(
+              child: Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      gradeController.fetchGrades();
+                      showMenu(
+                        context: context,
+                        color: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        position: RelativeRect.fromLTRB(100, 180, 0, 0),
+                        items: [
+                          PopupMenuItem<String>(
+                            enabled: false,
+                            child: ConstrainedBox(
+                              constraints: const BoxConstraints(
+                                maxHeight: 150,
+                              ),
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children:
+                                      gradeController.examList.map((exam) {
+                                    return PopupMenuItem<String>(
+                                      value: exam,
+                                      child: Text(
+                                        exam,
+                                        style: const TextStyle(
+                                          fontFamily: 'regular',
+                                          fontSize: 14,
+                                          color: Colors.white,
                                         ),
-                                        child: Text(
-                                          '$classSign',
-                                          style: TextStyle(
-                                            fontFamily: 'medium',
-                                            fontSize: 12,
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        elevation: 8.0,
+                      ).then((value) {
+                        if (value != null) {
+                          print('Selected: $value');
+                          _fetchExamMaintimetable(exam: value);
+                        }
+                      });
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width *
+                            0.06, // 6% of screen width
+                        top: MediaQuery.of(context).size.height *
+                            0.014, // 1.2% of screen height
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/Filter_icon.svg',
+                            fit: BoxFit.contain,
+                            height: 20,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.012,
+                            ),
+                            child: Text(
+                              'by Exams',
+                              style: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 12,
+                                color: Color.fromRGBO(47, 47, 47, 1),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  //
+
+                  FutureBuilder(
+                    future: ExamtimeTableFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                            child: Text('No Exam Timetable available.'));
+                      } else {
+                        var data = snapshot.data!;
+                        return SingleChildScrollView(
+                          controller: _scrollController,
+                          child: Column(
+                            children: [
+                              ...data.map((e) {
+                                var classSign = _getClassSignByGradeId(
+                                    e.gradeId.toString());
+                                return Column(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.025,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Transform.translate(
+                                            offset: Offset(20, 20),
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 5, horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Color.fromRGBO(
+                                                        48, 126, 185, 1),
+                                                    Color.fromRGBO(
+                                                        0, 70, 123, 1),
+                                                  ],
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                ),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                '$classSign',
+                                                style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    //
+                                    Padding(
+                                      padding: EdgeInsets.all(
+                                          MediaQuery.of(context).size.width *
+                                              0.04),
+                                      child: Card(
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Container(
+                                          padding: EdgeInsets.all(15),
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
                                             color: Colors.white,
+                                            border: Border.all(
+                                              color: Color.fromRGBO(
+                                                  238, 238, 238, 1),
+                                              width: 1.5,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 15, top: 5),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      'Posted on : ${e.postedOn} | ${e.day}',
+                                                      style: TextStyle(
+                                                        fontFamily: 'regular',
+                                                        fontSize: 12,
+                                                        color: Colors.black,
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                              ),
+                                              ExpansionTile(
+                                                initiallyExpanded:
+                                                    data.indexOf(e) == 0,
+                                                shape: Border(),
+                                                title: Row(
+                                                  children: [
+                                                    Text(
+                                                      '${e.exam}',
+                                                      style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 12,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    Spacer(),
+                                                  ],
+                                                ),
+                                                children: [
+                                                  Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      Container(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: Colors
+                                                                    .transparent
+                                                                    .withOpacity(
+                                                                        0.6)),
+                                                        child: Center(
+                                                          child: Opacity(
+                                                            opacity: 0.6,
+                                                            child:
+                                                                Image.network(
+                                                              '${e.filePath}',
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      //
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          var imagePath =
+                                                              e.filePath;
+                                                          _showBottomSheetss(
+                                                              context,
+                                                              imagePath);
+                                                        },
+                                                        child: Container(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      20,
+                                                                  vertical: 5),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: Colors
+                                                                .transparent,
+                                                            border: Border.all(
+                                                                color: Colors
+                                                                    .white,
+                                                                width: 1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        30),
+                                                          ),
+                                                          child: Text(
+                                                            'View Image',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 14,
+                                                              fontFamily:
+                                                                  'semibold',
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 25),
+                                                    child: Row(
+                                                      children: [
+                                                        Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          children: [
+                                                            Text(
+                                                              'Posted by : ${e.postedBy}',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'regular',
+                                                                fontSize: 12,
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        138,
+                                                                        138,
+                                                                        138,
+                                                                        1),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Spacer(),
+                                                        if (UserSession().userType == 'admin' ||
+                                                            UserSession()
+                                                                    .userType ==
+                                                                'staff' ||
+                                                            UserSession()
+                                                                    .userType ==
+                                                                'superadmin')
+                                                          // if (e.isAlterAvailable ==
+                                                          //     'Y')
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              showDialog(
+                                                                  barrierDismissible:
+                                                                      false,
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                10)),
+                                                                        content:
+                                                                            Text(
+                                                                          "Do you really want to make\n changes to this ExamTimetable?",
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'regular',
+                                                                              fontSize: 16,
+                                                                              color: Colors.black),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Cancel',
+                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    )),
+                                                                                //edit...
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10),
+                                                                                  child: ElevatedButton(
+                                                                                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                      onPressed: () {
+                                                                                        Navigator.pop(context);
+                                                                                        Navigator.push(
+                                                                                            context,
+                                                                                            MaterialPageRoute(
+                                                                                                builder: (context) => EditExamtimetable(
+                                                                                                      id: e.id,
+                                                                                                      fetchmainexam: _fetchExamMaintimetable,
+                                                                                                    )));
+                                                                                      },
+                                                                                      child: Text(
+                                                                                        'Edit',
+                                                                                        style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                      )),
+                                                                                ),
+                                                                              ])
+                                                                        ]);
+                                                                  });
+                                                            },
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          5,
+                                                                      horizontal:
+                                                                          8),
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15),
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                              child: Row(
+                                                                children: [
+                                                                  SvgPicture.asset(
+                                                                      'assets/icons/timetable_upload.svg'),
+                                                                  Text(
+                                                                    'Reupload',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      fontFamily:
+                                                                          'medium',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        // delete icon
+                                                        if (UserSession().userType == 'admin' ||
+                                                            UserSession()
+                                                                    .userType ==
+                                                                'staff' ||
+                                                            UserSession()
+                                                                    .userType ==
+                                                                'superadmin')
+                                                          // if (e.isAlterAvailable ==
+                                                          //     'Y')
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              showDialog(
+                                                                  barrierDismissible:
+                                                                      false,
+                                                                  context:
+                                                                      context,
+                                                                  builder:
+                                                                      (BuildContext
+                                                                          context) {
+                                                                    return AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors
+                                                                                .white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius: BorderRadius.circular(
+                                                                                10)),
+                                                                        content:
+                                                                            Text(
+                                                                          "Do you really want to Delete\n  to this ExamTimetable?",
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'regular',
+                                                                              fontSize: 16,
+                                                                              color: Colors.black),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                              mainAxisAlignment: MainAxisAlignment.center,
+                                                                              children: [
+                                                                                ElevatedButton(
+                                                                                    style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                    onPressed: () {
+                                                                                      Navigator.pop(context);
+                                                                                    },
+                                                                                    child: Text(
+                                                                                      'Cancel',
+                                                                                      style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    )),
+                                                                                //delete...
+                                                                                Padding(
+                                                                                  padding: const EdgeInsets.only(left: 10),
+                                                                                  child: ElevatedButton(
+                                                                                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                      onPressed: () async {
+                                                                                        var examtimetableId = e.id;
+                                                                                        final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeExamTimetable/DeleteExamTimeTable?Id=$examtimetableId';
+
+                                                                                        try {
+                                                                                          final response = await http.delete(
+                                                                                            Uri.parse(url),
+                                                                                            headers: {
+                                                                                              'Content-Type': 'application/json',
+                                                                                              'Authorization': 'Bearer $authToken',
+                                                                                            },
+                                                                                          );
+
+                                                                                          if (response.statusCode == 200) {
+                                                                                            print('id has beeen deleted ${examtimetableId}');
+
+                                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                                              SnackBar(backgroundColor: Colors.green, content: Text('Examtimetable deleted successfully!')),
+                                                                                            );
+
+                                                                                            // Refresh the news data after deletion
+                                                                                            Navigator.pop(context);
+                                                                                            //
+                                                                                            await _fetchExamMaintimetable();
+                                                                                          } else {
+                                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                                              SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete examtimetable.')),
+                                                                                            );
+                                                                                          }
+                                                                                        } catch (e) {
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(content: Text('An error occurred: $e')),
+                                                                                          );
+                                                                                        }
+                                                                                        _fetchExamMaintimetable();
+
+                                                                                        Navigator.pop(context);
+                                                                                      },
+                                                                                      child: Text(
+                                                                                        'Delete',
+                                                                                        style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                      )),
+                                                                                ),
+                                                                              ])
+                                                                        ]);
+                                                                  });
+                                                            },
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      horizontal:
+                                                                          10),
+                                                              child: SvgPicture
+                                                                  .asset(
+                                                                'assets/icons/timetable_delete.svg',
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                                height: 25,
+                                                              ),
+                                                            ),
+                                                          ),
+
+                                                        //
+                                                        //download
+                                                        if (UserSession()
+                                                                .userType ==
+                                                            'student')
+                                                          GestureDetector(
+                                                            onTap: () {
+                                                              var imageUrl =
+                                                                  e.filePath;
+                                                              downloadImage(
+                                                                  imageUrl);
+                                                            },
+                                                            child: Container(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          5,
+                                                                      horizontal:
+                                                                          20),
+                                                              decoration: BoxDecoration(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                  border: Border.all(
+                                                                      color: Colors
+                                                                          .black,
+                                                                      width:
+                                                                          1.5)),
+                                                              child: Row(
+                                                                children: [
+                                                                  SvgPicture
+                                                                      .asset(
+                                                                    'assets/icons/Dwnl_icon.svg',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                    height: 20,
+                                                                  ),
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            5),
+                                                                    child: Text(
+                                                                      'Download',
+                                                                      style: TextStyle(
+                                                                          fontFamily:
+                                                                              'medium',
+                                                                          fontSize:
+                                                                              12,
+                                                                          color:
+                                                                              Colors.black),
+                                                                    ),
+                                                                  )
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  gradeController.fetchGrades();
-                                  showMenu(
-                                    context: context,
-                                    color: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    position:
-                                        RelativeRect.fromLTRB(100, 180, 0, 0),
-                                    items: [
-                                      PopupMenuItem<String>(
-                                        enabled: false,
-                                        child: ConstrainedBox(
-                                          constraints: const BoxConstraints(
-                                            maxHeight: 150,
-                                          ),
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: gradeController.examList
-                                                  .map((exam) {
-                                                return PopupMenuItem<String>(
-                                                  value: exam,
-                                                  child: Text(
-                                                    exam,
-                                                    style: const TextStyle(
-                                                      fontFamily: 'regular',
-                                                      fontSize: 14,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                    elevation: 8.0,
-                                  ).then((value) {
-                                    if (value != null) {
-                                      print('Selected: $value');
-                                      _fetchExamMaintimetable(exam: value);
-                                    }
-                                  });
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 25),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      SvgPicture.asset(
-                                        'assets/icons/Filter_icon.svg',
-                                        fit: BoxFit.contain,
-                                        height: 20,
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 5),
-                                        child: Text(
-                                          'by Exams',
-                                          style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 12,
-                                            color:
-                                                Color.fromRGBO(47, 47, 47, 1),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Card(
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Container(
-                                    padding: EdgeInsets.all(15),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: Colors.white,
-                                      border: Border.all(
-                                        color: Color.fromRGBO(238, 238, 238, 1),
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 15, top: 5),
-                                          child: Row(
-                                            children: [
-                                              Text(
-                                                'Posted on : ${e.postedOn} | ${e.day}',
-                                                style: TextStyle(
-                                                  fontFamily: 'regular',
-                                                  fontSize: 12,
-                                                  color: Colors.black,
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        ExpansionTile(
-                                          initiallyExpanded:
-                                              data.indexOf(e) == 0,
-                                          shape: Border(),
-                                          title: Row(
-                                            children: [
-                                              Text(
-                                                '${e.exam}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 12,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              Spacer(),
-                                            ],
-                                          ),
-                                          children: [
-                                            Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                Center(
-                                                  child: Opacity(
-                                                    opacity: 0.6,
-                                                    child: Image.network(
-                                                      '${e.filePath}',
-                                                      fit: BoxFit.cover,
-                                                    ),
-                                                  ),
-                                                ),
-                                                //
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    var imagePath = e.filePath;
-                                                    _showBottomSheetss(
-                                                        context, imagePath);
-                                                  },
-                                                  child: Container(
-                                                    padding: const EdgeInsets
-                                                        .symmetric(
-                                                        horizontal: 20,
-                                                        vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.transparent,
-                                                      border: Border.all(
-                                                          color: Colors.white,
-                                                          width: 1.5),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              30),
-                                                    ),
-                                                    child: Text(
-                                                      'View Image',
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontFamily: 'semibold',
-                                                      ),
-                                                    ),
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 25),
-                                              child: Row(
-                                                children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Posted by : ${e.postedBy}',
-                                                        style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 12,
-                                                          color: Color.fromRGBO(
-                                                              138, 138, 138, 1),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Spacer(),
-                                                  if (UserSession().userType ==
-                                                      'admin')
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        showDialog(
-                                                            barrierDismissible:
-                                                                false,
-                                                            context: context,
-                                                            builder:
-                                                                (BuildContext
-                                                                    context) {
-                                                              return AlertDialog(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10)),
-                                                                  content: Text(
-                                                                    "Do you really want to make\n changes to this ExamTimetable?",
-                                                                    style: TextStyle(
-                                                                        fontFamily:
-                                                                            'regular',
-                                                                        fontSize:
-                                                                            16,
-                                                                        color: Colors
-                                                                            .black),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                  actions: <Widget>[
-                                                                    Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                'Cancel',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                          //edit...
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 10),
-                                                                            child: ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                  Navigator.push(
-                                                                                      context,
-                                                                                      MaterialPageRoute(
-                                                                                          builder: (context) => EditExamtimetable(
-                                                                                                id: e.id,
-                                                                                                fetchmainexam: _fetchExamMaintimetable,
-                                                                                              )));
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Edit',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                          ),
-                                                                        ])
-                                                                  ]);
-                                                            });
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 5,
-                                                                horizontal: 8),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(15),
-                                                          border: Border.all(
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                        child: Row(
-                                                          children: [
-                                                            SvgPicture.asset(
-                                                                'assets/icons/timetable_upload.svg'),
-                                                            Text(
-                                                              'Reupload',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'medium',
-                                                                fontSize: 12,
-                                                                color: Colors
-                                                                    .black,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  // delete icon
-                                                  if (UserSession().userType ==
-                                                      'admin')
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        showDialog(
-                                                            barrierDismissible:
-                                                                false,
-                                                            context: context,
-                                                            builder:
-                                                                (BuildContext
-                                                                    context) {
-                                                              return AlertDialog(
-                                                                  backgroundColor:
-                                                                      Colors
-                                                                          .white,
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10)),
-                                                                  content: Text(
-                                                                    "Do you really want to Delete\n  to this ExamTimetable?",
-                                                                    style: TextStyle(
-                                                                        fontFamily:
-                                                                            'regular',
-                                                                        fontSize:
-                                                                            16,
-                                                                        color: Colors
-                                                                            .black),
-                                                                    textAlign:
-                                                                        TextAlign
-                                                                            .center,
-                                                                  ),
-                                                                  actions: <Widget>[
-                                                                    Row(
-                                                                        mainAxisAlignment:
-                                                                            MainAxisAlignment.center,
-                                                                        children: [
-                                                                          ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                'Cancel',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                          //delete...
-                                                                          Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(left: 10),
-                                                                            child: ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                                onPressed: () async {
-                                                                                  var examtimetableId = e.id;
-                                                                                  final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeExamTimetable/DeleteExamTimeTable?Id=$examtimetableId';
-
-                                                                                  try {
-                                                                                    final response = await http.delete(
-                                                                                      Uri.parse(url),
-                                                                                      headers: {
-                                                                                        'Content-Type': 'application/json',
-                                                                                        'Authorization': 'Bearer $authToken',
-                                                                                      },
-                                                                                    );
-
-                                                                                    if (response.statusCode == 200) {
-                                                                                      print('id has beeen deleted ${examtimetableId}');
-
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(backgroundColor: Colors.green, content: Text('Examtimetable deleted successfully!')),
-                                                                                      );
-
-                                                                                      // Refresh the news data after deletion
-                                                                                      Navigator.pop(context);
-                                                                                      //
-                                                                                      await _fetchExamMaintimetable();
-                                                                                    } else {
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete examtimetable.')),
-                                                                                      );
-                                                                                    }
-                                                                                  } catch (e) {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(content: Text('An error occurred: $e')),
-                                                                                    );
-                                                                                  }
-                                                                                  _fetchExamMaintimetable();
-
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Delete',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                          ),
-                                                                        ])
-                                                                  ]);
-                                                            });
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                horizontal: 10),
-                                                        child: SvgPicture.asset(
-                                                          'assets/icons/timetable_delete.svg',
-                                                          fit: BoxFit.contain,
-                                                          height: 25,
-                                                        ),
-                                                      ),
-                                                    ),
-
-                                                  //
-                                                  //download
-                                                  if (UserSession().userType ==
-                                                      'student')
-                                                    GestureDetector(
-                                                      onTap: () {
-                                                        var imageUrl =
-                                                            e.filePath;
-                                                        downloadImage(imageUrl);
-                                                      },
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 5,
-                                                                horizontal: 20),
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20),
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .black,
-                                                                width: 1.5)),
-                                                        child: Row(
-                                                          children: [
-                                                            SvgPicture.asset(
-                                                              'assets/icons/Dwnl_icon.svg',
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                              height: 20,
-                                                            ),
-                                                            Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 5),
-                                                              child: Text(
-                                                                'Download',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'medium',
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Colors
-                                                                        .black),
-                                                              ),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    )
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                                );
+                              }).toList(),
                             ],
-                          );
-                        }).toList(),
-                      ],
-                    ),
-                  );
-                }
-              },
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
       //
       //top arrow..
@@ -1074,6 +1167,8 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
         await file.writeAsBytes(response.bodyBytes);
         print('Image downloaded to: $filePath');
         showDownloadNotification(filePath);
+        await Future.delayed(Duration(seconds: 3));
+        openFile(filePath);
       } else {
         print('Failed to download image');
       }
@@ -1092,6 +1187,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
+      icon: '@mipmap/ic_launcher',
     );
     const NotificationDetails platformDetails =
         NotificationDetails(android: androidDetails);

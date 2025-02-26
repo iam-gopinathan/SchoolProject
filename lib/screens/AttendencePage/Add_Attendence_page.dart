@@ -446,8 +446,9 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
             children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: -MediaQuery.of(context).size.height *
+                    0.08, // 8% of screen height
+                left: MediaQuery.of(context).size.width * 0.45,
                 child: GestureDetector(
                   onTap: () {
                     setModalState(() {});
@@ -466,7 +467,7 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
               ),
               Container(
                 height: MediaQuery.of(context).size.height *
-                    0.4, //bottomsheet containner
+                    0.5, //bottomsheet containner
                 width: double.infinity,
                 child: Column(
                   children: [
@@ -656,42 +657,47 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.textFieldborderColor),
-                          onPressed: () {
-                            setState(() {
-                              // isLoading = true;
-                            });
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.02),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: AppTheme.textFieldborderColor),
+                            onPressed: () {
+                              setState(() {
+                                // isLoading = true;
+                              });
 
-                            Navigator.pop(context);
+                              Navigator.pop(context);
 
-                            status = 'overall';
+                              status = 'overall';
 
-                            print('Selected Class: $selectedGrade');
-                            print('Selected Section: $selectedGradeSection');
+                              print('Selected Class: $selectedGrade');
+                              print('Selected Section: $selectedGradeSection');
 
-                            String formattedDate =
-                                DateFormat('dd-MM-yyyy').format(DateTime.now());
+                              String formattedDate = DateFormat('dd-MM-yyyy')
+                                  .format(DateTime.now());
 
-                            _fetchAddgetAttendanceData(selectedGrade,
-                                selectedGradeSection, formattedDate, status);
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 50),
-                            child: Text(
-                              'OK',
-                              style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 16,
-                                  color: Colors.black),
+                              _fetchAddgetAttendanceData(selectedGrade,
+                                  selectedGradeSection, formattedDate, status);
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 50),
+                              child: Text(
+                                'OK',
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -709,6 +715,7 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        titleSpacing: 0,
         iconTheme: IconThemeData(color: Colors.black),
         automaticallyImplyLeading: true,
         backgroundColor: AppTheme.appBackgroundPrimaryColor,
@@ -723,7 +730,8 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
           children: [
             //search container..
             Padding(
-              padding: const EdgeInsets.only(top: 20),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.05),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -733,12 +741,12 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                         controller: _searchController,
                         decoration: InputDecoration(
                           fillColor: Colors.white,
-                          contentPadding: EdgeInsets.symmetric(vertical: 5),
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
                           hintText: 'Student by Name or Roll Number',
                           hintStyle: TextStyle(
                               fontFamily: 'regular',
                               fontSize: 14,
-                              fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(94, 94, 94, 1)),
                           prefixIcon: Icon(Icons.search,
                               color: Color.fromRGBO(94, 94, 94, 1)),
@@ -840,11 +848,13 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
             ),
             //overall tab section...
             Padding(
-              padding: const EdgeInsets.only(top: 18),
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.02),
               child: Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 20),
+                    padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width * 0.05),
                     child: Container(
                       width: MediaQuery.of(context).size.width * 0.7,
                       padding: EdgeInsets.symmetric(
@@ -1008,7 +1018,8 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                   Spacer(),
                   //export icons....
                   Padding(
-                    padding: const EdgeInsets.only(right: 20),
+                    padding: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width * 0.05),
                     child: GestureDetector(
                       onTap: () async {
                         print('export clicked');
@@ -1031,7 +1042,6 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                 ],
               ),
             ),
-
             //next section.....
             isLoading
                 ? Padding(
@@ -1060,11 +1070,17 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                       return Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(left: 15, top: 15),
+                            padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.05,
+                              top: MediaQuery.of(context).size.height * 0.01,
+                            ),
                             child: Row(
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 10),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.01,
+                                  ),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.only(
@@ -1080,7 +1096,11 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
-                                            padding: EdgeInsets.all(6),
+                                            padding: EdgeInsets.all(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.02),
                                             decoration: BoxDecoration(
                                               borderRadius: BorderRadius.only(
                                                 topLeft: Radius.circular(10),
@@ -1106,8 +1126,11 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                                           ),
                                           // Grade and Section Info
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 10),
+                                            padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
                                             child: Text(
                                               'Class Teacher - ',
                                               style: TextStyle(
@@ -1119,8 +1142,16 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                                           ),
                                           // Class Teacher Name
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 15, right: 10),
+                                            padding: EdgeInsets.only(
+                                              left: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.05,
+                                              right: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.03,
+                                            ),
                                             child: Text(
                                               attendanceData.classTeacher ??
                                                   'N/A',
@@ -1157,10 +1188,7 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                     physics: NeverScrollableScrollPhysics(),
                     itemCount: filteredStudents.length,
                     itemBuilder: (context, index) {
-                      // var student = attendanceData?.details?[index];
-
                       var student = filteredStudents[index];
-
                       return Padding(
                         padding:
                             const EdgeInsets.only(top: 10, left: 10, right: 10),

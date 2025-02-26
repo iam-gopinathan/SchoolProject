@@ -57,12 +57,12 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
     }
   }
 
+  //filter bottomsheet..
   void _showFilterBottomSheet(BuildContext context) {
     String selectedGrade = '';
     List<String> sections = [];
     String selectedSection = '';
     final gradeController = Get.find<GradeController>();
-
     showModalBottomSheet(
       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
       context: context,
@@ -76,8 +76,8 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -70,
-                  left: 180,
+                  top: MediaQuery.of(context).size.height * -0.09,
+                  left: MediaQuery.of(context).size.width * 0.45,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -124,7 +124,8 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
                         child: Card(
                           elevation: 0,
                           child: Container(
@@ -133,8 +134,12 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                               children: [
                                 // Select Class
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 30, left: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.03,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.05,
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -150,7 +155,10 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                 ),
                                 // Classes
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.02,
+                                  ),
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
@@ -209,8 +217,12 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                 // Select Section
                                 if (sections.isNotEmpty) ...[
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 30, left: 20),
+                                    padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.02,
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05,
+                                    ),
                                     child: Row(
                                       children: [
                                         Text(
@@ -226,7 +238,10 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20),
+                                    padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.02,
+                                    ),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
@@ -363,7 +378,7 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
   }
 
   void _scrollListener() {
-    setState(() {}); // Trigger UI update when scroll position changes
+    setState(() {});
   }
 
   @override
@@ -387,143 +402,122 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        widget.fetch();
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Received Consent Form',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () async {
-                                await _selectDate(context);
-                                setState(() {
-                                  isLoading = true;
-                                });
-                                await _recievedconsent(date: selectedDate);
-                              },
-                              child: Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/Attendancepage_calendar_icon.svg',
-                                      fit: BoxFit.contain,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    displayDate,
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      color: Color.fromRGBO(73, 73, 73, 1),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 2,
-                                      decorationColor:
-                                          Color.fromRGBO(75, 75, 75, 1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    // Padding(
-                    //   padding: const EdgeInsets.only(right: 20),
-                    //   child: Column(
-                    //     crossAxisAlignment: CrossAxisAlignment.start,
-                    //     children: [
-                    //       Text(
-                    //         'My \n Projects',
-                    //         style: TextStyle(
-                    //           fontFamily: 'medium',
-                    //           fontSize: 12,
-                    //           color: Colors.black,
-                    //           fontWeight: FontWeight.bold,
-                    //         ),
-                    //         textAlign: TextAlign.center,
-                    //       ),
-                    //       Switch(
-                    //         materialTapTargetSize:
-                    //             MaterialTapTargetSize.shrinkWrap,
-                    //         activeTrackColor: AppTheme.textFieldborderColor,
-                    //         inactiveTrackColor: Colors.white,
-                    //         inactiveThumbColor: Colors.black,
-                    //         value: isswitched,
-                    //         onChanged: (value) {
-                    //           setState(() {
-                    //             isswitched = value;
-                    //           });
-                    //           _recievedconsent()
-                    //         },
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    //filter icon..
-                    GestureDetector(
-                      onTap: () {
-                        _showFilterBottomSheet(context);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: SvgPicture.asset(
-                          'assets/icons/Filter_icon.svg',
-                          fit: BoxFit.contain,
-                          height: 30,
-                        ),
-                      ),
-                    ),
-
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateConsentformpage(
-                                      fetch: _recievedconsent,
-                                    )));
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.Addiconcolor,
-                          shape: BoxShape.circle,
-                        ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ), // 3% of screen height),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          widget.fetch();
+                          Navigator.pop(context);
+                        },
                         child: Icon(
-                          Icons.add,
+                          Icons.arrow_back,
                           color: Colors.black,
-                          size: 30,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Received Consent Form',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              GestureDetector(
+                                onTap: () async {
+                                  await _selectDate(context);
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await _recievedconsent(date: selectedDate);
+                                },
+                                child: Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/Attendancepage_calendar_icon.svg',
+                                        fit: BoxFit.contain,
+                                        height: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      displayDate,
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        color: Color.fromRGBO(73, 73, 73, 1),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+
+                      //filter icon..
+                      GestureDetector(
+                        onTap: () {
+                          _showFilterBottomSheet(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              right:
+                                  MediaQuery.of(context).size.width * 0.0833),
+                          child: SvgPicture.asset(
+                            'assets/icons/Filter_icon.svg',
+                            fit: BoxFit.contain,
+                            height: 30,
+                          ),
+                        ),
+                      ),
+                      //create
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                              right: MediaQuery.of(context).size.width * 0.025),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          CreateConsentformpage(
+                                            fetch: _recievedconsent,
+                                          )));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -904,57 +898,33 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                           ],
                         );
                       }),
-                      //top arrow..
-                      //top arrow..
-                      if (_scrollController.hasClients &&
-                          _scrollController.offset > 100)
-                        Column(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                shape: BoxShape.circle,
-                              ),
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.arrow_upward_outlined,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  _scrollController.animateTo(
-                                    0,
-                                    duration: Duration(seconds: 1),
-                                    curve: Curves.easeInOut,
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        )
                     ],
                   ),
                 ),
-      //
+
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_upward_outlined,
-                      color: Colors.white,
+              ? Transform.translate(
+                  offset: Offset(0, -20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
                 )
               : null,

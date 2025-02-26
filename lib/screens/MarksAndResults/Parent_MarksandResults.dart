@@ -4,12 +4,10 @@ import 'package:excel/excel.dart' hide Border;
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:open_file/open_file.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Marks_models/ParentMarks_model.dart';
 import 'package:flutter_application_1/services/Marks_Api/Parents_marks_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
-
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
@@ -112,39 +110,44 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Marks/Results',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ), // 3% of screen height)
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
                         ),
-                      ],
-                    ),
-                    Spacer(),
-                  ],
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                      Text(
+                        'Marks/Results',
+                        style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -198,7 +201,8 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                           ),
                           //comparison..
                           Padding(
-                            padding: const EdgeInsets.only(left: 15),
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.04),
                             child: GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -244,7 +248,8 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                       ),
                     )
                   : Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(
+                          MediaQuery.of(context).size.width * 0.03),
                       child: Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Container(
@@ -254,7 +259,7 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                                 color: Color.fromRGBO(215, 215, 215, 1),
-                                width: 1),
+                                width: 0.8),
                           ),
                           child: Column(
                             children: [
@@ -299,14 +304,15 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                               ),
                               if (ismarks)
                                 Padding(
-                                  padding: const EdgeInsets.all(10.0),
+                                  padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width * 0.03),
                                   child: Container(
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(10),
                                       border: Border.all(
                                         color: Color.fromRGBO(215, 215, 215, 1),
-                                        width: 1,
+                                        width: 0.5,
                                       ),
                                     ),
                                     child: Column(
@@ -332,20 +338,26 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                     ),
                                                     children: [
                                                       Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(10.0),
+                                                        padding: EdgeInsets.all(
+                                                            MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.03),
                                                         child: Divider(
                                                           color: Color.fromRGBO(
                                                               249, 249, 249, 1),
-                                                          thickness: 2,
-                                                          height: 4,
+                                                          thickness: 1,
+                                                          height: 5,
                                                         ),
                                                       ),
                                                       Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(8.0),
+                                                        padding: EdgeInsets.all(
+                                                            MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.02),
                                                         child: Row(
                                                           children: [
                                                             DataTable(
@@ -473,10 +485,12 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                                   : [],
                                                             ),
                                                             Padding(
-                                                              padding:
-                                                                  const EdgeInsets
-                                                                      .only(
-                                                                      left: 30),
+                                                              padding: EdgeInsets.only(
+                                                                  left: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.08),
                                                               child: Column(
                                                                 children: [
                                                                   Row(
@@ -640,7 +654,7 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                             side: BorderSide(
                                                                 color: Colors
                                                                     .black,
-                                                                width: 1.5),
+                                                                width: 1),
                                                           ),
                                                           elevation: 0,
                                                           backgroundColor:
@@ -670,11 +684,23 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                         children: [
                                                           Padding(
                                                             padding:
-                                                                const EdgeInsets
-                                                                    .only(
-                                                                    top: 10,
-                                                                    left: 45,
-                                                                    bottom: 20),
+                                                                EdgeInsets.only(
+                                                              top: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height *
+                                                                  0.015, // 1.5% of screen height
+                                                              left: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width *
+                                                                  0.12, // 12% of screen width
+                                                              bottom: MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .height *
+                                                                  0.025, // 2.5% of screen heigh
+                                                            ),
                                                             child:
                                                                 ElevatedButton(
                                                               style:
@@ -709,7 +735,6 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                                                     sheetObject =
                                                                     excel[
                                                                         'Sheet1'];
-
                                                                 // Base headers
                                                                 List<CellValue>
                                                                     headers = [

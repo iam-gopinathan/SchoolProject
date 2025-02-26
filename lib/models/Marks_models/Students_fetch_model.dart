@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class StudentsFetchModel {
   final String rollNumber;
   final String name;
@@ -17,11 +15,11 @@ class StudentsFetchModel {
 
   factory StudentsFetchModel.fromJson(Map<String, dynamic> json) {
     return StudentsFetchModel(
-      rollNumber: json['rollNumber'],
-      name: json['name'],
-      grade: json['grade'],
-      section: json['section'],
-      profile: json['profile'],
+      rollNumber: json['rollNumber'] ?? '',
+      name: json['name'] ?? '',
+      grade: json['grade'] ?? '',
+      section: json['section'] ?? '',
+      profile: json['profile'] ?? '',
     );
   }
 }
@@ -48,10 +46,10 @@ class GradeMarkss {
         list.map((i) => StudentsFetchModel.fromJson(i)).toList();
 
     return GradeMarkss(
-      gradeId: json['gradeId'],
-      section: json['section'],
-      gradeSection: json['gradeSection'],
-      subjects: List<String>.from(json['subjects']),
+      gradeId: json['gradeId'] ?? '',
+      section: json['section'] ?? "",
+      gradeSection: json['gradeSection'] ?? '',
+      subjects: List<String>.from(json['subjects'] ?? ''),
       students: studentList,
       classTeacher: json['classTeacher'] ?? '',
     );

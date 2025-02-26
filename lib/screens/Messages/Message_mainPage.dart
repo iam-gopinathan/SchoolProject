@@ -21,7 +21,6 @@ class MessageMainpage extends StatefulWidget {
 
 class _MessageMainpageState extends State<MessageMainpage> {
   TextEditingController searchcontroller = TextEditingController();
-
   //select date
   String selectedDate = '';
   var displayDate = '';
@@ -160,6 +159,7 @@ class _MessageMainpageState extends State<MessageMainpage> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
         child: AppBar(
+          titleSpacing: 0,
           backgroundColor: Colors.white,
           iconTheme: IconThemeData(color: Colors.black),
           automaticallyImplyLeading: false,
@@ -170,135 +170,146 @@ class _MessageMainpageState extends State<MessageMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Messages',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () async {
-                                await _selectDate(context);
-                                _fetchPosts();
-                              },
-                              child: Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/Attendancepage_calendar_icon.svg',
-                                      fit: BoxFit.contain,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    displayDate,
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      color: Color.fromRGBO(73, 73, 73, 1),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 2,
-                                      decorationColor:
-                                          Color.fromRGBO(75, 75, 75, 1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.04),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
                         ),
-                      ],
-                    ),
-                    Spacer(),
-                    if (UserSession().userType == 'admin')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'My \n Projects',
-                              style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Messages',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
                               ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Switch(
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeTrackColor: AppTheme.textFieldborderColor,
-                              inactiveTrackColor: Colors.white,
-                              inactiveThumbColor: Colors.black,
-                              value: isswitched,
-                              onChanged: (value) {
-                                setState(() {
-                                  isswitched = value;
-                                });
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.007,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  await _selectDate(context);
+                                  _fetchPosts();
+                                },
+                                child: Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/Attendancepage_calendar_icon.svg',
+                                        fit: BoxFit.contain,
+                                        height: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      displayDate,
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        color: Color.fromRGBO(73, 73, 73, 1),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.05,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'My Projects',
+                                style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Switch(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeTrackColor: AppTheme.textFieldborderColor,
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.black,
+                                activeColor: Colors.white,
+                                value: isswitched,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isswitched = value;
+                                  });
 
-                                _fetchPosts();
-                              },
-                            ),
-                          ],
+                                  _fetchPosts();
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-//create mesages screen....
-                    if (UserSession().userType == 'admin')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Createmessagepage(
-                                          messageFetch: _fetchPosts,
-                                        )));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.Addiconcolor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 30,
+                      //create mesages screen....
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.05,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Createmessagepage(
+                                            messageFetch: _fetchPosts,
+                                          )));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -308,7 +319,9 @@ class _MessageMainpageState extends State<MessageMainpage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 15),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).size.height * 0.02,
+            ),
             child: Container(
               color: Colors.white,
               child: Column(
@@ -324,6 +337,7 @@ class _MessageMainpageState extends State<MessageMainpage> {
                           controller: searchcontroller,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: 5),
                               prefixIcon: Transform.translate(
                                 offset: Offset(75, 0),
                                 child: Icon(Icons.search,
@@ -416,99 +430,131 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                       final message = post.messages[innerIndex];
                                       return Column(
                                         children: [
-                                          //postedon..
-
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 50, top: 20),
-                                            child: Row(
-                                              children: [
-                                                //postedon date....
-                                                Text(
-                                                  'Posted on : ${post.postedOnDate}',
-                                                  style: TextStyle(
-                                                      fontFamily: 'regular',
-                                                      fontSize: 12,
-                                                      color: Colors.black),
-                                                ),
-                                              ],
+                                            padding: EdgeInsets.only(
+                                              left: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.07,
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.03,
                                             ),
-                                          ),
-                                          Transform.translate(
-                                            offset: Offset(
-                                                post.tag.isEmpty ? 50 : 0, 25),
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  post.tag.isEmpty
-                                                      ? MainAxisAlignment.start
-                                                      : MainAxisAlignment
-                                                          .spaceAround,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Posted on : ${post.postedOnDate}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'regular',
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ],
+                                                ),
+                                                //
                                                 if (message
                                                     .updatedOn!.isNotEmpty)
-                                                  Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                      vertical: 10,
-                                                    ),
-                                                    decoration: BoxDecoration(
-                                                      color: Color.fromRGBO(
-                                                          255, 251, 245, 1),
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(10),
-                                                        topRight:
-                                                            Radius.circular(10),
+                                                  Row(
+                                                    children: [
+                                                      //updatedon
+                                                      Transform.translate(
+                                                        offset: Offset(1, 20),
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 10,
+                                                                  horizontal:
+                                                                      10),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    255,
+                                                                    251,
+                                                                    245,
+                                                                    1),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .only(
+                                                              topLeft: Radius
+                                                                  .circular(10),
+                                                              topRight: Radius
+                                                                  .circular(10),
+                                                            ),
+                                                          ),
+                                                          child: Text(
+                                                            'Updated on ${message.updatedOn}',
+                                                            style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 10,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      49,
+                                                                      49,
+                                                                      49,
+                                                                      1),
+                                                            ),
+                                                          ),
+                                                        ),
                                                       ),
-                                                    ),
-                                                    child: Text(
-                                                      'Updated on ${message.updatedOn}',
-                                                      style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 10,
-                                                        color: Color.fromRGBO(
-                                                            49, 49, 49, 1),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                if (message.updatedOn!.isEmpty)
-                                                  SizedBox(
-                                                    width: 100,
-                                                  ),
-                                                //today
-                                                if (post.tag.isNotEmpty)
-                                                  Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 8,
-                                                            horizontal: 20),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(10),
-                                                        topRight:
-                                                            Radius.circular(10),
-                                                      ),
-                                                      color: AppTheme
-                                                          .textFieldborderColor,
-                                                    ),
-                                                    child: Text(
-                                                      '${post.tag}',
-                                                      style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        color: Colors.black,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
+                                                      Spacer(),
+                                                      //today
+                                                      if (post.tag.isNotEmpty)
+                                                        Transform.translate(
+                                                          offset:
+                                                              Offset(-30, 24),
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical: 8,
+                                                                    horizontal:
+                                                                        20),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .only(
+                                                                topLeft: Radius
+                                                                    .circular(
+                                                                        10),
+                                                                topRight: Radius
+                                                                    .circular(
+                                                                        10),
+                                                              ),
+                                                              color: AppTheme
+                                                                  .textFieldborderColor,
+                                                            ),
+                                                            child: Text(
+                                                              '${post.tag}',
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'medium',
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                    ],
                                                   ),
                                               ],
                                             ),
                                           ),
+
                                           //cardsection...
                                           Padding(
-                                            padding: const EdgeInsets.all(15.0),
+                                            padding: EdgeInsets.all(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.04),
                                             child: Card(
                                               shape: RoundedRectangleBorder(
                                                   side: BorderSide(
@@ -518,26 +564,54 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           15)),
-                                              elevation: 1,
+                                              elevation: 0,
                                               child: Container(
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
                                                     0.9,
-                                                padding: EdgeInsets.all(15),
+                                                padding: EdgeInsets.all(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.04),
                                                 color: Colors.white,
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
                                                     //heading.....
-                                                    Text(
-                                                      '${message.headLine ?? ''}',
-                                                      style: TextStyle(
-                                                          fontFamily:
-                                                              'semibold',
-                                                          fontSize: 16,
-                                                          color: Colors.black),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 7),
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
+                                                        child: Text(
+                                                          '${message.headLine ?? ''}',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'semibold',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    //
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 10),
+                                                      child: Divider(
+                                                        thickness: 1,
+                                                        color: Color.fromRGBO(
+                                                            243, 243, 243, 1),
+                                                      ),
                                                     ),
 //
                                                     Container(
@@ -545,7 +619,7 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                           MediaQuery.of(context)
                                                                   .size
                                                                   .width *
-                                                              0.7,
+                                                              0.8,
                                                       child: message.message !=
                                                                   null &&
                                                               message.message!
@@ -561,6 +635,17 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                               },
                                                             )
                                                           : const Text(''),
+                                                    ),
+                                                    //
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              top: 10),
+                                                      child: Divider(
+                                                        thickness: 1,
+                                                        color: Color.fromRGBO(
+                                                            243, 243, 243, 1),
+                                                      ),
                                                     ),
                                                     Padding(
                                                       padding:
@@ -597,9 +682,9 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                         12,
                                                                     color: Color
                                                                         .fromRGBO(
-                                                                            135,
-                                                                            79,
-                                                                            79,
+                                                                            138,
+                                                                            138,
+                                                                            138,
                                                                             1)),
                                                               )
                                                             ],
@@ -607,56 +692,60 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                           Spacer(),
                                                           //edit
                                                           if (UserSession()
-                                                                  .userType ==
-                                                              'admin')
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                showDialog(
-                                                                  barrierDismissible:
-                                                                      false,
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (BuildContext
-                                                                          context) {
-                                                                    return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Do you really want to make\n changes to this message?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
-                                                                            color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Cancel',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                            //edit...
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 10),
-                                                                              child: ElevatedButton(
+                                                                      .userType ==
+                                                                  'admin' ||
+                                                              UserSession()
+                                                                      .userType ==
+                                                                  'superadmin')
+                                                            if (message.isAlterAvailable ==
+                                                                    "Y" ||
+                                                                UserSession()
+                                                                        .userType ==
+                                                                    'superadmin')
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  showDialog(
+                                                                    barrierDismissible:
+                                                                        false,
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors.white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(10)),
+                                                                        content:
+                                                                            Text(
+                                                                          "Do you really want to make\n changes to this message?",
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'regular',
+                                                                              fontSize: 16,
+                                                                              color: Colors.black),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //edit...
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
                                                                                   style: ElevatedButton.styleFrom(
                                                                                     padding: EdgeInsets.symmetric(horizontal: 40),
                                                                                     backgroundColor: AppTheme.textFieldborderColor,
@@ -675,176 +764,180 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                                   child: Text(
                                                                                     'Edit',
                                                                                     style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                  )),
-                                                                            ),
-                                                                          ],
+                                                                                  ),
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                  child:
+                                                                      Container(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        vertical:
+                                                                            5,
+                                                                        horizontal:
+                                                                            15),
+                                                                    decoration: BoxDecoration(
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                20),
+                                                                        border: Border.all(
+                                                                            color:
+                                                                                Colors.black)),
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Icon(Icons
+                                                                            .edit),
+                                                                        Text(
+                                                                          'Edit',
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'medium',
+                                                                              fontSize: 12,
+                                                                              color: Colors.black),
                                                                         ),
                                                                       ],
-                                                                    );
-                                                                  },
-                                                                );
-                                                              },
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                child:
-                                                                    Container(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              5,
-                                                                          horizontal:
-                                                                              15),
-                                                                  decoration: BoxDecoration(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              20),
-                                                                      border: Border.all(
-                                                                          color:
-                                                                              Colors.black)),
-                                                                  child: Row(
-                                                                    children: [
-                                                                      Icon(Icons
-                                                                          .edit),
-                                                                      Text(
-                                                                        'Edit',
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'medium',
-                                                                            fontSize:
-                                                                                12,
-                                                                            color:
-                                                                                Colors.black),
-                                                                      ),
-                                                                    ],
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
                                                           //delete icon
                                                           if (UserSession()
-                                                                  .userType ==
-                                                              'admin')
-                                                            GestureDetector(
-                                                              onTap: () {
-                                                                showDialog(
-                                                                  barrierDismissible:
-                                                                      false,
-                                                                  context:
-                                                                      context,
-                                                                  builder:
-                                                                      (BuildContext
-                                                                          context) {
-                                                                    return AlertDialog(
-                                                                      backgroundColor:
-                                                                          Colors
-                                                                              .white,
-                                                                      shape: RoundedRectangleBorder(
-                                                                          borderRadius:
-                                                                              BorderRadius.circular(10)),
-                                                                      content:
-                                                                          Text(
-                                                                        "Are you sure you want to delete\n this item?",
-                                                                        style: TextStyle(
-                                                                            fontFamily:
-                                                                                'regular',
-                                                                            fontSize:
-                                                                                16,
-                                                                            color:
-                                                                                Colors.black),
-                                                                        textAlign:
-                                                                            TextAlign.center,
-                                                                      ),
-                                                                      actions: <Widget>[
-                                                                        Row(
-                                                                          mainAxisAlignment:
-                                                                              MainAxisAlignment.center,
-                                                                          children: [
-                                                                            ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
-                                                                                onPressed: () {
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Cancel',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                                )),
-                                                                            //delete...
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(left: 10),
-                                                                              child: ElevatedButton(
-                                                                                style: ElevatedButton.styleFrom(
-                                                                                  padding: EdgeInsets.symmetric(horizontal: 40),
-                                                                                  backgroundColor: AppTheme.textFieldborderColor,
-                                                                                  elevation: 0,
-                                                                                ),
-                                                                                onPressed: () async {
-                                                                                  var messageId = message.id;
-                                                                                  final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeMessage/DeleteMessage?Id=$messageId';
+                                                                      .userType ==
+                                                                  'admin' ||
+                                                              UserSession()
+                                                                      .userType ==
+                                                                  'superadmin' ||
+                                                              UserSession()
+                                                                      .userType ==
+                                                                  'staff')
+                                                            if (message.isAlterAvailable ==
+                                                                    "Y" ||
+                                                                UserSession()
+                                                                        .userType ==
+                                                                    'superadmin')
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  showDialog(
+                                                                    barrierDismissible:
+                                                                        false,
+                                                                    context:
+                                                                        context,
+                                                                    builder:
+                                                                        (BuildContext
+                                                                            context) {
+                                                                      return AlertDialog(
+                                                                        backgroundColor:
+                                                                            Colors.white,
+                                                                        shape: RoundedRectangleBorder(
+                                                                            borderRadius:
+                                                                                BorderRadius.circular(10)),
+                                                                        content:
+                                                                            Text(
+                                                                          "Are you sure you want to delete\n this item?",
+                                                                          style: TextStyle(
+                                                                              fontFamily: 'regular',
+                                                                              fontSize: 16,
+                                                                              color: Colors.black),
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                        ),
+                                                                        actions: <Widget>[
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                                MainAxisAlignment.center,
+                                                                            children: [
+                                                                              ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                                  onPressed: () {
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Cancel',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  )),
+                                                                              //delete...
+                                                                              Padding(
+                                                                                padding: const EdgeInsets.only(left: 10),
+                                                                                child: ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(
+                                                                                    padding: EdgeInsets.symmetric(horizontal: 40),
+                                                                                    backgroundColor: AppTheme.textFieldborderColor,
+                                                                                    elevation: 0,
+                                                                                  ),
+                                                                                  onPressed: () async {
+                                                                                    var messageId = message.id;
+                                                                                    final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeMessage/DeleteMessage?Id=$messageId&RollNumber=${UserSession().rollNumber}&UserType=${UserSession().userType}';
 
-                                                                                  try {
-                                                                                    final response = await http.delete(
-                                                                                      Uri.parse(url),
-                                                                                      headers: {
-                                                                                        'Content-Type': 'application/json',
-                                                                                        'Authorization': 'Bearer $authToken',
-                                                                                      },
-                                                                                    );
-
-                                                                                    if (response.statusCode == 200) {
-                                                                                      print('id has beeen deleted $messageId');
-
-                                                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(backgroundColor: Colors.green, content: Text('Message deleted successfully!')),
+                                                                                    try {
+                                                                                      final response = await http.delete(
+                                                                                        Uri.parse(url),
+                                                                                        headers: {
+                                                                                          'Content-Type': 'application/json',
+                                                                                          'Authorization': 'Bearer $authToken',
+                                                                                        },
                                                                                       );
-                                                                                      //
-                                                                                      Navigator.pop(context);
-                                                                                      //
-                                                                                      await _fetchPosts();
-                                                                                    } else {
+
+                                                                                      if (response.statusCode == 200) {
+                                                                                        print('id has beeen deleted $messageId');
+
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.green, content: Text('Message deleted successfully!')),
+                                                                                        );
+                                                                                        //
+                                                                                        Navigator.pop(context);
+                                                                                        //
+                                                                                        await _fetchPosts();
+                                                                                      } else {
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete message.')),
+                                                                                        );
+                                                                                      }
+                                                                                    } catch (e) {
                                                                                       ScaffoldMessenger.of(context).showSnackBar(
-                                                                                        SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete message.')),
+                                                                                        SnackBar(content: Text('An error occurred: $e')),
                                                                                       );
                                                                                     }
-                                                                                  } catch (e) {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(content: Text('An error occurred: $e')),
-                                                                                    );
-                                                                                  }
-                                                                                  Navigator.pop(context);
-                                                                                },
-                                                                                child: Text(
-                                                                                  'Delete',
-                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                    Navigator.pop(context);
+                                                                                  },
+                                                                                  child: Text(
+                                                                                    'Delete',
+                                                                                    style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                  ),
                                                                                 ),
                                                                               ),
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                                );
-                                                              },
-                                                              child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                        .only(
-                                                                        right:
-                                                                            10),
-                                                                child:
-                                                                    SvgPicture
-                                                                        .asset(
-                                                                  'assets/icons/delete_icons.svg',
-                                                                  fit: BoxFit
-                                                                      .contain,
-                                                                  height: 35,
+                                                                            ],
+                                                                          ),
+                                                                        ],
+                                                                      );
+                                                                    },
+                                                                  );
+                                                                },
+                                                                child: Padding(
+                                                                  padding:
+                                                                      const EdgeInsets
+                                                                          .only(
+                                                                          right:
+                                                                              10),
+                                                                  child:
+                                                                      SvgPicture
+                                                                          .asset(
+                                                                    'assets/icons/delete_icons.svg',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                    height: 35,
+                                                                  ),
                                                                 ),
                                                               ),
-                                                            ),
                                                         ],
                                                       ),
                                                     )
@@ -857,7 +950,7 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                           if (post.messages[index].status ==
                                               'schedule')
                                             Transform.translate(
-                                              offset: Offset(65, -18),
+                                              offset: Offset(65, -20),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
@@ -929,28 +1022,31 @@ class _MessageMainpageState extends State<MessageMainpage> {
           //
           //top arrow..
           if (_scrollController.hasClients && _scrollController.offset > 50)
-            Column(
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_upward_outlined,
-                      color: Colors.white,
+            Transform.translate(
+              offset: Offset(0, -20),
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             )
         ],
       ),

@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/circular_models/Create_Circular_model.dart';
-import 'package:flutter_application_1/services/Circular_Api/circular_mainPage_Api.dart';
+import 'package:flutter_application_1/user_Session.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http_parser/http_parser.dart';
@@ -49,11 +50,22 @@ Future<void> postCircular(CreateCircularModel circular, selectedFile, context,
     final response = await request.send();
 
     if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+      String snackBarMessage = '';
+      if (UserSession().userType == 'superadmin') {
+        snackBarMessage = 'Circular Created Successfully!';
+      } else if (UserSession().userType == 'admin' ||
+          UserSession().userType == 'staff') {
+        snackBarMessage = 'Circular Creation Request Was Sent Successfully!';
+      }
+
+      if (snackBarMessage.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
             backgroundColor: Colors.green,
-            content: Text('Circular posted successfully!')),
-      );
+            content: Text(snackBarMessage),
+          ),
+        );
+      }
 
       print('Circular posted successfully');
       response.stream.transform(utf8.decoder).listen((value) {
@@ -78,8 +90,24 @@ Future<void> postCircular(CreateCircularModel circular, selectedFile, context,
       response.stream.transform(utf8.decoder).listen((value) {
         print(value);
       });
+      // Add a delay of 2 seconds before navigating
+      await Future.delayed(Duration(seconds: 2));
+
+      fetchcircular();
+
+      Navigator.pop(
+        context,
+      );
     }
   } catch (e) {
     print('Error posting circular: $e');
+    // Add a delay of 2 seconds before navigating
+    await Future.delayed(Duration(seconds: 2));
+
+    fetchcircular();
+
+    Navigator.pop(
+      context,
+    );
   }
 }

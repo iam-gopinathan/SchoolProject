@@ -654,29 +654,67 @@ class _MarksShowpageState extends State<MarksShowpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+        backgroundColor: Colors.white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-            child: AppBar(
-              iconTheme: IconThemeData(color: Colors.black),
-              backgroundColor: AppTheme.appBackgroundPrimaryColor,
-              leading: GestureDetector(
-                  onTap: () {
-                    Navigator.pop(context);
-                  },
-                  child: Icon(Icons.arrow_back)),
-              title: Text(
-                'Marks / Results',
-                style: TextStyle(
-                  fontFamily: 'semibold',
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+          preferredSize: Size.fromHeight(100),
+          child: AppBar(
+            titleSpacing: 0,
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Colors.black),
+            automaticallyImplyLeading: false,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.appBackgroundPrimaryColor,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30)),
+              ),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.04),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.02),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Marks / Results',
+                                  style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height *
+                                      0.007,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -700,13 +738,19 @@ class _MarksShowpageState extends State<MarksShowpage> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: Color.fromRGBO(203, 203, 203, 1),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: Color.fromRGBO(203, 203, 203, 1),
                             ),
@@ -807,16 +851,18 @@ class _MarksShowpageState extends State<MarksShowpage> {
                       children: [
                         //
                         Transform.translate(
-                          offset: Offset(0, 15),
+                          offset: Offset(0, 16),
                           child: Padding(
-                            padding: const EdgeInsets.only(left: 25),
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.06),
                             child: Row(
                               children: [
                                 IntrinsicWidth(
                                   child: Container(
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10)),
+                                            topRight: Radius.circular(10),
+                                            topLeft: Radius.circular(10)),
                                         border: Border.all(
                                             color: Color.fromRGBO(
                                                 234, 234, 234, 1))),
@@ -864,12 +910,13 @@ class _MarksShowpageState extends State<MarksShowpage> {
                           ),
                         ),
                         //card sections...
-                        Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Column(
-                            children: [
-                              ...data.prekgRequest.map((e) {
-                                return Container(
+                        Column(
+                          children: [
+                            ...data.prekgRequest.map((e) {
+                              return Padding(
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.04),
+                                child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 15),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
@@ -880,8 +927,16 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                     children: [
                                       //individual export.......
                                       Padding(
-                                        padding: const EdgeInsets.only(
-                                            right: 20, bottom: 10),
+                                        padding: EdgeInsets.only(
+                                          right: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.05, // 5% of screen width
+                                          bottom: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.015, // 1.5% of screen height
+                                        ),
                                         child: Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
@@ -889,7 +944,6 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                             GestureDetector(
                                               onTap: () async {
                                                 _initializeNotification();
-
                                                 String selectedSection =
                                                     e.section;
                                                 String rollNumber =
@@ -1048,7 +1102,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                           color:
                                               Color.fromRGBO(245, 245, 245, 1),
                                           height: 5,
-                                          thickness: 3,
+                                          thickness: 1,
                                         ),
                                       ),
                                       //marks table.............
@@ -1122,9 +1176,8 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                       Divider(
                                         color: Color.fromRGBO(245, 245, 245, 1),
                                         height: 5,
-                                        thickness: 3,
+                                        thickness: 1,
                                       ),
-
                                       Row(
                                         children: [
                                           Padding(
@@ -1160,27 +1213,27 @@ class _MarksShowpageState extends State<MarksShowpage> {
                                           )
                                         ],
                                       ),
-                                      // Linear progress bar
-                                      Container(
-                                        width: 60,
-                                        height: 10,
-                                        child: LinearProgressIndicator(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          backgroundColor:
-                                              Color.fromRGBO(225, 225, 225, 1),
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.black),
-                                          value: _progress,
-                                        ),
-                                      ),
+                                      // // Linear progress bar
+                                      // Container(
+                                      //   width: 60,
+                                      //   height: 10,
+                                      //   child: LinearProgressIndicator(
+                                      //     borderRadius:
+                                      //         BorderRadius.circular(10),
+                                      //     backgroundColor:
+                                      //         Color.fromRGBO(225, 225, 225, 1),
+                                      //     valueColor:
+                                      //         AlwaysStoppedAnimation<Color>(
+                                      //             Colors.black),
+                                      //     value: _progress,
+                                      //   ),
+                                      // ),
                                     ],
                                   ),
-                                );
-                              }).toList(),
-                            ],
-                          ),
+                                ),
+                              );
+                            }).toList(),
+                          ],
                         ),
                       ],
                     );

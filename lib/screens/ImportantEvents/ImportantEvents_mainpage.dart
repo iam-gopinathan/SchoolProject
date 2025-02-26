@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/ImportantEvents_models/ImportantEvent_mainpage_model.dart';
 import 'package:flutter_application_1/screens/ImportantEvents/Create_Event_calender.dart';
 import 'package:flutter_application_1/screens/ImportantEvents/Edit_Event_calender.dart';
@@ -110,6 +111,92 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Colors.white,
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(100),
+      //   child: AppBar(
+      //     backgroundColor: Colors.white,
+      //     iconTheme: IconThemeData(color: Colors.black),
+      //     automaticallyImplyLeading: false,
+      //     flexibleSpace: Container(
+      //       decoration: BoxDecoration(
+      //         color: AppTheme.appBackgroundPrimaryColor,
+      //         borderRadius: BorderRadius.only(
+      //             bottomLeft: Radius.circular(30),
+      //             bottomRight: Radius.circular(30)),
+      //       ),
+      //       padding: EdgeInsets.all(10),
+      //       child: Column(
+      //         mainAxisAlignment: MainAxisAlignment.center,
+      //         children: [
+      //           Row(
+      //             children: [
+      //               GestureDetector(
+      //                 onTap: () {
+      //                   Navigator.pop(context);
+      //                 },
+      //                 child: Icon(
+      //                   Icons.arrow_back,
+      //                   color: Colors.black,
+      //                 ),
+      //               ),
+      //               SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+      //               Row(
+      //                 mainAxisAlignment: MainAxisAlignment.start,
+      //                 children: [
+      //                   Column(
+      //                     crossAxisAlignment: CrossAxisAlignment.start,
+      //                     children: [
+      //                       Text(
+      //                         'Event Calender',
+      //                         style: TextStyle(
+      //                           fontFamily: 'semibold',
+      //                           fontSize: 16,
+      //                           color: Colors.black,
+      //                         ),
+      //                       ),
+      //                       SizedBox(height: 10),
+      //                     ],
+      //                   ),
+      //                 ],
+      //               ),
+      //               Spacer(),
+      //               //add screen....
+      //               if (UserSession().userType == 'admin' ||
+      //                   UserSession().userType == 'staff' ||
+      //                   UserSession().userType == 'superadmin')
+      //                 Padding(
+      //                   padding: const EdgeInsets.only(right: 30),
+      //                   child: GestureDetector(
+      //                     onTap: () {
+      //                       Navigator.push(
+      //                           context,
+      //                           MaterialPageRoute(
+      //                               builder: (context) => CreateEventCalender(
+      //                                   fetchAndDisplayEvents:
+      //                                       fetchAndDisplayEvents)));
+      //                     },
+      //                     child: Container(
+      //                       padding: EdgeInsets.all(10),
+      //                       decoration: BoxDecoration(
+      //                         color: AppTheme.Addiconcolor,
+      //                         shape: BoxShape.circle,
+      //                       ),
+      //                       child: Icon(
+      //                         Icons.add,
+      //                         color: Colors.black,
+      //                         size: 30,
+      //                       ),
+      //                     ),
+      //                   ),
+      //                 ),
+      //             ],
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -124,70 +211,83 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Event Calender',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Icon(
+                                      Icons.arrow_back,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Event Calender',
+                                    style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    //add screen....
-                    if (UserSession().userType == 'admin')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 30),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => CreateEventCalender(
-                                        fetchAndDisplayEvents:
-                                            fetchAndDisplayEvents)));
-                          },
-                          child: Container(
-                            padding: EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: AppTheme.Addiconcolor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.add,
-                              color: Colors.black,
-                              size: 30,
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      //add screen....
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'staff' ||
+                          UserSession().userType == 'superadmin')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.04,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => CreateEventCalender(
+                                          fetchAndDisplayEvents:
+                                              fetchAndDisplayEvents)));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -210,10 +310,13 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                     child: Container(
                       color: Color.fromRGBO(254, 251, 250, 1),
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.025),
                         child: TableCalendar(
                           onDayLongPressed: (selectedDay, focusedDay) {
-                            if (UserSession().userType == "admin")
+                            if (UserSession().userType == "admin" ||
+                                UserSession().userType == 'staff' ||
+                                UserSession().userType == 'superadmin')
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) {
@@ -305,11 +408,9 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                           },
                           onPageChanged: (focusedDay) {
                             setState(() {
-                              this.focusedDay =
-                                  focusedDay; // Update focusedDay when month is changed
+                              this.focusedDay = focusedDay;
                             });
-                            onMonthChanged(
-                                focusedDay); // Call your function to fetch events for the new month
+                            onMonthChanged(focusedDay);
                           },
                           calendarStyle: CalendarStyle(
                             todayTextStyle: TextStyle(
@@ -360,8 +461,14 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, top: 20, bottom: 10),
+                          padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width *
+                                0.05, // 5% of screen width
+                            top: MediaQuery.of(context).size.height *
+                                0.025, // 2.5% of screen height
+                            bottom: MediaQuery.of(context).size.height *
+                                0.012, // 1.2% of screen height
+                          ),
                           child: Row(
                             children: [
                               Text(
@@ -383,7 +490,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                   child: Text(
                                     "You haven’t made anything yet;\nstart creating now!",
                                     style: TextStyle(
-                                      fontSize: 22,
+                                      fontSize: 16,
                                       fontFamily: 'regular',
                                       color: Color.fromRGBO(145, 145, 145, 1),
                                     ),
@@ -416,36 +523,38 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                     248, 248, 248, 1)),
                                           ),
                                         ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            'to',
-                                            style: TextStyle(
-                                                fontFamily: 'medium',
-                                                fontSize: 14,
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 10),
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: 10, horizontal: 10),
-                                            decoration: BoxDecoration(
-                                                color: Colors.deepOrange,
-                                                shape: BoxShape.circle),
+                                        if (e.from != e.to)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${e.to}',
+                                              'to',
                                               style: TextStyle(
                                                   fontFamily: 'medium',
                                                   fontSize: 14,
-                                                  color: Color.fromRGBO(
-                                                      248, 248, 248, 1)),
+                                                  color: Colors.black),
                                             ),
                                           ),
-                                        ),
+                                        if (e.from != e.to)
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 10),
+                                            child: Container(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10, horizontal: 10),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.deepOrange,
+                                                  shape: BoxShape.circle),
+                                              child: Text(
+                                                '${e.to}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 14,
+                                                    color: Color.fromRGBO(
+                                                        248, 248, 248, 1)),
+                                              ),
+                                            ),
+                                          ),
                                         //
                                         Padding(
                                           padding:
@@ -473,7 +582,12 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                     children: [
                       //
                       Padding(
-                        padding: const EdgeInsets.only(left: 20, top: 25),
+                        padding: EdgeInsets.only(
+                          left: MediaQuery.of(context).size.width *
+                              0.05, // 5% of screen width
+                          top: MediaQuery.of(context).size.height *
+                              0.025, // 2.5% of screen height
+                        ),
                         child: Row(
                           children: [
                             Text(
@@ -494,7 +608,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                             child: Text(
                               "You haven’t made anything yet;\nstart creating now!",
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 16, //
                                 fontFamily: 'regular',
                                 color: Color.fromRGBO(145, 145, 145, 1),
                               ),
@@ -510,7 +624,9 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                               top: 15,
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.only(right: 15),
+                              padding: EdgeInsets.only(
+                                  right:
+                                      MediaQuery.of(context).size.width * 0.04),
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 10),
                                 decoration: BoxDecoration(
@@ -586,7 +702,6 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                 ),
                                             ],
                                           ),
-
                                           Padding(
                                             padding: const EdgeInsets.only(
                                                 top: 10, left: 10),
@@ -627,7 +742,11 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                   height: 1.5),
                                             ),
                                           ),
-                                          if (UserSession().userType == 'admin')
+                                          if (UserSession().userType == 'admin' ||
+                                              UserSession().userType ==
+                                                  'staff' ||
+                                              UserSession().userType ==
+                                                  'superadmin')
                                             //delete
                                             GestureDetector(
                                               onTap: () {
@@ -803,19 +922,27 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                       onTap: () {
                                         var image = upcoming.filePath;
                                         var video = upcoming.filePath;
-
                                         if (upcoming.fileType == 'image') {
                                           _PreviewBottomsheet(
-                                              context, upcoming.filePath, null);
+                                              context, image, null);
                                         } else if (upcoming.fileType ==
                                             'link') {
-                                          _PreviewBottomsheet(
-                                              context, null, upcoming.filePath);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  videoimportantv(
+                                                      videoUrl: video),
+                                            ),
+                                          );
                                         }
                                       },
                                       child: Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 20),
+                                        padding: EdgeInsets.only(
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05),
                                         child: Column(
                                           children: [
                                             Text(
@@ -823,7 +950,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                   ? 'View Image'
                                                   : upcoming.fileType == 'link'
                                                       ? 'View Video'
-                                                      : 'Unknown File Type',
+                                                      : '',
                                               style: TextStyle(
                                                   fontFamily: 'regular',
                                                   fontSize: 12,
@@ -834,8 +961,11 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                   decorationThickness: 2),
                                             ),
                                             //
-                                            if (UserSession().userType ==
-                                                'admin')
+                                            if (UserSession().userType == 'admin' ||
+                                                UserSession().userType ==
+                                                    'staff' ||
+                                                UserSession().userType ==
+                                                    'superadmin')
                                               GestureDetector(
                                                 onTap: () {
                                                   showDialog(
@@ -1063,6 +1193,90 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
           },
         );
       },
+    );
+  }
+}
+
+class videoimportantv extends StatefulWidget {
+  final String videoUrl;
+
+  const videoimportantv({super.key, required this.videoUrl});
+
+  @override
+  _VideoScreenState createState() => _VideoScreenState();
+}
+
+class _VideoScreenState extends State<videoimportantv> {
+  late YoutubePlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = YoutubePlayerController(
+      initialVideoId: YoutubePlayer.convertUrlToId(widget.videoUrl) ?? '',
+      flags: const YoutubePlayerFlags(
+        autoPlay: true,
+        mute: false,
+      ),
+    );
+
+    // Reset to portrait mode when exiting fullscreen
+    _controller.addListener(() {
+      if (!_controller.value.isFullScreen) {
+        SystemChrome.setPreferredOrientations([
+          DeviceOrientation.portraitUp,
+          DeviceOrientation.portraitDown,
+        ]);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.6), // Apply same opacity color
+        ),
+        child: Center(
+          child: YoutubePlayerBuilder(
+            onEnterFullScreen: () {
+              // Allow rotation in fullscreen only
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.landscapeLeft,
+                DeviceOrientation.landscapeRight,
+              ]);
+            },
+            onExitFullScreen: () {
+              // Lock back to portrait when exiting fullscreen
+              SystemChrome.setPreferredOrientations([
+                DeviceOrientation.portraitUp,
+                DeviceOrientation.portraitDown,
+              ]);
+            },
+            player: YoutubePlayer(
+              controller: _controller,
+              showVideoProgressIndicator: true,
+              aspectRatio: 16 / 9,
+            ),
+            builder: (context, player) {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  player, // Video Player centered
+                ],
+              );
+            },
+          ),
+        ),
+      ),
     );
   }
 }

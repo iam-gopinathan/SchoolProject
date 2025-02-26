@@ -11,6 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'dart:ui' as ui;
 
 class ConsentformMainpage extends StatefulWidget {
   const ConsentformMainpage({super.key});
@@ -79,12 +80,12 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
     super.initState();
     gradeController.fetchGrades();
     _fetchconsentform();
-    // Add a listener to the ScrollController to monitor scroll changes.
+
     _scrollController.addListener(_scrollListener);
   }
 
   void _scrollListener() {
-    setState(() {}); // Trigger UI update when scroll position changes
+    setState(() {});
   }
 
   @override
@@ -374,6 +375,7 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
       },
     );
   }
+  //
 
   @override
   Widget build(BuildContext context) {
@@ -392,169 +394,154 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(
+              MediaQuery.of(context).size.width * 0.025,
+            ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Consent Form',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () async {
-                                await _selectDate(context);
-
-                                setState(() {
-                                  isLoading = true;
-                                });
-
-                                await _fetchconsentform(date: selectedDate);
-                              },
-                              child: Row(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.topLeft,
-                                    child: SvgPicture.asset(
-                                      'assets/icons/Attendancepage_calendar_icon.svg',
-                                      fit: BoxFit.contain,
-                                      height: 20,
-                                    ),
-                                  ),
-                                  Text(
-                                    displayDate,
-                                    style: TextStyle(
-                                      fontFamily: 'medium',
-                                      color: Color.fromRGBO(73, 73, 73, 1),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      decoration: TextDecoration.underline,
-                                      decorationThickness: 2,
-                                      decorationColor:
-                                          Color.fromRGBO(75, 75, 75, 1),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'My \n Projects',
-                          style: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 12,
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        Switch(
-                          materialTapTargetSize:
-                              MaterialTapTargetSize.shrinkWrap,
-                          activeTrackColor: AppTheme.textFieldborderColor,
-                          inactiveTrackColor: Colors.white,
-                          inactiveThumbColor: Colors.black,
-                          value: isswitched,
-                          onChanged: (value) {
-                            setState(() {
-                              isswitched = value;
-                              isLoading = true;
-                            });
-
-                            _fetchconsentform();
-                          },
-                        ),
-                      ],
-                    ),
-                    //recieved..
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ReceivedConsentform(
-                                      fetch: _fetchconsentform,
-                                    )));
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: Color.fromRGBO(251, 247, 245, 1)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              '•',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'medium',
-                                  color: Color.fromRGBO(216, 70, 0, 1)),
-                            ),
-                            Text(
-                              'Recieved',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'medium',
-                                  color: Color.fromRGBO(217, 78, 11, 1)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-//
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateConsentformpage(
-                                      fetch: _fetchconsentform,
-                                    )));
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppTheme.Addiconcolor,
-                          shape: BoxShape.circle,
-                        ),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.04),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
                         child: Icon(
-                          Icons.add,
+                          Icons.arrow_back,
                           color: Colors.black,
-                          size: 30,
                         ),
                       ),
-                    ),
-                  ],
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Consent Form',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.007,
+                              ),
+                              GestureDetector(
+                                onTap: () async {
+                                  await _selectDate(context);
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await _fetchconsentform(date: selectedDate);
+                                },
+                                child: Row(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.topLeft,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/Attendancepage_calendar_icon.svg',
+                                        fit: BoxFit.contain,
+                                        height: 20,
+                                      ),
+                                    ),
+                                    Text(
+                                      displayDate,
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        color: Color.fromRGBO(73, 73, 73, 1),
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      //
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                              right:
+                                  MediaQuery.of(context).size.width * 0.0833),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'My Projects',
+                                style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Switch(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeTrackColor: AppTheme.textFieldborderColor,
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.black,
+                                value: isswitched,
+                                activeColor: Colors.white,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isswitched = value;
+                                    isLoading = true;
+                                  });
+                                  _fetchconsentform();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      //
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                              right:
+                                  MediaQuery.of(context).size.width * 0.0500),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          CreateConsentformpage(
+                                            fetch: _fetchconsentform,
+                                          )));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: AppTheme.Addiconcolor,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.add,
+                                color: Colors.black,
+                                size: 30,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -584,6 +571,54 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                   controller: _scrollController,
                   child: Column(
                     children: [
+                      //recieved..
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.04,
+                            top: 12),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ReceivedConsentform(
+                                              fetch: _fetchconsentform,
+                                            )));
+                              },
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 12),
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: Color.fromRGBO(251, 247, 245, 1)),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      '•',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'medium',
+                                          color: Color.fromRGBO(216, 70, 0, 1)),
+                                    ),
+                                    Text(
+                                      'Received',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontFamily: 'medium',
+                                          color:
+                                              Color.fromRGBO(217, 78, 11, 1)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       //card sections..
                       Column(
                         children: [
@@ -592,8 +627,12 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                               children: [
                                 //postedon date...
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 20, top: 10),
+                                  padding: EdgeInsets.only(
+                                    left: MediaQuery.of(context).size.width *
+                                        0.05, // 5% of screen width
+                                    top: MediaQuery.of(context).size.height *
+                                        0.012,
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -605,7 +644,7 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                                       ),
                                       if (e.tag.isNotEmpty)
                                         Transform.translate(
-                                          offset: Offset(40, 15),
+                                          offset: Offset(57, 16),
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
                                                 vertical: 5, horizontal: 10),
@@ -630,11 +669,34 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                                   ),
                                 ),
                                 ...e.consentForm.map((consent) {
+                                  TextPainter textPainter = TextPainter(
+                                    text: TextSpan(
+                                      text: consent.question,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'medium',
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    maxLines: 4,
+                                    textDirection: ui.TextDirection.ltr,
+                                  )..layout(
+                                      maxWidth:
+                                          MediaQuery.of(context).size.width *
+                                              0.8);
+
+                                  //
+                                  bool showReadMore =
+                                      textPainter.didExceedMaxLines;
+
+//
                                   bool isExpanded =
                                       _expandedQuestions[consent.question] ??
                                           false;
                                   return Padding(
-                                    padding: const EdgeInsets.all(12.0),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.03),
                                     child: Card(
                                       elevation: 0,
                                       shape: RoundedRectangleBorder(
@@ -654,15 +716,27 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
+                                            //heading
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 10),
-                                              child: Text(
-                                                '${consent.heading}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.black),
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
+                                                    child: Text(
+                                                      '${consent.heading}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 16,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
                                             Divider(
@@ -673,150 +747,170 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 10),
-                                              child: Text(
-                                                '${consent.question}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.black),
-                                                maxLines: isExpanded ? null : 4,
+                                              child: Row(
+                                                children: [
+                                                  Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
+                                                    child: Text(
+                                                      '${consent.question}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 16,
+                                                          color: Colors.black),
+                                                      maxLines:
+                                                          isExpanded ? null : 4,
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
                                             ),
+
                                             //readmore button...
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   top: 15, bottom: 5),
                                               child: Row(
                                                 children: [
-                                                  ElevatedButton(
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            Colors.black,
-                                                      ),
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _expandedQuestions[
-                                                                  consent
-                                                                      .question] =
-                                                              !isExpanded;
-                                                        });
-                                                      },
-                                                      child: Text(
-                                                        isExpanded
-                                                            ? 'Read Less'
-                                                            : 'Read More',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 16,
-                                                            color:
-                                                                Colors.white),
-                                                      )),
+                                                  if (showReadMore)
+                                                    ElevatedButton(
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      15),
+                                                          backgroundColor:
+                                                              Colors.black,
+                                                        ),
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _expandedQuestions[
+                                                                    consent
+                                                                        .question] =
+                                                                !isExpanded;
+                                                          });
+                                                        },
+                                                        child: Text(
+                                                          isExpanded
+                                                              ? 'Read Less'
+                                                              : 'Read More',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors.white),
+                                                        )),
                                                   Spacer(),
                                                   //delete
-                                                  GestureDetector(
-                                                    onTap: () {
-                                                      showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            10)),
-                                                                content: Text(
-                                                                  "Do you really want to Delete\n  to this ExamTimetable?",
-                                                                  style: TextStyle(
-                                                                      fontFamily:
-                                                                          'regular',
-                                                                      fontSize:
-                                                                          16,
-                                                                      color: Colors
-                                                                          .black),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                ),
-                                                                actions: <Widget>[
-                                                                  Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
-                                                                        ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(
-                                                                                backgroundColor: Colors.white,
-                                                                                elevation: 0,
-                                                                                side: BorderSide(color: Colors.black, width: 1)),
-                                                                            onPressed: () {
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child: Text(
-                                                                              'Cancel',
-                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                            )),
-                                                                        //delete...
-                                                                        Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              left: 10),
-                                                                          child: ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                              onPressed: () async {
-                                                                                var consentDel = consent.questionId;
-                                                                                final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/Consent/DeleteConsentForm?Id=$consentDel';
-
-                                                                                try {
-                                                                                  final response = await http.delete(
-                                                                                    Uri.parse(url),
-                                                                                    headers: {
-                                                                                      'Content-Type': 'application/json',
-                                                                                      'Authorization': 'Bearer $authToken',
-                                                                                    },
-                                                                                  );
-
-                                                                                  if (response.statusCode == 200) {
-                                                                                    print('id has beeen deleted ${consentDel}');
-
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(backgroundColor: Colors.green, content: Text('Consent Form deleted successfully!')),
-                                                                                    );
-                                                                                  } else {
-                                                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                                                      SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete ConsentForm.')),
-                                                                                    );
-                                                                                  }
-                                                                                } catch (e) {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(content: Text('An error occurred: $e')),
-                                                                                  );
-                                                                                }
-                                                                                _fetchconsentform();
-
+                                                  if (UserSession().userType ==
+                                                          'admin' ||
+                                                      UserSession().userType ==
+                                                          'superadmin' ||
+                                                      UserSession().userType ==
+                                                          'staff')
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        showDialog(
+                                                            barrierDismissible:
+                                                                false,
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return AlertDialog(
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .white,
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10)),
+                                                                  content: Text(
+                                                                    "Do you really want to Delete\n  to this ExamTimetable?",
+                                                                    style: TextStyle(
+                                                                        fontFamily:
+                                                                            'regular',
+                                                                        fontSize:
+                                                                            16,
+                                                                        color: Colors
+                                                                            .black),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
+                                                                  ),
+                                                                  actions: <Widget>[
+                                                                    Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.center,
+                                                                        children: [
+                                                                          ElevatedButton(
+                                                                              style: ElevatedButton.styleFrom(backgroundColor: Colors.white, elevation: 0, side: BorderSide(color: Colors.black, width: 1)),
+                                                                              onPressed: () {
                                                                                 Navigator.pop(context);
                                                                               },
                                                                               child: Text(
-                                                                                'Delete',
+                                                                                'Cancel',
                                                                                 style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
                                                                               )),
-                                                                        ),
-                                                                      ])
-                                                                ]);
-                                                          });
-                                                    },
-                                                    child: SvgPicture.asset(
-                                                      'assets/icons/timetable_delete.svg',
-                                                      fit: BoxFit.contain,
-                                                      height: 25,
+                                                                          //delete...
+                                                                          Padding(
+                                                                            padding:
+                                                                                const EdgeInsets.only(left: 10),
+                                                                            child: ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
+                                                                                onPressed: () async {
+                                                                                  var consentDel = consent.questionId;
+                                                                                  final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/Consent/DeleteConsentForm?Id=$consentDel';
+
+                                                                                  try {
+                                                                                    final response = await http.delete(
+                                                                                      Uri.parse(url),
+                                                                                      headers: {
+                                                                                        'Content-Type': 'application/json',
+                                                                                        'Authorization': 'Bearer $authToken',
+                                                                                      },
+                                                                                    );
+
+                                                                                    if (response.statusCode == 200) {
+                                                                                      print('id has beeen deleted ${consentDel}');
+
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(backgroundColor: Colors.green, content: Text('Consent Form deleted successfully!')),
+                                                                                      );
+                                                                                    } else {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete ConsentForm.')),
+                                                                                      );
+                                                                                    }
+                                                                                  } catch (e) {
+                                                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                                                      SnackBar(content: Text('An error occurred: $e')),
+                                                                                    );
+                                                                                  }
+                                                                                  _fetchconsentform();
+
+                                                                                  Navigator.pop(context);
+                                                                                },
+                                                                                child: Text(
+                                                                                  'Delete',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                )),
+                                                                          ),
+                                                                        ])
+                                                                  ]);
+                                                            });
+                                                      },
+                                                      child: SvgPicture.asset(
+                                                        'assets/icons/timetable_delete.svg',
+                                                        fit: BoxFit.contain,
+                                                        height: 25,
+                                                      ),
                                                     ),
-                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -837,23 +931,26 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                 ),
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_upward_outlined,
-                      color: Colors.white,
+              ? Transform.translate(
+                  offset: Offset(0, -20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
                 )
               : null,

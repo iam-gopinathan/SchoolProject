@@ -5,6 +5,7 @@ import 'package:flutter_application_1/screens/Feedback/create_feedback.dart';
 import 'package:flutter_application_1/services/Feedback_Api/Parent_feedback_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'dart:ui' as ui;
 
 class FeedbackMainpage extends StatefulWidget {
   const FeedbackMainpage({super.key});
@@ -89,104 +90,101 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Feedback',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Text(
+                        'Feedback',
+                        style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+
+                      Spacer(),
+                      //questions....
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.05),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MyquestionsPage()));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 12),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color.fromRGBO(251, 247, 245, 1)),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  '•',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'medium',
+                                      color: Color.fromRGBO(216, 70, 0, 1)),
+                                ),
+                                Text(
+                                  'Questions',
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'medium',
+                                      color: Color.fromRGBO(217, 78, 11, 1)),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    //questions....
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => MyquestionsPage()));
-                        },
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 5, horizontal: 12),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(20),
-                              color: Color.fromRGBO(251, 247, 245, 1)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                '•',
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'medium',
-                                    color: Color.fromRGBO(216, 70, 0, 1)),
-                              ),
-                              Text(
-                                'Questions',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontFamily: 'medium',
-                                    color: Color.fromRGBO(217, 78, 11, 1)),
-                              ),
-                            ],
                           ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CreateFeedback()));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.025),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CreateFeedback()));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -211,15 +209,23 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Container(
-                          width: 150,
+                          width: MediaQuery.of(context).size.width * 0.4,
                           child: DropdownButtonFormField<String>(
                             decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 10),
                               hintText: 'Select',
                               hintStyle: TextStyle(
                                   fontFamily: 'regular',
                                   fontSize: 14,
                                   color: Colors.black),
                               border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
                                   color: Color.fromRGBO(203, 203, 203, 1),
@@ -281,8 +287,14 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                       children: [
                         //postedon
                         Padding(
-                          padding: const EdgeInsets.only(
-                              left: 20, top: 10, right: 15),
+                          padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width *
+                                0.05, // 5% of screen width
+                            top: MediaQuery.of(context).size.height *
+                                0.02, // 2% of screen height
+                            right: MediaQuery.of(context).size.width *
+                                0.04, // 4% of screen width
+                          ),
                           child: Row(
                             children: [
                               Text(
@@ -296,6 +308,24 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                           ),
                         ),
                         ...feedbackData.parentsFeedBack.map((e) {
+                          TextPainter textPainter = TextPainter(
+                            text: TextSpan(
+                              text: e.question,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'medium',
+                                color: Colors.white,
+                              ),
+                            ),
+                            maxLines: 4,
+                            textDirection: ui.TextDirection.ltr,
+                          )..layout(
+                              maxWidth:
+                                  MediaQuery.of(context).size.width * 0.8);
+
+                          //
+                          bool showReadMore = textPainter.didExceedMaxLines;
+
                           bool isExpanded =
                               _expandedQuestions[e.question] ?? false;
                           return Padding(
@@ -354,12 +384,18 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                                                     .size
                                                     .width *
                                                 0.8,
-                                            child: Text(
-                                              '${e.heading}',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 16,
-                                                  color: Colors.black),
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.8,
+                                              child: Text(
+                                                '${e.heading}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -371,39 +407,46 @@ class _FeedbackMainpageState extends State<FeedbackMainpage> {
                                     ),
                                     Padding(
                                       padding: const EdgeInsets.only(top: 10),
-                                      child: Text(
-                                        '${e.question}',
-                                        style: TextStyle(
-                                            fontFamily: 'medium',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                        maxLines: isExpanded ? null : 4,
+                                      child: Container(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.8,
+                                        child: Text(
+                                          '${e.question}',
+                                          style: TextStyle(
+                                              fontFamily: 'medium',
+                                              fontSize: 16,
+                                              color: Colors.black),
+                                          maxLines: isExpanded ? null : 4,
+                                        ),
                                       ),
                                     ),
                                     //readmore button...
+
                                     Padding(
                                       padding: const EdgeInsets.only(
                                           top: 15, bottom: 5),
                                       child: Row(
                                         children: [
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.black,
+                                          if (showReadMore)
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.black,
+                                              ),
+                                              onPressed: () {
+                                                setState(() {
+                                                  _expandedQuestions[
+                                                      e.question] = !isExpanded;
+                                                });
+                                              },
+                                              child: Text(
+                                                'Read More...',
+                                                style: TextStyle(
+                                                    fontFamily: 'regular',
+                                                    fontSize: 16,
+                                                    color: Colors.white),
+                                              ),
                                             ),
-                                            onPressed: () {
-                                              setState(() {
-                                                _expandedQuestions[e.question] =
-                                                    !isExpanded;
-                                              });
-                                            },
-                                            child: Text(
-                                              'Read More...',
-                                              style: TextStyle(
-                                                  fontFamily: 'regular',
-                                                  fontSize: 16,
-                                                  color: Colors.white),
-                                            ),
-                                          ),
                                         ],
                                       ),
                                     )

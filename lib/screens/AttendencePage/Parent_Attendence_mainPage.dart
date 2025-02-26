@@ -137,514 +137,692 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
       ),
       builder: (BuildContext context) {
         return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModalState) {
-          return Stack(clipBehavior: Clip.none, children: [
-            // Close icon
-            Positioned(
-              top: -70,
-              left: 180,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                  child: Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 35,
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(clipBehavior: Clip.none, children: [
+              // Close icon
+              Positioned(
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // -8% of screen height
+                left: MediaQuery.of(context).size.width *
+                    0.45, // 45% of screen width
+
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 35,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.8,
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Irregular Days',
-                          style: TextStyle(
-                              fontFamily: 'semibold',
-                              fontSize: 16,
-                              color: Colors.black),
-                        ),
-                        Spacer(),
-                        //dropdown code
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: DropdownButtonFormField<String>(
-                            dropdownColor: Colors.black,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(169, 169, 169, 1)),
-                                borderRadius: BorderRadius.circular(10),
+              Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.8,
+                padding: EdgeInsets.all(MediaQuery.of(context).size.width *
+                    0.025), // 2.5% of screen width
+
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(
+                          MediaQuery.of(context).size.width *
+                              0.02), // 2% of screen width
+
+                      child: Row(
+                        children: [
+                          Text(
+                            'Irregular Days',
+                            style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                          Spacer(),
+                          //dropdown code
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            child: DropdownButtonFormField<String>(
+                              dropdownColor: Colors.black,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(169, 169, 169, 1)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(169, 169, 169, 1)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(169, 169, 169, 1)),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 0),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(169, 169, 169, 1)),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Color.fromRGBO(169, 169, 169, 1)),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 5),
-                            ),
-                            hint: Text(
-                              'Select Month',
-                              style: TextStyle(
-                                  fontFamily: 'regular',
-                                  fontSize: 14,
-                                  color: Colors.black),
-                            ),
-                            value: selectedMonth,
-                            selectedItemBuilder: (BuildContext context) {
-                              return months.map((String month) {
-                                return Text(
-                                  month,
-                                  style: TextStyle(
+                              hint: Text(
+                                'Select Month',
+                                style: TextStyle(
                                     fontFamily: 'regular',
                                     fontSize: 14,
-                                    color: Colors.black,
+                                    color: Colors.black),
+                              ),
+                              value: selectedMonth,
+                              selectedItemBuilder: (BuildContext context) {
+                                return months.map((String month) {
+                                  return Text(
+                                    month,
+                                    style: TextStyle(
+                                      fontFamily: 'regular',
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                              icon: Icon(Icons.arrow_drop_down),
+                              items: getAvailableMonths().map((String month) {
+                                return DropdownMenuItem<String>(
+                                  value: month,
+                                  child: Text(
+                                    month,
+                                    style: TextStyle(
+                                      fontFamily: 'regular',
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 );
-                              }).toList();
-                            },
-                            icon: Icon(Icons.arrow_drop_down),
-                            items: getAvailableMonths().map((String month) {
-                              return DropdownMenuItem<String>(
-                                value: month,
-                                child: Text(
-                                  month,
-                                  style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 14,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                            menuMaxHeight: 150,
-                            onChanged: (String? newValue) {
-                              setModalState(() {
-                                selectedMonth = newValue;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  //
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Row(
-                      children: [
-                        Text(
-                          selectedMonth.toString(),
-                          style: TextStyle(
-                              fontFamily: 'semibold',
-                              fontSize: 12,
-                              color: Color.fromRGBO(73, 73, 73, 1)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text(
-                            DateTime.now().year.toString(),
-                            style: TextStyle(
-                              fontFamily: 'semibold',
-                              fontSize: 12,
-                              color: Color.fromRGBO(73, 73, 73, 1),
+                              }).toList(),
+                              menuMaxHeight: 150,
+                              onChanged: (String? newValue) {
+                                setModalState(() {
+                                  selectedMonth = newValue;
+                                });
+                              },
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  //
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: Color.fromRGBO(238, 238, 238, 1),
-                          width: 1.5,
-                        ),
+                    //
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width *
+                            0.025, // 2.5% of screen width
                       ),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Left purple indicator
-                          Container(
-                            width: 5,
-                            height: 210,
-                            decoration: BoxDecoration(
-                                color: Colors.purple,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10),
-                                    bottomLeft: Radius.circular(10))),
+                          Text(
+                            selectedMonth.toString(),
+                            style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 12,
+                                color: Color.fromRGBO(73, 73, 73, 1)),
                           ),
-                          // Main content
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Title
-                                Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(vertical: 5),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10),
-                                            topRight: Radius.circular(10)),
-                                        border: Border.all(
-                                            color: Colors.black, width: 1),
-                                        color:
-                                            Color.fromRGBO(239, 222, 246, 1)),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          'Total Days - ${IrrData?.irregularAttendanceStatus.monthTotalDays}',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
+                          Padding(
+                            padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width *
+                                  0.01, // 1% of screen width
+                            ),
+                            child: Text(
+                              DateTime.now().year.toString(),
+                              style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 12,
+                                color: Color.fromRGBO(73, 73, 73, 1),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: Color.fromRGBO(238, 238, 238, 1),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Left purple indicator
+                            Container(
+                              width: MediaQuery.of(context).size.width *
+                                  0.014, // 1.2% of screen width
+                              height: MediaQuery.of(context).size.height *
+                                  0.25, // 25% of screen height
+
+                              decoration: BoxDecoration(
+                                  color: Colors.purple,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10),
+                                      bottomLeft: Radius.circular(10))),
+                            ),
+                            // Main content
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Title
+                                  Padding(
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.025), // 2.5% of screen width
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 5),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10)),
+                                          border: Border.all(
+                                              color: Colors.black, width: 1),
+                                          color:
+                                              Color.fromRGBO(239, 222, 246, 1)),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Text(
+                                            'Total Days - ${IrrData?.irregularAttendanceStatus.monthTotalDays}',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  // Attendance details
+                                  Transform.translate(
+                                    offset: Offset(0, -17),
+                                    child: Padding(
+                                      padding: EdgeInsets.all(
+                                          MediaQuery.of(context).size.width *
+                                              0.02),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            color: Color.fromRGBO(
+                                                250, 244, 252, 1)),
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.025, // 2.5% of screen height
+                                            bottom: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.025,
+                                          ),
+                                          child: Row(
+                                            children: [
+                                              // Present and Absent
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.05,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 5,
+                                                          backgroundColor:
+                                                              Color.fromRGBO(0,
+                                                                  150, 601, 1),
+                                                        ),
+                                                        SizedBox(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.015), // 1.5% of screen width
+
+                                                        Text(
+                                                          'Present - ${IrrData?.irregularAttendanceStatus.present}',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 14,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height *
+                                                            0.012),
+                                                    Row(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 5,
+                                                          backgroundColor:
+                                                              Color.fromRGBO(
+                                                                  218, 0, 0, 1),
+                                                        ),
+                                                        SizedBox(
+                                                            width: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.015), // 1.5% of screen width
+
+                                                        Text(
+                                                          'Absent - ${IrrData?.irregularAttendanceStatus.absent}',
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 14,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // Vertical Divider
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.05, // 5% of screen width
+                                                ),
+                                                child: Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.12, // 12% of screen height
+
+                                                  child: VerticalDivider(
+                                                    color: Color.fromRGBO(
+                                                        238, 219, 245, 1),
+                                                    width: 20,
+                                                    thickness: 2,
+                                                    indent: 20,
+                                                    endIndent: 20,
+                                                  ),
+                                                ),
+                                              ),
+                                              // Leave and Late
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.05, // 5% of screen width
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Row(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 5,
+                                                          backgroundColor:
+                                                              Color.fromRGBO(59,
+                                                                  72, 213, 1),
+                                                        ),
+                                                        SizedBox(width: 6),
+                                                        Text(
+                                                          'Leave - ${IrrData?.irregularAttendanceStatus.leave}',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontFamily:
+                                                                'medium',
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height *
+                                                            0.012),
+                                                    Row(
+                                                      children: [
+                                                        CircleAvatar(
+                                                          radius: 5,
+                                                          backgroundColor:
+                                                              Color.fromRGBO(
+                                                                  134,
+                                                                  0,
+                                                                  187,
+                                                                  1),
+                                                        ),
+                                                        SizedBox(width: 5),
+                                                        Text(
+                                                          'Late - ${IrrData?.irregularAttendanceStatus.late}',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            fontFamily:
+                                                                'medium',
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              // Percentage Circle
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.05, // 5% of screen width
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width *
+                                                          0.15, // 15% of screen width
+                                                      height: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .height *
+                                                          0.08, // 8% of screen height
+                                                      decoration: BoxDecoration(
+                                                        color: Color.fromRGBO(
+                                                            0, 150, 601, 1),
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                      alignment:
+                                                          Alignment.center,
+                                                      child: Text(
+                                                        '${IrrData?.irregularAttendanceStatus.percentage}%',
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontFamily: 'medium',
+                                                          color: Colors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    //
+                    Padding(
+                      padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height *
+                            0.03, // 3% of screen height
+                        left: MediaQuery.of(context).size.width *
+                            0.010, // 1.2% of screen width
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.white),
+                        child: Row(
+                          children: [
+                            //absent
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(10)),
+                                  color: Color.fromRGBO(243, 242, 242, 1)),
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: MediaQuery.of(context).size.width *
+                                      0.06, // 6% of screen width
+                                  right: MediaQuery.of(context).size.width *
+                                      0.08, // 8% of screen width
+                                ),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 5,
+                                      backgroundColor:
+                                          Color.fromRGBO(218, 0, 0, 1),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: Text(
+                                        'Absent',
+                                        style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            //leave
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                  color: Color.fromRGBO(249, 244, 252, 1)),
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: MediaQuery.of(context).size.width *
+                                      0.06, // 6% of screen width
+                                  right: MediaQuery.of(context).size.width *
+                                      0.08, // 8% of screen width
+                                ),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 5,
+                                      backgroundColor:
+                                          Color.fromRGBO(59, 72, 213, 1),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: Text(
+                                        'Leave',
+                                        style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            //late
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(10)),
+                                  color: Color.fromRGBO(245, 246, 253, 1)),
+                              child: Padding(
+                                padding: EdgeInsets.only(
+                                  left: MediaQuery.of(context).size.width *
+                                      0.08, // 6% of screen width
+                                  right: MediaQuery.of(context).size.width *
+                                      0.10, // 8% of screen width
+                                ),
+                                child: Row(
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 5,
+                                      backgroundColor:
+                                          Color.fromRGBO(134, 0, 187, 1),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 5),
+                                      child: Text(
+                                        'Late',
+                                        style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    //absent data///////////////////////////////////////////////
+                    Transform.translate(
+                      offset: Offset(-2, -23),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Padding(
+                          padding: EdgeInsets.all(
+                              MediaQuery.of(context).size.width *
+                                  0.02), // 2% of screen width
+
+                          child: Container(
+                            padding: EdgeInsets.symmetric(vertical: 5),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(10),
+                                  bottomRight: Radius.circular(10)),
+                              border: Border.all(
+                                color: Color.fromRGBO(238, 238, 238, 1),
+                              ),
+                            ),
+                            child: IntrinsicHeight(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Absent..
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.03, // 4% of screen width
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        if (IrrData == null ||
+                                            IrrData!.absent.isEmpty)
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2, // 20% of screen width
+                                            ),
+                                          ),
+
+                                        //
+                                        if (IrrData != null &&
+                                            IrrData!.absent.isNotEmpty)
+                                          ...IrrData!.absent.map((e) {
+                                            return Padding(
+                                              padding: EdgeInsets.only(
+                                                top: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.012, // 1.2% of screen height
+                                                bottom: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.012, // 1.2% of screen height
+                                              ),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${e.date}',
+                                                    style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    '${e.day}',
+                                                    style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 14,
+                                                      color: Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
                                       ],
                                     ),
                                   ),
-                                ),
-                                // Attendance details
-                                Transform.translate(
-                                  offset: Offset(0, -17),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
+                                  // Vertical Divider
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05, // 5% of screen width
+                                    ),
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                          color:
-                                              Color.fromRGBO(250, 244, 252, 1)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 20, bottom: 20),
-                                        child: Row(
-                                          children: [
-                                            // Present and Absent
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        radius: 5,
-                                                        backgroundColor:
-                                                            Color.fromRGBO(
-                                                                0, 150, 601, 1),
-                                                      ),
-                                                      SizedBox(width: 6),
-                                                      Text(
-                                                        'Present - ${IrrData?.irregularAttendanceStatus.present}',
-                                                        style: TextStyle(
-                                                          fontFamily: 'medium',
-                                                          fontSize: 14,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        radius: 5,
-                                                        backgroundColor:
-                                                            Color.fromRGBO(
-                                                                218, 0, 0, 1),
-                                                      ),
-                                                      SizedBox(width: 6),
-                                                      Text(
-                                                        'Absent - ${IrrData?.irregularAttendanceStatus.absent}',
-                                                        style: TextStyle(
-                                                          fontFamily: 'medium',
-                                                          fontSize: 14,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            // Vertical Divider
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 20),
-                                              child: Container(
-                                                height: 100,
-                                                child: VerticalDivider(
-                                                  color: Color.fromRGBO(
-                                                      238, 219, 245, 1),
-                                                  width: 20,
-                                                  thickness: 2,
-                                                  indent: 20,
-                                                  endIndent: 20,
-                                                ),
-                                              ),
-                                            ),
-
-                                            // Leave and Late
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                left: 20,
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Row(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        radius: 5,
-                                                        backgroundColor:
-                                                            Color.fromRGBO(
-                                                                59, 72, 213, 1),
-                                                      ),
-                                                      SizedBox(width: 6),
-                                                      Text(
-                                                        'Leave - ${IrrData?.irregularAttendanceStatus.leave}',
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontFamily: 'medium',
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  SizedBox(height: 10),
-                                                  Row(
-                                                    children: [
-                                                      CircleAvatar(
-                                                        radius: 5,
-                                                        backgroundColor:
-                                                            Color.fromRGBO(
-                                                                134, 0, 187, 1),
-                                                      ),
-                                                      SizedBox(width: 5),
-                                                      Text(
-                                                        'Late - ${IrrData?.irregularAttendanceStatus.late}',
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontFamily: 'medium',
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            // Percentage Circle
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 30),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                    width: 60,
-                                                    height: 60,
-                                                    decoration: BoxDecoration(
-                                                      color: Color.fromRGBO(
-                                                          0, 150, 601, 1),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    alignment: Alignment.center,
-                                                    child: Text(
-                                                      '${IrrData?.irregularAttendanceStatus.percentage}%',
-                                                      style: TextStyle(
-                                                        fontSize: 20,
-                                                        fontFamily: 'medium',
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                      child: VerticalDivider(
+                                        color: Color.fromRGBO(238, 219, 245, 1),
+                                        width: 20,
+                                        thickness: 2,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  //
-                  Padding(
-                    padding: const EdgeInsets.only(top: 25, left: 5),
-                    child: Container(
-                      decoration: BoxDecoration(color: Colors.white),
-                      child: Row(
-                        children: [
-                          //absent
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(10)),
-                                color: Color.fromRGBO(243, 242, 242, 1)),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 25, right: 30),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor:
-                                        Color.fromRGBO(218, 0, 0, 1),
-                                  ),
+                                  if (IrrData == null || IrrData!.leave.isEmpty)
+                                    Padding(padding: EdgeInsets.only(left: 80)),
+                                  // Leave..
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: Text(
-                                      'Absent',
-                                      style: TextStyle(
-                                        fontFamily: 'medium',
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.025, // 2.5% of screen width
                                     ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          //leave
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                                color: Color.fromRGBO(249, 244, 252, 1)),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 25, right: 30),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor:
-                                        Color.fromRGBO(59, 72, 213, 1),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: Text(
-                                      'Leave',
-                                      style: TextStyle(
-                                        fontFamily: 'medium',
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                          //late
-                          Container(
-                            padding: EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                    topRight: Radius.circular(10)),
-                                color: Color.fromRGBO(245, 246, 253, 1)),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 25, right: 50),
-                              child: Row(
-                                children: [
-                                  CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor:
-                                        Color.fromRGBO(134, 0, 187, 1),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 5),
-                                    child: Text(
-                                      'Late',
-                                      style: TextStyle(
-                                        fontFamily: 'medium',
-                                        fontSize: 16,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  //absent data///////////////////////////////////////////////
-                  Transform.translate(
-                    offset: Offset(0, -23),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
-                            border: Border.all(
-                              color: Color.fromRGBO(238, 238, 238, 1),
-                            ),
-                          ),
-                          child: IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Absent..
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 15),
-                                  child: Column(
-                                    children: [
-                                      if (IrrData == null ||
-                                          IrrData!.absent.isEmpty)
-                                        Padding(
-                                            padding: EdgeInsets.only(left: 80)),
-                                      //
-                                      if (IrrData != null &&
-                                          IrrData!.absent.isNotEmpty)
-                                        ...IrrData!.absent.map((e) {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 10, top: 10),
-                                            child: Column(
+                                    child: Column(
+                                      children: [
+                                        if (IrrData != null &&
+                                            IrrData!.absent.isNotEmpty)
+                                          ...IrrData!.leave.map((e) {
+                                            return Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
                                               children: [
@@ -665,120 +843,85 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                   ),
                                                 ),
                                               ],
+                                            );
+                                          }).toList(),
+                                      ],
+                                    ),
+                                  ),
+                                  // Vertical Divider
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05, // 5% of screen width
+                                    ),
+                                    child: Container(
+                                      child: VerticalDivider(
+                                        color: Color.fromRGBO(238, 219, 245, 1),
+                                        width: 20,
+                                        thickness: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  // late..
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.025, // 2.5% of screen width
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        if (IrrData == null ||
+                                            IrrData!.late.isEmpty)
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.2, // 20% of screen width
                                             ),
-                                          );
-                                        }).toList(),
-                                    ],
-                                  ),
-                                ),
-                                // Vertical Divider
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20),
-                                  child: Container(
-                                    child: VerticalDivider(
-                                      color: Color.fromRGBO(238, 219, 245, 1),
-                                      width: 20,
-                                      thickness: 2,
+                                          ),
+                                        if (IrrData != null &&
+                                            IrrData!.absent.isNotEmpty)
+                                          ...IrrData!.late.map((e) {
+                                            return Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${e.date}',
+                                                  style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 14,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${e.day}',
+                                                  style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 14,
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }).toList(),
+                                      ],
                                     ),
                                   ),
-                                ),
-                                if (IrrData == null || IrrData!.leave.isEmpty)
-                                  Padding(padding: EdgeInsets.only(left: 80)),
-                                // Leave..
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    children: [
-                                      if (IrrData != null &&
-                                          IrrData!.absent.isNotEmpty)
-                                        ...IrrData!.leave.map((e) {
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${e.date}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              Text(
-                                                '${e.day}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
-                                    ],
-                                  ),
-                                ),
-                                // Vertical Divider
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 20),
-                                  child: Container(
-                                    child: VerticalDivider(
-                                      color: Color.fromRGBO(238, 219, 245, 1),
-                                      width: 20,
-                                      thickness: 2,
-                                    ),
-                                  ),
-                                ),
-                                // late..
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 10),
-                                  child: Column(
-                                    children: [
-                                      if (IrrData == null ||
-                                          IrrData!.late.isEmpty)
-                                        Padding(
-                                            padding: EdgeInsets.only(left: 80)),
-                                      if (IrrData != null &&
-                                          IrrData!.absent.isNotEmpty)
-                                        ...IrrData!.late.map((e) {
-                                          return Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${e.date}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                              Text(
-                                                '${e.day}',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Colors.black,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-            ),
-          ]);
-        });
+            ]);
+          },
+        );
       },
     );
   }
@@ -787,15 +930,66 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: Colors.white,
+      // appBar: AppBar(
+      //   iconTheme: IconThemeData(color: Colors.black),
+      //   automaticallyImplyLeading: true,
+      //   backgroundColor: AppTheme.appBackgroundPrimaryColor,
+      //   title: Text(
+      //     'Attendance',
+      //     style: TextStyle(
+      //         fontFamily: 'semibold', fontSize: 16, color: Colors.black),
+      //   ),
+      // ),
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        automaticallyImplyLeading: true,
-        backgroundColor: AppTheme.appBackgroundPrimaryColor,
-        title: Text(
-          'Attendance',
-          style: TextStyle(
-              fontFamily: 'semibold', fontSize: 16, color: Colors.black),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Text(
+                        'Attendance',
+                        style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
       body: isLoading
@@ -822,7 +1016,8 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                     children: [
                       //
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.03),
                         child: Card(
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -830,14 +1025,19 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                               side: BorderSide(
                                   color: Color.fromRGBO(225, 225, 225, 1))),
                           child: Container(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(
+                                MediaQuery.of(context).size.width * 0.015),
                             decoration: BoxDecoration(color: Colors.white),
                             width: double.infinity,
                             child: Column(
                               children: [
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 10, left: 10),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.015, // 1.5% of screen height
+                                    left: MediaQuery.of(context).size.width *
+                                        0.025, // 2.5% of screen width
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -851,9 +1051,11 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                   ),
                                 ),
                                 //
-
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 10),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.012,
+                                  ),
                                   child: Card(
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(
@@ -869,7 +1071,11 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                         children: [
                                           //
                                           Padding(
-                                            padding: const EdgeInsets.all(10.0),
+                                            padding: EdgeInsets.all(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.025),
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 5),
@@ -901,8 +1107,16 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                           ),
                                           //
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                top: 10, bottom: 5),
+                                            padding: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.012, // 1.2% of screen height
+                                              bottom: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.006, // 0.6% of screen height
+                                            ),
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
@@ -955,7 +1169,11 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                           ),
                                           //
                                           Padding(
-                                            padding: const EdgeInsets.all(10.0),
+                                            padding: EdgeInsets.all(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.025),
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 5),
@@ -1015,10 +1233,18 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                         //
                                                         Padding(
                                                           padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  left: 30,
-                                                                  top: 20),
+                                                              EdgeInsets.only(
+                                                            left: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.08, // 8% of screen width
+                                                            top: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .height *
+                                                                0.025, // 2.5% of screen height
+                                                          ),
                                                           child: Row(
                                                             children: [
                                                               //present.
@@ -1048,10 +1274,14 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                               ),
                                                               Padding(
                                                                 padding:
-                                                                    const EdgeInsets
+                                                                    EdgeInsets
                                                                         .only(
-                                                                        left:
-                                                                            10),
+                                                                  left: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.025, // 2.5% of screen width
+                                                                ),
                                                                 child: Text(
                                                                   'Present - ${attendanceData?.attendanceStatus?.present ?? ''}',
                                                                   style: TextStyle(
@@ -1066,10 +1296,14 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                               //leave
                                                               Padding(
                                                                 padding:
-                                                                    const EdgeInsets
+                                                                    EdgeInsets
                                                                         .only(
-                                                                        left:
-                                                                            25),
+                                                                  left: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.060, // 2.5% of screen width
+                                                                ),
                                                                 child:
                                                                     Container(
                                                                   height: 10,
@@ -1085,6 +1319,7 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                                           .circle),
                                                                 ),
                                                               ),
+                                                              //
                                                               Padding(
                                                                 padding:
                                                                     const EdgeInsets
@@ -1105,11 +1340,15 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                             ],
                                                           ),
                                                         ),
+                                                        //
                                                         Padding(
                                                           padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                            left: 30,
+                                                              EdgeInsets.only(
+                                                            left: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.080, // 2.5% of screen width
                                                           ),
                                                           child: Row(
                                                             children: [
@@ -1147,10 +1386,14 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                               //late
                                                               Padding(
                                                                 padding:
-                                                                    const EdgeInsets
+                                                                    EdgeInsets
                                                                         .only(
-                                                                        left:
-                                                                            38),
+                                                                  left: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.070, // 2.5% of screen width
+                                                                ),
                                                                 child:
                                                                     Container(
                                                                   height: 10,
@@ -1206,7 +1449,7 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                                       children: [
                                                                         Container(
                                                                           padding:
-                                                                              EdgeInsets.all(15),
+                                                                              EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
                                                                           decoration: BoxDecoration(
                                                                               color: Color.fromRGBO(0, 150, 601, 1),
                                                                               shape: BoxShape.circle),
@@ -1246,7 +1489,9 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                       ),
                       //irregular attendencies..
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width *
+                                0.03), // 2% of screen width
                         child: Card(
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -1259,8 +1504,14 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                             child: Column(
                               children: [
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 5, bottom: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.007, // 0.7% of screen height
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.025, // 2.5% of screen height
+                                    left: MediaQuery.of(context).size.width *
+                                        0.02,
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -1317,8 +1568,12 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                           ),
                                           Spacer(),
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 15),
+                                            padding: EdgeInsets.only(
+                                              right: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.04, // 4% of screen width
+                                            ),
                                             child: Icon(
                                               Icons.arrow_forward,
                                               size: 30,

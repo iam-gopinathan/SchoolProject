@@ -3,6 +3,7 @@ import 'package:flutter_application_1/screens/Approval_Status/Approval_Status_me
 import 'package:flutter_application_1/screens/Messages/Message_mainPage.dart';
 import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
 import 'package:flutter_application_1/screens/circularPage/circular_mainPage.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -59,70 +60,106 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
   ];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('usertype:${UserSession().userType}');
+    print('rollnumber:${UserSession().rollNumber}');
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      backgroundColor: Color.fromRGBO(253, 253, 253, 1),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-          child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
-            backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () async {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Row(
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  'My Project',
-                  style: TextStyle(
-                    fontFamily: 'semibold',
-                    fontSize: 16,
-                    color: Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ), // 3% of screen height),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'My Project',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black),
+                        ),
+                      ),
+                      Spacer(),
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.07,
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ApprovalStatusMenu()));
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(30),
+                                  color: Color.fromRGBO(253, 247, 239, 1)),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    height: 8,
+                                    width: 8,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color.fromRGBO(216, 70, 0, 1)),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      'Approval Status',
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Color.fromRGBO(216, 70, 0, 1)),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                    ],
                   ),
                 ),
-                Spacer(),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ApprovalStatusMenu()));
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(30),
-                        color: Color.fromRGBO(253, 247, 239, 1)),
-                    child: Row(
-                      children: [
-                        Container(
-                          height: 8,
-                          width: 8,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Color.fromRGBO(216, 70, 0, 1)),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 5),
-                          child: Text(
-                            'Approval Status',
-                            style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 16,
-                                color: Color.fromRGBO(216, 70, 0, 1)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
               ],
             ),
           ),

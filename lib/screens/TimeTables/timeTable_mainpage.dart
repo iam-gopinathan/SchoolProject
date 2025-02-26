@@ -11,6 +11,7 @@ import 'package:flutter_application_1/services/Timetables/Main_timetable_Api.dar
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_launcher_icons/main.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_svg/svg.dart';
@@ -127,7 +128,8 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                         ),
                         padding: EdgeInsets.symmetric(vertical: 15),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 20),
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.05),
                           child: Row(
                             children: [
                               Text(
@@ -143,7 +145,8 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
                         child: Card(
                           elevation: 0,
                           child: Container(
@@ -152,8 +155,12 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                               children: [
                                 // Select Class
                                 Padding(
-                                  padding:
-                                      const EdgeInsets.only(top: 30, left: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.04, // 4% of screen height
+                                    left: MediaQuery.of(context).size.width *
+                                        0.05, // 5% of screen width
+                                  ),
                                   child: Row(
                                     children: [
                                       Text(
@@ -169,7 +176,9 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                 ),
                                 // Classes
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 20),
+                                  padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.03),
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
@@ -190,7 +199,11 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                               },
                                               child: Container(
                                                 width: 100,
-                                                padding: EdgeInsets.all(5),
+                                                padding: EdgeInsets.all(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.0125),
                                                 decoration: BoxDecoration(
                                                   color: selectedGrade ==
                                                           grade['id'].toString()
@@ -286,116 +299,129 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Timetables',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-                    if (UserSession().userType == 'admin')
-                      Padding(
-                        padding: const EdgeInsets.only(right: 20),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'My \n Projects',
-                              style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            Switch(
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              activeTrackColor: AppTheme.textFieldborderColor,
-                              inactiveTrackColor: Colors.white,
-                              inactiveThumbColor: Colors.black,
-                              value: isswitched,
-                              onChanged: (value) {
-                                setState(() {
-                                  isswitched = value;
-                                  isLoading = true;
-
-                                  print(
-                                      'Switch is: ${isswitched ? "ON (Y)" : "OFF (N)"}');
-                                });
-                                _fetchMaintimetable();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-
-                    //filter icon..
-                    if (UserSession().userType == 'admin' ||
-                        UserSession().userType == 'teacher')
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.04),
+                  child: Row(
+                    children: [
                       GestureDetector(
                         onTap: () {
-                          _showFilterBottomSheet(context);
+                          Navigator.pop(context);
                         },
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 30),
-                          child: SvgPicture.asset(
-                            'assets/icons/Filter_icon.svg',
-                            fit: BoxFit.contain,
-                            height: 30,
-                          ),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
                         ),
                       ),
-                    if (UserSession().userType == 'admin')
-                      GestureDetector(
-                        onTap: () {
-                          //
-                          _showDialog(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
-                          ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Text(
+                        'Timetables',
+                        style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black,
                         ),
                       ),
-                  ],
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(height: 10),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        Padding(
+                          padding: EdgeInsets.only(
+                              right: MediaQuery.of(context).size.width * 0.05),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                'My Projects',
+                                style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 12,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              Switch(
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                activeTrackColor: AppTheme.textFieldborderColor,
+                                inactiveTrackColor: Colors.white,
+                                inactiveThumbColor: Colors.black,
+                                value: isswitched,
+                                onChanged: (value) {
+                                  setState(() {
+                                    isswitched = value;
+                                    isLoading = true;
+
+                                    print(
+                                        'Switch is: ${isswitched ? "ON (Y)" : "OFF (N)"}');
+                                  });
+                                  _fetchMaintimetable();
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      //filter icon..
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'teacher' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        GestureDetector(
+                          onTap: () {
+                            _showFilterBottomSheet(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                                right:
+                                    MediaQuery.of(context).size.width * 0.06),
+                            child: SvgPicture.asset(
+                              'assets/icons/Filter_icon.svg',
+                              fit: BoxFit.contain,
+                              height: 30,
+                            ),
+                          ),
+                        ),
+                      if (UserSession().userType == 'admin' ||
+                          UserSession().userType == 'superadmin' ||
+                          UserSession().userType == 'staff')
+                        GestureDetector(
+                          onTap: () {
+                            //
+                            _showDialog(context);
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -451,7 +477,9 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                               child: Row(
                                 children: [
                                   Container(
-                                    padding: EdgeInsets.all(5),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.02),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(
                                             topLeft: Radius.circular(10)),
@@ -474,8 +502,10 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                 ],
                               ),
                             ),
+                            //card section..
                             Padding(
-                              padding: const EdgeInsets.all(12.0),
+                              padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.03),
                               child: Card(
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
@@ -508,23 +538,42 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                         shape: Border(),
                                         title: Row(
                                           children: [
-                                            Text(
-                                              '${e.gradeSection}',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 16,
-                                                  color: Colors.black),
+                                            Transform.translate(
+                                              offset: Offset(-14, 0),
+                                              child: Text(
+                                                '${e.gradeSection}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 16,
+                                                    color: Colors.black),
+                                              ),
                                             ),
                                             Spacer(),
                                             if (e.updatedOn != null &&
                                                 e.updatedOn!.isNotEmpty)
-                                              Text(
-                                                '${e.updatedOn}',
-                                                style: TextStyle(
-                                                    color: Color.fromRGBO(
-                                                        49, 49, 49, 1),
-                                                    fontFamily: 'medium',
-                                                    fontSize: 10),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 10,
+                                                    horizontal: 8),
+                                                decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(
+                                                      255, 251, 245, 1),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10),
+                                                    topRight:
+                                                        Radius.circular(10),
+                                                  ),
+                                                ),
+                                                child: Text(
+                                                  'Updated on :${e.updatedOn}',
+                                                  style: TextStyle(
+                                                      color: Color.fromRGBO(
+                                                          49, 49, 49, 1),
+                                                      fontFamily: 'medium',
+                                                      fontSize: 10),
+                                                ),
                                               )
                                             else
                                               SizedBox(),
@@ -595,7 +644,11 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                               children: [
                                                 Spacer(),
                                                 if (UserSession().userType ==
-                                                    'admin')
+                                                        'admin' ||
+                                                    UserSession().userType ==
+                                                        'superadmin' ||
+                                                    UserSession().userType ==
+                                                        'staff')
                                                   GestureDetector(
                                                     onTap: () {
                                                       showDialog(
@@ -699,7 +752,11 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                                     ),
                                                   ),
                                                 if (UserSession().userType ==
-                                                    'admin')
+                                                        'admin' ||
+                                                    UserSession().userType ==
+                                                        'superadmin' ||
+                                                    UserSession().userType ==
+                                                        'staff')
                                                   //delete icon
                                                   GestureDetector(
                                                     onTap: () {
@@ -1002,6 +1059,9 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
         await file.writeAsBytes(response.bodyBytes);
         print('Image downloaded to: $filePath');
         showDownloadNotification(filePath);
+
+        await Future.delayed(Duration(seconds: 3));
+        openFile(filePath);
       } else {
         print('Failed to download image');
       }
@@ -1020,6 +1080,7 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
       importance: Importance.high,
       priority: Priority.high,
       playSound: true,
+      icon: '@mipmap/ic_launcher',
     );
     const NotificationDetails platformDetails =
         NotificationDetails(android: androidDetails);

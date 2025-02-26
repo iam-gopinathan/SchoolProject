@@ -102,7 +102,10 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(254, 251, 250, 1),
         Color.fromRGBO(254, 251, 250, 1),
       ],
-      "page": UserSession().userType == 'admin'
+      "page": UserSession().userType == 'admin' ||
+              UserSession().userType == 'superadmin' ||
+              UserSession().userType == 'staff' ||
+              UserSession().userType == 'teacher'
           ? ConsentformMainpage()
           : ParentyesornoPage(),
     },
@@ -170,7 +173,9 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(250, 251, 252, 1),
       ],
       "page": UserSession().userType == 'admin' ||
-              UserSession().userType == 'teacher'
+              UserSession().userType == 'teacher' ||
+              UserSession().userType == 'staff' ||
+              UserSession().userType == 'superadmin'
           ? Marksmainpage()
           : ParentMarksandresults(),
     },
@@ -212,7 +217,9 @@ class _CommunicationState extends State<Communication> {
           Color.fromRGBO(254, 251, 250, 1),
           Color.fromRGBO(254, 251, 250, 1),
         ],
-        "page": UserSession().userType == 'admin'
+        "page": UserSession().userType == 'admin' ||
+                UserSession().userType == 'staff' ||
+                UserSession().userType == 'superadmin'
             ? FeedbackMainpage()
             : ParentfeedbackMainpage(),
       },
@@ -228,7 +235,9 @@ class _CommunicationState extends State<Communication> {
         Color.fromRGBO(253, 250, 252, 1),
       ],
       "page": UserSession().userType == 'admin' ||
-              UserSession().userType == 'teacher'
+              UserSession().userType == 'teacher' ||
+              UserSession().userType == 'superadmin' ||
+              UserSession().userType == 'staff'
           ? AttendencePage(
               imagePath: '',
               userType: '',

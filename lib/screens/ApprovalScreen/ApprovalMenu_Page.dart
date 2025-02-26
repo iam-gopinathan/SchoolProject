@@ -62,29 +62,80 @@ class _ApprovalmenuPageState extends State<ApprovalmenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      // backgroundColor: Colors.white,
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(100),
+      //   child: ClipRRect(
+      //     borderRadius: BorderRadius.only(
+      //       bottomLeft: Radius.circular(30),
+      //       bottomRight: Radius.circular(30),
+      //     ),
+      //     child: AppBar(
+      //       iconTheme: IconThemeData(color: Colors.black),
+      //       backgroundColor: AppTheme.appBackgroundPrimaryColor,
+      //       leading: GestureDetector(
+      //           onTap: () async {
+      //             Navigator.pop(context);
+      //           },
+      //           child: Icon(Icons.arrow_back)),
+      //       title: Text(
+      //         'Approvals',
+      //         style: TextStyle(
+      //           fontFamily: 'semibold',
+      //           fontSize: 16,
+      //           color: Colors.black,
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      backgroundColor: Color.fromRGBO(253, 253, 253, 1),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-          child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
-            backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () async {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Text(
-              'Approvals',
-              style: TextStyle(
-                fontFamily: 'semibold',
-                fontSize: 16,
-                color: Colors.black,
-              ),
+        preferredSize: Size.fromHeight(80),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ), // 3% of screen height),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'Approvals',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),

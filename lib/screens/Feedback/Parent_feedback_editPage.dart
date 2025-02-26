@@ -28,103 +28,109 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
 //preview bottomsheet...
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: -70,
-                left: 180,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
-                    ),
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+          return Stack(clipBehavior: Clip.none, children: [
+            // Close icon
+            Positioned(
+              top: MediaQuery.of(context).size.height *
+                  -0.09, // -9% of screen height
+              left: MediaQuery.of(context).size.width *
+                  0.45, // 45% of screen width
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                  child: Icon(
+                    Icons.close,
+                    color: Colors.white,
+                    size: 35,
                   ),
                 ),
               ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
+            ),
+            Container(
+              padding: EdgeInsets.all(10),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          ),
+                        ],
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 1,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
-                      //selected suggesstions..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${selectedOptions}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
+                    ),
+                    //selected suggesstions..
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            "${selectedOptions}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ],
                       ),
+                    ),
 
-                      ///selected descriptions...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
+                    ///selected descriptions...
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Text(
                               "${_desc.text}",
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                   color: Colors.black),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              )
-            ]);
-          });
+              ),
+            )
+          ]);
         });
+      },
+    );
   }
 
 //fetch function...
@@ -257,6 +263,15 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
                           ),
                           borderRadius: BorderRadius.circular(10),
                         ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: Color.fromRGBO(203, 203, 203, 1),
+                            width: 1,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 10),
                       ),
                       dropdownColor: Colors.black,
                       items: options.map((String item) {
@@ -280,7 +295,10 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
             ),
             //description...
             Padding(
-              padding: const EdgeInsets.only(top: 50, left: 30),
+              padding: EdgeInsets.only(
+                top: 50,
+                left: MediaQuery.of(context).size.width * 0.07,
+              ),
               child: Row(children: [
                 Text(
                   'Edit Description',
@@ -293,7 +311,7 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
             ),
             //description..
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
               child: Container(
                 child: TextFormField(
                   inputFormatters: [LengthLimitingTextInputFormatter(600)],
@@ -314,13 +332,22 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
                       ),
                       borderRadius: BorderRadius.circular(10),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromRGBO(203, 203, 203, 1),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
             ),
             //
             Padding(
-              padding: const EdgeInsets.only(left: 15),
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.08,
+              ),
               child: Row(
                 children: [
                   Text(
@@ -333,48 +360,51 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
                 ],
               ),
             ),
-            //draft
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 230,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  //preview
-                  GestureDetector(
-                    onTap: () {
-                      _PreviewBottomsheet(context);
-                    },
-                    child: Text(
-                      'Preview',
-                      style: TextStyle(
-                          fontFamily: 'semibold',
-                          fontSize: 16,
-                          color: Colors.black),
-                    ),
-                  ),
-
-                  ///post
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.textFieldborderColor,
-                        side: BorderSide.none),
-                    onPressed: () {
-                      update();
-                    },
-                    child: Text(
-                      'Update',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        child: //draft
+            Padding(
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height *
+                0.05, // 5% of screen height
+            bottom: MediaQuery.of(context).size.height *
+                0.05, // 5% of screen height
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              //preview
+              GestureDetector(
+                onTap: () {
+                  _PreviewBottomsheet(context);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
+
+              ///post
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () {
+                  update();
+                },
+                child: Text(
+                  'Update',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

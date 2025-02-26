@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/ConsentForm/Parent_Answer_model.dart';
-
 import 'package:flutter_application_1/models/ConsentForm/Parentscreen_formResponse_model.dart';
 import 'package:flutter_application_1/services/ConsentForm/ParentAnswer_Api.dart';
 import 'package:flutter_application_1/services/ConsentForm/Parentscreen_Formanswering_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
-
 import 'package:intl/intl.dart';
 
 class ParentyesornoPage extends StatefulWidget {
@@ -125,72 +123,77 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Consent Form',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            // GestureDetector(
-                            //   onTap: () async {
-                            //     await _selectDate(context);
-                            //     setState(() {
-                            //       isLoading = true;
-                            //     });
-                            //     fetchparentForm();
-                            //   },
-                            //   child: Row(
-                            //     children: [
-                            //       Align(
-                            //         alignment: Alignment.topLeft,
-                            //         child: SvgPicture.asset(
-                            //           'assets/icons/Attendancepage_calendar_icon.svg',
-                            //           fit: BoxFit.contain,
-                            //           height: 20,
-                            //         ),
-                            //       ),
-                            //       Text(
-                            //         displayDate,
-                            //         style: TextStyle(
-                            //           fontFamily: 'medium',
-                            //           color: Color.fromRGBO(73, 73, 73, 1),
-                            //           fontSize: 12,
-                            //           fontWeight: FontWeight.bold,
-                            //           decoration: TextDecoration.underline,
-                            //           decorationThickness: 2,
-                            //           decorationColor:
-                            //               Color.fromRGBO(75, 75, 75, 1),
-                            //         ),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
-                          ],
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Text(
+                        'Consent Form',
+                        style: TextStyle(
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            children: [
+                              SizedBox(height: 10),
+                              // GestureDetector(
+                              //   onTap: () async {
+                              //     await _selectDate(context);
+                              //     setState(() {
+                              //       isLoading = true;
+                              //     });
+                              //     fetchparentForm();
+                              //   },
+                              //   child: Row(
+                              //     children: [
+                              //       Align(
+                              //         alignment: Alignment.topLeft,
+                              //         child: SvgPicture.asset(
+                              //           'assets/icons/Attendancepage_calendar_icon.svg',
+                              //           fit: BoxFit.contain,
+                              //           height: 20,
+                              //         ),
+                              //       ),
+                              //       Text(
+                              //         displayDate,
+                              //         style: TextStyle(
+                              //           fontFamily: 'medium',
+                              //           color: Color.fromRGBO(73, 73, 73, 1),
+                              //           fontSize: 12,
+                              //           fontWeight: FontWeight.bold,
+                              //           decoration: TextDecoration.underline,
+                              //           decorationThickness: 2,
+                              //           decorationColor:
+                              //               Color.fromRGBO(75, 75, 75, 1),
+                              //         ),
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -223,7 +226,12 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
                         return Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(left: 20, top: 10),
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width *
+                                    0.05, // 5% of screen width
+                                top: MediaQuery.of(context).size.height *
+                                    0.03, // 3% of screen height
+                              ),
                               child: Row(
                                 children: [
                                   Text(
@@ -233,47 +241,59 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
                                         fontSize: 12,
                                         color: Colors.black),
                                   ),
+                                ],
+                              ),
+                            ),
+                            Transform.translate(
+                              offset: Offset(-40, 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
                                   if (e.tag.isNotEmpty)
-                                    Transform.translate(
-                                      offset: Offset(40, 15),
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            vertical: 5, horizontal: 10),
-                                        decoration: BoxDecoration(
-                                            color:
-                                                AppTheme.textFieldborderColor,
-                                            borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(10),
-                                                topRight: Radius.circular(10))),
-                                        child: Text(
-                                          '${e.tag}',
-                                          style: TextStyle(
-                                              fontFamily: 'regular',
-                                              fontSize: 14,
-                                              color: Colors.black),
-                                        ),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 10),
+                                      decoration: BoxDecoration(
+                                          color: AppTheme.textFieldborderColor,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              topRight: Radius.circular(10))),
+                                      child: Text(
+                                        '${e.tag}',
+                                        style: TextStyle(
+                                            fontFamily: 'regular',
+                                            fontSize: 14,
+                                            color: Colors.black),
                                       ),
                                     ),
                                 ],
                               ),
                             ),
                             //card section
-                            ...e.fromParents.map((consent) {
+                            // ...e.fromParents.map((consent) {
+                            ...e.fromParents.asMap().entries.map((entry) {
+                              int index = entry.key; // Get the index
+                              var consent = entry
+                                  .value; // Get the consent object (each item in the list)
+
                               return Padding(
-                                padding: const EdgeInsets.all(12.0),
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.03),
                                 child: Card(
                                   elevation: 0,
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
                                   child: Container(
-                                    padding: EdgeInsets.all(15),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.04),
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(12),
                                         color: Colors.white,
                                         border: Border.all(
                                             color: Color.fromRGBO(
                                                 238, 238, 238, 1),
-                                            width: 1.5)),
+                                            width: 1)),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -289,12 +309,17 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
                                                 color: Colors.black),
                                           ),
                                         ),
-                                        Divider(
-                                          color:
-                                              Color.fromRGBO(230, 230, 230, 1),
-                                          thickness: 1,
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Divider(
+                                            color: Color.fromRGBO(
+                                                230, 230, 230, 1),
+                                            thickness: 1,
+                                          ),
                                         ),
                                         ExpansionTile(
+                                          initiallyExpanded: index == 0,
                                           backgroundColor: Colors.white,
                                           shape: Border(),
                                           title: Center(
@@ -331,105 +356,136 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
                                                 ),
                                               ],
                                             ),
-                                            //yes or no
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 10),
-                                              child: Row(
-                                                children: [
-                                                  //yes
-                                                  ElevatedButton(
-                                                      style: ElevatedButton.styleFrom(
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
-                                                              side: BorderSide(
-                                                                  color: Color
-                                                                      .fromRGBO(
-                                                                          0,
-                                                                          150,
-                                                                          60,
-                                                                          1),
-                                                                  width: 1)),
-                                                          elevation: 0,
-                                                          backgroundColor:
-                                                              Colors.white),
-                                                      onPressed: () {
-                                                        final model =
-                                                            ParentAnswerModel(
-                                                                id: consent.id
-                                                                    .toString(),
-                                                                answer: 'Y');
-                                                        // Call the API
-                                                        updateConsentAnswer(
-                                                            model, context);
-                                                      },
-                                                      child: Text(
-                                                        'Yes',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'medium',
-                                                            fontSize: 20,
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    0,
-                                                                    150,
-                                                                    60,
-                                                                    1)),
-                                                      )),
-                                                  //no
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 20),
-                                                    child: ElevatedButton(
-                                                      style: ElevatedButton.styleFrom(
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
-                                                              side: BorderSide(
-                                                                  color: Color
-                                                                      .fromRGBO(
-                                                                          216,
-                                                                          70,
-                                                                          0,
-                                                                          1),
-                                                                  width: 1)),
-                                                          elevation: 0,
-                                                          backgroundColor:
-                                                              Colors.white),
-                                                      onPressed: () {
-                                                        final model =
-                                                            ParentAnswerModel(
-                                                                id: consent.id
-                                                                    .toString(),
-                                                                answer: 'N');
-                                                        // Call the API
-                                                        updateConsentAnswer(
-                                                            model, context);
-                                                      },
-                                                      child: Text(
-                                                        'No',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'medium',
-                                                            fontSize: 20,
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    216,
-                                                                    70,
-                                                                    0,
-                                                                    1)),
+                                            // Padding(
+                                            //   padding:
+                                            //       const EdgeInsets.only(top: 5),
+                                            //   child: Divider(
+                                            //     color: Color.fromRGBO(
+                                            //         230, 230, 230, 1),
+                                            //     thickness: 1,
+                                            //   ),
+                                            // ),
+                                            if (consent.answer == null)
+                                              //yes or no
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 10),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    //yes
+                                                    ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                side: BorderSide(
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            0,
+                                                                            150,
+                                                                            60,
+                                                                            1),
+                                                                    width: 1)),
+                                                            elevation: 0,
+                                                            backgroundColor:
+                                                                Colors.white),
+                                                        onPressed: () async {
+                                                          final model =
+                                                              ParentAnswerModel(
+                                                                  id: consent.id
+                                                                      .toString(),
+                                                                  answer: 'Y');
+                                                          // Call the API
+                                                          await updateConsentAnswer(
+                                                              model, context);
+                                                          //
+                                                          await fetchparentForm();
+                                                        },
+                                                        child: Text(
+                                                          'Yes',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 20,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      0,
+                                                                      150,
+                                                                      60,
+                                                                      1)),
+                                                        )),
+                                                    //no
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 20),
+                                                      child: ElevatedButton(
+                                                        style: ElevatedButton.styleFrom(
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                side: BorderSide(
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            216,
+                                                                            70,
+                                                                            0,
+                                                                            1),
+                                                                    width: 1)),
+                                                            elevation: 0,
+                                                            backgroundColor:
+                                                                Colors.white),
+                                                        onPressed: () async {
+                                                          final model =
+                                                              ParentAnswerModel(
+                                                                  id: consent.id
+                                                                      .toString(),
+                                                                  answer: 'N');
+                                                          // Call the API
+                                                          await updateConsentAnswer(
+                                                              model, context);
+                                                          //
+                                                          await fetchparentForm();
+                                                        },
+                                                        child: Text(
+                                                          'No',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 20,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      216,
+                                                                      70,
+                                                                      0,
+                                                                      1)),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
-                                            )
+                                            if (consent.answer != null)
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                        0.02),
+                                                child: Text(
+                                                  'Thank You for your Response 😊 !',
+                                                  style: TextStyle(
+                                                      fontFamily: 'semibold',
+                                                      fontSize: 16,
+                                                      color: Colors.green),
+                                                ),
+                                              )
                                           ],
                                         ),
                                       ],

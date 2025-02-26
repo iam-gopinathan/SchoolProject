@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -206,8 +205,11 @@ class _EditHomeworkState extends State<EditHomework> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // 8% of screen height (negative)
+                left: MediaQuery.of(context).size.width *
+                    0.45, // 45% of screen width
+
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -254,41 +256,44 @@ class _EditHomeworkState extends State<EditHomework> {
                         ),
                       ),
 //heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${_selectedClass}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 15, top: 10),
+                      //   child: Row(
+                      //     children: [
+                      //       Text(
+                      //         "${_selectedClass}",
+                      //         style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.black),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
-                      //selected section..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${_selectedSection}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // //selected section..
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 15, top: 10),
+                      //   child: Row(
+                      //     children: [
+                      //       Text(
+                      //         "${_selectedSection}",
+                      //         style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.black),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
 
                       //fetchedimage...
-                      Image.network(
-                        image,
-                        fit: BoxFit.cover,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15),
+                        child: Image.network(
+                          image,
+                          fit: BoxFit.cover,
+                        ),
                       ),
 
                       ///image section...
@@ -401,10 +406,29 @@ class _EditHomeworkState extends State<EditHomework> {
                         Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           child: DropdownButtonFormField<String>(
+                            hint: Text(
+                              'Select class',
+                              style: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
                             decoration: InputDecoration(
-                              labelText: 'Select class',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
                               ),
                             ),
                             value: _selectedClass,
@@ -421,8 +445,6 @@ class _EditHomeworkState extends State<EditHomework> {
                     ),
                   ),
 
-                  //select section..
-
                   //select sections.....
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
@@ -436,13 +458,31 @@ class _EditHomeworkState extends State<EditHomework> {
                               fontSize: 14,
                               color: Color.fromRGBO(38, 38, 38, 1)),
                         ),
-
                         // Section dropdown code
                         Container(
                           width: MediaQuery.of(context).size.width * 0.5,
                           child: DropdownButtonFormField<String>(
+                            hint: Text(
+                              'Select Section',
+                              style: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
                             decoration: InputDecoration(
-                              labelText: 'Select Section',
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -460,10 +500,14 @@ class _EditHomeworkState extends State<EditHomework> {
                       ],
                     ),
                   ),
-
 //upload image......
                   Padding(
-                    padding: const EdgeInsets.only(top: 40, left: 15),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height *
+                          0.05, // 5% of screen height
+                      left: MediaQuery.of(context).size.width *
+                          0.05, // 4% of screen width
+                    ),
                     child: Row(
                       children: [
                         Container(
@@ -484,7 +528,10 @@ class _EditHomeworkState extends State<EditHomework> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: EdgeInsets.all(
+                      MediaQuery.of(context).size.width *
+                          0.05, // 4% of screen width
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: DottedBorder(
@@ -517,12 +564,12 @@ class _EditHomeworkState extends State<EditHomework> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Click Here to',
                                           style: TextStyle(
-                                              fontSize: 14,
+                                              fontSize: 12,
                                               fontFamily: 'medium',
                                               color: Color.fromRGBO(
                                                   93, 93, 93, 1)),
@@ -557,7 +604,6 @@ class _EditHomeworkState extends State<EditHomework> {
                       ),
                     ),
                   ),
-
                   //fetchedimage...
                   if (isFetchedImageVisible && homeWorkData?.filePath != null)
                     Padding(
@@ -592,7 +638,6 @@ class _EditHomeworkState extends State<EditHomework> {
                     ),
 
                   ///display selected image...
-
                   if (selectedFile != null)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -668,23 +713,48 @@ class _EditHomeworkState extends State<EditHomework> {
                             fontSize: 9,
                             color: Color.fromRGBO(168, 168, 168, 1)),
                       ),
-                      Text(
-                        '*Upload either an image or a link',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
+                      // Text(
+                      //   '*Upload either an image or a link',
+                      //   style: TextStyle(
+                      //       fontFamily: 'regular',
+                      //       fontSize: 9,
+                      //       color: Color.fromRGBO(168, 168, 168, 1)),
+                      // ),
                     ],
                   ),
                   //scheduled section....
+                  //schedule post...
                   Padding(
-                    padding: const EdgeInsets.only(top: 50),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.08, // 5% of screen width
+                      top: MediaQuery.of(context).size.height *
+                          0.03, // 3% of screen height
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Re-Schedule Post',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 14,
+                              color: Color.fromRGBO(38, 38, 38, 1)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height * 0.02,
+                      left: MediaQuery.of(context).size.width *
+                          0.03, // 3% of screen width
+                      right: MediaQuery.of(context).size.width * 0.04,
+                    ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
+                          width: MediaQuery.of(context).size.width * 0.87,
                           child: TextFormField(
                             controller: _scheduledDateandtime,
                             readOnly: true,
@@ -727,58 +797,53 @@ class _EditHomeworkState extends State<EditHomework> {
                       ],
                     ),
                   ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50, bottom: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        //preview
-                        GestureDetector(
-                          onTap: () {
-                            _PreviewBottomsheet(
-                              context,
-                              homeWorkData!.filePath!,
-                            );
-                          },
-                          child: Text(
-                            'Preview',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ),
-
-                        ///publish
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.textFieldborderColor,
-                              side: BorderSide.none),
-                          onPressed: () {
-                            final String status =
-                                _scheduledDateandtime.text.isEmpty
-                                    ? 'post'
-                                    : 'schedule';
-
-                            updateHomeworkExample(status);
-                          },
-                          child: Text(
-                            _scheduledDateandtime.text.isEmpty
-                                ? 'Update'
-                                : 'Schedule',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'medium',
-                                color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ),
+      bottomNavigationBar: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 50, bottom: 50),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              //preview
+              GestureDetector(
+                onTap: () {
+                  _PreviewBottomsheet(
+                    context,
+                    homeWorkData!.filePath!,
+                  );
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
+
+              ///publish
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () {
+                  final String status =
+                      _scheduledDateandtime.text.isEmpty ? 'post' : 'schedule';
+
+                  updateHomeworkExample(status);
+                },
+                child: Text(
+                  _scheduledDateandtime.text.isEmpty ? 'Update' : 'Schedule',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

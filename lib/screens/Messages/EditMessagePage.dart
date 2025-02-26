@@ -43,8 +43,10 @@ class _EditmessagepageState extends State<Editmessagepage> {
           return Stack(clipBehavior: Clip.none, children: [
             // Close icon
             Positioned(
-              top: -70,
-              left: 180,
+              top: MediaQuery.of(context).size.height *
+                  -0.08, // 8% of screen height (negative)
+              left: MediaQuery.of(context).size.width *
+                  0.45, // 45% of screen width
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();
@@ -86,7 +88,7 @@ class _EditmessagepageState extends State<Editmessagepage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: Divider(
-                        thickness: 2,
+                        thickness: 1,
                         color: Color.fromRGBO(243, 243, 243, 1),
                       ),
                     ),
@@ -95,12 +97,15 @@ class _EditmessagepageState extends State<Editmessagepage> {
                       padding: const EdgeInsets.only(left: 15, top: 10),
                       child: Row(
                         children: [
-                          Text(
-                            _heading.text,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black),
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            child: Text(
+                              _heading.text,
+                              style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
                           ),
                         ],
                       ),
@@ -115,6 +120,21 @@ class _EditmessagepageState extends State<Editmessagepage> {
                               ? Html(data: htmlContent)
                               : const Text(''),
                         ),
+                      ],
+                    ),
+                    //
+                    Row(
+                      children: [
+                        Container(
+                            width: MediaQuery.of(context).size.width * 0.8,
+                            padding: const EdgeInsets.all(10),
+                            child: Text(
+                              _scheduledDateandtime.text,
+                              style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            )),
                       ],
                     ),
                   ],
@@ -470,10 +490,18 @@ class _EditmessagepageState extends State<Editmessagepage> {
                           child: DropdownButtonFormField<String>(
                               value: selectedRecipient,
                               decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color.fromRGBO(203, 203, 203, 1),
+                                      width: 0.5,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10)),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 7, horizontal: 10),
                                 hintText: 'Select',
                                 hintStyle: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 16,
+                                    fontFamily: 'regular',
+                                    fontSize: 14,
                                     color: Colors.black),
                                 border: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -534,64 +562,74 @@ class _EditmessagepageState extends State<Editmessagepage> {
                   //
                   Padding(
                     padding: const EdgeInsets.only(top: 35),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        Text(
-                          'Select Class',
-                          style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 14,
-                              color: Color.fromRGBO(38, 38, 38, 1)),
-                        ),
-
-                        //dropdown field.......
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.5,
-                          child: GestureDetector(
-                            onTap: () {
-                              _showMenu(context);
-                            },
+                    child: Transform.translate(
+                      offset: Offset(-1, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            'Select Class',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 14,
+                                color: Color.fromRGBO(38, 38, 38, 1)),
+                          ),
+                          //dropdown field.......
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.05),
                             child: Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 15),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                  color: Color.fromRGBO(203, 203, 203, 1),
-                                  width: 0.5,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      selected.isEmpty
-                                          ? 'Select class'
-                                          : selected.join(', '),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                        fontFamily: 'regular',
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                      maxLines: 1,
+                              width: MediaQuery.of(context).size.width * 0.5,
+                              child: GestureDetector(
+                                onTap: () {
+                                  _showMenu(context);
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 10, vertical: 11),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: Color.fromRGBO(203, 203, 203, 1),
+                                      width: 0.5,
                                     ),
                                   ),
-                                  Icon(Icons.arrow_drop_down,
-                                      color: Colors.black),
-                                ],
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          selected.isEmpty
+                                              ? 'Select class'
+                                              : selected.join(', '),
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                            fontFamily: 'regular',
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                      Icon(Icons.arrow_drop_down,
+                                          color: Colors.black),
+                                    ],
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-
                   //heading...
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 45),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.06, // 5% of screen width
+                      top: MediaQuery.of(context).size.height *
+                          0.03, // 3% of screen height
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -605,13 +643,16 @@ class _EditmessagepageState extends State<Editmessagepage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
                         color: Colors.transparent,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: const Color.fromARGB(255, 173, 172, 172)
+                                .withOpacity(0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
                             offset: Offset(0, 0),
@@ -647,7 +688,10 @@ class _EditmessagepageState extends State<Editmessagepage> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.only(left: 15),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.06, // 5% of screen width
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -663,7 +707,12 @@ class _EditmessagepageState extends State<Editmessagepage> {
 
                   ///add description
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 30),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.06, // 5% of screen width
+                      top: MediaQuery.of(context).size.height *
+                          0.03, // 3% of screen height
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -678,14 +727,16 @@ class _EditmessagepageState extends State<Editmessagepage> {
                   ),
                   //description field..
                   Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
                     child: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: const Color.fromARGB(255, 173, 172, 172)
+                                .withOpacity(0.2),
                             spreadRadius: 2,
                             blurRadius: 5,
                             offset: Offset(0, 0),
@@ -761,7 +812,10 @@ class _EditmessagepageState extends State<Editmessagepage> {
                   ),
 
                   Padding(
-                    padding: const EdgeInsets.only(left: 15),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.06, // 5% of screen width
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -776,7 +830,12 @@ class _EditmessagepageState extends State<Editmessagepage> {
                   ),
                   //schedule post...
                   Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 30),
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width *
+                          0.06, // 5% of screen width
+                      top: MediaQuery.of(context).size.height *
+                          0.02, // 3% of screen height
+                    ),
                     child: Row(
                       children: [
                         Text(
@@ -790,20 +849,6 @@ class _EditmessagepageState extends State<Editmessagepage> {
                     ),
                   ),
 
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20, top: 20),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Set Date',
-                          style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 14,
-                              color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  ),
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
                     child: Row(
@@ -853,54 +898,148 @@ class _EditmessagepageState extends State<Editmessagepage> {
                       ],
                     ),
                   ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40, bottom: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        ///preview
-                        GestureDetector(
-                          onTap: () {
-                            _PreviewBottomsheet(context);
-                          },
-                          child: Text(
-                            'Preview',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ),
-
-                        ///scheduled
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.textFieldborderColor,
-                              side: BorderSide.none),
-                          onPressed: () {
-                            if (_scheduledDateandtime.text.isEmpty) {
-                              _submitUpdateForm("post");
-                            } else {
-                              _submitUpdateForm("schedule");
-                            }
-                          },
-                          child: Text(
-                            _scheduledDateandtime.text.isEmpty
-                                ? 'Update'
-                                : 'Schedule',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'medium',
-                                color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  //
                 ],
               ),
             ),
+      //
+      bottomNavigationBar: Container(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 40, bottom: 50),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ///preview
+              GestureDetector(
+                onTap: () {
+                  _PreviewBottomsheet(context);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
+
+              ///scheduled or update  button
+              if (UserSession().userType == 'superadmin')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      backgroundColor: AppTheme.textFieldborderColor,
+                      side: BorderSide.none),
+                  onPressed: () {
+                    if (_scheduledDateandtime.text.isEmpty) {
+                      _submitUpdateForm("post");
+                    } else {
+                      _submitUpdateForm("schedule");
+                    }
+                  },
+                  child: Text(
+                    _scheduledDateandtime.text.isEmpty ? 'Update' : 'Schedule',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'medium',
+                        color: Colors.black),
+                  ),
+                ),
+              //request now button..
+              if (UserSession().userType == 'admin' ||
+                  UserSession().userType == 'staff')
+                ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        backgroundColor: AppTheme.textFieldborderColor,
+                        side: BorderSide.none),
+                    onPressed: () {
+                      //
+                      if (_heading.text.isEmpty || htmlContent.isNotEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.red,
+                            content: Text(
+                                'Please fill in both heading and description'),
+                          ),
+                        );
+                        return;
+                      }
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            backgroundColor: Colors.white,
+                            title: Text(
+                              "Confirm Request !",
+                              style: TextStyle(
+                                fontFamily: 'semibold',
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            content: Text(
+                              "Are you sure you want to edit this request?",
+                              style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                            actions: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  side:
+                                      BorderSide(color: Colors.black, width: 1),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 14,
+                                      color: Colors.black),
+                                ),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.amber),
+                                onPressed: () {
+                                  if (_scheduledDateandtime.text.isEmpty) {
+                                    _submitUpdateForm("post");
+                                  } else {
+                                    _submitUpdateForm("schedule");
+                                  }
+
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Yes Send",
+                                  style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 14,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: Text(
+                      'Request Now',
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black),
+                    ))
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -29,6 +29,17 @@ class EditNewsscreen extends StatefulWidget {
 }
 
 class _EditNewsscreenState extends State<EditNewsscreen> {
+  // Function to paste clipboard text
+  Future<void> _pasteFromClipboard() async {
+    ClipboardData? clipboardData =
+        await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData != null && clipboardData.text != null) {
+      _controller.document
+          .insert(_controller.selection.baseOffset, clipboardData.text!);
+    }
+  }
+
+  //
   late String htmlContent = "";
   bool isuploadimage = true;
   bool isaddLink = false;
@@ -125,113 +136,116 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: -70,
-                left: 180,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: MediaQuery.of(context).size.height * (-70 / 800),
+                  left: MediaQuery.of(context).size.width * 0.4,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
+                Container(
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.7,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Preview Screen',
+                                style: TextStyle(
+                                    fontFamily: 'medium',
+                                    fontSize: 16,
+                                    color: Color.fromRGBO(104, 104, 104, 1)),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
+                        //
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Divider(
+                            thickness: 1,
+                            color: Color.fromRGBO(243, 243, 243, 1),
+                          ),
                         ),
-                      ),
 //heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, top: 10),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                child: Text(
+                                  headingController.text,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // description...
+                        Row(
                           children: [
                             Container(
-                              width: MediaQuery.of(context).size.width * 0.9,
-                              child: Text(
-                                headingController.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
+                              width: MediaQuery.of(context).size.width * 0.7,
+                              padding: const EdgeInsets.all(10),
+                              child: htmlContent.isNotEmpty
+                                  ? Html(data: htmlContent)
+                                  : const Text(''),
                             ),
                           ],
                         ),
-                      ),
-                      // description...
-                      Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            padding: const EdgeInsets.all(10),
-                            child: htmlContent.isNotEmpty
-                                ? Html(data: htmlContent)
-                                : const Text(''),
+                        //fetched image...
+                        if (imageUrl.isNotEmpty)
+                          Image.network(
+                            imageUrl,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
                           ),
-                        ],
-                      ),
-                      //fetched image...
-                      if (imageUrl.isNotEmpty)
-                        Image.network(
-                          imageUrl,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
 
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
-                      )
-                    ],
+                        ///image section...
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15),
+                          child: Center(
+                            child: selectedFile != null &&
+                                    selectedFile!.bytes != null
+                                ? Image.memory(
+                                    selectedFile!.bytes!,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Container(),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              )
-            ]);
+                )
+              ],
+            );
           },
         );
       },
@@ -314,8 +328,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
       print("Current Text: ${headingController.text}");
     });
 
-    //
-
     // Fetch the edit news data
     _EditNews = fetchEditNews(widget.newsId);
     _EditNews.then((data) {
@@ -344,29 +356,92 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      // backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(60),
+      //   child: ClipRRect(
+      //     borderRadius: BorderRadius.only(
+      //       bottomLeft: Radius.circular(30),
+      //       bottomRight: Radius.circular(30),
+      //     ),
+      //     child: AppBar(
+      //       iconTheme: IconThemeData(color: Colors.black),
+      //       backgroundColor: AppTheme.appBackgroundPrimaryColor,
+
+      //       leading: GestureDetector(
+      //           onTap: () {
+      //             Navigator.pop(context);
+      //             widget.onCreateNews();
+      //           },
+      //           child: Icon(Icons.arrow_back)),
+      //       title: Text(
+      //         'Edit News',
+      //         style: TextStyle(
+      //           fontFamily: 'semibold',
+      //           fontSize: 16,
+      //           color: Colors.black,
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      backgroundColor: Color.fromRGBO(253, 253, 253, 1),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
+        preferredSize: Size.fromHeight(100),
         child: ClipRRect(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(30),
             bottomRight: Radius.circular(30),
           ),
           child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
+            titleSpacing: 0,
             backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  widget.onCreateNews();
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Text(
-              'Edit News',
-              style: TextStyle(
-                fontFamily: 'semibold',
-                fontSize: 16,
-                color: Colors.black,
+            iconTheme: IconThemeData(color: Colors.black),
+            automaticallyImplyLeading: false,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.appBackgroundPrimaryColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
+                ),
+              ),
+              padding:
+                  EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.02),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            widget.onCreateNews();
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                              left: MediaQuery.of(context).size.width * 0.025),
+                          child: Text(
+                            'Edit News',
+                            style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -377,23 +452,20 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
-                  child: CircularProgressIndicator(
-                strokeWidth: 4,
-                color: AppTheme.textFieldborderColor,
-              ));
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  color: AppTheme.textFieldborderColor,
+                ),
+              );
             }
-
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             }
-
             if (snapshot.hasData) {
               final news = snapshot.data!;
-
               if (headingController.text.isEmpty) {
                 headingController.text = news.headline;
               }
-
               if (descriptionController.document.toPlainText().trim().isEmpty) {
                 descriptionController = quill.QuillController(
                   document: quill.Document()..insert(0, news.news),
@@ -435,10 +507,13 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                           padding: const EdgeInsets.all(15.0),
                           child: Container(
                             decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
                               color: Colors.transparent,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color:
+                                      const Color.fromARGB(255, 173, 172, 172)
+                                          .withOpacity(0.2),
                                   spreadRadius: 2,
                                   blurRadius: 5,
                                   offset: Offset(0, 0),
@@ -511,7 +586,9 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               color: Colors.white,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
+                                  color:
+                                      const Color.fromARGB(255, 173, 172, 172)
+                                          .withOpacity(0.2),
                                   spreadRadius: 2,
                                   blurRadius: 5,
                                   offset: Offset(0, 0),
@@ -527,13 +604,14 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                     QuillSimpleToolbar(
                                       controller: descriptionController,
                                       configurations:
-                                          const QuillSimpleToolbarConfigurations(
+                                          QuillSimpleToolbarConfigurations(
                                         dialogTheme: QuillDialogTheme(
                                             labelTextStyle:
                                                 TextStyle(color: Colors.black),
                                             inputTextStyle: TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 14)),
+                                        showClipboardCopy: false,
                                         showBoldButton: true,
                                         showClearFormat: false,
                                         showAlignmentButtons: false,
@@ -570,6 +648,14 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                         showSuperscript: false,
                                       ),
                                     ),
+                                    IconButton(
+                                        icon: Icon(Icons.paste,
+                                            color: Colors.black),
+                                        onPressed: () {
+                                          setState(() {
+                                            _pasteFromClipboard();
+                                          });
+                                        }),
                                   ],
                                 ),
                                 //quill controller.....
@@ -577,29 +663,25 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                   padding: EdgeInsets.all(10),
                                   child: QuillEditor.basic(
                                     controller: descriptionController,
-                                    configurations:
-                                        const QuillEditorConfigurations(
-                                            padding:
-                                                EdgeInsetsDirectional.symmetric(
-                                                    vertical: 25)),
+                                    configurations: QuillEditorConfigurations(
+                                      padding: EdgeInsetsDirectional.symmetric(
+                                          vertical: 25),
+                                      customStyles: DefaultStyles(
+                                        paragraph: quill.DefaultTextBlockStyle(
+                                          TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 16), // Text color black
+                                          quill.HorizontalSpacing(0, 0),
+                                          quill.VerticalSpacing.zero,
+                                          quill.VerticalSpacing(0, 0),
+                                          null, // TextAlign (null if not needed)
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15),
-                          child: Row(
-                            children: [
-                              Text(
-                                '*Max 600 Characters',
-                                style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 12,
-                                    color: Color.fromRGBO(127, 127, 127, 1)),
-                              )
-                            ],
                           ),
                         ),
                         // Upload Image and Add Link Section
@@ -665,8 +747,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
 
                         ///upload sections....
                         if (isuploadimage)
-
-                          ///upload section
                           Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: Padding(
@@ -703,12 +783,12 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.center,
                                               children: [
                                                 Text(
                                                   'Click Here to',
                                                   style: TextStyle(
-                                                      fontSize: 14,
+                                                      fontSize: 12,
                                                       fontFamily: 'medium',
                                                       color: Color.fromRGBO(
                                                           93, 93, 93, 1)),
@@ -851,7 +931,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                             ),
 
                         /// Display Selected File end...
-                        //addlink tab....
                         if (isaddLink)
                           Padding(
                             padding: const EdgeInsets.all(15.0),
@@ -861,36 +940,45 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               color: Color.fromRGBO(0, 102, 255, 1),
                               strokeWidth: 2,
                               child: Container(
-                                  height: 50,
-                                  child: TextFormField(
-                                    controller: _linkController,
-                                    decoration: InputDecoration(
-                                        fillColor:
-                                            Color.fromRGBO(228, 238, 253, 1)
-                                                .withOpacity(0.9),
-                                        filled: true,
-                                        hintText: 'Paste Link Here',
-                                        hintStyle: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 14,
-                                            color:
-                                                Color.fromRGBO(0, 102, 255, 1)),
-                                        border: OutlineInputBorder(
-                                            borderSide: BorderSide.none)),
-                                  )),
+                                height: 50,
+                                child: TextFormField(
+                                  controller: _linkController,
+                                  decoration: InputDecoration(
+                                      fillColor:
+                                          Color.fromRGBO(228, 238, 253, 1)
+                                              .withOpacity(0.9),
+                                      filled: true,
+                                      hintText: 'Paste Link Here',
+                                      hintStyle: TextStyle(
+                                          fontFamily: 'regular',
+                                          fontSize: 14,
+                                          color:
+                                              Color.fromRGBO(0, 102, 255, 1)),
+                                      border: OutlineInputBorder(
+                                          borderSide: BorderSide.none)),
+                                ),
+                              ),
                             ),
                           ),
-
+                        Transform.translate(
+                          offset: Offset(0, -5),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Supported Format : JPEG,Webp PNG, PDF',
+                                style: TextStyle(
+                                    fontFamily: 'regular',
+                                    fontSize: 9,
+                                    color: Color.fromRGBO(168, 168, 168, 1)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        //
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              'Supported Format : JPEG,Webp PNG, PDF',
-                              style: TextStyle(
-                                  fontFamily: 'regular',
-                                  fontSize: 9,
-                                  color: Color.fromRGBO(168, 168, 168, 1)),
-                            ),
                             Text(
                               '*Upload either an image or a link',
                               style: TextStyle(
@@ -916,21 +1004,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                             ],
                           ),
                         ),
-                        //
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Set Date',
-                                style: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 14,
-                                    color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        ),
+
                         //re-scheduled section....
                         Padding(
                           padding: const EdgeInsets.only(top: 10),
@@ -984,6 +1058,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                             ],
                           ),
                         ),
+                        //
                         Padding(
                           padding: const EdgeInsets.only(top: 30, bottom: 50),
                           child: Row(
@@ -1003,24 +1078,114 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                 ),
                               ),
                               //scheduled
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  elevation: 0,
-                                  backgroundColor:
-                                      AppTheme.textFieldborderColor,
-                                  side: BorderSide.none,
+                              if (UserSession().userType == 'superadmin')
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    elevation: 0,
+                                    backgroundColor:
+                                        AppTheme.textFieldborderColor,
+                                    side: BorderSide.none,
+                                  ),
+                                  onPressed: () {
+                                    _updateNews(news);
+                                  },
+                                  child: Text(
+                                    _isScheduled ? 'Schedule' : 'Update',
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'medium',
+                                        color: Colors.black),
+                                  ),
                                 ),
-                                onPressed: () {
-                                  _updateNews(news);
-                                },
-                                child: Text(
-                                  _isScheduled ? 'Schedule' : 'Update',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontFamily: 'medium',
-                                      color: Colors.black),
-                                ),
-                              ),
+                              ////request now..
+                              if (UserSession().userType == 'admin' ||
+                                  UserSession().userType == 'staff')
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            AppTheme.textFieldborderColor,
+                                        side: BorderSide.none),
+                                    onPressed: () {
+                                      if (headingController.text.isEmpty ||
+                                          htmlContent.isEmpty) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                            backgroundColor: Colors.red,
+                                            content: Text(
+                                                'Please fill in both heading and description'),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            backgroundColor: Colors.white,
+                                            title: Text(
+                                              "Confirm Request !",
+                                              style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 18,
+                                                color: Colors.black,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            content: Text(
+                                              "Are you sure you want to edit this request?",
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 16,
+                                                  color: Colors.black),
+                                            ),
+                                            actions: [
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.white,
+                                                  side: BorderSide(
+                                                      color: Colors.black,
+                                                      width: 1),
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text(
+                                                  "Cancel",
+                                                  style: TextStyle(
+                                                      fontFamily: 'semibold',
+                                                      fontSize: 14,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.amber),
+                                                onPressed: () {
+                                                  _updateNews(news);
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text(
+                                                  "Yes Send",
+                                                  style: TextStyle(
+                                                      fontFamily: 'semibold',
+                                                      fontSize: 14,
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Text(
+                                      'Request Now',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'medium',
+                                          color: Colors.black),
+                                    ))
                             ],
                           ),
                         ),
@@ -1043,13 +1208,10 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
     final generatedHtml = QuillDeltaToHtmlConverter(
       descriptionController.document.toDelta().toJson(),
     ).convert();
-
     // Assign the generated HTML to htmlContent
     late String htmlContent = generatedHtml;
-
     // Debug print the generated HTML content
     print("Generated HTML Content: $htmlContent");
-
     if (headingController.text.isEmpty || htmlContent.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1059,12 +1221,10 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
       );
       return;
     }
-
     try {
       String status = _isScheduled ? 'schedule' : 'post';
       String? fileToUpload;
       String? fileTypeToUpload;
-
 // Determine file type and file to upload
       if (selectedFile != null) {
         fileToUpload = selectedFile!.path;
@@ -1083,7 +1243,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
 // Ensure default values
       fileToUpload ??= '';
       fileTypeToUpload ??= '';
-
       // Debug print the values
       print("status: $status");
       print("fileToUpload: $fileToUpload");
@@ -1091,13 +1250,11 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
       print("Headline: ${headingController.text}");
       print("News content: ${htmlContent}");
       print("Link: ${_linkController.text}");
-      print(
-          "Scheduled On: ${_isScheduled ? _scheduledDateandtime.text : null}");
+      print("Scheduled On: ${_isScheduled ? _scheduledDateandtime.text : ''}");
       print(
           "Posted On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
       print(
           "Updated On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
-
       // Print the full updatedNews data before sending
       NewsUpdateModel updatedNews = NewsUpdateModel(
         id: news.id ?? 0,
@@ -1113,30 +1270,47 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
         postedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
         updatedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
       );
-
       print("Updated News: ${updatedNews.toJson()}");
-
       File? fileToUploadObj =
           selectedFile != null ? File(selectedFile!.path!) : null;
-
       bool success = await updateNewsWithFormData(updatedNews, fileToUploadObj);
-
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            backgroundColor: Colors.green,
-            content: Text('News updated successfully')));
-        // Add a delay of 2 seconds before navigating
+        //
+        String snackBarMessage = '';
+        if (UserSession().userType == 'superadmin') {
+          snackBarMessage = 'News Updated Successfully!';
+        } else if (UserSession().userType == 'admin' ||
+            UserSession().userType == 'staff') {
+          snackBarMessage = 'News update request sent successfully!';
+        }
+        if (snackBarMessage.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green,
+              content: Text(snackBarMessage),
+            ),
+          );
+          // Delay before navigation
+          await Future.delayed(Duration(seconds: 2));
+          widget.onCreateNews();
+          Navigator.pop(context);
+        }
+      } else {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to update news ')));
+        // Delay before navigation
         await Future.delayed(Duration(seconds: 2));
         widget.onCreateNews();
         Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to update news')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Error: $e')));
       print(e);
+      // Delay before navigation
+      await Future.delayed(Duration(seconds: 2));
+      widget.onCreateNews();
+      Navigator.pop(context);
     }
   }
 }

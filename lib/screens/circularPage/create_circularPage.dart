@@ -107,8 +107,11 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // 8% of screen height (negative)
+                left: MediaQuery.of(context).size.width *
+                    0.45, // 45% of screen width
+
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -173,12 +176,15 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                         padding: const EdgeInsets.only(left: 15, top: 10),
                         child: Row(
                           children: [
-                            Text(
-                              selected.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              child: Text(
+                                selected.toString(),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
                             ),
                           ],
                         ),
@@ -188,12 +194,15 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                         padding: const EdgeInsets.only(left: 15, top: 10),
                         child: Row(
                           children: [
-                            Text(
-                              _heading.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              child: Text(
+                                _heading.text,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
                             ),
                           ],
                         ),
@@ -202,7 +211,7 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                       Row(
                         children: [
                           Container(
-                            width: MediaQuery.of(context).size.width * 0.7,
+                            width: MediaQuery.of(context).size.width * 0.8,
                             padding: const EdgeInsets.all(10),
                             child: htmlContent.isNotEmpty
                                 ? Html(data: htmlContent)
@@ -503,17 +512,24 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                         fontSize: 14,
                         color: Color.fromRGBO(38, 38, 38, 1)),
                   ),
-
                   //dropdown field.......
                   Container(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: DropdownButtonFormField<String>(
                         decoration: InputDecoration(
-                          hintText: 'Select',
+                          contentPadding:
+                              EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                          hintText: 'Select Recipient',
                           hintStyle: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 16,
+                              fontFamily: 'regular',
+                              fontSize: 14,
                               color: Colors.black),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(203, 203, 203, 1),
+                                width: 0.5,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
                           border: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Color.fromRGBO(203, 203, 203, 1),
@@ -570,64 +586,75 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
             if (selectedRecipient == 'Students')
               Padding(
                 padding: EdgeInsets.only(top: 35),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Text(
-                      'Select Class',
-                      style: TextStyle(
-                          fontFamily: 'medium',
-                          fontSize: 14,
-                          color: Color.fromRGBO(38, 38, 38, 1)),
-                    ),
-                    //class dropdown...
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: GestureDetector(
-                        onTap: () {
-                          _showMenu(context);
-                        },
+                child: Transform.translate(
+                  offset: Offset(-1, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Text(
+                        'Select Class',
+                        style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 14,
+                            color: Color.fromRGBO(38, 38, 38, 1)),
+                      ),
+                      //class dropdown...
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * 0.06),
                         child: Container(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 15),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                              width: 0.5,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  selected.isEmpty
-                                      ? 'Select class'
-                                      : selected.join(', '),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    fontFamily: 'regular',
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showMenu(context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 0.5,
                                 ),
                               ),
-                              Icon(Icons.arrow_drop_down, color: Colors.black),
-                            ],
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      selected.isEmpty
+                                          ? 'Select class'
+                                          : selected.join(', '),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontFamily: 'regular',
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_drop_down,
+                                      color: Colors.black),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
-            SizedBox(height: 20),
-
             //heading...
             Padding(
-              padding: const EdgeInsets.only(left: 20, top: 45),
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width *
+                    0.05, // 5% of screen width
+                top: MediaQuery.of(context).size.height *
+                    0.04, // 3% of screen height
+              ),
               child: Row(
                 children: [
                   Text(
@@ -641,13 +668,16 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
               child: Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: const Color.fromARGB(255, 173, 172, 172)
+                          .withOpacity(0.2),
                       spreadRadius: 2,
                       blurRadius: 5,
                       offset: Offset(0, 0),
@@ -679,7 +709,8 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.only(left: 15),
+              padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width * 0.05),
               child: Row(
                 children: [
                   Text(
@@ -695,7 +726,12 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
 
             ///add description
             Padding(
-              padding: const EdgeInsets.only(left: 20, top: 30),
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width *
+                    0.05, // 5% of screen width
+                top: MediaQuery.of(context).size.height *
+                    0.03, // 3% of screen height
+              ),
               child: Row(
                 children: [
                   Text(
@@ -711,7 +747,7 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
 
             //editor...
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
               child: Container(
                 width: double.infinity,
                 decoration: BoxDecoration(
@@ -719,7 +755,8 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
+                      color: const Color.fromARGB(255, 173, 172, 172)
+                          .withOpacity(0.2),
                       spreadRadius: 2,
                       blurRadius: 5,
                       offset: Offset(0, 0),
@@ -799,7 +836,8 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
             ),
             //
             Padding(
-              padding: const EdgeInsets.only(left: 15),
+              padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width * 0.05),
               child: Row(
                 children: [
                   Text(
@@ -847,7 +885,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
             ),
 
             ///upload sections....
-
             if (isuploadimage)
 
               ///upload section
@@ -882,12 +919,12 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                                 padding: const EdgeInsets.only(left: 15),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Text(
                                       'Click Here to',
                                       style: TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 12,
                                           fontFamily: 'medium',
                                           color: Color.fromRGBO(93, 93, 93, 1)),
                                     ),
@@ -1032,7 +1069,12 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
             ),
             //schedule post...
             Padding(
-              padding: const EdgeInsets.only(left: 20, top: 30),
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width *
+                    0.05, // 5% of screen width
+                top: MediaQuery.of(context).size.height *
+                    0.03, // 3% of screen height
+              ),
               child: Row(
                 children: [
                   Text(
@@ -1046,20 +1088,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 20),
-              child: Row(
-                children: [
-                  Text(
-                    'Set Date',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
@@ -1108,78 +1136,174 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: Container(
+        child:
             //save as draft
             Padding(
-              padding: const EdgeInsets.only(top: 40, bottom: 50),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: Colors.black, width: 1.5)),
-                    onPressed: () {
-                      _createcircular("draft");
-                    },
-                    child: Text(
-                      'Save as Draft',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black),
-                    ),
-                  ),
-
-                  ///preview
-                  GestureDetector(
-                    onTap: () {
-                      final generatedHtml = QuillDeltaToHtmlConverter(
-                        _controller.document.toDelta().toJson(),
-                      ).convert();
-
-                      setState(() {
-                        htmlContent = generatedHtml;
-                      });
-
-                      print("Generated HTML Content: $htmlContent");
-
-                      _PreviewBottomsheet(context);
-                    },
-                    child: Text(
-                      'Preview',
-                      style: TextStyle(
-                          fontFamily: 'semibold',
-                          fontSize: 16,
-                          color: Colors.black),
-                    ),
-                  ),
-
-                  ///scheduled
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.textFieldborderColor,
-                        side: BorderSide.none),
-                    onPressed: () {
-                      if (_scheduledDateandtime.text.isEmpty) {
-                        _createcircular("post");
-                      } else {
-                        _createcircular("schedule");
-                      }
-                    },
-                    child: Text(
-                      _scheduledDateandtime.text.isEmpty
-                          ? 'Publish'
-                          : 'Schedule',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black),
-                    ),
-                  ),
-                ],
+          padding: const EdgeInsets.only(top: 40, bottom: 50),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.black, width: 1.5)),
+                onPressed: () {
+                  _createcircular("draft");
+                },
+                child: Text(
+                  'Save as Draft',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
               ),
-            ),
-          ],
+
+              ///preview
+              GestureDetector(
+                onTap: () {
+                  final generatedHtml = QuillDeltaToHtmlConverter(
+                    _controller.document.toDelta().toJson(),
+                  ).convert();
+
+                  setState(() {
+                    htmlContent = generatedHtml;
+                  });
+
+                  print("Generated HTML Content: $htmlContent");
+
+                  _PreviewBottomsheet(context);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
+
+              ///scheduled or post
+              if (UserSession().userType == 'superadmin')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      backgroundColor: AppTheme.textFieldborderColor,
+                      side: BorderSide.none),
+                  onPressed: () {
+                    if (_scheduledDateandtime.text.isEmpty) {
+                      _createcircular("post");
+                    } else {
+                      _createcircular("schedule");
+                    }
+                  },
+                  child: Text(
+                    _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
+                    style: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'medium',
+                        color: Colors.black),
+                  ),
+                ),
+
+              ////request now..
+              if (UserSession().userType == 'admin' ||
+                  UserSession().userType == 'staff')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 15),
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none,
+                  ),
+                  onPressed: () {
+                    //
+                    if (_heading.text.isEmpty ||
+                        _controller.document.isEmpty()) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Colors.red,
+                          content: Text(
+                              'Please fill in both heading and description'),
+                        ),
+                      );
+                      return;
+                    }
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          backgroundColor: Colors.white,
+                          title: Text(
+                            "Confirm Request !",
+                            style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 18,
+                              color: Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          content: Text(
+                            "Are you sure you want to create a new request?",
+                            style: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                          actions: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                side: BorderSide(color: Colors.black, width: 1),
+                              ),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Cancel",
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 14,
+                                    color: Colors.black),
+                              ),
+                            ),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.amber),
+                              onPressed: () {
+                                if (_scheduledDateandtime.text.isEmpty) {
+                                  _createcircular("post");
+                                } else {
+                                  _createcircular("schedule");
+                                }
+                                Navigator.of(context).pop();
+                              },
+                              child: Text(
+                                "Yes Send",
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 14,
+                                    color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Text(
+                    'Request Now',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'medium',
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

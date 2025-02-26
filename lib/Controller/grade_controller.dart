@@ -34,10 +34,10 @@ class GradeController extends GetxController {
             .toList()
             .cast<String>();
       } else {
-        Get.snackbar('Error', 'Failed to fetch grades: ${response.statusCode}');
+        print('Error, Failed to fetch grades: ${response.statusCode}');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred: $e');
+      print('Error, An error occurred: $e');
     }
   }
 

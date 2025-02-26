@@ -25,12 +25,12 @@ class _MarksmainpageState extends State<Marksmainpage> {
     // TODO: implement initState
     super.initState();
     gradeController.fetchGrades();
-    // Add a listener to the ScrollController to monitor scroll changes.
+
     _scrollController.addListener(_scrollListener);
   }
 
   void _scrollListener() {
-    setState(() {}); // Trigger UI update when scroll position changes
+    setState(() {});
   }
 
   @override
@@ -57,68 +57,73 @@ class _MarksmainpageState extends State<Marksmainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(10),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
-                      ),
-                    ),
-                    SizedBox(width: MediaQuery.of(context).size.width * 0.02),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Marks/Results',
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black,
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Spacer(),
-
-//add screen....
-                    Padding(
-                      padding: const EdgeInsets.only(right: 30),
-                      child: GestureDetector(
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Addmarks()));
+                          Navigator.pop(context);
                         },
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: AppTheme.Addiconcolor,
-                            shape: BoxShape.circle,
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Marks/Results',
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                            ],
                           ),
-                          child: Icon(
-                            Icons.add,
-                            color: Colors.black,
-                            size: 30,
+                        ],
+                      ),
+                      Spacer(),
+                      //add screen....
+                      Padding(
+                        padding: EdgeInsets.only(
+                            right: MediaQuery.of(context).size.width * 0.04),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Addmarks()));
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppTheme.Addiconcolor,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.add,
+                              color: Colors.black,
+                              size: 30,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -174,7 +179,8 @@ class _MarksmainpageState extends State<Marksmainpage> {
                     textColor: Colors.black,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.025),
                         child: nurseryGrades.isEmpty
                             ? Center(
                                 child: CircularProgressIndicator(
@@ -236,8 +242,11 @@ class _MarksmainpageState extends State<Marksmainpage> {
                                           ),
                                           Expanded(
                                             child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(12.0),
+                                              padding: EdgeInsets.all(
+                                                  MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.02),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment

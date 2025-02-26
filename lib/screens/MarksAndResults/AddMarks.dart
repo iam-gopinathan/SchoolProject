@@ -195,96 +195,104 @@ class _AddmarksState extends State<Addmarks> {
       ),
       builder: (BuildContext context) {
         return StatefulBuilder(
-            builder: (BuildContext context, StateSetter setModalState) {
-          return Stack(clipBehavior: Clip.none, children: [
-            // Close icon
-            Positioned(
-              top: -70,
-              left: 180,
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pop();
-                },
-                child: CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                  child: Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: 35,
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: -MediaQuery.of(context).size.height * 0.09,
+                  left: MediaQuery.of(context).size.width * 0.45,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.all(10),
-              width: double.infinity,
-              height: MediaQuery.of(context).size.height * 0.5,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Teacher Comment',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
+                Container(
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 10),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Teacher Comment',
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                    //
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.02,
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color.fromRGBO(202, 202, 202, 1),
-                            )),
-                        width: MediaQuery.of(context).size.width * 0.9,
-                        child: TextFormField(
-                          controller: _Addcomment,
-                          maxLines: 9,
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                  borderSide: BorderSide.none),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide.none)),
                         ),
-                      ),
+                        //
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02,
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Color.fromRGBO(202, 202, 202, 1),
+                                )),
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: TextFormField(
+                              readOnly: true,
+                              controller: _Addcomment,
+                              maxLines: 6,
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderSide: BorderSide.none),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide.none)),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 25),
+                          child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(horizontal: 70),
+                                  elevation: 0,
+                                  backgroundColor: Colors.white,
+                                  side: BorderSide(
+                                      color: Colors.black, width: 1)),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: Text(
+                                'Close',
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              )),
+                        )
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 25),
-                      child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              padding: EdgeInsets.symmetric(horizontal: 70),
-                              elevation: 0,
-                              backgroundColor: Colors.white,
-                              side: BorderSide(color: Colors.black, width: 1)),
-                          onPressed: () {},
-                          child: Text(
-                            'Close',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          )),
-                    )
-                  ],
-                ),
-              ),
-            )
-          ]);
-        });
+                  ),
+                )
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -304,8 +312,9 @@ class _AddmarksState extends State<Addmarks> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: -MediaQuery.of(context).size.height *
+                    0.09, // -9% of screen height
+                left: MediaQuery.of(context).size.width * 0.45,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -358,7 +367,7 @@ class _AddmarksState extends State<Addmarks> {
                           width: MediaQuery.of(context).size.width * 0.9,
                           child: TextFormField(
                             controller: _Addcomment,
-                            maxLines: 9,
+                            maxLines: 6,
                             decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                     borderSide: BorderSide.none),
@@ -375,7 +384,9 @@ class _AddmarksState extends State<Addmarks> {
                               elevation: 0,
                               backgroundColor: AppTheme.textFieldborderColor,
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
                             child: Text(
                               'Save',
                               style: TextStyle(
@@ -428,8 +439,10 @@ class _AddmarksState extends State<Addmarks> {
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -70,
-                  left: 180,
+                  top: -MediaQuery.of(context).size.height *
+                      0.09, // -9% of screen height
+                  left: MediaQuery.of(context).size.width *
+                      0.45, // 45% of screen width
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -446,7 +459,7 @@ class _AddmarksState extends State<Addmarks> {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   child: Column(
                     children: [
@@ -476,7 +489,8 @@ class _AddmarksState extends State<Addmarks> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
                         child: Card(
                           elevation: 0,
                           child: Container(
@@ -561,8 +575,12 @@ class _AddmarksState extends State<Addmarks> {
                                 // Select Section
                                 if (sections.isNotEmpty) ...[
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 30, left: 20),
+                                    padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.04, // 4% of screen height
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05,
+                                    ),
                                     child: Row(
                                       children: [
                                         Text(
@@ -578,7 +596,10 @@ class _AddmarksState extends State<Addmarks> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 20),
+                                    padding: EdgeInsets.only(
+                                      top: MediaQuery.of(context).size.height *
+                                          0.025,
+                                    ),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Row(
@@ -634,7 +655,9 @@ class _AddmarksState extends State<Addmarks> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.025,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -818,7 +841,6 @@ class _AddmarksState extends State<Addmarks> {
   }
 
   GradeMarkss? _gradeData;
-  //
 
   //
   String initialHeading = "";
@@ -834,6 +856,7 @@ class _AddmarksState extends State<Addmarks> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: Colors.white,
               title: Text(
                 "Unsaved Changes !",
                 style: TextStyle(
@@ -875,32 +898,105 @@ class _AddmarksState extends State<Addmarks> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+        // backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+        // appBar: PreferredSize(
+        //   preferredSize: Size.fromHeight(100),
+        //   child: ClipRRect(
+        //     borderRadius: BorderRadius.only(
+        //       bottomLeft: Radius.circular(30),
+        //       bottomRight: Radius.circular(30),
+        //     ),
+        //     child: Padding(
+        //       padding: EdgeInsets.only(
+        //         top: MediaQuery.of(context).size.height * 0.04,
+        //       ),
+        //       child: AppBar(
+        //         iconTheme: IconThemeData(color: Colors.black),
+        //         backgroundColor: AppTheme.appBackgroundPrimaryColor,
+        //         leading: GestureDetector(
+        //             onTap: () async {
+        //               if (hasUnsavedChanges()) {
+        //                 await _showUnsavedChangesDialog();
+        //               }
+        //               Navigator.pop(context);
+        //             },
+        //             child: Icon(Icons.arrow_back)),
+        //         title: Text(
+        //           'Add Marks',
+        //           style: TextStyle(
+        //             fontFamily: 'semibold',
+        //             fontSize: 16,
+        //             color: Colors.black,
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        backgroundColor: Colors.white,
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60),
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(30),
-              bottomRight: Radius.circular(30),
-            ),
-            child: AppBar(
-              iconTheme: IconThemeData(color: Colors.black),
-              backgroundColor: AppTheme.appBackgroundPrimaryColor,
-              leading: GestureDetector(
-                  onTap: () async {
-                    if (hasUnsavedChanges()) {
-                      await _showUnsavedChangesDialog();
-                    }
-                    Navigator.pop(context);
-                  },
-                  child: Icon(Icons.arrow_back)),
-              title: Text(
-                'Add Marks',
-                style: TextStyle(
-                  fontFamily: 'semibold',
-                  fontSize: 16,
-                  color: Colors.black,
-                ),
+          preferredSize: Size.fromHeight(100),
+          child: AppBar(
+            titleSpacing: 0,
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Colors.black),
+            automaticallyImplyLeading: false,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.appBackgroundPrimaryColor,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30)),
+              ),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        top: MediaQuery.of(context).size.height * 0.04),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            if (hasUnsavedChanges()) {
+                              await _showUnsavedChangesDialog();
+                            }
+                            Navigator.pop(context);
+                          },
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                          ),
+                        ),
+                        SizedBox(
+                            width: MediaQuery.of(context).size.width * 0.02),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Add Marks',
+                                  style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: MediaQuery.of(context).size.height *
+                                      0.007,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -910,14 +1006,16 @@ class _AddmarksState extends State<Addmarks> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.only(top: 20),
+                padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.025,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
                       'Add Exam Name',
                       style: TextStyle(
-                          fontFamily: 'regular',
+                          fontFamily: 'semibold',
                           fontSize: 12,
                           color: Colors.black),
                     ),
@@ -930,13 +1028,19 @@ class _AddmarksState extends State<Addmarks> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 15),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: Color.fromRGBO(203, 203, 203, 1),
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(30),
                             borderSide: BorderSide(
                               color: Color.fromRGBO(203, 203, 203, 1),
                             ),
@@ -1056,15 +1160,18 @@ class _AddmarksState extends State<Addmarks> {
                       return Column(
                         children: [
                           Transform.translate(
-                            offset: Offset(0, 15),
+                            offset: Offset(0, 16),
                             child: Padding(
-                              padding: const EdgeInsets.only(left: 25),
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.06,
+                              ),
                               child: Row(children: [
                                 IntrinsicWidth(
                                   child: Container(
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10)),
+                                            topRight: Radius.circular(10),
+                                            topLeft: Radius.circular(10)),
                                         border: Border.all(
                                             color: Color.fromRGBO(
                                                 234, 234, 234, 1))),
@@ -1092,8 +1199,16 @@ class _AddmarksState extends State<Addmarks> {
                                           ),
                                         ),
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 5),
+                                          padding: EdgeInsets.only(
+                                            left: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.025, // 2.5% of screen width
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.0125, // 1.25% of screen width
+                                          ),
                                           child: Text(
                                             'Class Teacher - ${gradeData.classTeacher}',
                                             style: TextStyle(
@@ -1114,14 +1229,15 @@ class _AddmarksState extends State<Addmarks> {
                               studentIndex < gradeData.students.length;
                               studentIndex++)
                             Padding(
-                              padding: const EdgeInsets.all(15.0),
+                              padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.04),
                               child: Container(
                                 padding: EdgeInsets.symmetric(vertical: 15),
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: Color.fromRGBO(238, 238, 238, 1),
-                                    )),
+                                        color: Color.fromRGBO(238, 238, 238, 1),
+                                        width: 1)),
                                 child: Column(
                                   children: [
                                     Row(
@@ -1259,7 +1375,7 @@ class _AddmarksState extends State<Addmarks> {
                                       child: Divider(
                                         color: Color.fromRGBO(245, 245, 245, 1),
                                         height: 5,
-                                        thickness: 3,
+                                        thickness: 1,
                                       ),
                                     ),
                                     //table.......
@@ -1267,7 +1383,9 @@ class _AddmarksState extends State<Addmarks> {
                                       controller: _horizontalScrollController,
                                       scrollDirection: Axis.horizontal,
                                       child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
+                                        padding: EdgeInsets.all(
+                                            MediaQuery.of(context).size.width *
+                                                0.02),
                                         child: DataTable(
                                           headingRowColor: MaterialStateProperty
                                               .resolveWith<Color>(
@@ -1355,25 +1473,28 @@ class _AddmarksState extends State<Addmarks> {
                                       ),
                                     ),
                                     //
-                                    Divider(
-                                      color: Color.fromRGBO(245, 245, 245, 1),
-                                      height: 5,
-                                      thickness: 3,
-                                    ),
-                                    //linear indicator...
-                                    Container(
-                                      width: 60,
-                                      height: 10,
-                                      child: LinearProgressIndicator(
-                                        borderRadius: BorderRadius.circular(10),
-                                        backgroundColor:
-                                            Color.fromRGBO(225, 225, 225, 1),
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.black),
-                                        value: _progress,
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 10),
+                                      child: Divider(
+                                        color: Color.fromRGBO(245, 245, 245, 1),
+                                        height: 5,
+                                        thickness: 1,
                                       ),
                                     ),
+                                    // //linear indicator...
+                                    // Container(
+                                    //   width: 60,
+                                    //   height: 10,
+                                    //   child: LinearProgressIndicator(
+                                    //     borderRadius: BorderRadius.circular(10),
+                                    //     backgroundColor:
+                                    //         Color.fromRGBO(225, 225, 225, 1),
+                                    //     valueColor:
+                                    //         AlwaysStoppedAnimation<Color>(
+                                    //             Colors.black),
+                                    //     value: _progress,
+                                    //   ),
+                                    // ),
                                     Row(
                                       children: [
                                         Padding(
@@ -1393,8 +1514,16 @@ class _AddmarksState extends State<Addmarks> {
                                             _addBottomsheet(context);
                                           },
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 15, top: 10),
+                                            padding: EdgeInsets.only(
+                                              right: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.04, // 4% of screen width
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.012, // 1.2% of screen height
+                                            ),
                                             child: Container(
                                               padding: EdgeInsets.symmetric(
                                                   vertical: 2, horizontal: 10),
@@ -1426,8 +1555,16 @@ class _AddmarksState extends State<Addmarks> {
                                             _viewBottomsheet(context);
                                           },
                                           child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 15, top: 10),
+                                            padding: EdgeInsets.only(
+                                              right: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.04, // 4% of screen width
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.012, // 1.2% of screen height
+                                            ),
                                             child: Text(
                                               'View',
                                               style: TextStyle(
@@ -1452,15 +1589,20 @@ class _AddmarksState extends State<Addmarks> {
         ),
         bottomNavigationBar: Container(
           child: Padding(
-            padding: const EdgeInsets.only(top: 40, bottom: 50),
+            padding: EdgeInsets.only(
+              top: MediaQuery.of(context).size.height *
+                  0.05, // 5% of screen height
+              bottom: MediaQuery.of(context).size.height * 0.05,
+            ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 //draft
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
                       backgroundColor: Colors.white,
-                      side: BorderSide(color: Colors.black, width: 1.5)),
+                      side: BorderSide(color: Colors.black, width: 1)),
                   onPressed: () {
                     String status = 'draft';
                     addMarks(context, selectedExam!, _gradeData!, status,
@@ -1476,40 +1618,37 @@ class _AddmarksState extends State<Addmarks> {
                 ),
 
                 ///publish
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: areAllMarksEntered()
-                            ? AppTheme.textFieldborderColor
-                            : Colors.grey),
-                    onPressed: () {
-                      if (areAllMarksEntered()) {
-                        String status = 'post';
-                        addMarks(context, selectedExam!, _gradeData!, status,
-                            selectedGrade);
-                        print('elevatedexaaaam${selectedExam}');
-                        print('_gradeData!${selectedExam}');
-                        print('ele status ${status}');
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            backgroundColor: AppTheme.textFieldborderColor,
-                            content: Text(
-                              'Please enter marks for all students!',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontFamily: 'semibold',
-                                  fontSize: 16),
-                            )));
-                      }
-                    },
-                    child: Text(
-                      'Publish',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'semibold',
-                        color: Colors.black,
-                      ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: areAllMarksEntered()
+                          ? AppTheme.textFieldborderColor
+                          : Colors.grey),
+                  onPressed: () {
+                    if (areAllMarksEntered()) {
+                      String status = 'post';
+                      addMarks(context, selectedExam!, _gradeData!, status,
+                          selectedGrade);
+                      print('elevatedexaaaam${selectedExam}');
+                      print('_gradeData!${selectedExam}');
+                      print('ele status ${status}');
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          backgroundColor: AppTheme.textFieldborderColor,
+                          content: Text(
+                            'Please enter marks for all students!',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'semibold',
+                                fontSize: 16),
+                          )));
+                    }
+                  },
+                  child: Text(
+                    'Publish',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'semibold',
+                      color: Colors.black,
                     ),
                   ),
                 ),

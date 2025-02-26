@@ -154,8 +154,11 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // 8% of screen height (negative)
+                left: MediaQuery.of(context).size.width *
+                    0.45, // 45% of screen width
+
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -197,41 +200,41 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Divider(
-                          thickness: 2,
+                          thickness: 1,
                           color: Color.fromRGBO(243, 243, 243, 1),
                         ),
                       ),
                       //selectedclass
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _selectedClass.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 15, top: 10),
+                      //   child: Row(
+                      //     children: [
+                      //       Text(
+                      //         _selectedClass.toString(),
+                      //         style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.black),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                       //slected exam
 
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _selectedExam.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(left: 15, top: 10),
+                      //   child: Row(
+                      //     children: [
+                      //       Text(
+                      //         _selectedExam.toString(),
+                      //         style: TextStyle(
+                      //             fontWeight: FontWeight.bold,
+                      //             fontSize: 16,
+                      //             color: Colors.black),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
                       //fethed image..
                       Padding(
                         padding: const EdgeInsets.only(top: 15),
@@ -294,29 +297,34 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        widget.fetchmainexam();
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.04,
+                  ), // 3
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          widget.fetchmainexam();
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Edit Exam Timetable',
-                        style: TextStyle(
-                            fontFamily: 'semibold',
-                            fontSize: 16,
-                            color: Colors.black),
-                      ),
-                    )
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'Edit Exam Timetable',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -364,12 +372,24 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                                   color: Color.fromRGBO(203, 203, 203, 1),
                                 ),
                               ),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
                             ),
                             value: _selectedClass,
                             items: gradeList.map((grade) {
                               return DropdownMenuItem<String>(
                                 value: grade['sign'],
-                                child: Text(grade['sign']),
+                                child: Text(
+                                  grade['sign'],
+                                  style: TextStyle(
+                                      fontFamily: 'regular',
+                                      fontSize: 14,
+                                      color: Colors.black),
+                                ),
                               );
                             }).toList(),
                             onChanged: null,
@@ -404,6 +424,12 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                                 borderSide: BorderSide(
                                   color: Color.fromRGBO(203, 203, 203, 1),
@@ -450,7 +476,12 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                   ),
                   //upload image......
                   Padding(
-                    padding: const EdgeInsets.only(top: 40, left: 15),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).size.height *
+                          0.05, // 5% of screen height
+                      left: MediaQuery.of(context).size.width *
+                          0.05, // 4% of screen width
+                    ),
                     child: Row(
                       children: [
                         Container(
@@ -471,7 +502,8 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
                     child: Padding(
                       padding: const EdgeInsets.only(top: 10),
                       child: DottedBorder(
@@ -545,23 +577,6 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                     ),
                   ),
 
-                  ///fetched image show
-                  if (isFetchedImageVisible && selectedFile == null)
-                    if (initialFilePath != null)
-                      if (initialFileType == 'image')
-                        Image.network(
-                          initialFilePath!,
-                          height: 150,
-                          width: double.infinity,
-                          fit: BoxFit.contain,
-                        )
-                      else if (initialFileType == 'pdf')
-                        Icon(
-                          Icons.picture_as_pdf,
-                          size: 100,
-                          color: Colors.red,
-                        ),
-
                   /// Display selected image...
                   if (selectedFile != null)
                     Padding(
@@ -630,7 +645,7 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                   //
 
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         'Supported Format : JPEG,Webp PNG, PDF',
@@ -639,57 +654,56 @@ class _EditExamtimetableState extends State<EditExamtimetable> {
                             fontSize: 9,
                             color: Color.fromRGBO(168, 168, 168, 1)),
                       ),
-                      Text(
-                        '*Upload either an image or a link',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
+                      // Text(
+                      //   '*Upload either an image or a link',
+                      //   style: TextStyle(
+                      //       fontFamily: 'regular',
+                      //       fontSize: 9,
+                      //       color: Color.fromRGBO(168, 168, 168, 1)),
+                      // ),
                     ],
-                  ),
-
-                  //preview
-                  Padding(
-                    padding: const EdgeInsets.only(top: 50),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            _PreviewBottomsheet(context, initialFilePath!);
-                          },
-                          child: Text(
-                            'Preview',
-                            style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ),
-
-                        //update..
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: AppTheme.textFieldborderColor,
-                              side: BorderSide.none),
-                          onPressed: () {
-                            onUpdateExamTimeTable(selectedFile, context);
-                          },
-                          child: Text(
-                            'Update',
-                            style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'medium',
-                                color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),
             ),
+      bottomNavigationBar: Container(
+        child: //preview
+            Padding(
+          padding: const EdgeInsets.only(top: 20, bottom: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  _PreviewBottomsheet(context, initialFilePath!);
+                },
+                child: Text(
+                  'Preview',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 16,
+                      color: Colors.black),
+                ),
+              ),
+
+              //update..
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () {
+                  onUpdateExamTimeTable(selectedFile, context);
+                },
+                child: Text(
+                  'Update',
+                  style: TextStyle(
+                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -193,606 +193,746 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      // backgroundColor: Color.fromRGBO(251, 251, 251, 1),
+      // appBar: PreferredSize(
+      //   preferredSize: Size.fromHeight(60),
+      //   child: ClipRRect(
+      //     borderRadius: BorderRadius.only(
+      //       bottomLeft: Radius.circular(30),
+      //       bottomRight: Radius.circular(30),
+      //     ),
+      //     child: AppBar(
+      //       iconTheme: IconThemeData(color: Colors.black),
+      //       backgroundColor: AppTheme.appBackgroundPrimaryColor,
+      //       leading: GestureDetector(
+      //           onTap: () async {
+      //             if (hasUnsavedChanges()) {
+      //               await _showUnsavedChangesDialog();
+      //             }
+      //             Navigator.pop(context);
+      //             widget.fetchAndDisplayEvents();
+      //           },
+      //           child: Icon(Icons.arrow_back)),
+      //       title: Text(
+      //         'Create Event Calender',
+      //         style: TextStyle(
+      //           fontFamily: 'semibold',
+      //           fontSize: 16,
+      //           color: Colors.black,
+      //         ),
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(30),
-            bottomRight: Radius.circular(30),
-          ),
-          child: AppBar(
-            iconTheme: IconThemeData(color: Colors.black),
-            backgroundColor: AppTheme.appBackgroundPrimaryColor,
-            leading: GestureDetector(
-                onTap: () async {
-                  if (hasUnsavedChanges()) {
-                    await _showUnsavedChangesDialog();
-                  }
-                  Navigator.pop(context);
-                  widget.fetchAndDisplayEvents();
-                },
-                child: Icon(Icons.arrow_back)),
-            title: Text(
-              'Create Event Calender',
-              style: TextStyle(
-                fontFamily: 'semibold',
-                fontSize: 16,
-                color: Colors.black,
-              ),
+        preferredSize: Size.fromHeight(100),
+        child: AppBar(
+          backgroundColor: Colors.white,
+          iconTheme: IconThemeData(color: Colors.black),
+          automaticallyImplyLeading: false,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              color: AppTheme.appBackgroundPrimaryColor,
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30)),
+            ),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (hasUnsavedChanges()) {
+                                        await _showUnsavedChangesDialog();
+                                      }
+                                      Navigator.pop(context);
+                                      widget.fetchAndDisplayEvents();
+                                    },
+                                    child: Icon(
+                                      Icons.arrow_back,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Create Event Calender',
+                                    style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
           ),
         ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 10),
-              child: Row(
-                children: [
-                  Text(
-                    'Set Date',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
-                ],
-              ),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Color.fromRGBO(249, 249, 249, 1)),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 15),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width *
+                        0.05, // 5% of screen width
+                    top: MediaQuery.of(context).size.height *
+                        0.015, // 1.5% of screen height
+                  ),
+                  child: Row(
                     children: [
                       Text(
-                        'From',
+                        'Set Date',
+                        style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 20, top: 15),
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'From',
+                            style: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 14,
+                                color: Color.fromRGBO(167, 167, 167, 1)),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              child: TextFormField(
+                                controller: _startdate,
+                                decoration: InputDecoration(
+                                  suffixIcon: IconButton(
+                                    icon: Icon(Icons.calendar_month),
+                                    onPressed: () => _selectStartDate(context),
+                                  ),
+                                  hintText: 'Start Date',
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Color.fromRGBO(
+                                              203, 203, 203, 1))),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Color.fromRGBO(
+                                              203, 203, 203, 1))),
+                                  enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                          color: Color.fromRGBO(
+                                              203, 203, 203, 1))),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                      Spacer(),
+                      //end date..
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'To',
+                              style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                  color: Color.fromRGBO(167, 167, 167, 1)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: Container(
+                                width: MediaQuery.of(context).size.width * 0.4,
+                                child: TextFormField(
+                                  enabled: !_isChecked,
+                                  controller: _enddate,
+                                  decoration: InputDecoration(
+                                    suffixIcon: IconButton(
+                                      icon: Icon(Icons.calendar_month),
+                                      onPressed: () => _selectEndDate(context),
+                                    ),
+                                    hintText: 'End Date',
+                                    border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(
+                                            color: Color.fromRGBO(
+                                                203, 203, 203, 1))),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(
+                                            color: Color.fromRGBO(
+                                                203, 203, 203, 1))),
+                                    enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        borderSide: BorderSide(
+                                            color: Color.fromRGBO(
+                                                203, 203, 203, 1))),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                //only from...
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        activeColor: AppTheme.textFieldborderColor,
+                        value: _isChecked,
+                        onChanged: (bool? newValue) {
+                          setState(() {
+                            _isChecked = newValue!;
+                          });
+                          if (_isChecked) {
+                            // Set "To Date" to match "From Date" when checkbox is checked
+                            _enddate.text = _startdate.text;
+                          } else {
+                            // Optionally clear the "To Date" field when unchecked
+                            _enddate.clear();
+                          }
+                        },
+                      ),
+                      Text(
+                        'Only From',
+                        style: TextStyle(
+                            fontSize: 12,
+                            fontFamily: 'regular',
+                            color: Colors.black),
+                      ),
+                    ],
+                  ),
+                ),
+                //
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width *
+                        0.05, // 5% of screen width
+                    top: MediaQuery.of(context).size.height *
+                        0.025, // 2.5% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Add Heading',
+                        style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 14,
+                            color: Color.fromRGBO(38, 38, 38, 1)),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.transparent,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 173, 172, 172)
+                              .withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                    child: TextFormField(
+                      controller: _heading,
+                      inputFormatters: [LengthLimitingTextInputFormatter(100)],
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'medium',
+                          fontSize: 14),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.05,
+                  ), // 5% of screen width),
+                  child: Row(
+                    children: [
+                      Text(
+                        '*Max 100 Characters',
                         style: TextStyle(
                             fontFamily: 'regular',
-                            fontSize: 14,
-                            color: Color.fromRGBO(167, 167, 167, 1)),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.4,
-                          child: TextFormField(
-                            controller: _startdate,
-                            decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                icon: Icon(Icons.calendar_month),
-                                onPressed: () => _selectStartDate(context),
-                              ),
-                              hintText: 'Start Date',
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(203, 203, 203, 1))),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(203, 203, 203, 1))),
-                            ),
-                          ),
-                        ),
+                            fontSize: 12,
+                            color: Color.fromRGBO(127, 127, 127, 1)),
                       )
                     ],
                   ),
-                  Spacer(),
-                  //end date..
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'To',
-                          style: TextStyle(
-                              fontFamily: 'regular',
-                              fontSize: 14,
-                              color: Color.fromRGBO(167, 167, 167, 1)),
+                ),
+                //desc
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width *
+                        0.05, // 5% of screen width
+                    top: MediaQuery.of(context).size.height *
+                        0.025, // 2.5% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Add Description',
+                        style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 14,
+                            color: Color.fromRGBO(38, 38, 38, 1)),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.transparent,
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 173, 172, 172)
+                              .withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: Offset(0, 0),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
+                      ],
+                    ),
+                    child: TextFormField(
+                      maxLines: 5,
+                      controller: _desc,
+                      inputFormatters: [LengthLimitingTextInputFormatter(100)],
+                      decoration: InputDecoration(
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontFamily: 'medium',
+                          fontSize: 14),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width *
+                        0.05, // 5% of screen width
+                  ),
+                  child: Row(
+                    children: [
+                      Text(
+                        '*Max 600 Characters',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 12,
+                            color: Color.fromRGBO(127, 127, 127, 1)),
+                      )
+                    ],
+                  ),
+                ),
+
+                // Upload Image and Add Link Section
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width *
+                        0.04, // 4% of screen width
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 4% of screen height
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isuploadimage = true;
+                            isaddLink = false;
+                          });
+                        },
+                        child: Container(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: isuploadimage
+                                  ? Color.fromRGBO(246, 246, 246, 1)
+                                  : Colors.transparent),
+                          child: Text(
+                            'Upload Image',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontFamily: 'medium',
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      // Add Link Button
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isuploadimage = false;
+                            isaddLink = true;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20),
                           child: Container(
-                            width: MediaQuery.of(context).size.width * 0.4,
-                            child: TextFormField(
-                              enabled: !_isChecked,
-                              controller: _enddate,
-                              decoration: InputDecoration(
-                                suffixIcon: IconButton(
-                                  icon: Icon(Icons.calendar_month),
-                                  onPressed: () => _selectEndDate(context),
-                                ),
-                                hintText: 'End Date',
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color:
-                                            Color.fromRGBO(203, 203, 203, 1))),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color:
-                                            Color.fromRGBO(203, 203, 203, 1))),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: isaddLink
+                                    ? Color.fromRGBO(246, 246, 246, 1)
+                                    : Colors.transparent),
+                            child: Text(
+                              'Add Link',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontFamily: 'medium',
+                                  color: Colors.black),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (isuploadimage)
+
+                  ///upload section
+                  Padding(
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: DottedBorder(
+                        dashPattern: [8, 4],
+                        borderType: BorderType.Rect,
+                        color: Color.fromRGBO(0, 102, 255, 1),
+                        strokeWidth: 2,
+                        child: GestureDetector(
+                          onTap: () {
+                            pickFile();
+                          },
+                          child: Container(
+                            color: Color.fromRGBO(228, 238, 253, 1)
+                                .withOpacity(0.9),
+                            height: 100,
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset(
+                                    'assets/icons/NewsPage_file.svg',
+                                    fit: BoxFit.contain,
+                                    height: 40,
+                                    width: 40,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 15),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Click Here to',
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontFamily: 'medium',
+                                              color: Color.fromRGBO(
+                                                  93, 93, 93, 1)),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 2),
+                                          child: Text(
+                                            'Upload File',
+                                            style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                        Text(
+                                          'Maximum Size : 25MB',
+                                          style: TextStyle(
+                                              fontFamily: 'medium',
+                                              fontSize: 10,
+                                              color: Color.fromRGBO(
+                                                  0, 102, 255, 1)),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            //only from...
-            Padding(
-              padding: const EdgeInsets.only(left: 10),
-              child: Row(
-                children: [
-                  Checkbox(
-                    activeColor: AppTheme.textFieldborderColor,
-                    value: _isChecked,
-                    onChanged: (bool? newValue) {
-                      setState(() {
-                        _isChecked = newValue!;
-                      });
-                      if (_isChecked) {
-                        // Set "To Date" to match "From Date" when checkbox is checked
-                        _enddate.text = _startdate.text;
-                      } else {
-                        // Optionally clear the "To Date" field when unchecked
-                        _enddate.clear();
-                      }
-                    },
-                  ),
-                  Text(
-                    'Only From',
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontFamily: 'regular',
-                        color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
-            //
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 20),
-              child: Row(
-                children: [
-                  Text(
-                    'Add Heading',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: TextFormField(
-                  controller: _heading,
-                  inputFormatters: [LengthLimitingTextInputFormatter(100)],
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: Colors.black, fontFamily: 'medium', fontSize: 14),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  Text(
-                    '*Max 100 Characters',
-                    style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Color.fromRGBO(127, 127, 127, 1)),
-                  )
-                ],
-              ),
-            ),
-            //desc
-            Padding(
-              padding: const EdgeInsets.only(left: 20, top: 20),
-              child: Row(
-                children: [
-                  Text(
-                    'Add Description',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: TextFormField(
-                  maxLines: 5,
-                  controller: _desc,
-                  inputFormatters: [LengthLimitingTextInputFormatter(100)],
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: Colors.black, fontFamily: 'medium', fontSize: 14),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  Text(
-                    '*Max 600 Characters',
-                    style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Color.fromRGBO(127, 127, 127, 1)),
-                  )
-                ],
-              ),
-            ),
-
-            // Upload Image and Add Link Section
-            Padding(
-              padding: const EdgeInsets.only(left: 15, top: 30),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isuploadimage = true;
-                        isaddLink = false;
-                      });
-                    },
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: isuploadimage
-                              ? Color.fromRGBO(246, 246, 246, 1)
-                              : Colors.transparent),
-                      child: Text(
-                        'Upload Image',
-                        style: TextStyle(
-                            fontSize: 12,
-                            fontFamily: 'medium',
-                            color: Colors.black),
-                      ),
-                    ),
-                  ),
-                  // Add Link Button
-                  GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        isuploadimage = false;
-                        isaddLink = true;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 20),
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            color: isaddLink
-                                ? Color.fromRGBO(246, 246, 246, 1)
-                                : Colors.transparent),
-                        child: Text(
-                          'Add Link',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontFamily: 'medium',
-                              color: Colors.black),
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
-            if (isuploadimage)
 
-              ///upload section
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: DottedBorder(
-                    dashPattern: [8, 4],
-                    borderType: BorderType.Rect,
-                    color: Color.fromRGBO(0, 102, 255, 1),
-                    strokeWidth: 2,
-                    child: GestureDetector(
-                      onTap: () {
-                        pickFile();
-                      },
-                      child: Container(
-                        color:
-                            Color.fromRGBO(228, 238, 253, 1).withOpacity(0.9),
-                        height: 100,
-                        child: Center(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                /// Display selected image...
+                if (isuploadimage)
+                  if (selectedFile != null)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Stack(
+                        children: [
+                          Column(
                             children: [
-                              SvgPicture.asset(
-                                'assets/icons/NewsPage_file.svg',
-                                fit: BoxFit.contain,
-                                height: 40,
-                                width: 40,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 15),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Click Here to',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          fontFamily: 'medium',
-                                          color: Color.fromRGBO(93, 93, 93, 1)),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2),
-                                      child: Text(
-                                        'Upload File',
-                                        style: TextStyle(
-                                            fontFamily: 'semibold',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                      ),
-                                    ),
-                                    Text(
-                                      'Maximum Size : 25MB',
-                                      style: TextStyle(
-                                          fontFamily: 'medium',
-                                          fontSize: 10,
-                                          color:
-                                              Color.fromRGBO(0, 102, 255, 1)),
-                                    )
-                                  ],
+                              if (['jpeg', 'png', 'webp', 'jpg']
+                                  .contains(selectedFile!.extension))
+                                selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        height: 150,
+                                        width: double.infinity,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : Text(
+                                        'Failed to load image data.',
+                                        style: TextStyle(color: Colors.red),
+                                      )
+                              else if (selectedFile!.extension == 'pdf')
+                                Icon(
+                                  Icons.picture_as_pdf,
+                                  size: 100,
+                                  color: Colors.red,
+                                ),
+                              SizedBox(height: 10),
+                              // Display file name
+                              Text(
+                                selectedFile!.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-            /// Display selected image...
-            if (isuploadimage)
-              if (selectedFile != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                  child: Stack(
-                    children: [
-                      Column(
-                        children: [
-                          if (['jpeg', 'png', 'webp', 'jpg']
-                              .contains(selectedFile!.extension))
-                            selectedFile!.bytes != null
-                                ? Image.memory(
-                                    selectedFile!.bytes!,
-                                    height: 150,
-                                    width: double.infinity,
-                                    fit: BoxFit.contain,
-                                  )
-                                : Text(
-                                    'Failed to load image data.',
-                                    style: TextStyle(color: Colors.red),
-                                  )
-                          else if (selectedFile!.extension == 'pdf')
-                            Icon(
-                              Icons.picture_as_pdf,
-                              size: 100,
-                              color: Colors.red,
-                            ),
-                          SizedBox(height: 10),
-                          // Display file name
-                          Text(
-                            selectedFile!.name,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                          // Close icon to remove image
+                          Positioned(
+                            top: 0,
+                            right: 40,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedFile = null;
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black),
+                                  shape: BoxShape.circle,
+                                ),
+                                padding: EdgeInsets.all(4),
+                                child: Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.black,
+                                ),
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      // Close icon to remove image
-                      Positioned(
-                        top: 0,
-                        right: 40,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              selectedFile = null;
-                            });
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.black),
-                              shape: BoxShape.circle,
-                            ),
-                            padding: EdgeInsets.all(4),
-                            child: Icon(
-                              Icons.close,
-                              size: 18,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
+                    ),
+
+                /// Display Selected File end...
+                //addlink tab....
+                if (isaddLink)
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: DottedBorder(
+                      dashPattern: [8, 4],
+                      borderType: BorderType.Rect,
+                      color: Color.fromRGBO(0, 102, 255, 1),
+                      strokeWidth: 2,
+                      child: Container(
+                          height: 50,
+                          child: TextFormField(
+                            controller: _linkController,
+                            decoration: InputDecoration(
+                                fillColor: Color.fromRGBO(228, 238, 253, 1)
+                                    .withOpacity(0.9),
+                                filled: true,
+                                hintText: 'Paste Link Here',
+                                hintStyle: TextStyle(
+                                    fontFamily: 'regular',
+                                    fontSize: 14,
+                                    color: Color.fromRGBO(0, 102, 255, 1)),
+                                border: OutlineInputBorder(
+                                    borderSide: BorderSide.none)),
+                          )),
+                    ),
+                  ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Supported Format : JPEG,Webp PNG, PDF',
+                      style: TextStyle(
+                          fontFamily: 'regular',
+                          fontSize: 9,
+                          color: Color.fromRGBO(168, 168, 168, 1)),
+                    ),
+                  ],
+                ),
+                //
+                Padding(
+                  padding: const EdgeInsets.only(top: 5, bottom: 10),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '*Upload either an image or a link',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
                       ),
                     ],
                   ),
                 ),
-
-            /// Display Selected File end...
-
-            //addlink tab....
-            if (isaddLink)
-              Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: DottedBorder(
-                  dashPattern: [8, 4],
-                  borderType: BorderType.Rect,
-                  color: Color.fromRGBO(0, 102, 255, 1),
-                  strokeWidth: 2,
-                  child: Container(
-                      height: 50,
-                      child: TextFormField(
-                        controller: _linkController,
-                        decoration: InputDecoration(
-                            fillColor: Color.fromRGBO(228, 238, 253, 1)
-                                .withOpacity(0.9),
-                            filled: true,
-                            hintText: 'Paste Link Here',
-                            hintStyle: TextStyle(
-                                fontFamily: 'regular',
-                                fontSize: 14,
-                                color: Color.fromRGBO(0, 102, 255, 1)),
-                            border: OutlineInputBorder(
-                                borderSide: BorderSide.none)),
-                      )),
-                ),
-              ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-                Text(
-                  '*Upload either an image or a link',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
               ],
             ),
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        child:
             //save as draft
             Padding(
-              padding: const EdgeInsets.only(top: 40, bottom: 50),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        side: BorderSide(color: Colors.black, width: 1.5)),
-                    onPressed: () {},
-                    child: Text(
-                      'Cancel',
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'semibold',
-                          color: Colors.black),
-                    ),
-                  ),
-
-                  ///scheduled
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.textFieldborderColor,
-                          side: BorderSide.none),
-                      onPressed: () {
-                        createevent();
-                      },
-                      child: Text(
-                        'Publish',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'semibold',
-                            color: Colors.black),
-                      ),
-                    ),
-                  ),
-                ],
+          padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height *
+                0.05, // 5% of screen height
+            bottom: MediaQuery.of(context).size.height *
+                0.06, // 6% of screen height
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    side: BorderSide(color: Colors.black, width: 1.5)),
+                onPressed: () {},
+                child: Text(
+                  'Cancel',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'semibold',
+                      color: Colors.black),
+                ),
               ),
-            ),
-          ],
+
+              ///scheduled
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () {
+                  createevent();
+                },
+                child: Text(
+                  'Publish',
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'semibold',
+                      color: Colors.black),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  //create
   void createevent() {
     if (_startdate.text.isEmpty ||
         _heading.text.isEmpty ||
@@ -800,34 +940,37 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
-          content: Text('Please fill in both heading and description'),
+          content:
+              Text('Please fill in the heading, description, and start date'),
         ),
       );
       return;
     }
-    String fileType = '';
-    String? filePath;
-    String? link;
+
+    String fileType = 'empty';
+    String filePath = "";
+    String link = "";
+
     if (isuploadimage && selectedFile != null) {
       fileType = 'image';
-      filePath = selectedFile!.path;
+      filePath = selectedFile!.path ?? '';
     } else if (isaddLink && _linkController.text.isNotEmpty) {
       fileType = 'link';
       link = _linkController.text;
-    } else {
-      print("Please upload a file or provide a link.");
-      return;
     }
+
     CreateImportantEventModel create = CreateImportantEventModel(
-        userType: UserSession().userType ?? '',
-        rollNumber: UserSession().rollNumber ?? '',
-        headLine: _heading.text,
-        description: _desc.text,
-        fileType: fileType,
-        file: filePath.toString(),
-        link: _linkController.text,
-        fromDate: _startdate.text,
-        toDate: _enddate.text);
+      userType: UserSession().userType ?? '',
+      rollNumber: UserSession().rollNumber ?? '',
+      headLine: _heading.text,
+      description: _desc.text,
+      fileType: fileType, // Will be 'empty' if no file or link is chosen
+      file: filePath, // Will be empty if no file is chosen
+      link: link, // Will be empty if no link is provided
+      fromDate: _startdate.text,
+      toDate: _enddate.text,
+    );
+
     postEventCalendar(create, context, widget.fetchAndDisplayEvents);
   }
 }
