@@ -529,143 +529,102 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                             ),
                                           if (newsResponse
                                               .postedOnDate.isNotEmpty)
-                                            //today
+                                            //postedondate
                                             Padding(
                                               padding: EdgeInsets.only(
-                                                left:
-                                                    newsResponse.tag.isNotEmpty
-                                                        ? 0
-                                                        : 20,
+                                                left: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.05, // 5% of screen width
                                               ),
                                               child: Row(
-                                                mainAxisAlignment: newsResponse
-                                                        .tag.isNotEmpty
-                                                    ? MainAxisAlignment
-                                                        .spaceAround
-                                                    : MainAxisAlignment.start,
                                                 children: [
                                                   if (newsResponse
                                                       .postedOnDate.isNotEmpty)
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        //postedon
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .only(
-                                                                  bottom: 10),
-                                                          child: Row(
-                                                            children: [
-                                                              Text(
-                                                                'Posted on : ${newsResponse.postedOnDate ?? ''} | ${newsResponse.postedOnDay ?? ''}',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Colors
-                                                                        .black),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                        //updatedon
-                                                        if (newsResponse
-                                                                    .news[index]
-                                                                    .updatedOn !=
-                                                                null &&
-                                                            newsResponse
-                                                                .news[index]
-                                                                .updatedOn!
-                                                                .isNotEmpty)
-//updatedon
-                                                          Container(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        10,
-                                                                    horizontal:
-                                                                        6),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      255,
-                                                                      251,
-                                                                      245,
-                                                                      1),
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .only(
-                                                                topLeft: Radius
-                                                                    .circular(
-                                                                        10),
-                                                                topRight: Radius
-                                                                    .circular(
-                                                                        10),
-                                                              ),
-                                                            ),
-                                                            child: Text(
-                                                              'Updated on ${news.updatedOn}',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'medium',
-                                                                fontSize: 10,
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        49,
-                                                                        49,
-                                                                        49,
-                                                                        1),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                      ],
-                                                    )
-                                                  else
-                                                    SizedBox(width: 100),
+                                                    Text(
+                                                      'Posted on : ${newsResponse.postedOnDate ?? ''} | ${newsResponse.postedOnDay ?? ''}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'regular',
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+
+                                          //updatedon
+                                          if (newsResponse
+                                                      .news[index].updatedOn !=
+                                                  null &&
+                                              newsResponse.news[index]
+                                                  .updatedOn!.isNotEmpty)
+                                            Transform.translate(
+                                              offset: Offset(0, 16),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 10,
+                                                            horizontal: 6),
+                                                    decoration: BoxDecoration(
+                                                      color: Color.fromRGBO(
+                                                          255, 251, 245, 1),
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                        topLeft:
+                                                            Radius.circular(10),
+                                                        topRight:
+                                                            Radius.circular(10),
+                                                      ),
+                                                    ),
+                                                    child: Text(
+                                                      'Updated on ${news.updatedOn}',
+                                                      style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 10,
+                                                        color: Color.fromRGBO(
+                                                            49, 49, 49, 1),
+                                                      ),
+                                                    ),
+                                                  ),
                                                   //today
                                                   if (newsResponse
                                                       .tag.isNotEmpty)
-                                                    Transform.translate(
-                                                      offset: Offset(0, 25),
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 8,
-                                                                horizontal: 20),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius.only(
-                                                            topLeft:
-                                                                Radius.circular(
-                                                                    10),
-                                                            topRight:
-                                                                Radius.circular(
-                                                                    10),
-                                                          ),
-                                                          color: AppTheme
-                                                              .textFieldborderColor,
+                                                    Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 8,
+                                                              horizontal: 20),
+                                                      decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10),
                                                         ),
-                                                        child: Text(
-                                                          '${newsResponse.tag ?? ''}',
-                                                          style: TextStyle(
-                                                            fontFamily:
-                                                                'medium',
-                                                            color: Colors.black,
-                                                            fontSize: 12,
-                                                          ),
+                                                        color: AppTheme
+                                                            .textFieldborderColor,
+                                                      ),
+                                                      child: Text(
+                                                        '${newsResponse.tag ?? ''}',
+                                                        style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          color: Colors.black,
+                                                          fontSize: 12,
                                                         ),
                                                       ),
                                                     ),
                                                 ],
                                               ),
                                             ),
-                                          //
+////
                                           Padding(
                                             padding: EdgeInsets.all(
                                                 MediaQuery.of(context)

@@ -616,6 +616,7 @@ class _DashboardState extends State<Dashboard> {
                                     ),
                                   ),
                                 ),
+                                //
                                 Container(
                                   height:
                                       MediaQuery.sizeOf(context).height * 0.08,
@@ -643,7 +644,7 @@ class _DashboardState extends State<Dashboard> {
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.01,
+                                                0.02,
                                       ),
                                       if (dashboardManagementCount != null)
                                         Container(
@@ -681,6 +682,11 @@ class _DashboardState extends State<Dashboard> {
                                         color: Color.fromRGBO(229, 31, 103, 1),
                                         size: 25,
                                       ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.02,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -697,7 +703,7 @@ class _DashboardState extends State<Dashboard> {
                       if (_activeIndex == 0)
                         Padding(
                           padding: EdgeInsets.only(
-                              left: MediaQuery.sizeOf(context).width * 0.08,
+                              left: MediaQuery.sizeOf(context).width * 0.07,
                               top: MediaQuery.sizeOf(context).height * 0.015),
                           child: Row(
                             children: [
@@ -756,7 +762,7 @@ class _DashboardState extends State<Dashboard> {
                                             width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.04,
+                                                0.03,
                                           ),
                                           //count..
                                           if (dashboardManagementCount != null)
@@ -905,6 +911,11 @@ class _DashboardState extends State<Dashboard> {
                                             ),
                                           ),
                                         ),
+                                      SizedBox(
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                      ),
                                       Icon(
                                         Icons.arrow_forward,
                                         color: Color.fromRGBO(113, 19, 165, 1),
@@ -913,7 +924,7 @@ class _DashboardState extends State<Dashboard> {
                                       SizedBox(
                                         width:
                                             MediaQuery.of(context).size.width *
-                                                0.01,
+                                                0.02,
                                       ),
                                     ],
                                   ),
@@ -931,7 +942,7 @@ class _DashboardState extends State<Dashboard> {
                       if (_activeIndex == 0)
                         Padding(
                           padding: EdgeInsets.only(
-                              left: MediaQuery.sizeOf(context).width * 0.07,
+                              left: MediaQuery.sizeOf(context).width * 0.06,
                               top: MediaQuery.sizeOf(context).height * 0.015),
                           child: Row(
                             children: [
@@ -2665,6 +2676,9 @@ class _DashboardState extends State<Dashboard> {
                                         bottom:
                                             MediaQuery.sizeOf(context).height *
                                                 0.01,
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
                                       ),
                                       decoration: BoxDecoration(
                                         color: selectedValue == option
@@ -3112,23 +3126,26 @@ class _DashboardState extends State<Dashboard> {
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
-              ? Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.arrow_upward_outlined,
-                      color: Colors.white,
+              ? Transform.translate(
+                  offset: Offset(0, -15),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black,
+                      shape: BoxShape.circle,
                     ),
-                    onPressed: () {
-                      _scrollController.animateTo(
-                        0,
-                        duration: Duration(seconds: 1),
-                        curve: Curves.easeInOut,
-                      );
-                    },
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.arrow_upward_outlined,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _scrollController.animateTo(
+                          0,
+                          duration: Duration(seconds: 1),
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
                 )
               : null,
@@ -3233,6 +3250,7 @@ class _DashboardState extends State<Dashboard> {
                   backgroundColor: AppTheme.textFieldborderColor),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
+                //
                 UserSession().clearSession();
 
                 Navigator.pushAndRemoveUntil(

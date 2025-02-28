@@ -854,9 +854,8 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           )),
                     ),
                   ),
-                Transform.translate(
-                  offset: Offset(0, -5),
-                  child: Row(
+                if (isuploadimage)
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
@@ -868,20 +867,20 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                       ),
                     ],
                   ),
-                ),
                 //
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '*Upload either an image or a link',
-                      style: TextStyle(
-                          fontFamily: 'regular',
-                          fontSize: 9,
-                          color: Color.fromRGBO(168, 168, 168, 1)),
-                    ),
-                  ],
-                ),
+                if (isaddLink)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '*Paste a Valid  Video Link',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                    ],
+                  ),
 
                 ///schedule post..
                 Padding(

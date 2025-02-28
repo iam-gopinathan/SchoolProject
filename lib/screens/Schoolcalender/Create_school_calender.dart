@@ -866,34 +866,38 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                           )),
                     ),
                   ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Supported Format : JPEG,Webp PNG, PDF',
-                      style: TextStyle(
-                          fontFamily: 'regular',
-                          fontSize: 9,
-                          color: Color.fromRGBO(168, 168, 168, 1)),
+                if (isuploadimage)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Supported Format : JPEG,Webp PNG, PDF',
+                          style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 9,
+                              color: Color.fromRGBO(168, 168, 168, 1)),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 5, bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '*Upload either an image or a link',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
-                    ],
                   ),
-                ),
+                if (isaddLink)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '*Paste a Valid  Video Link',
+                          style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 9,
+                              color: Color.fromRGBO(168, 168, 168, 1)),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),

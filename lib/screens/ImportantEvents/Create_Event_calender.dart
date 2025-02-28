@@ -849,27 +849,12 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                           )),
                     ),
                   ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Supported Format : JPEG,Webp PNG, PDF',
-                      style: TextStyle(
-                          fontFamily: 'regular',
-                          fontSize: 9,
-                          color: Color.fromRGBO(168, 168, 168, 1)),
-                    ),
-                  ],
-                ),
-                //
-                Padding(
-                  padding: const EdgeInsets.only(top: 5, bottom: 10),
-                  child: Row(
+                if (isuploadimage)
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        '*Upload either an image or a link',
+                        'Supported Format : JPEG,Webp PNG, PDF',
                         style: TextStyle(
                             fontFamily: 'regular',
                             fontSize: 9,
@@ -877,7 +862,23 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                       ),
                     ],
                   ),
-                ),
+                //
+                if (isaddLink)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          '*Paste a Valid  Video Link',
+                          style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 9,
+                              color: Color.fromRGBO(168, 168, 168, 1)),
+                        ),
+                      ],
+                    ),
+                  ),
               ],
             ),
           ),
