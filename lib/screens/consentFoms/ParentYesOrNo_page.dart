@@ -64,6 +64,9 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
     print('usertype ${UserSession().rollNumber}');
     // Add a listener to the ScrollController to monitor scroll changes.
     _scrollController.addListener(_scrollListener);
+    //
+    isExpandedList = List.generate(
+        fetchedConsentDataParentForm.length, (index) => index == 0);
   }
 
   void _scrollListener() {
@@ -93,6 +96,12 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
       setState(() {
         isLoading = false;
         fetchedConsentDataParentForm = res.data;
+
+//
+// Initialize isExpandedList AFTER fetching data
+        // Ensure that isExpandedList is reset properly
+        isExpandedList = List.generate(
+            fetchedConsentDataParentForm.length, (index) => index == 0);
       });
     } catch (e) {
       setState(() {
@@ -101,6 +110,10 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
       print('Error fetching parent form data: $e');
     }
   }
+
+  //
+
+  List<bool> isExpandedList = [];
 
   @override
   Widget build(BuildContext context) {
@@ -274,6 +287,8 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
                             ...e.fromParents.asMap().entries.map((entry) {
                               int index = entry.key;
                               var consent = entry.value;
+
+                              var con = e.fromParents[index];
 
                               return Padding(
                                 padding: EdgeInsets.all(

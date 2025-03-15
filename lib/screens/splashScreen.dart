@@ -1,6 +1,5 @@
 // import 'package:flutter/material.dart';
 // import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
-// import 'dart:async';
 // import 'package:flutter_application_1/screens/loginscreen.dart';
 // import 'package:flutter_application_1/services/Login_Api/loginpage_news.dart';
 // import 'package:flutter_application_1/utils/theme.dart';
@@ -14,35 +13,36 @@
 // }
 
 // class _SplashscreenState extends State<Splashscreen> {
-//   late final Widget lottieAnimation;
+//   bool _isAnimationCompleted = false;
+//   bool _isNewsLoaded = false;
+//   List<NewsArticle> _newsArticles = [];
 
 //   @override
 //   void initState() {
 //     super.initState();
-//     _loadNewsAndNavigate();
-//     //
-//     lottieAnimation = Lottie.asset(
-//       'assets/images/Msms_splashvideo.json',
-//       fit: BoxFit.cover,
-//       frameRate: FrameRate.max,
-//     );
+//     _loadNews();
 //   }
 
-//   //api integration code for login news..
-//   Future<void> _loadNewsAndNavigate() async {
+//   /// Fetch news data from API
+//   Future<void> _loadNews() async {
 //     try {
-//       List<NewsArticle> newsArticles = await fetchNews();
-
-//       Timer(Duration(seconds: 2), () {
-//         Navigator.pushReplacement(
-//           context,
-//           MaterialPageRoute(
-//             builder: (context) => Loginpage(newsArticles: newsArticles),
-//           ),
-//         );
-//       });
+//       _newsArticles = await fetchNews();
+//       _isNewsLoaded = true;
+//       _navigateToLogin();
 //     } catch (error) {
 //       print('Error loading news: $error');
+//     }
+//   }
+
+//   /// Navigate to login screen only when both conditions are met
+//   void _navigateToLogin() {
+//     if (_isAnimationCompleted && _isNewsLoaded) {
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => Loginpage(newsArticles: _newsArticles),
+//         ),
+//       );
 //     }
 //   }
 
@@ -51,18 +51,28 @@
 //     return Scaffold(
 //       backgroundColor: AppTheme.appBackgroundPrimaryColor,
 //       body: Center(
-//         child: lottieAnimation,
+//         child: Lottie.asset(
+//           'assets/images/Msms_splashvideo.json',
+//           fit: BoxFit.cover,
+//           frameRate: FrameRate.max,
+//           onLoaded: (composition) {
+//             Future.delayed(composition.duration, () {
+//               setState(() {
+//                 _isAnimationCompleted = true;
+//               });
+//               _navigateToLogin();
+//             });
+//           },
+//         ),
 //       ),
 //     );
 //   }
 // }
-
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
+import 'dart:async';
 import 'package:flutter_application_1/screens/loginscreen.dart';
+import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
 import 'package:flutter_application_1/services/Login_Api/loginpage_news.dart';
-import 'package:flutter_application_1/utils/theme.dart';
-import 'package:lottie/lottie.dart';
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
@@ -72,57 +82,96 @@ class Splashscreen extends StatefulWidget {
 }
 
 class _SplashscreenState extends State<Splashscreen> {
-  bool _isAnimationCompleted = false;
-  bool _isNewsLoaded = false;
   List<NewsArticle> _newsArticles = [];
+
+  var image = 'assets/images/splashscreen_image.png';
+
+  bool _showText = false;
 
   @override
   void initState() {
-    super.initState();
     _loadNews();
+
+    super.initState();
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _showText = true;
+      });
+    });
+    image;
+
+    Timer(Duration(seconds: 6), () {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => Loginpage(
+                    newsArticles: _newsArticles,
+                  )));
+    });
   }
 
-  /// Fetch news data from API
+  //
   Future<void> _loadNews() async {
     try {
       _newsArticles = await fetchNews();
-      _isNewsLoaded = true;
-      _navigateToLogin();
     } catch (error) {
       print('Error loading news: $error');
     }
   }
 
-  /// Navigate to login screen only when both conditions are met
-  void _navigateToLogin() {
-    if (_isAnimationCompleted && _isNewsLoaded) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Loginpage(newsArticles: _newsArticles),
-        ),
-      );
-    }
+  //
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    precacheImage(AssetImage('assets/images/splashscreen_image.png'), context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.appBackgroundPrimaryColor,
-      body: Center(
-        child: Lottie.asset(
-          'assets/images/Msms_splashvideo.json',
-          fit: BoxFit.cover,
-          frameRate: FrameRate.max,
-          onLoaded: (composition) {
-            Future.delayed(composition.duration, () {
-              setState(() {
-                _isAnimationCompleted = true;
-              });
-              _navigateToLogin();
-            });
-          },
-        ),
+      backgroundColor: Color.fromRGBO(255, 253, 247, 1),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: Image.asset(
+              image,
+              width: 150,
+              height: 150,
+              fit: BoxFit.contain,
+            ),
+          ),
+          AnimatedOpacity(
+            opacity: _showText ? 1.0 : 0.0,
+            duration: Duration(seconds: 1),
+            child: Column(
+              children: [
+                Center(
+                  child: Text(
+                    'Morning Star \n Matriculation School',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'semibold',
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.002,
+                ),
+                Text(
+                  'Where every student thrives'.toUpperCase(),
+                  style: TextStyle(
+                    fontFamily: 'medium',
+                    fontSize: 12,
+                    color: Color.fromRGBO(17, 101, 109, 1),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

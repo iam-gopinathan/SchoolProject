@@ -439,153 +439,154 @@ class _MessageApprovalPageState extends State<MessageApprovalPage> {
                                               MainAxisAlignment.end,
                                           children: [
                                             //
-
-                                            GestureDetector(
-                                              onTap: () {
-                                                showDialog(
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return AlertDialog(
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10)),
-                                                      content: Text(
-                                                        "Do you really want to make\n changes to this message?,",
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 16,
-                                                            color:
-                                                                Colors.black),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      actions: <Widget>[
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            ElevatedButton(
-                                                                style: ElevatedButton.styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    elevation:
-                                                                        0,
-                                                                    side: BorderSide(
+                                            if (smessage.requestFor != 'delete')
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        content: Text(
+                                                          "Do you really want to make\n changes to this message?,",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: <Widget>[
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      elevation:
+                                                                          0,
+                                                                      side: BorderSide(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          width:
+                                                                              1)),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Cancel',
+                                                                    style: TextStyle(
                                                                         color: Colors
                                                                             .black,
-                                                                        width:
-                                                                            1)),
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: Text(
-                                                                  'Cancel',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontFamily:
-                                                                          'regular'),
-                                                                )),
-                                                            //edit...
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .only(
-                                                                left: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width *
-                                                                    0.025,
-                                                              ),
-                                                              child:
-                                                                  ElevatedButton(
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        padding:
-                                                                            EdgeInsets.symmetric(horizontal: 40),
-                                                                        backgroundColor:
-                                                                            AppTheme.textFieldborderColor,
-                                                                        elevation:
-                                                                            0,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        Navigator.pop(
-                                                                            context);
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontFamily:
+                                                                            'regular'),
+                                                                  )),
+                                                              //edit...
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .only(
+                                                                  left: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.025,
+                                                                ),
+                                                                child:
+                                                                    ElevatedButton(
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          padding:
+                                                                              EdgeInsets.symmetric(horizontal: 40),
+                                                                          backgroundColor:
+                                                                              AppTheme.textFieldborderColor,
+                                                                          elevation:
+                                                                              0,
+                                                                        ),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
 
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(builder: (context) => Messageapprovaledit(Id: smessage.id, messageFetch: fetchMessages)));
-                                                                      },
-                                                                      child:
-                                                                          Text(
-                                                                        'Edit',
-                                                                        style: TextStyle(
-                                                                            color: Colors
-                                                                                .black,
-                                                                            fontSize:
-                                                                                16,
-                                                                            fontFamily:
-                                                                                'regular'),
-                                                                      )),
-                                                            )
-                                                          ],
+                                                                          Navigator.push(
+                                                                              context,
+                                                                              MaterialPageRoute(builder: (context) => Messageapprovaledit(Id: smessage.id, messageFetch: fetchMessages)));
+                                                                        },
+                                                                        child:
+                                                                            Text(
+                                                                          'Edit',
+                                                                          style: TextStyle(
+                                                                              color: Colors.black,
+                                                                              fontSize: 16,
+                                                                              fontFamily: 'regular'),
+                                                                        )),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                    right:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.110,
+                                                  ),
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5,
+                                                            horizontal: 15),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                        border: Border.all(
+                                                            color:
+                                                                Colors.black)),
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.edit,
+                                                          color: Colors.black,
+                                                        ),
+                                                        Text(
+                                                          'Edit',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 12,
+                                                              color:
+                                                                  Colors.black),
                                                         ),
                                                       ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                  right: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.110,
-                                                ),
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 5,
-                                                      horizontal: 15),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      border: Border.all(
-                                                          color: Colors.black)),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.edit,
-                                                        color: Colors.black,
-                                                      ),
-                                                      Text(
-                                                        'Edit',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'medium',
-                                                            fontSize: 12,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
+                                            //
 
                                             Container(
                                               width: MediaQuery.of(context)
@@ -1127,6 +1128,7 @@ class _MessageApprovalPageState extends State<MessageApprovalPage> {
                                               ),
                                             ),
                                             //editt..
+
                                             GestureDetector(
                                               onTap: () {
                                                 showDialog(
@@ -1242,48 +1244,54 @@ class _MessageApprovalPageState extends State<MessageApprovalPage> {
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.end,
                                                   children: [
-                                                    ///edit icon
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                        right: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width *
-                                                            0.110,
-                                                      ),
-                                                      child: Container(
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 5,
-                                                                horizontal: 15),
-                                                        decoration: BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20),
-                                                            border: Border.all(
-                                                                color: Colors
-                                                                    .black)),
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.edit,
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                            Text(
-                                                              'Edit',
-                                                              style: TextStyle(
-                                                                  fontFamily:
-                                                                      'medium',
-                                                                  fontSize: 12,
+                                                    if (e.requestFor !=
+                                                        'delete')
+
+                                                      ///edit icon
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                          right: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              0.110,
+                                                        ),
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  vertical: 5,
+                                                                  horizontal:
+                                                                      15),
+                                                          decoration: BoxDecoration(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                              border: Border.all(
                                                                   color: Colors
-                                                                      .black),
-                                                            ),
-                                                          ],
+                                                                      .black)),
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.edit,
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                              Text(
+                                                                'Edit',
+                                                                style: TextStyle(
+                                                                    fontFamily:
+                                                                        'medium',
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Colors
+                                                                        .black),
+                                                              ),
+                                                            ],
+                                                          ),
                                                         ),
                                                       ),
-                                                    ),
                                                     //
                                                     Row(
                                                       mainAxisAlignment:

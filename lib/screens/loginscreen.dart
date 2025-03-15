@@ -502,8 +502,20 @@ class _LoginpageState extends State<Loginpage> {
                             children: [
                               for (var article in widget.newsArticles)
                                 Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 10, right: 0, top: 12, bottom: 10),
+                                  padding: EdgeInsets.only(
+                                    // left: 10,
+                                    //  right: 10,
+                                    //  top: 12,
+                                    //  bottom: 10
+                                    left: MediaQuery.of(context).size.width *
+                                        0.025,
+                                    right: MediaQuery.of(context).size.width *
+                                        0.025,
+                                    top: MediaQuery.of(context).size.height *
+                                        0.015,
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.012,
+                                  ),
                                   child: Card(
                                     elevation: 0,
                                     shape: RoundedRectangleBorder(

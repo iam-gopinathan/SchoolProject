@@ -536,158 +536,157 @@ class _NewsApprovalPageState extends State<NewsApprovalPage> {
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: [
-                                            //editttt
-
-                                            GestureDetector(
-                                              onTap: () {
-                                                showDialog(
-                                                  barrierDismissible: false,
-                                                  context: context,
-                                                  builder:
-                                                      (BuildContext context) {
-                                                    return AlertDialog(
-                                                      backgroundColor:
-                                                          Colors.white,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          10)),
-                                                      content: Text(
-                                                        "Do you really want to make\n changes to this News?,",
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 16,
-                                                            color:
-                                                                Colors.black),
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                      actions: <Widget>[
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            ElevatedButton(
-                                                                style: ElevatedButton.styleFrom(
-                                                                    backgroundColor:
-                                                                        Colors
-                                                                            .white,
-                                                                    elevation:
-                                                                        0,
-                                                                    side: BorderSide(
+                                            if (snews.requestFor != 'delete')
+                                              //editttt
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        content: Text(
+                                                          "Do you really want to make\n changes to this News?,",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: <Widget>[
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      elevation:
+                                                                          0,
+                                                                      side: BorderSide(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          width:
+                                                                              1)),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Cancel',
+                                                                    style: TextStyle(
                                                                         color: Colors
                                                                             .black,
-                                                                        width:
-                                                                            1)),
-                                                                onPressed: () {
-                                                                  Navigator.pop(
-                                                                      context);
-                                                                },
-                                                                child: Text(
-                                                                  'Cancel',
-                                                                  style: TextStyle(
-                                                                      color: Colors
-                                                                          .black,
-                                                                      fontSize:
-                                                                          16,
-                                                                      fontFamily:
-                                                                          'regular'),
-                                                                )),
-                                                            //edit...
-                                                            Padding(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .only(
-                                                                left: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .width *
-                                                                    0.025,
-                                                              ),
-                                                              child:
-                                                                  ElevatedButton(
-                                                                      style: ElevatedButton
-                                                                          .styleFrom(
-                                                                        padding:
-                                                                            EdgeInsets.symmetric(horizontal: 40),
-                                                                        backgroundColor:
-                                                                            AppTheme.textFieldborderColor,
-                                                                        elevation:
-                                                                            0,
-                                                                      ),
-                                                                      onPressed:
-                                                                          () {
-                                                                        Navigator.pop(
-                                                                            context);
-                                                                        //
-                                                                        Navigator.push(
-                                                                            context,
-                                                                            MaterialPageRoute(
-                                                                                builder: (context) => Newsapprovaledit(
-                                                                                      newsId: snews.id,
-                                                                                      fetch: fetchApproval,
-                                                                                    )));
-                                                                      },
-                                                                      child:
-                                                                          Text(
-                                                                        'Edit',
-                                                                        style: TextStyle(
-                                                                            color: Colors
-                                                                                .black,
-                                                                            fontSize:
-                                                                                16,
-                                                                            fontFamily:
-                                                                                'regular'),
-                                                                      )),
-                                                            )
-                                                          ],
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontFamily:
+                                                                            'regular'),
+                                                                  )),
+                                                              //edit...
+                                                              Padding(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .only(
+                                                                  left: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.025,
+                                                                ),
+                                                                child:
+                                                                    ElevatedButton(
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          padding:
+                                                                              EdgeInsets.symmetric(horizontal: 40),
+                                                                          backgroundColor:
+                                                                              AppTheme.textFieldborderColor,
+                                                                          elevation:
+                                                                              0,
+                                                                        ),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          //
+                                                                          Navigator.push(
+                                                                              context,
+                                                                              MaterialPageRoute(
+                                                                                  builder: (context) => Newsapprovaledit(
+                                                                                        newsId: snews.id,
+                                                                                        fetch: fetchApproval,
+                                                                                      )));
+                                                                        },
+                                                                        child:
+                                                                            Text(
+                                                                          'Edit',
+                                                                          style: TextStyle(
+                                                                              color: Colors.black,
+                                                                              fontSize: 16,
+                                                                              fontFamily: 'regular'),
+                                                                        )),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      right:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.10),
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5,
+                                                            horizontal: 15),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                        border: Border.all(
+                                                            color:
+                                                                Colors.black)),
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.edit,
+                                                          color: Colors.black,
+                                                        ),
+                                                        Text(
+                                                          'Edit',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 12,
+                                                              color:
+                                                                  Colors.black),
                                                         ),
                                                       ],
-                                                    );
-                                                  },
-                                                );
-                                              },
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    right:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.10),
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      vertical: 5,
-                                                      horizontal: 15),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
-                                                      border: Border.all(
-                                                          color: Colors.black)),
-                                                  child: Row(
-                                                    children: [
-                                                      Icon(
-                                                        Icons.edit,
-                                                        color: Colors.black,
-                                                      ),
-                                                      Text(
-                                                        'Edit',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'medium',
-                                                            fontSize: 12,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ],
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
 
                                             ///
                                             if (snews.requestFor != 'delete')
@@ -1331,6 +1330,7 @@ class _NewsApprovalPageState extends State<NewsApprovalPage> {
                                           ),
                                         ),
                                         //editttt
+
                                         GestureDetector(
                                           onTap: () {
                                             showDialog(
@@ -1440,45 +1440,46 @@ class _NewsApprovalPageState extends State<NewsApprovalPage> {
                                                   MainAxisAlignment.end,
                                               children: [
                                                 ///edit icon
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                    right:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.110,
-                                                  ),
-                                                  child: Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 5,
-                                                            horizontal: 15),
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20),
-                                                        border: Border.all(
-                                                            color:
-                                                                Colors.black)),
-                                                    child: Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.edit,
-                                                          color: Colors.black,
-                                                        ),
-                                                        Text(
-                                                          'Edit',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'medium',
-                                                              fontSize: 12,
-                                                              color:
-                                                                  Colors.black),
-                                                        ),
-                                                      ],
+                                                if (e.requestFor != 'delete')
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                      right:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.110,
+                                                    ),
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 5,
+                                                              horizontal: 15),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                          border: Border.all(
+                                                              color: Colors
+                                                                  .black)),
+                                                      child: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.edit,
+                                                            color: Colors.black,
+                                                          ),
+                                                          Text(
+                                                            'Edit',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'medium',
+                                                                fontSize: 12,
+                                                                color: Colors
+                                                                    .black),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
                                                 //
 
                                                 if (e.requestFor != 'delete')

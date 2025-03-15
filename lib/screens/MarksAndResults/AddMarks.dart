@@ -1645,6 +1645,27 @@ class _AddmarksState extends State<Addmarks> {
                       backgroundColor: Colors.white,
                       side: BorderSide(color: Colors.black, width: 1)),
                   onPressed: () {
+                    //
+                    if (_gradeData == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Error: Grade data is missing!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+                    //
+                    if (selectedExam == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Please select Exam!'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      return;
+                    }
+
                     String status = 'draft';
                     addMarks(context, selectedExam!, _gradeData!, status,
                         selectedGrade);
