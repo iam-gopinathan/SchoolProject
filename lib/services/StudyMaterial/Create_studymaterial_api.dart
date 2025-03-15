@@ -34,18 +34,20 @@ Future<void> postStudyMaterial(CreateStudymaterialModel studyMaterial, context,
     var response = await request.send();
 
     if (response.statusCode == 200) {
+      String message = studyMaterial.status == 'draft'
+          ? 'StudyMaterial saved as Draft!'
+          : 'StudyMaterial Created successfully!';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('StudyMaterial posted successfully!'),
+          content: Text(message),
           backgroundColor: Colors.green,
         ),
       );
-      print('Study Material uploaded successfully');
 
       var responseBody = await response.stream.bytesToString();
       print(responseBody);
 
-      // Add a delay of 2 seconds before navigating
       await Future.delayed(Duration(seconds: 2));
 
       fetchstudymaterial();

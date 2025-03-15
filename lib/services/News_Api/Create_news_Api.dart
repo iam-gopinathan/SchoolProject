@@ -69,9 +69,22 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
 
       String snackBarMessage = '';
       if (userType == 'superadmin') {
-        snackBarMessage = 'News Created Successfully!';
+        if (action == 'post') {
+          snackBarMessage = 'News Created Successfully!';
+        } else if (action == 'schedule') {
+          snackBarMessage = 'News Scheduled Successfully!';
+        }
       } else if (userType == 'admin' || userType == 'staff') {
-        snackBarMessage = 'News Creation Request Was Sent Successfully!';
+        if (action == 'post') {
+          snackBarMessage = 'News Creation Request Was Sent Successfully!';
+        } else if (action == 'schedule') {
+          snackBarMessage = 'News Scheduling Request Was Sent Successfully!';
+        }
+      }
+
+      // ✅ Correctly handle "Draft" case
+      if (action == 'draft') {
+        snackBarMessage = ' News Saved as Draft!';
       }
 
       if (snackBarMessage.isNotEmpty) {
@@ -112,5 +125,28 @@ Future<void> postNews(CreateNewsModel newsPost, String action,
     Navigator.pop(
       context,
     );
+  }
+}
+
+//  **Function to Send Push Notification**
+Future<void> sendPushNotification(String title, String body) async {
+  final Uri uri = Uri.parse(
+      'http://localhost:5001/send-notification'); // Update with your server URL
+  final Map<String, dynamic> notificationData = {
+    'token': "YOUR_DEVICE_FCM_TOKEN", // Replace with actual FCM token
+    'title': title,
+    'body': body
+  };
+
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode(notificationData),
+  );
+
+  if (response.statusCode == 200) {
+    print("Push notification sent successfully!");
+  } else {
+    print("Failed to send push notification: ${response.body}");
   }
 }

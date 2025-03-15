@@ -39,10 +39,18 @@ Future<void> CreateMessage(
 
       String snackBarMessage = '';
       if (UserSession().userType == 'superadmin') {
-        snackBarMessage = 'Message Created Successfully!';
+        snackBarMessage = newMessage.status == "schedule"
+            ? 'Message Scheduled Successfully!'
+            : 'Message Created Successfully!';
       } else if (UserSession().userType == 'admin' ||
           UserSession().userType == 'staff') {
-        snackBarMessage = 'Message Creation Request Was Sent Successfully!';
+        snackBarMessage = newMessage.status == "schedule"
+            ? 'Message Scheduling Request Sent Successfully!'
+            : 'Message Creation Request Was Sent Successfully!';
+      }
+      //
+      if (newMessage.status == 'draft') {
+        snackBarMessage = 'Message Saved as Draft';
       }
       if (snackBarMessage.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(

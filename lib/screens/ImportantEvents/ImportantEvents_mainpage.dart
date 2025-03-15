@@ -40,7 +40,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
   }
 
   void _scrollListener() {
-    setState(() {}); // Trigger UI update when scroll position changes
+    setState(() {});
   }
 
   @override
@@ -81,10 +81,22 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
   }
 
   // Check if the day is an event day
+  // bool isEventDay(DateTime day) {
+  //   for (var event in events.allEvents) {
+  //     if (day.isAfter(event.parsedFromDate.subtract(Duration(days: 1))) &&
+  //         day.isBefore(event.parsedToDate.add(Duration(days: 1)))) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
   bool isEventDay(DateTime day) {
     for (var event in events.allEvents) {
-      if (day.isAfter(event.parsedFromDate.subtract(Duration(days: 1))) &&
-          day.isBefore(event.parsedToDate.add(Duration(days: 1)))) {
+      DateTime fromDate = event.parsedFromDate;
+      DateTime toDate = event.parsedToDate;
+
+      if ((day.isAtSameMomentAs(fromDate) || day.isAtSameMomentAs(toDate)) ||
+          (day.isAfter(fromDate) && day.isBefore(toDate))) {
         return true;
       }
     }
@@ -488,7 +500,10 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                 padding: const EdgeInsets.only(top: 20),
                                 child: Center(
                                   child: Text(
-                                    "You haven’t made anything yet;\nstart creating now!",
+                                    UserSession().userType == 'student' ||
+                                            UserSession().userType == 'teacher'
+                                        ? "No messages from the school yet. Stay tuned for updates!"
+                                        : "You haven’t made anything yet;\nstart creating now!",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'regular',
@@ -606,7 +621,10 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                           padding: const EdgeInsets.only(top: 20),
                           child: Center(
                             child: Text(
-                              "You haven’t made anything yet;\nstart creating now!",
+                              UserSession().userType == 'student' ||
+                                      UserSession().userType == 'teacher'
+                                  ? "No messages from the school yet. Stay tuned for updates!"
+                                  : "You haven’t made anything yet;\nstart creating now!",
                               style: TextStyle(
                                 fontSize: 16, //
                                 fontFamily: 'regular',
@@ -765,7 +783,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                                       .circular(
                                                                           10)),
                                                       content: Text(
-                                                        "Do you really want to Delete\n  to this Event?",
+                                                        "Do you really want to Delete\n  this Event?",
                                                         style: TextStyle(
                                                             fontFamily:
                                                                 'regular',
@@ -982,7 +1000,7 @@ class _ImportanteventsMainpageState extends State<ImportanteventsMainpage> {
                                                                         .circular(
                                                                             10)),
                                                             content: Text(
-                                                              "Do you really want to make\n changes to this Timetable?",
+                                                              "Do you really want to make\n changes to this Event?",
                                                               style: TextStyle(
                                                                   fontFamily:
                                                                       'regular',

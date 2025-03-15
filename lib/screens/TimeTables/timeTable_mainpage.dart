@@ -452,17 +452,30 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
 
                 // Check if the list is empty
                 if (timetableList.isEmpty) {
-                  return Center(
-                    child: Text(
-                      "You haven’t made anything yet; start creating now!",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontFamily: 'regular',
-                        color: Color.fromRGBO(145, 145, 145, 1),
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
+                  return (UserSession().userType == 'student' ||
+                          UserSession().userType == 'teacher')
+                      ? Center(
+                          child: Text(
+                            "No messages from the school yet. Stay tuned for updates!",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontFamily: 'regular',
+                              color: Color.fromRGBO(145, 145, 145, 1),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        )
+                      : Center(
+                          child: Text(
+                            "You haven’t made anything yet; start creating now!",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontFamily: 'regular',
+                              color: Color.fromRGBO(145, 145, 145, 1),
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        );
                 }
                 return SingleChildScrollView(
                   controller: _scrollController,
@@ -511,7 +524,8 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12)),
                                 child: Container(
-                                  padding: EdgeInsets.all(15),
+                                  padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width * 0.04),
                                   decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       color: Colors.white,
@@ -536,47 +550,91 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                         initiallyExpanded:
                                             index == initiallyExpandedIndex,
                                         shape: Border(),
-                                        title: Row(
+                                        title: Column(
                                           children: [
-                                            Transform.translate(
-                                              offset: Offset(-14, 0),
-                                              child: Text(
-                                                '${e.gradeSection}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.black),
-                                              ),
-                                            ),
-                                            Spacer(),
-                                            if (e.updatedOn != null &&
-                                                e.updatedOn!.isNotEmpty)
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                    vertical: 10,
-                                                    horizontal: 8),
-                                                decoration: BoxDecoration(
-                                                  color: Color.fromRGBO(
-                                                      255, 251, 245, 1),
-                                                  borderRadius:
-                                                      BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(10),
-                                                    topRight:
-                                                        Radius.circular(10),
+                                            Row(
+                                              children: [
+                                                Transform.translate(
+                                                  offset: Offset(-14, 0),
+                                                  child: Text(
+                                                    '${e.gradeSection}',
+                                                    style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 16,
+                                                        color: Colors.black),
                                                   ),
                                                 ),
-                                                child: Text(
-                                                  'Updated on :${e.updatedOn}',
-                                                  style: TextStyle(
-                                                      color: Color.fromRGBO(
-                                                          49, 49, 49, 1),
-                                                      fontFamily: 'medium',
-                                                      fontSize: 10),
+                                                // Spacer(),
+
+                                                //   Container(
+                                                //     padding: EdgeInsets.symmetric(
+                                                //       vertical: MediaQuery.of(
+                                                //                   context)
+                                                //               .size
+                                                //               .height *
+                                                //           0.012, // 1.2% of screen height
+                                                //       horizontal:
+                                                //           MediaQuery.of(context)
+                                                //                   .size
+                                                //                   .width *
+                                                //               0.02,
+                                                //     ),
+                                                //     decoration: BoxDecoration(
+                                                //       color: Color.fromRGBO(
+                                                //           255, 251, 245, 1),
+                                                //       borderRadius:
+                                                //           BorderRadius.only(
+                                                //         topLeft:
+                                                //             Radius.circular(10),
+                                                //         topRight:
+                                                //             Radius.circular(10),
+                                                //       ),
+                                                //     ),
+                                                //     child: Text(
+                                                //       'Updated on :${e.updatedOn}',
+                                                //       style: TextStyle(
+                                                //           color: Color.fromRGBO(
+                                                //               49, 49, 49, 1),
+                                                //           fontFamily: 'medium',
+                                                //           fontSize: 10),
+                                                //     ),
+                                                //   )
+                                                // else
+                                                //   SizedBox(),
+                                              ],
+                                            ),
+                                            if (e.updatedOn != null &&
+                                                e.updatedOn!.isNotEmpty)
+                                              Transform.translate(
+                                                offset: Offset(-14, 0),
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      top:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .height *
+                                                              0.01),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        'Updated on :${e.updatedOn}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    49,
+                                                                    49,
+                                                                    49,
+                                                                    1),
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 10),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              )
-                                            else
-                                              SizedBox(),
+                                              ),
                                           ],
                                         ),
                                         children: [
@@ -652,75 +710,116 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
+                                                        barrierDismissible:
+                                                            false,
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return AlertDialog(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
                                                                             10)),
-                                                                content: Text(
-                                                                  "Do you really want to make\n changes to this Timetable?",
-                                                                  style: TextStyle(
-                                                                      fontFamily:
-                                                                          'regular',
-                                                                      fontSize:
-                                                                          16,
-                                                                      color: Colors
-                                                                          .black),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                ),
-                                                                actions: <Widget>[
-                                                                  Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
-                                                                      children: [
+                                                            content: Text(
+                                                              "Do you really want to make\n changes to this Timetable?",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'regular',
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .black),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                            actions: <Widget>[
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  ElevatedButton(
+                                                                      style: ElevatedButton.styleFrom(
+                                                                          backgroundColor: Colors
+                                                                              .white,
+                                                                          elevation:
+                                                                              0,
+                                                                          side: BorderSide(
+                                                                              color: Colors
+                                                                                  .black,
+                                                                              width:
+                                                                                  1)),
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Cancel',
+                                                                        style: TextStyle(
+                                                                            color: Colors
+                                                                                .black,
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontFamily:
+                                                                                'regular'),
+                                                                      )),
+                                                                  //edit...
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10),
+                                                                    child:
                                                                         ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(
-                                                                                backgroundColor: Colors.white,
-                                                                                elevation: 0,
-                                                                                side: BorderSide(color: Colors.black, width: 1)),
-                                                                            onPressed: () {
-                                                                              Navigator.pop(context);
-                                                                            },
-                                                                            child: Text(
-                                                                              'Cancel',
-                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                            )),
-                                                                        //edit...
-                                                                        Padding(
-                                                                          padding: const EdgeInsets
-                                                                              .only(
-                                                                              left: 10),
-                                                                          child: ElevatedButton(
-                                                                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                                Navigator.push(
-                                                                                    context,
-                                                                                    MaterialPageRoute(
-                                                                                        builder: (context) => EditTimetable(
-                                                                                              id: e.id,
-                                                                                              fetchMaintimetable: _fetchMaintimetable,
-                                                                                            )));
-                                                                              },
-                                                                              child: Text(
-                                                                                'Edit',
-                                                                                style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                              )),
-                                                                        ),
-                                                                      ])
-                                                                ]);
-                                                          });
+                                                                      style: ElevatedButton.styleFrom(
+                                                                          backgroundColor: AppTheme
+                                                                              .textFieldborderColor,
+                                                                          elevation:
+                                                                              0,
+                                                                          side:
+                                                                              BorderSide.none),
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        //
+                                                                        Navigator.push(
+                                                                            context,
+                                                                            MaterialPageRoute(
+                                                                                builder: (context) => EditTimetable(
+                                                                                      id: e.id,
+                                                                                      fetchMaintimetable: _fetchMaintimetable,
+                                                                                    )));
+                                                                        //
+                                                                        print(
+                                                                            "UserSession().rollNumber: ${UserSession().rollNumber}");
+                                                                        print(
+                                                                            "UserSession().userType: ${UserSession().userType}");
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Edit',
+                                                                        style: TextStyle(
+                                                                            color: Colors
+                                                                                .black,
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontFamily:
+                                                                                'regular'),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
                                                     },
                                                     child: Container(
                                                       padding:
@@ -761,103 +860,139 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                                                   GestureDetector(
                                                     onTap: () {
                                                       showDialog(
-                                                          barrierDismissible:
-                                                              false,
-                                                          context: context,
-                                                          builder: (BuildContext
-                                                              context) {
-                                                            return AlertDialog(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .white,
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
+                                                        barrierDismissible:
+                                                            false,
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return AlertDialog(
+                                                            backgroundColor:
+                                                                Colors.white,
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
                                                                             10)),
-                                                                content: Text(
-                                                                  "Do you really want delete \n to this Timetable?",
-                                                                  style: TextStyle(
-                                                                      fontFamily:
-                                                                          'regular',
-                                                                      fontSize:
-                                                                          16,
-                                                                      color: Colors
-                                                                          .black),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                ),
-                                                                actions: <Widget>[
-                                                                  Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
-                                                                    children: [
-                                                                      ElevatedButton(
-                                                                          style: ElevatedButton.styleFrom(
-                                                                              backgroundColor: Colors.white,
-                                                                              elevation: 0,
-                                                                              side: BorderSide(color: Colors.black, width: 1)),
-                                                                          onPressed: () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child: Text(
-                                                                            'Cancel',
-                                                                            style: TextStyle(
-                                                                                color: Colors.black,
-                                                                                fontSize: 16,
-                                                                                fontFamily: 'regular'),
-                                                                          )),
-                                                                      //delete...
-                                                                      Padding(
-                                                                        padding: const EdgeInsets
-                                                                            .only(
-                                                                            left:
-                                                                                10),
-                                                                        child: ElevatedButton(
-                                                                            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
-                                                                            onPressed: () async {
-                                                                              var timesheetid = e.id;
-                                                                              final String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeTimetable/DeleteTimeTable?Id=$timesheetid';
+                                                            content: Text(
+                                                              "Are you sure you want to delete\n this Timetable?",
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'regular',
+                                                                  fontSize: 16,
+                                                                  color: Colors
+                                                                      .black),
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ),
+                                                            actions: <Widget>[
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .center,
+                                                                children: [
+                                                                  ElevatedButton(
+                                                                      style: ElevatedButton.styleFrom(
+                                                                          backgroundColor: Colors
+                                                                              .white,
+                                                                          elevation:
+                                                                              0,
+                                                                          side: BorderSide(
+                                                                              color: Colors
+                                                                                  .black,
+                                                                              width:
+                                                                                  1)),
+                                                                      onPressed:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Cancel',
+                                                                        style: TextStyle(
+                                                                            color: Colors
+                                                                                .black,
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontFamily:
+                                                                                'regular'),
+                                                                      )),
+                                                                  //delete...
+                                                                  Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10),
+                                                                    child:
+                                                                        ElevatedButton(
+                                                                      style: ElevatedButton.styleFrom(
+                                                                          backgroundColor: AppTheme
+                                                                              .textFieldborderColor,
+                                                                          elevation:
+                                                                              0,
+                                                                          side:
+                                                                              BorderSide.none),
+                                                                      onPressed:
+                                                                          () async {
+                                                                        var timesheetid =
+                                                                            e.id;
+                                                                        final String
+                                                                            url =
+                                                                            'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeTimetable/DeleteTimeTable?Id=$timesheetid';
 
-                                                                              try {
-                                                                                final response = await http.delete(
-                                                                                  Uri.parse(url),
-                                                                                  headers: {
-                                                                                    'Content-Type': 'application/json',
-                                                                                    'Authorization': 'Bearer $authToken',
-                                                                                  },
-                                                                                );
-
-                                                                                if (response.statusCode == 200) {
-                                                                                  print('id has beeen deleted ${timesheetid}');
-
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(backgroundColor: Colors.green, content: Text('Timetable deleted successfully!')),
-                                                                                  );
-                                                                                } else {
-                                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                                    SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete .')),
-                                                                                  );
-                                                                                }
-                                                                              } catch (e) {
-                                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  SnackBar(content: Text('An error occurred: $e')),
-                                                                                );
-                                                                              }
-                                                                              //
-                                                                              Navigator.pop(context);
-                                                                              await _fetchMaintimetable();
+                                                                        try {
+                                                                          final response =
+                                                                              await http.delete(
+                                                                            Uri.parse(url),
+                                                                            headers: {
+                                                                              'Content-Type': 'application/json',
+                                                                              'Authorization': 'Bearer $authToken',
                                                                             },
-                                                                            child: Text(
-                                                                              'Delete',
-                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
-                                                                            )),
+                                                                          );
+
+                                                                          if (response.statusCode ==
+                                                                              200) {
+                                                                            print('id has beeen deleted ${timesheetid}');
+
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(backgroundColor: Colors.green, content: Text('Timetable deleted successfully!')),
+                                                                            );
+                                                                          } else {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                                              SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete .')),
+                                                                            );
+                                                                          }
+                                                                        } catch (e) {
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
+                                                                            SnackBar(content: Text('An error occurred: $e')),
+                                                                          );
+                                                                        }
+                                                                        //
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                        await _fetchMaintimetable();
+                                                                      },
+                                                                      child:
+                                                                          Text(
+                                                                        'Delete',
+                                                                        style: TextStyle(
+                                                                            color: Colors
+                                                                                .black,
+                                                                            fontSize:
+                                                                                16,
+                                                                            fontFamily:
+                                                                                'regular'),
                                                                       ),
-                                                                    ],
-                                                                  )
-                                                                ]);
-                                                          });
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              )
+                                                            ],
+                                                          );
+                                                        },
+                                                      );
                                                     },
                                                     child: Container(
                                                       padding:

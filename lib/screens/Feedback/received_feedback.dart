@@ -920,9 +920,29 @@ class _ReceivedFeedbackState extends State<ReceivedFeedback> {
                                                         ],
                                                       ),
                                                     ListTile(
-                                                        leading: Image.network(
+                                                        // leading: Image.network(
+                                                        //     answer.profile ??
+                                                        //         ''),
+                                                        leading: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                  30), // Make it circular if needed
+                                                          child: Image.network(
                                                             answer.profile ??
-                                                                ''),
+                                                                '',
+                                                            fit: BoxFit.cover,
+                                                            errorBuilder:
+                                                                (context, error,
+                                                                    stackTrace) {
+                                                              return Image
+                                                                  .asset(
+                                                                'assets/images/Dashboard_profileimage.png', // Your local dummy image
+                                                                fit: BoxFit
+                                                                    .cover,
+                                                              );
+                                                            },
+                                                          ),
+                                                        ),
                                                         title: Text(
                                                           answer.studentName ??
                                                               'No Name',

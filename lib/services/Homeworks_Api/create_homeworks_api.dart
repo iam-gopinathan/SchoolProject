@@ -69,13 +69,29 @@ Future<void> postHomework(
 
     if (response.statusCode == 200) {
       print('Homework posted successfully: ${response.statusCode}');
+
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text(homework.status == 'schedule'
+      //         ? 'Homework Scheduled Successfully!'
+      //         : 'Homework Created Successfully!'),
+      //     backgroundColor: Colors.green,
+      //   ),
+      // );
+
+      String successMessage = homework.status == 'draft'
+          ? 'Homework Saved as Draft!'
+          : homework.status == 'schedule'
+              ? 'Homework Scheduled Successfully!'
+              : 'Homework Created Successfully!';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Homework posted successfully!'),
+          content: Text(successMessage),
           backgroundColor: Colors.green,
         ),
       );
-      //
+
       // Add a delay of 2 seconds before navigating
       await Future.delayed(Duration(seconds: 2));
 

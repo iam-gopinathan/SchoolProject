@@ -48,7 +48,7 @@ Future<void> postSchoolCalendar(CreateSchoolCalendarModel model, context,
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Calender Event posted successfully!'),
+          content: Text('CalenderEvent Created successfully!'),
           backgroundColor: Colors.green,
         ),
       );

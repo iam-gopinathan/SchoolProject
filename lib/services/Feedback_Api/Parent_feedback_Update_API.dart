@@ -22,7 +22,7 @@ Future<bool> updateEditParentFeedback(ParentFeedbackUpdateModel feedbackData,
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('ParentsFeedBack updated successfully!'),
+          content: Text('FeedBack Updated Successfully!'),
           backgroundColor: Colors.green,
         ),
       );

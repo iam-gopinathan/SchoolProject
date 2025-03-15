@@ -102,10 +102,23 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
   }
 
   // Check if the day is an event day
+  // bool isEventDay(DateTime day) {
+  //   for (var event in allEvents) {
+  //     if (day.isAfter(event.parsedFromDate.subtract(Duration(days: 1))) &&
+  //         day.isBefore(event.parsedToDate.add(Duration(days: 1)))) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
+
   bool isEventDay(DateTime day) {
     for (var event in allEvents) {
-      if (day.isAfter(event.parsedFromDate.subtract(Duration(days: 1))) &&
-          day.isBefore(event.parsedToDate.add(Duration(days: 1)))) {
+      DateTime fromDate = event.parsedFromDate;
+      DateTime toDate = event.parsedToDate;
+
+      if ((day.isAtSameMomentAs(fromDate) || day.isAtSameMomentAs(toDate)) ||
+          (day.isAfter(fromDate) && day.isBefore(toDate))) {
         return true;
       }
     }
@@ -401,7 +414,10 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                               padding: const EdgeInsets.only(top: 20),
                               child: Center(
                                 child: Text(
-                                  "You haven’t made anything yet;\nstart creating now!",
+                                  UserSession().userType == 'student' ||
+                                          UserSession().userType == 'teacher'
+                                      ? "No messages from the school yet. Stay tuned for updates!"
+                                      : "You haven’t made anything yet;\nstart creating now!",
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontFamily: 'regular',
@@ -477,12 +493,18 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                         Padding(
                                           padding:
                                               const EdgeInsets.only(left: 15),
-                                          child: Text(
-                                            '${e.headLine}',
-                                            style: TextStyle(
-                                                fontFamily: 'regular',
-                                                fontSize: 14,
-                                                color: Colors.black),
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.6,
+                                            child: Text(
+                                              '${e.headLine}',
+                                              style: TextStyle(
+                                                  fontFamily: 'regular',
+                                                  fontSize: 14,
+                                                  color: Colors.black),
+                                            ),
                                           ),
                                         )
                                       ],
@@ -527,7 +549,10 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                             padding: const EdgeInsets.only(top: 20),
                             child: Center(
                               child: Text(
-                                "You haven’t made anything yet;\nstart creating now!",
+                                UserSession().userType == 'student' ||
+                                        UserSession().userType == 'teacher'
+                                    ? "No messages from the school yet. Stay tuned for updates!"
+                                    : "You haven’t made anything yet;\nstart creating now!",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontFamily: 'regular',
@@ -646,12 +671,19 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(
-                                                      '${e.headLine}',
-                                                      style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black,
+                                                    Container(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.45,
+                                                      child: Text(
+                                                        '${e.headLine}',
+                                                        style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 12,
+                                                          color: Colors.black,
+                                                        ),
                                                       ),
                                                     ),
                                                     Row(
@@ -661,7 +693,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                                       context)
                                                                   .size
                                                                   .width *
-                                                              0.45,
+                                                              0.5,
                                                           child: Divider(
                                                             color:
                                                                 Color.fromRGBO(
@@ -679,14 +711,22 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                       padding:
                                                           const EdgeInsets.only(
                                                               top: 5),
-                                                      child: Text(
-                                                        '${e.description}',
-                                                        style: TextStyle(
-                                                            fontFamily:
-                                                                'regular',
-                                                            fontSize: 14,
-                                                            color: Colors.black,
-                                                            height: 1.5),
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.5,
+                                                        child: Text(
+                                                          '${e.description}',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 14,
+                                                              color:
+                                                                  Colors.black,
+                                                              height: 1.5),
+                                                        ),
                                                       ),
                                                     ),
                                                     //delete
@@ -716,7 +756,7 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                                                 10)),
                                                                     content:
                                                                         Text(
-                                                                      "Do you really want to Delete\n  to this Event?",
+                                                                      "Do you really want to Delete\n   this Event?",
                                                                       style: TextStyle(
                                                                           fontFamily:
                                                                               'regular',
@@ -743,7 +783,6 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
                                                                                   style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
                                                                                 )),
                                                                             //delete...
-
                                                                             Padding(
                                                                               padding: const EdgeInsets.only(left: 10),
                                                                               child: ElevatedButton(
@@ -1028,8 +1067,11 @@ class _SchoolcalenderMainpageState extends State<SchoolcalenderMainpage> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // Adjust -70 relative to screen height
+                left: MediaQuery.of(context).size.width *
+                    0.45, // Adjust 180 relative to screen width
+
                 child: GestureDetector(
                   onTap: () {
                     Navigator.pop(modalContext);

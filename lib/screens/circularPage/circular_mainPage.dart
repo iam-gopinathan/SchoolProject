@@ -80,8 +80,9 @@ class _CircularMainpageState extends State<CircularMainpage> {
           return Stack(clipBehavior: Clip.none, children: [
             // Close icon
             Positioned(
-              top: -70,
-              left: 180,
+              top: MediaQuery.of(context).size.height *
+                  -0.08, // Adjust -70 dynamically
+              left: MediaQuery.of(context).size.width * 0.45,
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();
@@ -200,6 +201,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
   }
 
   //
+
   ScrollController _scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
@@ -313,6 +315,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                 inactiveTrackColor: Colors.white,
                                 inactiveThumbColor: Colors.black,
                                 value: isswitched,
+                                activeColor: Colors.white,
                                 onChanged: (value) {
                                   setState(() {
                                     isswitched = value;
@@ -372,17 +375,30 @@ class _CircularMainpageState extends State<CircularMainpage> {
               color: AppTheme.textFieldborderColor,
             ))
           : circulars.isEmpty
-              ? Center(
-                  child: Text(
-                    "You haven’t made anything yet;\nstart creating now!",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'regular',
-                      color: Color.fromRGBO(145, 145, 145, 1),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                )
+              ? (UserSession().userType == 'student' ||
+                      UserSession().userType == 'teacher')
+                  ? Center(
+                      child: Text(
+                        "No messages from the school yet. Stay tuned for updates!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        "You haven’t made anything yet;\nstart creating now!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
               : Column(
                   children: [
                     Padding(
@@ -406,7 +422,12 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                         contentPadding:
                                             EdgeInsets.symmetric(vertical: 5),
                                         prefixIcon: Transform.translate(
-                                          offset: Offset(75, 0),
+                                          offset: Offset(
+                                            MediaQuery.of(context).size.width *
+                                                0.18, // Adjust 75 dynamically
+                                            MediaQuery.of(context).size.height *
+                                                0.0,
+                                          ),
                                           child: Icon(Icons.search,
                                               color: Color.fromRGBO(
                                                   178, 178, 178, 1)),
@@ -452,12 +473,87 @@ class _CircularMainpageState extends State<CircularMainpage> {
                           itemCount: filteredCircularList.length,
                           itemBuilder: (context, index) {
                             final circular = filteredCircularList[index];
+                            //
+                            // Check if any circular has 'schedule' status
+                            bool hasScheduledCircular =
+                                filteredCircularList.any((circular) =>
+                                    circular.circulars.any((circularModel) =>
+                                        circularModel.status == 'schedule'));
                             return Padding(
                               padding: EdgeInsets.all(
                                 MediaQuery.of(context).size.width * 0.04,
                               ),
                               child: Column(
                                 children: [
+                                  ////schedule
+                                  if (index == 0 && hasScheduledCircular)
+                                    // Padding(
+                                    //   padding: EdgeInsets.only(
+                                    //     top:
+                                    //         MediaQuery.of(context).size.height *
+                                    //             0.02,
+                                    //     bottom:
+                                    //         MediaQuery.of(context).size.height *
+                                    //             0.017,
+                                    //   ),
+                                    //   child: ElevatedButton(
+                                    //     style: ElevatedButton.styleFrom(
+                                    //         backgroundColor: Color.fromRGBO(
+                                    //             131, 56, 236, 1)),
+                                    //     onPressed: () {},
+                                    //     child: Text(
+                                    //       'Upcoming Circular',
+                                    //       style: TextStyle(
+                                    //           fontSize: 14,
+                                    //           color: Colors.white,
+                                    //           fontFamily: 'medium'),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.05,
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.02,
+                                              bottom: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.017,
+                                            ),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topRight: Radius
+                                                                  .circular(
+                                                                      10))),
+                                                  backgroundColor:
+                                                      Color.fromRGBO(
+                                                          131, 56, 236, 1)),
+                                              onPressed: () {},
+                                              child: Text(
+                                                'Upcoming Circulars',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.white,
+                                                    fontFamily: 'medium'),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
                                   ListView.builder(
                                       physics: NeverScrollableScrollPhysics(),
                                       shrinkWrap: true,
@@ -676,9 +772,16 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                   '${circularModel.circular}',
                                                               style: {
                                                                 "body": Style(
-                                                                  color: Colors
-                                                                      .black,
-                                                                ),
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontFamily:
+                                                                        'semibold',
+                                                                    fontSize:
+                                                                        FontSize(
+                                                                            16),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify),
                                                               },
                                                             )
                                                           : const Text(''),
@@ -864,7 +967,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                                 BorderRadius.circular(10)),
                                                                         content:
                                                                             Text(
-                                                                          "Do you really want to make\n changes to this message?",
+                                                                          "Do you really want to make\n changes to this circular?",
                                                                           style: TextStyle(
                                                                               fontFamily: 'regular',
                                                                               fontSize: 16,
@@ -939,8 +1042,12 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                                 Colors.black)),
                                                                     child: Row(
                                                                       children: [
-                                                                        Icon(Icons
-                                                                            .edit),
+                                                                        Icon(
+                                                                          Icons
+                                                                              .edit,
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
                                                                         Text(
                                                                           'Edit',
                                                                           style: TextStyle(
@@ -987,7 +1094,7 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                                 BorderRadius.circular(10)),
                                                                         content:
                                                                             Text(
-                                                                          "Are you sure you want to delete\n this item?",
+                                                                          "Are you sure you want to delete\n this circular?",
                                                                           style: TextStyle(
                                                                               fontFamily: 'regular',
                                                                               fontSize: 16,
@@ -1034,15 +1141,30 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                                       if (response.statusCode == 200) {
                                                                                         print('id has beeen deleted ${cirId}');
 
-                                                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                                                          SnackBar(backgroundColor: Colors.green, content: Text('Circular deleted successfully!')),
-                                                                                        );
-                                                                                        //
-                                                                                        // Refresh the news data after deletion
-                                                                                        Navigator.pop(context);
+                                                                                        // ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        //   SnackBar(backgroundColor: Colors.green, content: Text('Circular deleted successfully!')),
+                                                                                        // );
+                                                                                        // //
+                                                                                        // // Refresh the news data after deletion
+                                                                                        // Navigator.pop(context);
 
-                                                                                        //
-                                                                                        await _fetchCircular();
+                                                                                        // //
+                                                                                        // await _fetchCircular();
+                                                                                        if (mounted) {
+                                                                                          String message = 'Circular deleted successfully!';
+
+                                                                                          // If user is admin or staff, change the message
+                                                                                          if (UserSession().userType == 'admin' || UserSession().userType == 'staff') {
+                                                                                            message = 'Delete request sent successfully!';
+                                                                                          }
+
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(backgroundColor: Colors.green, content: Text(message)),
+                                                                                          );
+                                                                                        }
+
+                                                                                        Navigator.pop(context); // Close the dialog
+                                                                                        await _fetchCircular(); // Refresh the data
                                                                                       } else {
                                                                                         ScaffoldMessenger.of(context).showSnackBar(
                                                                                           SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete Circular.')),
@@ -1093,6 +1215,81 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                 ),
                                               ),
                                             ),
+
+                                            ////scheduled on  code.....
+                                            if (circularModel.status ==
+                                                'schedule')
+                                              Transform.translate(
+                                                offset: Offset(
+                                                  MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.15, // Adjust X position based on width
+                                                  MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      -0.005,
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    IntrinsicWidth(
+                                                      child: Container(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 8,
+                                                                horizontal: 20),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                          ),
+                                                          color: Color.fromRGBO(
+                                                              243, 236, 254, 1),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.circle,
+                                                              size: 12,
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      131,
+                                                                      56,
+                                                                      236,
+                                                                      1),
+                                                            ),
+                                                            Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .only(
+                                                                      left: 5),
+                                                              child: Text(
+                                                                'Scheduled For ${circular.postedOnDay} ',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontFamily:
+                                                                      'medium',
+                                                                  color: Colors
+                                                                      .black,
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
                                           ],
                                         );
                                       }),

@@ -8,7 +8,7 @@ class CircularUpdateRequest {
   final String fileType;
   final String link;
   final String status;
-  final String postedOn;
+  // final String postedOn;
   final String scheduleOn;
   final String updatedOn;
   final String recipient;
@@ -24,7 +24,7 @@ class CircularUpdateRequest {
     required this.fileType,
     required this.link,
     required this.status,
-    required this.postedOn,
+    // required this.postedOn,
     required this.scheduleOn,
     required this.updatedOn,
     required this.recipient,
@@ -41,7 +41,7 @@ class CircularUpdateRequest {
       'FileType': fileType,
       'link': link,
       'Status': status,
-      'PostedOn': postedOn,
+      // 'PostedOn': postedOn,
       'ScheduleOn': scheduleOn,
       'UpdatedOn': updatedOn,
       'Recipient': recipient,

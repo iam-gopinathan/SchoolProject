@@ -45,7 +45,7 @@ Future<void> updateExamTimeTable(
       print("All Fields: ${request.fields}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Exam TimeTable updated successfully!'),
+          content: Text('ExamTimeTable Updated Successfully!'),
           backgroundColor: Colors.green,
         ),
       );

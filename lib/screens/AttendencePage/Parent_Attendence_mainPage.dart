@@ -1,3 +1,4 @@
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Attendence_models/Parent_Attendence_mainpage_model.dart';
 import 'package:flutter_application_1/models/Attendence_models/Parent_IrregularAttendence_Model.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_application_1/services/Attendance_Api/ParentAttendence_m
 import 'package:flutter_application_1/services/Attendance_Api/ParentIrregularAttendence_API.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:intl/intl.dart';
 
 class ParentAttendenceMainpage extends StatefulWidget {
   const ParentAttendenceMainpage({super.key});
@@ -18,10 +20,14 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
   ParentattendenceResponse? attendanceData;
   ScrollController _scrollController = ScrollController();
 
+  ScrollController _linearprogresscontroller = ScrollController();
+  double _progress = 0.0;
+
   bool isLoading = true;
 
   //fetch data..
   Future<void> fetch() async {
+    String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
     setState(() {
       isLoading = true;
     });
@@ -29,13 +35,14 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
       ParentattendenceResponse? data = await fetchParentmainAttendanceData(
         userType: UserSession().userType ?? '',
         rollNumber: UserSession().rollNumber ?? '',
-        date: '',
+        date: currentDate,
       );
       if (data != null) {
         setState(() {
           print('Fetching attendance data...');
           print('UserType: ${UserSession().userType}');
           print('RollNumber: ${UserSession().rollNumber}');
+          print('Date ${currentDate}');
           attendanceData = data;
         });
       } else {
@@ -66,6 +73,15 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
     //
     // Add a listener to the ScrollController to monitor scroll changes.
     _scrollController.addListener(_scrollListener);
+    //
+    _linearprogresscontroller.addListener(() {
+      setState(() {
+        double progress = _linearprogresscontroller.offset /
+            (_linearprogresscontroller.position.maxScrollExtent);
+
+        _progress = progress.clamp(0.0, 1.0);
+      });
+    });
   }
 
   void _scrollListener() {
@@ -83,15 +99,15 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
   ParentIrregularattendenceModel? IrrData;
 
   Future<void> fetchIregular() async {
+    String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
     setState(() {
       isLoading = true;
     });
-
     try {
       final data = await fetchIrregularAttendance(
         userType: UserSession().userType ?? '',
         rollNumber: UserSession().rollNumber ?? "",
-        date: '01-01-2025',
+        date: currentDate,
       );
       setState(() {
         IrrData = data;
@@ -228,7 +244,10 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                   );
                                 }).toList();
                               },
-                              icon: Icon(Icons.arrow_drop_down),
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.black,
+                              ),
                               items: getAvailableMonths().map((String month) {
                                 return DropdownMenuItem<String>(
                                   value: month,
@@ -330,8 +349,6 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                           borderRadius: BorderRadius.only(
                                               topLeft: Radius.circular(10),
                                               topRight: Radius.circular(10)),
-                                          border: Border.all(
-                                              color: Colors.black, width: 1),
                                           color:
                                               Color.fromRGBO(239, 222, 246, 1)),
                                       child: Row(
@@ -927,20 +944,20 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
   }
   //iregular attendence fetch...
 
+  //
+  final List<Map<String, dynamic>> terms = [
+    {'term': '1 Mid Term', 'totalDays': 80, 'present': 80},
+    {
+      'term': '2 Mid Term',
+      'totalDays': 90,
+      'present': 90,
+    },
+    {'term': '3 Mid Term', 'totalDays': 90, 'present': 90},
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.white,
-      // appBar: AppBar(
-      //   iconTheme: IconThemeData(color: Colors.black),
-      //   automaticallyImplyLeading: true,
-      //   backgroundColor: AppTheme.appBackgroundPrimaryColor,
-      //   title: Text(
-      //     'Attendance',
-      //     style: TextStyle(
-      //         fontFamily: 'semibold', fontSize: 16, color: Colors.black),
-      //   ),
-      // ),
       backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -1487,7 +1504,359 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                           ),
                         ),
                       ),
-                      //irregular attendencies..
+                      //
+                      Padding(
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width *
+                                0.03), // 2% of screen width
+                        child: Card(
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(
+                                  color: Color.fromRGBO(225, 225, 225, 1))),
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(color: Colors.white),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.007, // 0.7% of screen height
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.025, // 2.5% of screen height
+                                    left: MediaQuery.of(context).size.width *
+                                        0.02,
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Attendance Graph',
+                                            style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                          //
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 10),
+                                            child: Text(
+                                              'Academic Year ${DateTime.now().year}-${DateTime.now().year + 1}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.black),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                //
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.03,
+                                        right:
+                                            MediaQuery.of(context).size.width *
+                                                0.02,
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          for (int i = 100; i >= 0; i -= 25)
+                                            Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height *
+                                                          0.02),
+                                              child: Text(
+                                                "$i",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                    //
+                                    Expanded(
+                                      child: SingleChildScrollView(
+                                        controller: _linearprogresscontroller,
+                                        scrollDirection: Axis.horizontal,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Transform.translate(
+                                            offset: Offset(0, 10),
+                                            child: Container(
+                                              height: 240,
+                                              width: 750,
+                                              child: LineChart(
+                                                LineChartData(
+                                                  gridData: FlGridData(
+                                                    show: false,
+                                                  ),
+                                                  titlesData: FlTitlesData(
+                                                    topTitles: AxisTitles(
+                                                        sideTitles: SideTitles(
+                                                            showTitles: false)),
+                                                    leftTitles: AxisTitles(
+                                                        sideTitles: SideTitles(
+                                                            showTitles: false)),
+                                                    rightTitles: AxisTitles(
+                                                        sideTitles: SideTitles(
+                                                            showTitles: false)),
+                                                    bottomTitles: AxisTitles(
+                                                      sideTitles: SideTitles(
+                                                        interval: 1,
+                                                        showTitles: true,
+                                                        getTitlesWidget:
+                                                            (value, meta) {
+                                                          List<String> months =
+                                                              [
+                                                            'Jan',
+                                                            'Feb',
+                                                            'Mar',
+                                                            'Apr',
+                                                            'May',
+                                                            'Jun',
+                                                            'Jul',
+                                                            'Aug',
+                                                            'Sep',
+                                                            'Oct',
+                                                            'Nov',
+                                                            'Dec'
+                                                          ];
+
+                                                          if (value.toInt() >=
+                                                                  0 &&
+                                                              value.toInt() <
+                                                                  months
+                                                                      .length) {
+                                                            return SideTitleWidget(
+                                                              axisSide:
+                                                                  meta.axisSide,
+                                                              space:
+                                                                  2, // Adjust spacing
+                                                              child: Text(
+                                                                  months[value
+                                                                      .toInt()],
+                                                                  style: TextStyle(
+                                                                      fontSize:
+                                                                          12,
+                                                                      fontFamily:
+                                                                          'semibold',
+                                                                      color: Colors
+                                                                          .black)),
+                                                            );
+                                                          }
+                                                          return Container();
+                                                        },
+                                                        reservedSize: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  borderData:
+                                                      FlBorderData(show: false),
+                                                  lineBarsData: [
+                                                    LineChartBarData(
+                                                      spots: [
+                                                        FlSpot(
+                                                            0,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.january ??
+                                                                0.0.toDouble()),
+                                                        FlSpot(
+                                                            1,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.february ??
+                                                                0.0.toDouble()),
+                                                        FlSpot(
+                                                            2,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.march ??
+                                                                0.0.toDouble()),
+                                                        FlSpot(
+                                                            3,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.april ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            4,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.may ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            5,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.june ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            6,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.july ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            7,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.august ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            8,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.september ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            9,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.october ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            10,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.november ??
+                                                                0.0),
+                                                        FlSpot(
+                                                            11,
+                                                            attendanceData
+                                                                    ?.attendanceGraph
+                                                                    ?.december ??
+                                                                0.0),
+                                                      ],
+                                                      isCurved: false,
+                                                      color: Color.fromRGBO(
+                                                          0, 30, 224, 1),
+                                                      barWidth: 1,
+                                                      isStrokeCapRound: true,
+                                                      belowBarData: BarAreaData(
+                                                          show: true,
+                                                          gradient:
+                                                              LinearGradient(
+                                                            colors: [
+                                                              Color.fromRGBO(
+                                                                  249,
+                                                                  250,
+                                                                  255,
+                                                                  1),
+                                                              Color.fromRGBO(
+                                                                  249,
+                                                                  250,
+                                                                  255,
+                                                                  1),
+                                                            ],
+                                                            begin: Alignment
+                                                                .topCenter,
+                                                            end: Alignment
+                                                                .bottomCenter,
+                                                          )),
+                                                      dotData:
+                                                          FlDotData(show: true),
+                                                    ),
+                                                  ],
+                                                  lineTouchData: LineTouchData(
+                                                    touchTooltipData:
+                                                        LineTouchTooltipData(
+                                                      tooltipRoundedRadius: 10,
+                                                      fitInsideHorizontally:
+                                                          true,
+                                                      fitInsideVertically: true,
+                                                      getTooltipColor:
+                                                          (group) =>
+                                                              Colors.black,
+                                                      getTooltipItems:
+                                                          (List<LineBarSpot>
+                                                              touchedSpots) {
+                                                        List<String> months = [
+                                                          'January',
+                                                          'February',
+                                                          'March',
+                                                          'April',
+                                                          'May',
+                                                          'June',
+                                                          'July',
+                                                          'August',
+                                                          'September',
+                                                          'October',
+                                                          'November',
+                                                          'December'
+                                                        ];
+
+                                                        return touchedSpots
+                                                            .map((spot) {
+                                                          int monthIndex =
+                                                              spot.x.toInt();
+                                                          String monthName = months[
+                                                              monthIndex]; // Get correct month name
+
+                                                          return LineTooltipItem(
+                                                            '$monthName\n${spot.y.toInt()}%',
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .white),
+                                                          );
+                                                        }).toList();
+                                                      },
+                                                    ),
+                                                    touchCallback:
+                                                        (FlTouchEvent event,
+                                                            LineTouchResponse?
+                                                                response) {},
+                                                    handleBuiltInTouches: true,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      //linear progress
+                      Container(
+                        width: MediaQuery.sizeOf(context).width * 0.15,
+                        height: MediaQuery.sizeOf(context).height * 0.01,
+                        child: LinearProgressIndicator(
+                          borderRadius: BorderRadius.circular(10),
+                          backgroundColor: Color.fromRGBO(225, 225, 225, 1),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.black),
+                          value: _progress,
+                        ),
+                      ),
+//irregular attendencies..
                       Padding(
                         padding: EdgeInsets.all(
                             MediaQuery.of(context).size.width *

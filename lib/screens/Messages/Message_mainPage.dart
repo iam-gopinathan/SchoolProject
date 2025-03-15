@@ -96,13 +96,11 @@ class _MessageMainpageState extends State<MessageMainpage> {
   ///
   Future<void> _fetchPosts() async {
     String isMyProject = isswitched ? 'Y' : 'N';
-
     setState(() {
       isLoading = true;
       posts = [];
       filteredMessageList = [];
     });
-
     try {
       List<Post> fetchedPosts = await fetchPosts(
         rollNumber: UserSession().rollNumber ?? '',
@@ -110,7 +108,6 @@ class _MessageMainpageState extends State<MessageMainpage> {
         isMyProject: isMyProject,
         date: selectedDate,
       );
-
       print('Fetched posts count: ${fetchedPosts.length}');
       fetchedPosts.forEach((post) {
         print('Post Date: ${post.postedOnDate}');
@@ -121,7 +118,6 @@ class _MessageMainpageState extends State<MessageMainpage> {
           });
         }
       });
-
       setState(() {
         isLoading = false;
         posts = fetchedPosts;
@@ -339,7 +335,11 @@ class _MessageMainpageState extends State<MessageMainpage> {
                           decoration: InputDecoration(
                               contentPadding: EdgeInsets.symmetric(vertical: 5),
                               prefixIcon: Transform.translate(
-                                offset: Offset(75, 0),
+                                offset: Offset(
+                                  MediaQuery.of(context).size.width *
+                                      0.18, // Adjust 75 dynamically
+                                  MediaQuery.of(context).size.height * 0.0,
+                                ),
                                 child: Icon(Icons.search,
                                     color: Color.fromRGBO(178, 178, 178, 1)),
                               ),
@@ -379,17 +379,30 @@ class _MessageMainpageState extends State<MessageMainpage> {
                     color: AppTheme.textFieldborderColor,
                   ))
                 : posts.isEmpty
-                    ? Center(
-                        child: Text(
-                          "You haven’t made anything yet;\nstart creating now!",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontFamily: 'regular',
-                            color: Color.fromRGBO(145, 145, 145, 1),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      )
+                    ? (UserSession().userType == 'student' ||
+                            UserSession().userType == 'teacher')
+                        ? Center(
+                            child: Text(
+                              "No messages from the school yet. Stay tuned for updates!",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'regular',
+                                color: Color.fromRGBO(145, 145, 145, 1),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
+                        : Center(
+                            child: Text(
+                              "You haven’t made anything yet;\nstart creating now!",
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontFamily: 'regular',
+                                color: Color.fromRGBO(145, 145, 145, 1),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          )
                     : ListView.builder(
                         controller: _scrollController,
                         itemCount: filteredMessageList.length,
@@ -401,24 +414,76 @@ class _MessageMainpageState extends State<MessageMainpage> {
                           if (index < post.messages.length) {
                             print(
                                 'filteredMessageList length: ${filteredMessageList.length}');
+                            filteredMessageList.forEach((post) {
+                              post.messages.forEach((msg) {
+                                print(
+                                    'Message Status: ${msg.status}, Headline: ${msg.headLine}');
+                              });
+                            });
+
                             return Column(
                               children: [
                                 ////upcoming message
+                                // if (post.messages[index].status == 'schedule')
+                                // if (filteredMessageList.any((post) => post
+                                //     .messages
+                                //     .any((msg) => msg.status == 'schedule')))
                                 if (post.messages[index].status == 'schedule')
+                                  // Padding(
+                                  //   padding: const EdgeInsets.only(top: 15),
+                                  //   child: ElevatedButton(
+                                  //     style: ElevatedButton.styleFrom(
+                                  //         backgroundColor:
+                                  //             Color.fromRGBO(131, 56, 236, 1)),
+                                  //     onPressed: () {},
+                                  //     child: Text(
+                                  //       'Upcoming Messages',
+                                  //       style: TextStyle(
+                                  //           fontSize: 14,
+                                  //           color: Colors.white,
+                                  //           fontFamily: 'medium'),
+                                  //     ),
+                                  //   ),
+                                  // ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 15),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              Color.fromRGBO(131, 56, 236, 1)),
-                                      onPressed: () {},
-                                      child: Text(
-                                        'Upcoming Messages',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.white,
-                                            fontFamily: 'medium'),
-                                      ),
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.02,
+                                            bottom: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.017,
+                                          ),
+                                          child: ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    10))),
+                                                backgroundColor: Color.fromRGBO(
+                                                    131, 56, 236, 1)),
+                                            onPressed: () {},
+                                            child: Text(
+                                              'Upcoming Messages',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                  fontFamily: 'medium'),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 //card
@@ -629,9 +694,16 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                   '${message.message}',
                                                               style: {
                                                                 "body": Style(
-                                                                  color: Colors
-                                                                      .black,
-                                                                ),
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontSize:
+                                                                        FontSize(
+                                                                            16),
+                                                                    fontFamily:
+                                                                        'semibold',
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify),
                                                               },
                                                             )
                                                           : const Text(''),
@@ -796,8 +868,12 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                                 Colors.black)),
                                                                     child: Row(
                                                                       children: [
-                                                                        Icon(Icons
-                                                                            .edit),
+                                                                        Icon(
+                                                                          Icons
+                                                                              .edit,
+                                                                          color:
+                                                                              Colors.black,
+                                                                        ),
                                                                         Text(
                                                                           'Edit',
                                                                           style: TextStyle(
@@ -843,7 +919,7 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                                 BorderRadius.circular(10)),
                                                                         content:
                                                                             Text(
-                                                                          "Are you sure you want to delete\n this item?",
+                                                                          "Are you sure you want to delete this Message?",
                                                                           style: TextStyle(
                                                                               fontFamily: 'regular',
                                                                               fontSize: 16,
@@ -890,13 +966,28 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                                       if (response.statusCode == 200) {
                                                                                         print('id has beeen deleted $messageId');
 
-                                                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                                                          SnackBar(backgroundColor: Colors.green, content: Text('Message deleted successfully!')),
-                                                                                        );
-                                                                                        //
-                                                                                        Navigator.pop(context);
-                                                                                        //
-                                                                                        await _fetchPosts();
+                                                                                        // ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        //   SnackBar(backgroundColor: Colors.green, content: Text('Message deleted successfully!')),
+                                                                                        // );
+                                                                                        // //
+                                                                                        // Navigator.pop(context);
+                                                                                        // //
+                                                                                        // await _fetchPosts();
+                                                                                        if (mounted) {
+                                                                                          String message = 'Message deleted successfully!';
+
+                                                                                          // If user is admin or staff, change the message
+                                                                                          if (UserSession().userType == 'admin' || UserSession().userType == 'staff') {
+                                                                                            message = 'Delete request sent successfully!';
+                                                                                          }
+
+                                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                                            SnackBar(backgroundColor: Colors.green, content: Text(message)),
+                                                                                          );
+                                                                                        }
+
+                                                                                        Navigator.pop(context); // Close the dialog
+                                                                                        await _fetchPosts(); // Refresh the data
                                                                                       } else {
                                                                                         ScaffoldMessenger.of(context).showSnackBar(
                                                                                           SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete message.')),
@@ -947,10 +1038,20 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                             ),
                                           ),
                                           ////scheduled on  code.....
+
                                           if (post.messages[index].status ==
                                               'schedule')
                                             Transform.translate(
-                                              offset: Offset(65, -20),
+                                              offset: Offset(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.15, // Adjust 65 dynamically
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    -0.027, // Adjust -20 dynamically
+                                              ),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,

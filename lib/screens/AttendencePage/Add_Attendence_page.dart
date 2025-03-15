@@ -1220,11 +1220,32 @@ class _AddAttendencePageState extends State<AddAttendencePage> {
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.only(left: 5),
+                                        // child: CircleAvatar(
+                                        //   radius: 30,
+                                        //   backgroundImage: NetworkImage(
+                                        //     '${filteredStudents[index].studentPicture ?? ''}',
+                                        //   ),
+                                        // ),
                                         child: CircleAvatar(
                                           radius: 30,
-                                          backgroundImage: NetworkImage(
-                                            '${filteredStudents[index].studentPicture ?? ''}',
-                                          ),
+                                          backgroundImage: (filteredStudents[
+                                                              index]
+                                                          .studentPicture !=
+                                                      null &&
+                                                  filteredStudents[index]
+                                                      .studentPicture!
+                                                      .isNotEmpty &&
+                                                  Uri.tryParse(filteredStudents[
+                                                                  index]
+                                                              .studentPicture!)
+                                                          ?.hasAbsolutePath ==
+                                                      true)
+                                              ? NetworkImage(
+                                                  filteredStudents[index]
+                                                      .studentPicture!)
+                                              : AssetImage(
+                                                      'assets/images/Dashboard_profileimage.png')
+                                                  as ImageProvider,
                                         ),
                                       ),
                                     ],

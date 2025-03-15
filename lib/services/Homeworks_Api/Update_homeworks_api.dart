@@ -31,13 +31,17 @@ Future<void> updateHomework(
       print("Request Fields: ${request.toFormData()}");
 
       print("Homework updated successfully!");
+      // Show a success message based on the status
+      String message = request.status == 'schedule'
+          ? 'Homework Scheduled successfully!'
+          : 'Homework updated successfully!';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Homework updated successfully!'),
+          content: Text(message),
           backgroundColor: Colors.green,
         ),
       );
-
       // Add a delay of 2 seconds before navigating
       await Future.delayed(Duration(seconds: 2));
 

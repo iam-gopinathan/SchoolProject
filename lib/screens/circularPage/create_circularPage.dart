@@ -11,7 +11,7 @@ import 'package:flutter_application_1/services/Circular_Api/Create_circular_Api.
 import 'package:flutter_application_1/services/Message_Api/Grade_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Style;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
@@ -25,8 +25,18 @@ class CreateCircularpage extends StatefulWidget {
 }
 
 class _CreateCircularpageState extends State<CreateCircularpage> {
+  // Function to paste clipboard text
+  Future<void> _pasteFromClipboard() async {
+    ClipboardData? clipboardData =
+        await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData != null && clipboardData.text != null) {
+      _controller.document
+          .insert(_controller.selection.baseOffset, clipboardData.text!);
+    }
+  }
+
   List<String> dropdownItems = ['Everyone', 'Students', 'Teachers'];
-  String? selectedRecipient;
+  String? selectedRecipient = 'Everyone';
 
   List<String> selected = [];
   List<GradeGet> grades = [];
@@ -95,15 +105,15 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
   ///image bottomsheeet
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
@@ -131,133 +141,156 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              selectedRecipient.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //class
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: Text(
-                                selected.toString(),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-//heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: Text(
-                                _heading.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //description...
-                      Row(
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
                         children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            padding: const EdgeInsets.all(10),
-                            child: htmlContent.isNotEmpty
-                                ? Html(data: htmlContent)
-                                : const Text(''),
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
                           ),
                         ],
                       ),
-                      //image..
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 2,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
+                    ),
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
                           children: [
-                            Text(
-                              _scheduledDateandtime.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                            //
+                            if (selectedRecipient?.isNotEmpty ?? false)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      selectedRecipient ?? "",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //
+                            //class
+                            if (selected.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.8,
+                                      child: Text(
+                                        selected.toString(),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //heading...
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    child: Text(
+                                      _heading.text,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            //description...
+                            Row(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  padding: const EdgeInsets.all(10),
+                                  child: htmlContent.isNotEmpty
+                                      ? Html(
+                                          data: htmlContent,
+                                          style: {
+                                            "body": Style(
+                                                fontFamily: 'semibold',
+                                                fontSize: FontSize(16),
+                                                textAlign: TextAlign.justify)
+                                          },
+                                        )
+                                      : const Text(''),
+                                ),
+                              ],
+                            ),
+                            //image..
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Center(
+                                child: selectedFile != null &&
+                                        selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(),
+                              ),
+                            ),
+                            //
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _scheduledDateandtime.text,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )
             ]);
-          });
-        });
+          },
+        );
+      },
+    );
   }
-
-  //show menu..
 
 //show menu............
   void _showMenu(
@@ -422,20 +455,25 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -516,14 +554,10 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: DropdownButtonFormField<String>(
+                        value: selectedRecipient,
                         decoration: InputDecoration(
                           contentPadding:
                               EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                          hintText: 'Select Recipient',
-                          hintStyle: TextStyle(
-                              fontFamily: 'regular',
-                              fontSize: 14,
-                              color: Colors.black),
                           enabledBorder: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Color.fromRGBO(203, 203, 203, 1),
@@ -768,7 +802,7 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 5),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           QuillSimpleToolbar(
                             controller: _controller,
@@ -813,8 +847,16 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                               showUndo: false,
                               showUnderLineButton: false,
                               showSuperscript: false,
+                              showClipboardCopy: false,
                             ),
                           ),
+                          IconButton(
+                              icon: Icon(Icons.paste, color: Colors.black),
+                              onPressed: () {
+                                setState(() {
+                                  _pasteFromClipboard();
+                                });
+                              }),
                         ],
                       ),
                     ),
@@ -850,7 +892,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ],
               ),
             ),
-
             // Upload Image and Add Link Section
             Padding(
               padding: const EdgeInsets.only(left: 15, top: 30),
@@ -883,8 +924,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ],
               ),
             ),
-
-            ///upload sections....
             if (isuploadimage)
 
               ///upload section
@@ -958,6 +997,19 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ),
               ),
 
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Supported Format : JPEG,Webp PNG, PDF',
+                  style: TextStyle(
+                      fontFamily: 'regular',
+                      fontSize: 9,
+                      color: Color.fromRGBO(168, 168, 168, 1)),
+                ),
+              ],
+            ),
+
             /// Display selected image...
             if (isuploadimage)
               if (selectedFile != null)
@@ -1026,7 +1078,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ),
 
             /// Display Selected File end...
-
             //addlink tab....
             if (isaddLink)
               Padding(
@@ -1039,6 +1090,11 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                   child: Container(
                       height: 50,
                       child: TextFormField(
+                        style: TextStyle(
+                          color: Colors.black, // Set input text color to black
+                          fontSize: 14,
+                          fontFamily: 'regular',
+                        ),
                         controller: _linkController,
                         decoration: InputDecoration(
                             fillColor: Color.fromRGBO(228, 238, 253, 1)
@@ -1054,19 +1110,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                       )),
                 ),
               ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-              ],
-            ),
             //schedule post...
             Padding(
               padding: EdgeInsets.only(
@@ -1087,7 +1130,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
@@ -1147,19 +1189,55 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(horizontal: 15),
+              //       backgroundColor: Colors.white,
+              //       side: BorderSide(color: Colors.black, width: 1.5)),
+              //   onPressed: () {
+              //     _createcircular("draft");
+              //   },
+              //   child: Text(
+              //     'Save as Draft',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  _createcircular("draft");
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.black, width: 1.5),
                 ),
+                onPressed: isdraft
+                    ? null // Disable button while loading
+                    : () async {
+                        setState(() {
+                          isdraft = true; // Show progress
+                        });
+
+                        await _createcircular("draft"); // Call API
+
+                        setState(() {
+                          isdraft = false; // Hide progress after submission
+                        });
+                      },
+                child: isdraft
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.textFieldborderColor,
+                        ),
+                      )
+                    : Text(
+                        'Save as Draft',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
 
               ///preview
@@ -1187,28 +1265,65 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
               ),
 
               ///scheduled or post
+              // if (UserSession().userType == 'superadmin')
+              //   ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //         padding: EdgeInsets.symmetric(horizontal: 15),
+              //         backgroundColor: AppTheme.textFieldborderColor,
+              //         side: BorderSide.none),
+              //     onPressed: () {
+              //       if (_scheduledDateandtime.text.isEmpty) {
+              //         _createcircular("post");
+              //       } else {
+              //         _createcircular("schedule");
+              //       }
+              //     },
+              //     child: Text(
+              //       _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
+              //       style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'medium',
+              //           color: Colors.black),
+              //     ),
+              //   ),
               if (UserSession().userType == 'superadmin')
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       backgroundColor: AppTheme.textFieldborderColor,
                       side: BorderSide.none),
-                  onPressed: () {
-                    if (_scheduledDateandtime.text.isEmpty) {
-                      _createcircular("post");
-                    } else {
-                      _createcircular("schedule");
-                    }
-                  },
-                  child: Text(
-                    _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'medium',
-                        color: Colors.black),
-                  ),
-                ),
+                  onPressed: isLoading
+                      ? null // Disable button when loading
+                      : () {
+                          setState(() {
+                            isLoading = true; // Show loader
+                          });
 
+                          if (_scheduledDateandtime.text.isEmpty) {
+                            _createcircular("post");
+                          } else {
+                            _createcircular("schedule");
+                          }
+                        },
+                  child: isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: AppTheme.textFieldborderColor,
+                            strokeWidth: 4,
+                          ),
+                        )
+                      : Text(
+                          _scheduledDateandtime.text.isEmpty
+                              ? 'Publish'
+                              : 'Schedule',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'medium',
+                              color: Colors.black),
+                        ),
+                ),
               ////request now..
               if (UserSession().userType == 'admin' ||
                   UserSession().userType == 'staff')
@@ -1311,10 +1426,11 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
 
   // Method to show date picker
   Future<void> _pickDate() async {
+    DateTime now = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2101),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -1393,7 +1509,12 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
     return null;
   }
 
-  void _createcircular(String status) {
+//
+  bool isdraft = false;
+//
+  bool isLoading = false;
+//create function...
+  Future<void> _createcircular(String status) async {
     //
     final generatedHtml = QuillDeltaToHtmlConverter(
       _controller.document.toDelta().toJson(),
@@ -1403,13 +1524,17 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
     // Print the generated HTML content for debugging
     print("Generated HTML Content: $htmlContent");
     //
-    if (_heading.text.isEmpty || htmlContent.isEmpty) {
+    if (_heading.text.isEmpty ||
+        _controller.document.toPlainText().trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
           content: Text('Please fill in both heading and description'),
         ),
       );
+      setState(() {
+        isLoading = false; // Stop loading if validation fails
+      });
       return;
     }
     //
@@ -1461,6 +1586,6 @@ class _CreateCircularpageState extends State<CreateCircularpage> {
       link: link,
     );
 
-    postCircular(circular, selectedFile, context, widget.fetchcircular);
+    await postCircular(circular, selectedFile, context, widget.fetchcircular);
   }
 }

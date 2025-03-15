@@ -12,6 +12,8 @@ class EditNewsModel {
   final String? updatedOn;
   final String? rollNumber; // Add rollNumber here
   final String? userType; // Add userType here
+  final String? filepath;
+  String? scheduleOnRailwayTime;
 
   EditNewsModel({
     this.id,
@@ -27,24 +29,28 @@ class EditNewsModel {
     this.updatedOn,
     this.rollNumber, // Add rollNumber to the constructor
     this.userType, // Add userType to the constructor
+    this.filepath,
+    this.scheduleOnRailwayTime,
   });
 
   factory EditNewsModel.fromJson(Map<String, dynamic> json) {
     return EditNewsModel(
-      id: json['id'],
-      headline: json['headLine'] ?? '',
-      news: json['news'] ?? '',
-      fileType: json['filetype'] ?? '',
-      file: json['filepath'] ?? '',
-      link: json['filename'] ?? '',
-      postedOn: json['postedOn'] ?? '',
-      status: json['status'] ?? '',
-      scheduleOn: json['scheduleOn'],
-      draftedOn: json['draftedOn'],
-      updatedOn: json['updatedOn'],
-      rollNumber:
-          json['rollNumber'], // Ensure rollNumber is included in the JSON
-      userType: json['userType'], // Ensure userType is included in the JSON
-    );
+        id: json['id'],
+        headline: json['headLine'] ?? '',
+        news: json['news'] ?? '',
+        fileType: json['filetype'] ?? '',
+        file: json['filepath'] ?? '',
+        link: json['filename'] ?? '',
+        postedOn: json['postedOn'] ?? '',
+        status: json['status'] ?? '',
+        scheduleOn: json['scheduleOn'],
+        draftedOn: json['draftedOn'],
+        updatedOn: json['updatedOn'],
+        rollNumber:
+            json['rollNumber'], // Ensure rollNumber is included in the JSON
+        userType: json['userType'], // Ensure userType is included in the JSON
+
+        filepath: json['filepath'],
+        scheduleOnRailwayTime: json['scheduleOnRailwayTime'] ?? '');
   }
 }

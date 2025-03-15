@@ -208,7 +208,7 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
           : fetchedConsentDataParentForm.isEmpty
               ? Center(
                   child: Text(
-                    "You haven’t made anything yet\nstart creating now!",
+                    "No messages from the school yet. Stay tuned for updates!",
                     style: TextStyle(
                       fontSize: 22,
                       fontFamily: 'regular',
@@ -272,9 +272,8 @@ class _ParentyesornoPageState extends State<ParentyesornoPage> {
                             //card section
                             // ...e.fromParents.map((consent) {
                             ...e.fromParents.asMap().entries.map((entry) {
-                              int index = entry.key; // Get the index
-                              var consent = entry
-                                  .value; // Get the consent object (each item in the list)
+                              int index = entry.key;
+                              var consent = entry.value;
 
                               return Padding(
                                 padding: EdgeInsets.all(

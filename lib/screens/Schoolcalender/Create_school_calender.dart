@@ -7,6 +7,7 @@ import 'package:flutter_application_1/services/school_Calendar_Api/Create_school
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
+
 import 'package:intl/intl.dart';
 
 class CreateSchoolCalender extends StatefulWidget {
@@ -25,10 +26,11 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
   TextEditingController _enddate = TextEditingController();
 
   Future<void> _selectStartDate(BuildContext context) async {
+    DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2100),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -56,10 +58,11 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
   }
 
   Future<void> _selectEndDate(BuildContext context) async {
+    DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2100),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -167,26 +170,59 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
           },
         ) ??
         false;
+  }
+
+  // Regular expression to validate YouTube links
+  bool isValidYouTubeLink(String url) {
+    final RegExp youtubeRegex = RegExp(
+      r'^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  //
+  String? _errorMessage;
+  void _validateLink(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _errorMessage = "";
+      });
+    } else if (!isValidYouTubeLink(input)) {
+      setState(() {
+        _errorMessage = "Enter a valid YouTube link";
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
   }
 
   @override
@@ -710,6 +746,7 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                         child: GestureDetector(
                           onTap: () {
                             pickFile();
+                            _linkController.text = '';
                           },
                           child: Container(
                             color: Color.fromRGBO(228, 238, 253, 1)
@@ -769,6 +806,22 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                           ),
                         ),
                       ),
+                    ),
+                  ),
+                if (isuploadimage)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Supported Format : JPEG,Webp PNG, PDF',
+                          style: TextStyle(
+                              fontFamily: 'regular',
+                              fontSize: 9,
+                              color: Color.fromRGBO(168, 168, 168, 1)),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -838,7 +891,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                         ],
                       ),
                     ),
-
                 //addlink tab....
                 if (isaddLink)
                   Padding(
@@ -849,39 +901,59 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
                       color: Color.fromRGBO(0, 102, 255, 1),
                       strokeWidth: 2,
                       child: Container(
-                          height: 50,
-                          child: TextFormField(
-                            controller: _linkController,
-                            decoration: InputDecoration(
-                                fillColor: Color.fromRGBO(228, 238, 253, 1)
-                                    .withOpacity(0.9),
-                                filled: true,
-                                hintText: 'Paste Link Here',
-                                hintStyle: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 14,
-                                    color: Color.fromRGBO(0, 102, 255, 1)),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none)),
-                          )),
-                    ),
-                  ),
-                if (isuploadimage)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Supported Format : JPEG,Webp PNG, PDF',
+                        height: 50,
+                        child: TextFormField(
                           style: TextStyle(
-                              fontFamily: 'regular',
-                              fontSize: 9,
-                              color: Color.fromRGBO(168, 168, 168, 1)),
+                            color:
+                                Colors.black, // Set input text color to black
+                            fontSize: 14,
+                            fontFamily: 'regular',
+                          ),
+                          onChanged: (value) {
+                            //
+                            _validateLink(value);
+                            //
+                            selectedFile = null;
+                          },
+                          controller: _linkController,
+                          decoration: InputDecoration(
+                            fillColor: Color.fromRGBO(228, 238, 253, 1)
+                                .withOpacity(0.9),
+                            filled: true,
+                            hintText: 'Paste Link Here',
+                            hintStyle: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 14,
+                                color: Color.fromRGBO(0, 102, 255, 1)),
+                            border:
+                                OutlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter a link";
+                            } else if (!isValidYouTubeLink(value)) {
+                              return "Enter a valid YouTube link";
+                            }
+                            return null;
+                          },
                         ),
-                      ],
+                      ),
                     ),
                   ),
+                // Show error message below TextFormField
+                if (isaddLink && _linkController.text.isNotEmpty)
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, left: 5),
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 12,
+                            fontFamily: 'semibold'),
+                      ),
+                    ),
+                //
                 if (isaddLink)
                   Padding(
                     padding: const EdgeInsets.only(top: 5, bottom: 10),
@@ -931,22 +1003,53 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
               ),
 
               ///scheduled
+              // Padding(
+              //   padding: const EdgeInsets.only(left: 10),
+              //   child: ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //         backgroundColor: AppTheme.textFieldborderColor,
+              //         side: BorderSide.none),
+              //     onPressed: () {
+              //       _createschoolcalender();
+              //     },
+              //     child: Text(
+              //       'Publish',
+              //       style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'semibold',
+              //           color: Colors.black),
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.only(left: 10),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.textFieldborderColor,
-                      side: BorderSide.none),
-                  onPressed: () {
-                    _createschoolcalender();
-                  },
-                  child: Text(
-                    'Publish',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'semibold',
-                        color: Colors.black),
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none,
                   ),
+                  onPressed: isLoading
+                      ? null // Disable button when loading
+                      : () {
+                          _createschoolcalender();
+                        },
+                  child: isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: AppTheme.textFieldborderColor,
+                            strokeWidth: 4,
+                          ),
+                        )
+                      : Text(
+                          'Publish',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'semibold',
+                            color: Colors.black,
+                          ),
+                        ),
                 ),
               ),
             ],
@@ -956,20 +1059,38 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
     );
   }
 
+  //
+  bool isLoading = false;
+
 //create school calender...
-  void _createschoolcalender() {
-    if (_startdate.text.isEmpty ||
-        _heading.text.isEmpty ||
-        _desc.text.isEmpty) {
+
+  Future<void> _createschoolcalender() async {
+    if (_startdate.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text('Please select start date!'),
+      ));
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+    if (_heading.text.isEmpty || _desc.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
-          content:
-              Text('Please fill in the heading, description, and start date'),
+          content: Text('Please fill in the heading and description'),
         ),
       );
+      setState(() {
+        isLoading = false;
+      });
       return;
     }
+    //
+    setState(() {
+      isLoading = true;
+    });
 
     String fileType =
         'empty'; // Default to 'empty' if no file or link is chosen
@@ -982,6 +1103,16 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
     } else if (isaddLink && _linkController.text.isNotEmpty) {
       fileType = 'link';
       link = _linkController.text;
+      // Validate YouTube Link
+      if (!isValidYouTubeLink(link)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Invalid YouTube link. Please enter a valid link.'),
+          ),
+        );
+        return;
+      }
     }
 
     CreateSchoolCalendarModel create = CreateSchoolCalendarModel(
@@ -996,6 +1127,6 @@ class _CreateSchoolCalenderState extends State<CreateSchoolCalender> {
       toDate: _enddate.text,
     );
 
-    postSchoolCalendar(create, context, widget.fetchStudentCalendar);
+    await postSchoolCalendar(create, context, widget.fetchStudentCalendar);
   }
 }

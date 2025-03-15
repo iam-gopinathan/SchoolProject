@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
+import 'package:flutter_application_1/screens/Communication.dart';
 import 'package:flutter_application_1/screens/Dashboard.dart';
+import 'package:flutter_application_1/screens/Parent_communication_Page.dart';
 import 'package:flutter_application_1/services/auth_services.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Name.dart';
 import 'package:flutter_application_1/utils/theme.dart';
@@ -26,8 +28,77 @@ class _LoginpageState extends State<Loginpage> {
   String? _usernameErrorMessage;
   String? _passwordErrorMessage;
 
-//login function....
+// //login function....
+//   bool _isLoading = false;
+//   Future<void> _login() async {
+//     if (_formKey.currentState!.validate()) {
+//       String username = _usernamecontroller.text;
+//       String password = _passwordcontroller.text;
+//       print('Attempting to login with Username: $username');
 
+//       try {
+//         final response = await _authService.login(username, password);
+//         print('Full API response: $response');
+
+//         String message = response['message'];
+
+//         setState(() {
+//           _usernameErrorMessage = null;
+//           _passwordErrorMessage = null;
+//         });
+
+//         _isLoading = true;
+
+//         if (response['success'] == true) {
+//           String rollNumber = response['rollNumber'];
+//           String userType = response['userType'];
+
+//           final dashboardData = await fetchDashboardData(rollNumber, userType);
+
+//           setState(() {
+//             _isLoading = false;
+//           });
+
+//           if (dashboardData != null) {
+//             Navigator.push(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => Dashboard(
+//                   username: dashboardData.userDetails.username,
+//                   userType: dashboardData.userDetails.usertype,
+//                   imagePath: dashboardData.userDetails.filepath,
+//                   newsArticles: widget.newsArticles,
+//                 ),
+//               ),
+//             );
+//           } else {
+//             _usernameErrorMessage =
+//                 'Failed to load dashboard data. Please try again.';
+//             setState(() {});
+//           }
+//         } else {
+//           _isLoading = false;
+//           if (message == "Invalid Username") {
+//             _usernameErrorMessage = 'Please enter a valid username.';
+//           } else if (message == "Invalid Password") {
+//             _passwordErrorMessage = 'Please enter a valid password.';
+//           } else {
+//             _usernameErrorMessage = 'Invalid username or password.';
+//           }
+//           setState(() {});
+//         }
+//       } catch (e) {
+//         print('Error during login: $e');
+//         setState(() {
+//           _usernameErrorMessage =
+//               'An unexpected error occurred. Please try again.';
+//           _passwordErrorMessage = null;
+//         });
+//       }
+//     } else {
+//       print('Form validation failed');
+//     }
+//   }
   bool _isLoading = false;
 
   Future<void> _login() async {
@@ -35,6 +106,10 @@ class _LoginpageState extends State<Loginpage> {
       String username = _usernamecontroller.text;
       String password = _passwordcontroller.text;
       print('Attempting to login with Username: $username');
+
+      setState(() {
+        _isLoading = true;
+      });
 
       try {
         final response = await _authService.login(username, password);
@@ -60,17 +135,31 @@ class _LoginpageState extends State<Loginpage> {
           });
 
           if (dashboardData != null) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => Dashboard(
-                  username: dashboardData.userDetails.username,
-                  userType: dashboardData.userDetails.usertype,
-                  imagePath: dashboardData.userDetails.filepath,
-                  newsArticles: widget.newsArticles,
+            if (userType == "student") {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ParentCommunicationPage(
+                    username: dashboardData.userDetails.username,
+                    userType: dashboardData.userDetails.usertype,
+                    imagePath: dashboardData.userDetails.filepath,
+                    newsArticles: widget.newsArticles,
+                  ),
                 ),
-              ),
-            );
+              );
+            } else {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Dashboard(
+                    username: dashboardData.userDetails.username,
+                    userType: dashboardData.userDetails.usertype,
+                    imagePath: dashboardData.userDetails.filepath,
+                    newsArticles: widget.newsArticles,
+                  ),
+                ),
+              );
+            }
           } else {
             _usernameErrorMessage =
                 'Failed to load dashboard data. Please try again.';
@@ -188,6 +277,7 @@ class _LoginpageState extends State<Loginpage> {
                     color: Color.fromRGBO(255, 255, 255, 0.7),
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: TextFormField(
+                      cursorColor: Colors.black,
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 14,
@@ -255,6 +345,7 @@ class _LoginpageState extends State<Loginpage> {
                     color: Color.fromRGBO(255, 255, 255, 0.7),
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: TextFormField(
+                      cursorColor: Colors.black,
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 14,
@@ -412,8 +503,9 @@ class _LoginpageState extends State<Loginpage> {
                               for (var article in widget.newsArticles)
                                 Padding(
                                   padding: const EdgeInsets.only(
-                                      left: 20, right: 20, top: 12, bottom: 10),
+                                      left: 10, right: 0, top: 12, bottom: 10),
                                   child: Card(
+                                    elevation: 0,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       side: BorderSide(
@@ -480,21 +572,25 @@ class _LoginpageState extends State<Loginpage> {
                                               color: Colors.black,
                                               thickness: 0.5,
                                             ),
+                                            //
                                             Transform.translate(
                                               offset: Offset(-6, 0),
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    bottom: 0),
+                                              child: Container(
                                                 child: Html(
                                                   data: article.newsContent,
                                                   style: {
                                                     "body": Style(
                                                       color: Colors.black,
+                                                      fontSize: FontSize(16),
+                                                      fontFamily: 'semibold',
+                                                      textAlign:
+                                                          TextAlign.justify,
                                                     ),
                                                   },
                                                 ),
                                               ),
                                             ),
+                                            //
                                             if (article.filePath
                                                     .contains('youtube.com') ||
                                                 article.filePath

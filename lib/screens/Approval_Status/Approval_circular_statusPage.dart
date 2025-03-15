@@ -306,11 +306,18 @@ class _ApprovalCircularStatuspageState
                               Container(
                                 width: MediaQuery.of(context).size.width * 0.8,
                                 child: TextFormField(
+                                  cursorColor: Colors.black,
                                   controller: searchController,
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
+                                    contentPadding:
+                                        EdgeInsets.symmetric(vertical: 5),
                                     prefixIcon: Transform.translate(
-                                      offset: Offset(50, 0),
+                                      offset: Offset(
+                                        MediaQuery.of(context).size.width *
+                                            0.12, // Responsive X-axis (60)
+                                        0,
+                                      ),
                                       child: Icon(Icons.search,
                                           color:
                                               Color.fromRGBO(178, 178, 178, 1)),
@@ -519,7 +526,16 @@ class _ApprovalCircularStatuspageState
                                                       .size
                                                       .width *
                                                   0.8,
-                                              child: Html(data: e.circular),
+                                              child: Html(
+                                                data: e.circular,
+                                                style: {
+                                                  "body": Style(
+                                                      fontFamily: 'semibold',
+                                                      fontSize: FontSize(16),
+                                                      textAlign:
+                                                          TextAlign.justify)
+                                                },
+                                              ),
                                             )
                                           ],
                                         ),
@@ -660,7 +676,7 @@ class _ApprovalCircularStatuspageState
                                                                       .circular(
                                                                           10)),
                                                           content: Text(
-                                                            "Do you really want to Delete\n  to this News?",
+                                                            "Do you really want to Delete\n  this News?",
                                                             style: TextStyle(
                                                                 fontFamily:
                                                                     'regular',
@@ -721,10 +737,10 @@ class _ApprovalCircularStatuspageState
                                                                                   .none),
                                                                           onPressed:
                                                                               () async {
-                                                                            var dnewsID =
+                                                                            var dcirID =
                                                                                 e.id;
                                                                             //
-                                                                            Future<void> deleteNews(
+                                                                            Future<void> deletecirular(
                                                                                 String id,
                                                                                 String rollNumber,
                                                                                 String userType) async {
@@ -735,7 +751,7 @@ class _ApprovalCircularStatuspageState
                                                                                 'Authorization': 'Bearer $authToken',
                                                                               };
                                                                               final Map<String, String> params = {
-                                                                                'Id': dnewsID.toString(),
+                                                                                'Id': dcirID.toString(),
                                                                                 'RollNumber': UserSession().rollNumber ?? '',
                                                                                 'UserType': UserSession().userType ?? ''
                                                                               };
@@ -748,11 +764,19 @@ class _ApprovalCircularStatuspageState
                                                                                 print(url);
 
                                                                                 if (response.statusCode == 200) {
-                                                                                  print('News deleted successfully $dnewsID');
+                                                                                  print('News deleted successfully $dcirID');
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                                    backgroundColor: Colors.green,
+                                                                                    content: Text('Circular deleted successfully'),
+                                                                                  ));
                                                                                   //
                                                                                   Navigator.pop(context);
                                                                                   await fetchCircularApproval();
                                                                                 } else {
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                                    backgroundColor: Colors.red,
+                                                                                    content: Text('Failed to delete Circular. Status code: ${response.statusCode}'),
+                                                                                  ));
                                                                                   print('Failed to delete news. Status code: ${response.statusCode}');
                                                                                 }
                                                                               } catch (e) {
@@ -762,8 +786,8 @@ class _ApprovalCircularStatuspageState
 
                                                                             print('object');
                                                                             //
-                                                                            await deleteNews(
-                                                                                dnewsID.toString(),
+                                                                            await deletecirular(
+                                                                                dcirID.toString(),
                                                                                 UserSession().rollNumber ?? '',
                                                                                 UserSession().userType ?? '');
                                                                           },
@@ -928,7 +952,7 @@ class _ApprovalCircularStatuspageState
                         );
                       }),
                 ),
-                //
+
                 //top arrow..
                 if (_scrollController.hasClients &&
                     _scrollController.offset > 50)

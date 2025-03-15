@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
@@ -17,9 +18,14 @@ class AuthService {
 
     print('Login URL: $url');
 
+    // Get the FCM Token
+    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    print("FCM Token: $fcmToken");
+
     Map<String, String> requestBody = {
       'userName': username,
       'password': password,
+      'FCM': fcmToken ?? ''
     };
 
     try {
@@ -30,6 +36,9 @@ class AuthService {
         headers: headers,
         body: json.encode(requestBody),
       );
+
+      // Print request body before sending request
+      print('Request Body: ${jsonEncode(requestBody)}');
 
       print('Request sent. Awaiting response...');
 

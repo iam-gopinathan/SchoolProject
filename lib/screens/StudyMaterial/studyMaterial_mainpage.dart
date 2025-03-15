@@ -374,7 +374,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                       ),
                       Padding(
                         padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.019,
+                          top: MediaQuery.of(context).size.height * 0.035,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -416,6 +416,8 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
     );
   }
 
+//
+  String? _selectedSubject;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -612,17 +614,30 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
               color: AppTheme.textFieldborderColor,
             ))
           : studyMaterials.isEmpty
-              ? Center(
-                  child: Text(
-                    "You haven’t made anything yet \n start creating now!",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'regular',
-                      color: Color.fromRGBO(145, 145, 145, 1),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                )
+              ? (UserSession().userType == 'student' ||
+                      UserSession().userType == 'teacher')
+                  ? Center(
+                      child: Text(
+                        "No messages from the school yet. Stay tuned for updates!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        "You haven’t made anything yet \n start creating now!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
               : SingleChildScrollView(
                   controller: _scrollController,
                   child: Column(
@@ -648,7 +663,9 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                     subject,
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: Colors.white,
+                                        color: _selectedSubject == subject
+                                            ? AppTheme.textFieldborderColor
+                                            : Colors.white,
                                         fontFamily: 'regular'),
                                   ),
                                 );
@@ -656,6 +673,9 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                               elevation: 8.0,
                             ).then((value) {
                               if (value != null) {
+                                setState(() {
+                                  _selectedSubject = value;
+                                });
                                 print('Selected subject: $value');
                               }
                               _fetchStudyMaterial(subject: value!);
@@ -771,7 +791,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                             child: Row(
                                               children: [
                                                 Text(
-                                                  '${e.postedOn} | ${e.day}',
+                                                  'Posted on: ${e.postedOn} | ${e.day}',
                                                   style: TextStyle(
                                                       fontFamily: 'regular',
                                                       fontSize: 12,
@@ -780,20 +800,70 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                               ],
                                             ),
                                           ),
+                                          if (e.updatedOn.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15, top: 10),
+                                              child: Row(
+                                                children: [
+                                                  Text(
+                                                    'Updated on : ${e.updatedOn}',
+                                                    style: TextStyle(
+                                                        color: Color.fromRGBO(
+                                                            49, 49, 49, 1),
+                                                        fontFamily: 'medium',
+                                                        fontSize: 10),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           ExpansionTile(
                                             initiallyExpanded:
                                                 initiallyExpandedIndex == index,
                                             shape: Border(),
-                                            title: Row(
+                                            title: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                Text(
-                                                  '${e.subject}',
-                                                  style: TextStyle(
-                                                      fontFamily: 'medium',
-                                                      fontSize: 12,
-                                                      color: Colors.black),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 5),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        '${e.subject}',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                      Spacer(),
+                                                    ],
+                                                  ),
                                                 ),
-                                                Spacer(),
+                                                //
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 5),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        '${e.heading}',
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 12,
+                                                            color:
+                                                                Colors.black),
+                                                      ),
+                                                      Spacer(),
+                                                    ],
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                             children: [
@@ -920,7 +990,6 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                                     ),
                                                   ],
                                                 ),
-
                                               Padding(
                                                 padding: const EdgeInsets.only(
                                                     top: 25),
@@ -978,7 +1047,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                                                                 10)),
                                                                     content:
                                                                         Text(
-                                                                      "Do you really want to make\n changes to this Study Material?",
+                                                                      "Do you really want to make\n changes to this StudyMaterial?",
                                                                       style: TextStyle(
                                                                           fontFamily:
                                                                               'regular',
@@ -1092,7 +1161,7 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                                                                 10)),
                                                                     content:
                                                                         Text(
-                                                                      "Do you really want to Delete\n to this StudyMaterial?",
+                                                                      "Are you sure you want to delete\n this StudyMaterial?",
                                                                       style: TextStyle(
                                                                           fontFamily:
                                                                               'regular',

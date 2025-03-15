@@ -556,17 +556,30 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
               ),
             )
           : consentData.isEmpty
-              ? Center(
-                  child: Text(
-                    "You haven’t made anything yet;\nstart creating now!",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'regular',
-                      color: Color.fromRGBO(145, 145, 145, 1),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                )
+              ? (UserSession().userType == 'student' ||
+                      UserSession().userType == 'teacher')
+                  ? Center(
+                      child: Text(
+                        "No messages from the school yet. Stay tuned for updates!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        "You haven’t made anything yet;\nstart creating now!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
               : SingleChildScrollView(
                   controller: _scrollController,
                   child: Column(
@@ -831,7 +844,7 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                                                                           BorderRadius.circular(
                                                                               10)),
                                                                   content: Text(
-                                                                    "Do you really want to Delete\n  to this ExamTimetable?",
+                                                                    "Are you sure you want to delete\n  this Consent Question?",
                                                                     style: TextStyle(
                                                                         fontFamily:
                                                                             'regular',

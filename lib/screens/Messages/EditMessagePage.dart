@@ -9,7 +9,7 @@ import 'package:flutter_application_1/services/Message_Api/Update_message_Api.da
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Style;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:html/parser.dart' as html_parser;
@@ -26,6 +26,26 @@ class Editmessagepage extends StatefulWidget {
 }
 
 class _EditmessagepageState extends State<Editmessagepage> {
+  //
+
+  Future<void> _pasteFromClipboard() async {
+    ClipboardData? clipboardData =
+        await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData != null) {
+      String text = clipboardData.text ?? "";
+
+      // Insert plain text into QuillEditor
+      descriptionController.replaceText(
+        descriptionController.selection.baseOffset,
+        descriptionController.selection.extentOffset -
+            descriptionController.selection.baseOffset,
+        text,
+        TextSelection.collapsed(
+            offset: descriptionController.selection.baseOffset + text.length),
+      );
+    }
+  }
+
   late String htmlContent = "";
 
   ///image bottomsheeet
@@ -66,79 +86,135 @@ class _EditmessagepageState extends State<Editmessagepage> {
               padding: EdgeInsets.all(10),
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.7,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Preview Screen',
-                            style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 16,
-                                color: Color.fromRGBO(104, 104, 104, 1)),
-                          ),
-                        ],
-                      ),
-                    ),
-                    //
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Divider(
-                        thickness: 1,
-                        color: Color.fromRGBO(243, 243, 243, 1),
-                      ),
-                    ),
-//heading...
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Text(
-                              _heading.text,
-                              style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // description...
-                    Row(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 10),
+                    child: Row(
                       children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.8,
-                          padding: const EdgeInsets.all(10),
-                          child: htmlContent.isNotEmpty
-                              ? Html(data: htmlContent)
-                              : const Text(''),
+                        Text(
+                          'Preview Screen',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 16,
+                              color: Color.fromRGBO(104, 104, 104, 1)),
                         ),
                       ],
                     ),
-                    //
-                    Row(
-                      children: [
-                        Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            padding: const EdgeInsets.all(10),
-                            child: Text(
-                              _scheduledDateandtime.text,
-                              style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            )),
-                      ],
+                  ),
+                  //
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Divider(
+                      thickness: 1,
+                      color: Color.fromRGBO(243, 243, 243, 1),
                     ),
-                  ],
-                ),
+                  ),
+                  //heading...
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
+                        children: [
+                          //
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 10),
+                            child: Row(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      "${selectedRecipient}",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          //
+                          if (selected.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.8,
+                                    child: Text(
+                                      "${selected}",
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          //
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: Text(
+                                    _heading.text,
+                                    style: TextStyle(
+                                        fontFamily: 'semibold',
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //
+                          // description...
+                          Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                padding: const EdgeInsets.all(10),
+                                child: htmlContent.isNotEmpty
+                                    ? Html(
+                                        data: descriptionController
+                                            .pastePlainText,
+                                        style: {
+                                          "body": Style(
+                                              fontFamily: 'semibold',
+                                              fontSize: FontSize(16),
+                                              textAlign: TextAlign.justify)
+                                        },
+                                      )
+                                    : const Text(''),
+                              ),
+                            ],
+                          ),
+                          //
+                          Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.8,
+                                padding: const EdgeInsets.all(10),
+                                child: Text(
+                                  _scheduledDateandtime.text,
+                                  style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 16,
+                                      color: Colors.black),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             )
           ]);
@@ -162,7 +238,7 @@ class _EditmessagepageState extends State<Editmessagepage> {
   TextEditingController _scheduledDateandtime = TextEditingController();
 
   List<String> dropdownItems = ['Everyone', 'Students', 'Teachers'];
-  String? selectedRecipient;
+
   List<int> selectedGrades = [];
 
   EditmessageModels? messageDetails;
@@ -178,6 +254,8 @@ class _EditmessagepageState extends State<Editmessagepage> {
     descriptionController.dispose();
   }
 
+  var scheduleeee;
+  String? selectedRecipient;
   //edit fetch..
   void fetchMessageDetails() async {
     try {
@@ -193,6 +271,24 @@ class _EditmessagepageState extends State<Editmessagepage> {
           _desc.text = data.message;
 
           htmlContent = data.message;
+          scheduleeee = data.status;
+//
+          // _scheduledDateandtime.text = data.scheduleOnRailwayTime ?? '';
+
+          //
+          if (data.scheduleOn != null && data.scheduleOn!.isNotEmpty) {
+            try {
+              // Convert API date to desired format
+              DateTime parsedDate = DateTime.parse(data.scheduleOn!);
+              _scheduledDateandtime.text =
+                  DateFormat("dd-MM-yyyy HH:mm").format(parsedDate);
+            } catch (e) {
+              print("Error parsing date: $e");
+              _scheduledDateandtime.text = data.scheduleOn!;
+            }
+          } else {
+            _scheduledDateandtime.text = '';
+          }
 
           final plainText = html_parser.parse(data.message).body?.text ?? "";
 
@@ -203,6 +299,13 @@ class _EditmessagepageState extends State<Editmessagepage> {
           selectedRecipient = data.recipient;
           selectedGrades = List<int>.from(data.gradeIds);
           grades = fetchedGrades;
+
+          //
+          // Ensure the recipient exists in the dropdown list
+          selectedRecipient = dropdownItems.firstWhere(
+            (item) => item.toLowerCase() == data.recipient.toLowerCase(),
+            orElse: () => dropdownItems.first, // Default to 'Everyone'
+          );
 
           gradeNames = selectedGrades.map((gradeId) {
             var grade = grades.firstWhere(
@@ -339,10 +442,11 @@ class _EditmessagepageState extends State<Editmessagepage> {
 
   // Method to show date picker
   Future<void> _pickDate() async {
+    DateTime now = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2101),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -560,68 +664,73 @@ class _EditmessagepageState extends State<Editmessagepage> {
                     ),
                   ),
                   //
-                  Padding(
-                    padding: const EdgeInsets.only(top: 35),
-                    child: Transform.translate(
-                      offset: Offset(-1, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            'Select Class',
-                            style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 14,
-                                color: Color.fromRGBO(38, 38, 38, 1)),
-                          ),
-                          //dropdown field.......
-                          Padding(
-                            padding: EdgeInsets.only(
-                                left: MediaQuery.of(context).size.width * 0.05),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width * 0.5,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _showMenu(context);
-                                },
+                  if (selectedRecipient == 'Students')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 35),
+                      child: Transform.translate(
+                        offset: Offset(-1, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Text(
+                              'Select Class',
+                              style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 14,
+                                  color: Color.fromRGBO(38, 38, 38, 1)),
+                            ),
+                            //dropdown field.......
+                            if (selectedRecipient == 'Students')
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: MediaQuery.of(context).size.width *
+                                        0.05),
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 11),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Color.fromRGBO(203, 203, 203, 1),
-                                      width: 0.5,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          selected.isEmpty
-                                              ? 'Select class'
-                                              : selected.join(', '),
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.black,
-                                            fontFamily: 'regular',
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.5,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _showMenu(context);
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 11),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color:
+                                              Color.fromRGBO(203, 203, 203, 1),
+                                          width: 0.5,
                                         ),
                                       ),
-                                      Icon(Icons.arrow_drop_down,
-                                          color: Colors.black),
-                                    ],
+                                      child: Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              selected.isEmpty
+                                                  ? 'Select class'
+                                                  : selected.join(', '),
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.black,
+                                                fontFamily: 'regular',
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 1,
+                                            ),
+                                          ),
+                                          Icon(Icons.arrow_drop_down,
+                                              color: Colors.black),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                   //heading...
                   Padding(
                     padding: EdgeInsets.only(
@@ -747,7 +856,7 @@ class _EditmessagepageState extends State<Editmessagepage> {
                       child: Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               QuillSimpleToolbar(
                                 controller: descriptionController,
@@ -792,8 +901,16 @@ class _EditmessagepageState extends State<Editmessagepage> {
                                   showUndo: false,
                                   showUnderLineButton: false,
                                   showSuperscript: false,
+                                  showClipboardCopy: false,
                                 ),
                               ),
+                              IconButton(
+                                  icon: Icon(Icons.paste, color: Colors.black),
+                                  onPressed: () {
+                                    setState(() {
+                                      _pasteFromClipboard();
+                                    });
+                                  }),
                             ],
                           ),
                           //quill controller.....
@@ -829,75 +946,76 @@ class _EditmessagepageState extends State<Editmessagepage> {
                     ),
                   ),
                   //schedule post...
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width *
-                          0.06, // 5% of screen width
-                      top: MediaQuery.of(context).size.height *
-                          0.02, // 3% of screen height
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Schedule Post',
-                          style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 14,
-                              color: Color.fromRGBO(38, 38, 38, 1)),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: TextFormField(
-                            controller: _scheduledDateandtime,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              suffixIcon: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 10, bottom: 10),
-                                child: SvgPicture.asset(
-                                  'assets/icons/NewsPage_timepicker.svg',
-                                  fit: BoxFit.contain,
-                                  height: 30,
-                                  width: 30,
-                                ),
-                              ),
-                              hintText: 'Tap to select date and time',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 14,
-                                  color: Colors.black),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(203, 203, 203, 1),
-                                      width: 1)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(203, 203, 203, 1),
-                                      width: 1)),
-                            ),
-                            onTap: () async {
-                              await _pickDate();
-                              await _pickTime();
-                              _scheduledDateandtime.text = _dateTime;
-                            },
+                  if (scheduleeee == 'schedule')
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width *
+                            0.06, // 5% of screen width
+                        top: MediaQuery.of(context).size.height *
+                            0.02, // 3% of screen height
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Schedule Post',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 14,
+                                color: Color.fromRGBO(38, 38, 38, 1)),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  if (scheduleeee == 'schedule')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: TextFormField(
+                              controller: _scheduledDateandtime,
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/NewsPage_timepicker.svg',
+                                    fit: BoxFit.contain,
+                                    height: 30,
+                                    width: 30,
+                                  ),
+                                ),
+                                hintText: 'Tap to select date and time',
+                                hintStyle: TextStyle(
+                                    fontFamily: 'medium',
+                                    fontSize: 14,
+                                    color: Colors.black),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: Color.fromRGBO(203, 203, 203, 1),
+                                        width: 1)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: Color.fromRGBO(203, 203, 203, 1),
+                                        width: 1)),
+                              ),
+                              onTap: () async {
+                                await _pickDate();
+                                await _pickTime();
+                                _scheduledDateandtime.text = _dateTime;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   //
                 ],
               ),
@@ -924,27 +1042,73 @@ class _EditmessagepageState extends State<Editmessagepage> {
               ),
 
               ///scheduled or update  button
+              // if (UserSession().userType == 'superadmin')
+              //   ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //         padding: EdgeInsets.symmetric(horizontal: 20),
+              //         backgroundColor: AppTheme.textFieldborderColor,
+              //         side: BorderSide.none),
+              //     onPressed: () {
+              //       if (_scheduledDateandtime.text.isEmpty) {
+              //         _submitUpdateForm("post");
+              //       } else {
+              //         _submitUpdateForm("schedule");
+              //       }
+              //     },
+              //     child: Text(
+              //       _scheduledDateandtime.text.isEmpty ? 'Update' : 'Schedule',
+              //       style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'medium',
+              //           color: Colors.black),
+              //     ),
+              //   ),
+              /// Scheduled or update button
               if (UserSession().userType == 'superadmin')
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      backgroundColor: AppTheme.textFieldborderColor,
-                      side: BorderSide.none),
-                  onPressed: () {
-                    if (_scheduledDateandtime.text.isEmpty) {
-                      _submitUpdateForm("post");
-                    } else {
-                      _submitUpdateForm("schedule");
-                    }
-                  },
-                  child: Text(
-                    _scheduledDateandtime.text.isEmpty ? 'Update' : 'Schedule',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'medium',
-                        color: Colors.black),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none,
                   ),
+                  onPressed: _isLoading
+                      ? null // Disable button while loading
+                      : () async {
+                          setState(() {
+                            _isLoading = true;
+                          });
+
+                          if (_scheduledDateandtime.text.isEmpty) {
+                            await _submitUpdateForm("post");
+                          } else {
+                            await _submitUpdateForm("schedule");
+                          }
+
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        },
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: AppTheme.appBackgroundPrimaryColor,
+                            strokeWidth: 4,
+                          ),
+                        )
+                      : Text(
+                          _scheduledDateandtime.text.isEmpty
+                              ? 'Update'
+                              : 'Schedule',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black,
+                          ),
+                        ),
                 ),
+
               //request now button..
               if (UserSession().userType == 'admin' ||
                   UserSession().userType == 'staff')
@@ -1043,7 +1207,10 @@ class _EditmessagepageState extends State<Editmessagepage> {
     );
   }
 
-  void _submitUpdateForm(String status) {
+  bool _isLoading = false;
+//
+
+  Future<void> _submitUpdateForm(String status) async {
     // Convert the QuillController content to HTML
     final generatedHtml = QuillDeltaToHtmlConverter(
       descriptionController.document.toDelta().toJson(),
@@ -1062,8 +1229,14 @@ class _EditmessagepageState extends State<Editmessagepage> {
           content: Text('Please fill in both heading and description'),
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
+    setState(() {
+      _isLoading = true;
+    });
     List<int> selectedGradeIds = selected
         .map((selectedGradeName) {
           final grade = grades.firstWhere(
@@ -1076,6 +1249,29 @@ class _EditmessagepageState extends State<Editmessagepage> {
         .toList();
 
     String gradeIdsString = selectedGradeIds.join(',');
+//
+    String? scheduleOn;
+    if (status == 'schedule' && _scheduledDateandtime.text.isNotEmpty) {
+      try {
+        print("Raw Scheduled Date Input: ${_scheduledDateandtime.text}");
+
+        // Parse from "dd-MM-yyyy h:mm a" (12-hour format)
+        DateTime selectedDate = DateFormat("dd-MM-yyyy h:mm a")
+            .parse(_scheduledDateandtime.text.trim());
+
+        // Convert to "dd-MM-yyyy HH:mm" (24-hour format)
+        scheduleOn = DateFormat("dd-MM-yyyy HH:mm").format(selectedDate);
+
+        print("Formatted Schedule Date (24-hour): $scheduleOn");
+      } catch (e) {
+        print("Error formatting scheduleOn date: $e");
+        scheduleOn = _scheduledDateandtime.text; // Fallback in case of an error
+      }
+    } else {
+      scheduleOn = '';
+    }
+
+    //
 
     UpdateMessageModel updatedMessage = UpdateMessageModel(
       id: widget.Id,
@@ -1086,13 +1282,13 @@ class _EditmessagepageState extends State<Editmessagepage> {
       status: status,
       recipient: selectedRecipient ?? '',
       gradeIds: gradeIdsString,
-      postedOn: status == "post"
-          ? DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())
-          : "",
-      scheduleOn: status == "schedule" ? _scheduledDateandtime.text : "",
+      // postedOn: status == "post"
+      //     ? DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())
+      //     : "",
+      // scheduleOn: status == "schedule" ? _scheduledDateandtime.text : "",
+      scheduleOn: status == "schedule" ? scheduleOn : "",
       updatedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
     );
-
-    updateMessage(updatedMessage, context, widget.messageFetch);
+    await updateMessage(updatedMessage, context, widget.messageFetch);
   }
 }

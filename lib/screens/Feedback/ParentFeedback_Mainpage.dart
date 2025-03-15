@@ -472,58 +472,62 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                         child: Column(
                                           children: [
                                             //
+                                            // Padding(
+                                            //   padding:
+                                            //       const EdgeInsets.only(top: 5),
+                                            //   child: Container(
+                                            //     width: MediaQuery.of(context)
+                                            //             .size
+                                            //             .width *
+                                            //         0.8,
+                                            //     child: Text(
+                                            //       '${e.heading}',
+                                            //       style: TextStyle(
+                                            //         fontFamily: 'medium',
+                                            //         fontSize: 16,
+                                            //         color: Colors.black,
+                                            //       ),
+                                            //     ),
+                                            //   ),
+                                            // ),
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
+                                              padding: EdgeInsets.only(
+                                                  top: 5, bottom: 5),
                                               child: Container(
                                                 width: MediaQuery.of(context)
                                                         .size
                                                         .width *
                                                     0.8,
-                                                child: Text(
-                                                  '${e.heading}',
-                                                  style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.black,
-                                                  ),
+                                                child: Row(
+                                                  children: [
+                                                    Text(
+                                                      '${e.question}',
+                                                      style: TextStyle(
+                                                        fontFamily: 'medium',
+                                                        fontSize: 16,
+                                                        color: Colors.black,
+                                                      ),
+                                                      maxLines:
+                                                          isExpanded ? null : 4,
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ),
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.only(top: 5),
+                                              padding: const EdgeInsets.only(
+                                                  top: 5, bottom: 5),
                                               child: Divider(
                                                 color: Color.fromRGBO(
                                                     230, 230, 230, 1),
                                                 thickness: 1,
                                               ),
                                             ),
-                                            //
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.8,
-                                              child: Row(
-                                                children: [
-                                                  Text(
-                                                    '${e.question}',
-                                                    style: TextStyle(
-                                                      fontFamily: 'medium',
-                                                      fontSize: 16,
-                                                      color: Colors.black,
-                                                    ),
-                                                    maxLines:
-                                                        isExpanded ? null : 4,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
+
                                             //readmore button...
                                             Padding(
                                               padding: const EdgeInsets.only(
-                                                  bottom: 5),
+                                                  bottom: 5, top: 5),
                                               child: Row(
                                                 children: [
                                                   if (showReadMore)
@@ -705,7 +709,7 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                                                               10)),
                                                                       content:
                                                                           Text(
-                                                                        "Do you really want to Delete\n to this Feedback?",
+                                                                        "Do you really want to Delete\n this Feedback?",
                                                                         style: TextStyle(
                                                                             fontFamily:
                                                                                 'regular',

@@ -25,21 +25,22 @@ class Data {
   final String rollNumber;
   final String profile;
   final String gradeAndSection;
+  final String grade;
 
-  Data({
-    required this.name,
-    required this.rollNumber,
-    required this.profile,
-    required this.gradeAndSection,
-  });
+  Data(
+      {required this.name,
+      required this.rollNumber,
+      required this.profile,
+      required this.gradeAndSection,
+      required this.grade});
 
   factory Data.fromJson(Map<String, dynamic> json) {
     return Data(
-      name: json['name'] ?? '',
-      rollNumber: json['rollnumber'] ?? '',
-      profile: json['profile'] ?? '',
-      gradeAndSection: json['gradeAndSection'] ?? '',
-    );
+        name: json['name'] ?? '',
+        rollNumber: json['rollnumber'] ?? '',
+        profile: json['profile'] ?? '',
+        gradeAndSection: json['gradeAndSection'] ?? '',
+        grade: json['grade'] ?? '');
   }
 }
 

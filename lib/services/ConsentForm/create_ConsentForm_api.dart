@@ -21,22 +21,19 @@ Future<void> CreateConsentForm(
       },
       body: jsonEncode(request.toJson()),
     );
-
     if (response.statusCode == 200) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('ConsentForm posted successfully!'),
+          content: Text(request.status == 'draft'
+              ? 'ConsentForm saved as Draft!'
+              : 'ConsentForm Created Successfully!'),
           backgroundColor: Colors.green,
         ),
       );
-
       print("Success: ${response.body}");
-
       // Add a delay of 2 seconds before navigating
       await Future.delayed(Duration(seconds: 2));
-
       fetch();
-
       Navigator.pop(
         context,
       );

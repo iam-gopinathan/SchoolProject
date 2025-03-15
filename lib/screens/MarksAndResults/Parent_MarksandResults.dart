@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:excel/excel.dart' hide Border;
+import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_launcher_icons/xml_templates.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:open_file/open_file.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +14,7 @@ import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/painting.dart';
 
 class ParentMarksandresults extends StatefulWidget {
   const ParentMarksandresults({super.key});
@@ -874,16 +878,353 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
                                               : [],
                                     ),
                                   ),
-                                )
+                                ),
                             ],
                           ),
                         ),
                       ),
                     ),
+//comparison.........
+            if (iscomparison)
+              Padding(
+                padding:
+                    EdgeInsets.all(MediaQuery.of(context).size.width * 0.03),
+                child: Card(
+                  elevation: 0,
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(
+                      color: Color.fromRGBO(215, 215, 215, 1),
+                      width: 0.8,
+                    ),
+                  ),
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                          color: Color.fromRGBO(215, 215, 215, 1), width: 0.8),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * 0.03,
+                            top: MediaQuery.of(context).size.height * 0.02,
+                            bottom: MediaQuery.of(context).size.height * 0.02,
+                          ),
+                          child: Text(
+                            'Marks Comparison Graph',
+                            style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+
+                        /// **Static Left Side Titles**
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.03,
+                                right: MediaQuery.of(context).size.width * 0.02,
+                              ),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  for (int i = 100; i >= 0; i -= 25)
+                                    Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.02),
+                                      child: Text(
+                                        "$i",
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+
+                            /// **Single Graph for All Exams**
+                            Expanded(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Container(
+                                  color: Colors.white,
+                                  width: _parent!.exams.length * 1000.0,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.3,
+                                  padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width * 0.03),
+                                  child: BarChart(
+                                    BarChartData(
+                                      backgroundColor:
+                                          Color.fromRGBO(254, 247, 255, 1),
+                                      alignment: BarChartAlignment.start,
+                                      maxY: 100,
+                                      gridData: FlGridData(
+                                        drawHorizontalLine: true,
+                                        drawVerticalLine: true,
+                                        show: true,
+                                        horizontalInterval: 25,
+                                        getDrawingHorizontalLine: (value) =>
+                                            FlLine(
+                                          color: Colors.black.withOpacity(0.1),
+                                          strokeWidth: 1,
+                                          dashArray: [5, 5],
+                                        ),
+                                        getDrawingVerticalLine: (value) {
+                                          return FlLine(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            strokeWidth: 1,
+                                            dashArray: [5, 5],
+                                          );
+                                        },
+                                      ),
+                                      barGroups: _parent!.exams.entries
+                                          .map((examEntry) {
+                                        String semester = examEntry.key;
+                                        var examDetails = examEntry.value;
+                                        return BarChartGroupData(
+                                          x: _parent!.exams.keys
+                                              .toList()
+                                              .indexOf(semester),
+                                          barRods: [
+                                            BarChartRodData(
+                                                toY: double.tryParse(examDetails
+                                                        .percentage
+                                                        .toString()) ??
+                                                    0.0,
+                                                gradient: LinearGradient(
+                                                  colors: [
+                                                    Color.fromRGBO(
+                                                        131, 56, 236, 1),
+                                                    Color.fromRGBO(
+                                                        74, 32, 134, 1)
+                                                  ],
+                                                  begin: Alignment.topCenter,
+                                                  end: Alignment.bottomCenter,
+                                                ),
+                                                width: 25,
+                                                borderRadius:
+                                                    BorderRadius.circular(0)),
+                                          ],
+                                        );
+                                      }).toList(),
+                                      titlesData: FlTitlesData(
+                                        leftTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false)),
+                                        topTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false)),
+                                        rightTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false)),
+                                        //
+                                        bottomTitles: AxisTitles(
+                                          sideTitles: SideTitles(
+                                            showTitles: true,
+                                            getTitlesWidget:
+                                                (double value, TitleMeta meta) {
+                                              List<String> semesters =
+                                                  _parent!.exams.keys.toList();
+                                              String semester =
+                                                  semesters[value.toInt()];
+                                              return Padding(
+                                                padding:
+                                                    EdgeInsets.only(top: 5),
+                                                child: Text(
+                                                  semester.isNotEmpty
+                                                      ? semester[0]
+                                                      : "",
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    fontFamily: 'semibold',
+                                                    color: Colors.black,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            reservedSize: 25,
+                                          ),
+                                        ),
+                                      ),
+                                      borderData: FlBorderData(
+                                        show: false,
+                                      ),
+                                      barTouchData: BarTouchData(
+                                        touchTooltipData: BarTouchTooltipData(
+                                          fitInsideHorizontally: true,
+                                          fitInsideVertically: true,
+                                          tooltipRoundedRadius: 10,
+                                          maxContentWidth: 180,
+                                          tooltipPadding: EdgeInsets.only(
+                                              left: 10, top: 10, bottom: 10),
+                                          getTooltipColor: (group) =>
+                                              Colors.black,
+                                          getTooltipItem: (group, groupIndex,
+                                              rod, rodIndex) {
+                                            String semester = _parent!
+                                                .exams.keys
+                                                .toList()[groupIndex];
+                                            var examDetails =
+                                                _parent!.exams[semester];
+                                            return BarTooltipItem(
+                                              '$semester \n'
+                                              '🔹Total Marks (${examDetails!.totalMarks})\n'
+                                              '🔹Scored Marks (${examDetails.marksScored})\n'
+                                              '🔹Percentage: ${examDetails.percentage}%',
+                                              TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                              ),
+                                              textAlign: TextAlign.left,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        ///exam name...
+                        if (_parent != null &&
+                            _parent!.data.grade != 'X' &&
+                            _parent!.data.grade != 'PREKG' &&
+                            _parent!.data.grade != 'LKG' &&
+                            _parent!.data.grade != 'UKG')
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 10, bottom: 10),
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Container(
+                                    height: 10,
+                                    width: 10,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(176, 93, 208, 1),
+                                          Color.fromRGBO(134, 0, 187, 1),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      'Quarterly',
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 14,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  //halfyearly
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                  Container(
+                                    height: 10,
+                                    width: 10,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(176, 93, 208, 1),
+                                          Color.fromRGBO(134, 0, 187, 1),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      'Half Yearly',
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 14,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  //
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.2,
+                                  ),
+                                  Container(
+                                    height: 10,
+                                    width: 10,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromRGBO(176, 93, 208, 1),
+                                          Color.fromRGBO(134, 0, 187, 1),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      'Annual',
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 14,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
-      //
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
@@ -911,7 +1252,6 @@ class _ParentMarksandresultsState extends State<ParentMarksandresults> {
     );
   }
 }
-//
 
 // Function to show download notification
 void showDownloadNotification(String filePath) async {
@@ -979,8 +1319,10 @@ void _viewBottomsheet(BuildContext context, String notes) {
           return Stack(clipBehavior: Clip.none, children: [
             // Close icon
             Positioned(
-              top: -70,
-              left: 180,
+              top: MediaQuery.of(context).size.height *
+                  -0.1, // Adjust based on screen height
+              left: MediaQuery.of(context).size.width *
+                  0.45, // Adjust based on screen width
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();

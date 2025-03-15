@@ -26,13 +26,26 @@ Future<void> updateMessage(
 
     if (response.statusCode == 200) {
       print("Message updated successfully!");
+      print(response.body);
+      // Print the entered data
+      print("📌 Entered Data:");
+      print("🆔 Message ID: ${updateMessage.id}");
+      print("📜 Message Content: ${updateMessage.message}");
+      print("📆 Scheduled Date: ${updateMessage.scheduleOn}");
+      print("🕒 Scheduled Time: ${updateMessage.status}");
+      print("📌 Status: ${updateMessage.status}");
+      print("👤 User Type: ${UserSession().userType}");
 
       String snackBarMessage = '';
       if (UserSession().userType == 'superadmin') {
-        snackBarMessage = 'Message Updated Successfully!';
+        snackBarMessage = updateMessage.status == "schedule"
+            ? 'Message Scheduled Successfully!'
+            : 'Message Updated Successfully!';
       } else if (UserSession().userType == 'admin' ||
           UserSession().userType == 'staff') {
-        snackBarMessage = 'Message Update Request Sent Successfully!';
+        snackBarMessage = updateMessage.status == "schedule"
+            ? 'Message Scheduling Request Sent Successfully!'
+            : 'Message Update Request Was Sent Successfully!';
       }
       if (snackBarMessage.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(

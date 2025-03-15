@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/circular_models/update_Circular_model.dart';
+import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http/http.dart' as http;
 
@@ -43,12 +44,28 @@ Future<void> updateCircular(
       var responseData = await response.stream.bytesToString();
       print("Circular updated successfully: $responseData");
 
+      // Determine the message based on user role and circular status
+      String snackBarMessage = 'Circular Updated successfully!';
+
+      if (UserSession().userType == 'superadmin') {
+        if (request.status == 'post') {
+          snackBarMessage = 'Circular updated Successfully!';
+        } else if (request.status == 'schedule') {
+          snackBarMessage = 'Circular Scheduled Successfully!';
+        }
+      } else if (UserSession().userType == 'admin' ||
+          UserSession().userType == 'staff') {
+        if (request.status == 'post') {
+          snackBarMessage = 'Circular update Request Was Sent Successfully!';
+        } else if (request.status == 'schedule') {
+          snackBarMessage = 'Circular Schedule Request Was Sent Successfully!';
+        }
+      }
       // Ensure the widget is mounted before showing the SnackBar
       if (context.mounted) {
-        // Show success Snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Circular Updated successfully!'),
+            content: Text(snackBarMessage),
             backgroundColor: Colors.green,
           ),
         );
@@ -73,6 +90,7 @@ Future<void> updateCircular(
         ));
       }
       print("Failed to update circular: ${response.statusCode}");
+      Navigator.pop(context);
     }
   } catch (e) {
     // Handle error and ensure widget is mounted
@@ -84,6 +102,7 @@ Future<void> updateCircular(
           backgroundColor: Colors.red,
         ),
       );
+      Navigator.pop(context);
     }
   }
 }

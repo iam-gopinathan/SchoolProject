@@ -24,7 +24,7 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
   }
 
   List<String> options = ['Suggestions', 'Complaints', 'Others'];
-  String? selectedOptions;
+  String? selectedOptions = 'Suggestions';
 
   TextEditingController _desc = TextEditingController();
 
@@ -66,68 +66,93 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
               padding: EdgeInsets.all(10),
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.7,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Preview Screen',
-                            style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 16,
-                                color: Color.fromRGBO(104, 104, 104, 1)),
-                          ),
-                        ],
-                      ),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 10),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Preview Screen',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 16,
+                              color: Color.fromRGBO(104, 104, 104, 1)),
+                        ),
+                      ],
                     ),
-                    //
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Divider(
-                        thickness: 1,
-                        color: Color.fromRGBO(243, 243, 243, 1),
-                      ),
+                  ),
+                  //
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Divider(
+                      thickness: 1,
+                      color: Color.fromRGBO(243, 243, 243, 1),
                     ),
-                    //selected suggesstions..
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            "${selectedOptions}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
+                  ),
 
-                    ///selected descriptions...
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Text(
-                              "${_desc.text}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                          //selected suggesstions..
+
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  "${selectedOptions}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //selected suggesstions..
+                          if (selectedOptions != null &&
+                              selectedOptions!.isEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "${selectedOptions}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          ///selected descriptions...
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: Text(
+                                    "${_desc.text}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             )
           ]);
@@ -166,20 +191,25 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -266,6 +296,7 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.5,
                     child: DropdownButtonFormField<String>(
+                        value: selectedOptions,
                         decoration: InputDecoration(
                             hintText: 'Select',
                             hintStyle: TextStyle(
@@ -353,6 +384,7 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
               padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
               child: Container(
                 child: TextFormField(
+                  cursorColor: Colors.black,
                   inputFormatters: [LengthLimitingTextInputFormatter(600)],
                   controller: _desc,
                   maxLines: 5,
@@ -429,19 +461,43 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
               ),
 
               ///post
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     createParentFeedback();
+              //   },
+              //   child: Text(
+              //     'Publish',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  createParentFeedback();
-                },
-                child: Text(
-                  'Publish',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isloading ? null : createParentFeedback,
+                child: isloading
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.appBackgroundPrimaryColor,
+                        ),
+                      )
+                    : Text(
+                        'Publish',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
+              //
             ],
           ),
         ),
@@ -449,8 +505,26 @@ class _ParentFeedbackCreatepageState extends State<ParentFeedbackCreatepage> {
     );
   }
 
+  //
+  bool isloading = false;
+
   ///post api...
   void createParentFeedback() {
+    if (_desc.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please enter Description!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isloading = false;
+      });
+      return;
+    }
+    setState(() {
+      isloading = true;
+    });
     ParentCreateFeedbackModel create = ParentCreateFeedbackModel(
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',

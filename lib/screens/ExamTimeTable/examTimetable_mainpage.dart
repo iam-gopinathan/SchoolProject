@@ -92,8 +92,11 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -70,
-                  left: 180,
+                  top: MediaQuery.of(context).size.height *
+                      -0.08, // -70 based on screen height
+                  left: MediaQuery.of(context).size.width *
+                      0.45, // 180 based on screen width
+
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -140,7 +143,8 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: EdgeInsets.all(
+                            MediaQuery.of(context).size.width * 0.02),
                         child: Card(
                           elevation: 0,
                           child: Container(
@@ -166,7 +170,12 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                 ),
                                 // Classes
                                 Padding(
-                                  padding: const EdgeInsets.only(top: 20),
+                                  padding: EdgeInsets.only(
+                                    top: MediaQuery.of(context).size.height *
+                                        0.025, // 2.5% of screen height
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.04, // 4% of screen height
+                                  ),
                                   child: SingleChildScrollView(
                                     scrollDirection: Axis.horizontal,
                                     child: Row(
@@ -274,6 +283,11 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
     return grade['sign'] ?? 'Unknown';
   }
 
+  //
+  final ScrollController _scrollControllerss = ScrollController();
+
+  String? selectedExam;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -357,6 +371,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                 inactiveTrackColor: Colors.white,
                                 inactiveThumbColor: Colors.black,
                                 value: isswitched,
+                                activeColor: Colors.white,
                                 onChanged: (value) {
                                   setState(() {
                                     isswitched = value;
@@ -461,20 +476,34 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                 maxHeight: 150,
                               ),
                               child: SingleChildScrollView(
+                                controller: _scrollControllerss,
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children:
                                       gradeController.examList.map((exam) {
                                     return PopupMenuItem<String>(
                                       value: exam,
-                                      child: Text(
-                                        exam,
-                                        style: const TextStyle(
-                                          fontFamily: 'regular',
-                                          fontSize: 14,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      child: StatefulBuilder(
+                                          builder: (context, setState) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              selectedExam = exam;
+                                            });
+                                            Navigator.pop(context, exam);
+                                          },
+                                          child: Text(
+                                            exam,
+                                            style: TextStyle(
+                                              fontFamily: 'regular',
+                                              fontSize: 14,
+                                              color: selectedExam == exam
+                                                  ? Colors.amber
+                                                  : Colors.white,
+                                            ),
+                                          ),
+                                        );
+                                      }),
                                     );
                                   }).toList(),
                                 ),
@@ -486,6 +515,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                       ).then((value) {
                         if (value != null) {
                           print('Selected: $value');
+                          selectedExam = value;
                           _fetchExamMaintimetable(exam: value);
                         }
                       });
@@ -523,7 +553,6 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                     ),
                   ),
                   //
-
                   FutureBuilder(
                     future: ExamtimeTableFuture,
                     builder: (context, snapshot) {
@@ -533,7 +562,33 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                         return Center(
-                            child: Text('No Exam Timetable available.'));
+                            child: Text(
+                          'You haven’t made anything yet;\nstart creating now!',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontFamily: 'regular',
+                            color: Color.fromRGBO(145, 145, 145, 1),
+                          ),
+                        ));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (UserSession().userType == 'student' ||
+                                  UserSession().userType == 'teacher')
+                                Text(
+                                  "No messages from the school yet. Stay tuned for updates!",
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'regular',
+                                    color: Color.fromRGBO(145, 145, 145, 1),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                            ],
+                          ),
+                        );
                       } else {
                         var data = snapshot.data!;
                         return SingleChildScrollView(
@@ -627,6 +682,30 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                   ],
                                                 ),
                                               ),
+                                              if (e.updatedOn != null &&
+                                                  e.updatedOn!.isNotEmpty)
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 15, top: 10),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        'Updated on : ${e.updatedOn}',
+                                                        style: TextStyle(
+                                                            color:
+                                                                Color.fromRGBO(
+                                                                    49,
+                                                                    49,
+                                                                    49,
+                                                                    1),
+                                                            fontFamily:
+                                                                'medium',
+                                                            fontSize: 10),
+                                                      )
+                                                    ],
+                                                  ),
+                                                ),
                                               ExpansionTile(
                                                 initiallyExpanded:
                                                     data.indexOf(e) == 0,
@@ -876,7 +955,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                                                 10)),
                                                                         content:
                                                                             Text(
-                                                                          "Do you really want to Delete\n  to this ExamTimetable?",
+                                                                          "Are you sure you want to delete\n this Exam TimeTable?",
                                                                           style: TextStyle(
                                                                               fontFamily: 'regular',
                                                                               fontSize: 16,
@@ -963,8 +1042,6 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                               ),
                                                             ),
                                                           ),
-
-                                                        //
                                                         //download
                                                         if (UserSession()
                                                                 .userType ==
@@ -1044,7 +1121,6 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                 ],
               ),
             ),
-      //
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50
@@ -1087,8 +1163,10 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
           return Stack(clipBehavior: Clip.none, children: [
             // Close icon
             Positioned(
-              top: -70,
-              left: 180,
+              top: MediaQuery.of(context).size.height *
+                  -0.08, // -70 converted to percentage
+              left: MediaQuery.of(context).size.width *
+                  0.45, // 180 converted to percentage
               child: GestureDetector(
                 onTap: () {
                   Navigator.of(context).pop();
@@ -1146,7 +1224,6 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
     );
   }
 
-  //show image bottomsheet code end....
 //show image bottomsheet code end....
   Future<void> downloadImage(String imageUrl) async {
     try {
@@ -1243,7 +1320,7 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
               children: [
                 // Close icon
                 Positioned(
-                  top: -70,
+                  top: MediaQuery.of(context).size.height * -0.08,
                   left: MediaQuery.of(context).size.width / 2 - 28,
                   child: GestureDetector(
                     onTap: () {

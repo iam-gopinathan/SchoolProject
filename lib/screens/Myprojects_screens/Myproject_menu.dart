@@ -129,7 +129,8 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
                                           ApprovalStatusMenu()));
                             },
                             child: Container(
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.02),
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30),
                                   color: Color.fromRGBO(253, 247, 239, 1)),

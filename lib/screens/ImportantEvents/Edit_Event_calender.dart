@@ -171,6 +171,12 @@ class _EditEventCalenderState extends State<EditEventCalender> {
           _desc.text = edit.description;
           image = edit.filePath;
           _isLoading = false;
+
+          if (edit.fileType == 'link') {
+            _linkController.text = edit.filePath ?? '';
+            isaddLink = true;
+            isuploadimage = false;
+          }
         });
       } else {
         print("Failed to fetch event details.");
@@ -178,6 +184,36 @@ class _EditEventCalenderState extends State<EditEventCalender> {
       }
     } catch (e) {
       print("Error fetching event details: $e");
+    }
+  }
+
+  //
+
+  // Regular expression to validate YouTube links
+  bool isValidYouTubeLink(String url) {
+    final RegExp youtubeRegex = RegExp(
+      r'^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  //
+  String? _errorMessage;
+  void _validateLink(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _errorMessage = "";
+      });
+    } else if (!isValidYouTubeLink(input)) {
+      setState(() {
+        _errorMessage = "Enter a valid YouTube link";
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
     }
   }
 
@@ -668,6 +704,7 @@ class _EditEventCalenderState extends State<EditEventCalender> {
                                 onTap: () {
                                   pickFile();
                                   isFetchedImageVisible = false;
+                                  _linkController.text = '';
                                 },
                                 child: Container(
                                   color: Color.fromRGBO(228, 238, 253, 1)
@@ -731,43 +768,63 @@ class _EditEventCalenderState extends State<EditEventCalender> {
                             ),
                           ),
                         ),
+                      if (isuploadimage)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Supported Format : JPEG,Webp PNG, PDF',
+                              style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 9,
+                                  color: Color.fromRGBO(168, 168, 168, 1)),
+                            ),
+                          ],
+                        ),
 
                       // fetched image
                       if (isFetchedImageVisible)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.network(
-                              image.toString(),
-                              fit: BoxFit.cover,
-                              height: 150,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  (loadingProgress
-                                                          .expectedTotalBytes ??
-                                                      1)
-                                              : null,
-                                      strokeWidth: 4,
-                                      color: AppTheme.textFieldborderColor,
-                                    ),
+                        if (isuploadimage)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.network(
+                                image.toString(),
+                                fit: BoxFit.cover,
+                                height: 150,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  } else {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                        strokeWidth: 4,
+                                        color: AppTheme.textFieldborderColor,
+                                      ),
+                                    );
+                                  }
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Text(
+                                    '',
+                                    style: TextStyle(color: Colors.red),
                                   );
-                                }
-                              },
+                                },
+                              ),
                             ),
                           ),
-                        ),
 
                       /// Display selected image...
                       if (isuploadimage)
@@ -852,6 +909,20 @@ class _EditEventCalenderState extends State<EditEventCalender> {
                             child: Container(
                                 height: 50,
                                 child: TextFormField(
+                                  style: TextStyle(
+                                    color: Colors
+                                        .black, // Set input text color to black
+                                    fontSize: 14,
+                                    fontFamily: 'regular',
+                                  ),
+                                  onChanged: (value) {
+                                    //
+                                    _validateLink(value);
+                                    //
+                                    selectedFile = null;
+                                    //
+                                    image = '';
+                                  },
                                   controller: _linkController,
                                   decoration: InputDecoration(
                                       fillColor:
@@ -869,19 +940,19 @@ class _EditEventCalenderState extends State<EditEventCalender> {
                                 )),
                           ),
                         ),
-                      if (isuploadimage)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Supported Format : JPEG,Webp PNG, PDF',
+//  // Show error message below TextFormField
+                      if (isaddLink && _linkController.text.isNotEmpty)
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5, left: 5),
+                            child: Text(
+                              _errorMessage!,
                               style: TextStyle(
-                                  fontFamily: 'regular',
-                                  fontSize: 9,
-                                  color: Color.fromRGBO(168, 168, 168, 1)),
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                  fontFamily: 'semibold'),
                             ),
-                          ],
-                        ),
+                          ),
                       //
                       if (isaddLink)
                         Padding(
@@ -933,18 +1004,31 @@ class _EditEventCalenderState extends State<EditEventCalender> {
               ///update..
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  updateimportantevent();
-                },
-                child: Text(
-                  'Update',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'semibold',
-                      color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isUpdating
+                    ? null // Disable button while loading
+                    : () {
+                        updateimportantevent();
+                      },
+                child: isUpdating
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.textFieldborderColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Update',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'semibold',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -953,9 +1037,16 @@ class _EditEventCalenderState extends State<EditEventCalender> {
     );
   }
 
+  //
+  bool isUpdating = false;
+
   //update...
   void updateimportantevent() {
+    setState(() {
+      isUpdating = true;
+    });
     String fileType = '';
+
     String? filePath;
     String? link;
 
@@ -972,6 +1063,18 @@ class _EditEventCalenderState extends State<EditEventCalender> {
       print("Please upload a file or provide a link.");
       return;
     }
+    //
+    // **Validate YouTube Link**
+    if (_linkController.text.isNotEmpty &&
+        !isValidYouTubeLink(_linkController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Invalid YouTube link. Please enter a valid link.'),
+        ),
+      );
+      return;
+    }
 
     //updateon
     String updatedOn = DateFormat('dd-MM-yyyy').format(DateTime.now());
@@ -982,7 +1085,7 @@ class _EditEventCalenderState extends State<EditEventCalender> {
         rollNumber: UserSession().rollNumber ?? '',
         headLine: _heading.text,
         description: _desc.text,
-        file: filePath.toString(),
+        file: filePath ?? '',
         fileType: fileType,
         link: _linkController.text,
         updatedOn: updatedOn);

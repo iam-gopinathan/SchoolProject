@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -173,7 +174,7 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
   }
 
   ///image bottomsheeet
-  void _PreviewBottomsheet(BuildContext context) {
+  void _PreviewBottomsheet(BuildContext context, String image) {
     showModalBottomSheet(
         backgroundColor: Colors.white,
         context: context,
@@ -211,113 +212,130 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          ),
+                        ],
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 2,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
-//heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
+                    ),
+                    //heading...
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
                           children: [
-                            Text(
-                              "${selectedClasses}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      //selected section..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${selectedSection}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //subject..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${selectedSubject}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //heading
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: Text(
-                                "${_heading.text}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "${selectedClasses}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ],
                               ),
                             ),
+
+                            //selected section..
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "${selectedSection}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            //subject..
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    "${selectedSubject}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            //heading
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(
+                                      "${_heading.text}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            //fetchedimage...
+                            if (image.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Image.network(
+                                  image,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+
+                            ///image section...
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Center(
+                                child: selectedFile != null &&
+                                        selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(),
+                              ),
+                            )
                           ],
                         ),
                       ),
-
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )
             ]);
@@ -656,6 +674,7 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                       ],
                     ),
                   ),
+                  //
                   Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Container(
@@ -762,6 +781,7 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                           onTap: () {
                             pickFile();
                             isFetchedImageVisible = false;
+                            imageUrl = '';
                           },
                           child: Container(
                             color: Color.fromRGBO(228, 238, 253, 1)
@@ -822,6 +842,25 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                         ),
                       ),
                     ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                      // Text(
+                      //   '*Upload either an image or a link',
+                      //   style: TextStyle(
+                      //       fontFamily: 'regular',
+                      //       fontSize: 9,
+                      //       color: Color.fromRGBO(168, 168, 168, 1)),
+                      // ),
+                    ],
                   ),
                   //fetched image show..
                   if (isFetchedImageVisible &&
@@ -921,25 +960,6 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
                         ],
                       ),
                     ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Supported Format : JPEG,Webp PNG, PDF',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
-                      // Text(
-                      //   '*Upload either an image or a link',
-                      //   style: TextStyle(
-                      //       fontFamily: 'regular',
-                      //       fontSize: 9,
-                      //       color: Color.fromRGBO(168, 168, 168, 1)),
-                      // ),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -954,7 +974,7 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
               //preview
               GestureDetector(
                 onTap: () {
-                  _PreviewBottomsheet(context);
+                  _PreviewBottomsheet(context, imageUrl.toString());
                 },
                 child: Text(
                   'Preview',
@@ -966,18 +986,55 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
               ),
 
               ///
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     _updatestudymaterial();
+              //   },
+              //   child: Text(
+              //     'Update',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  _updatestudymaterial();
-                },
-                child: Text(
-                  'Update',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: _isUpdating
+                    ? null
+                    : () async {
+                        // Disable when loading
+                        setState(() {
+                          _isUpdating = true; // Start loading
+                        });
+
+                        await _updatestudymaterial(); // Wait for function to complete
+
+                        setState(() {
+                          _isUpdating = false; // Stop loading
+                        });
+                      },
+                child: _isUpdating
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.appBackgroundPrimaryColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Update',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -986,13 +1043,19 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
     );
   }
 
+  bool _isUpdating = false;
+
 //update study material.........
-  void _updatestudymaterial() {
+  Future<void> _updatestudymaterial() async {
     if (selectedFile == null && imageUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('Please select a file or ensure an image exists.')),
+            backgroundColor: Colors.red,
+            content: Text('Please select a file!')),
       );
+      setState(() {
+        _isUpdating = false;
+      });
       return;
     }
     String fileType = "";
@@ -1034,7 +1097,7 @@ class _EditStudymaterialpageState extends State<EditStudymaterialpage> {
       file: filePath,
       updatedOn: currentDateTime,
     );
-    updateStudyMaterial(
+    await updateStudyMaterial(
         updatestudy,
         selectedFile != null ? File(selectedFile!.path!) : null,
         context,

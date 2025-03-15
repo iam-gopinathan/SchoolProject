@@ -1,6 +1,7 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/Controller/grade_controller.dart';
 import 'package:flutter_application_1/Firebase_api.dart';
 import 'package:flutter_application_1/firebase_options.dart';
@@ -13,21 +14,23 @@ import 'package:get/get.dart';
 
 void main() async {
   HttpOverrides.global = MyHttpOverrides();
-
   WidgetsFlutterBinding.ensureInitialized();
-
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
   await FirebaseApi().initnotification();
-
   FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-
   // Initialize the FlutterDownloader plugin
   await FlutterDownloader.initialize(debug: true);
-
   //
+
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp, // Only allow portrait mode
+    DeviceOrientation.portraitDown, // Optional: Allow upside-down portrait
+  ]).then((_) {
+    runApp(MyApp());
+  });
 
   runApp(new MyApp());
 }
@@ -54,7 +57,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     final GradeController gradeController = Get.put(GradeController());
-
     gradeController.fetchGrades();
     return InternetChecker(
       child: GetMaterialApp(

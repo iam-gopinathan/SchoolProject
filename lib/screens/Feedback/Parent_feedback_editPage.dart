@@ -221,148 +221,159 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            //select receipents..
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 4,
+                color: AppTheme.textFieldborderColor,
+              ),
+            )
+          : SingleChildScrollView(
+              child: Column(
                 children: [
-                  Text(
-                    'Suggestions',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
+                  //select receipents..
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          'Suggestions',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 14,
+                              color: Color.fromRGBO(38, 38, 38, 1)),
+                        ),
+                        //
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: DropdownButtonFormField<String>(
+                            value: selectedOptions,
+                            decoration: InputDecoration(
+                              hintText: 'Select',
+                              hintStyle: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                              border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 0, horizontal: 10),
+                            ),
+                            dropdownColor: Colors.black,
+                            items: options.map((String item) {
+                              return DropdownMenuItem<String>(
+                                value: item,
+                                child: Text(
+                                  item,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontFamily: 'regular',
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: null,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //description...
+                  Padding(
+                    padding: EdgeInsets.only(
+                      top: 50,
+                      left: MediaQuery.of(context).size.width * 0.07,
+                    ),
+                    child: Row(children: [
+                      Text(
+                        'Edit Description',
+                        style: TextStyle(
+                            fontFamily: 'medium',
+                            fontSize: 14,
+                            color: Color.fromRGBO(38, 38, 38, 1)),
+                      ),
+                    ]),
+                  ),
+                  //description..
+                  Padding(
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.04),
+                    child: Container(
+                      child: TextFormField(
+                        cursorColor: Colors.black,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(600)
+                        ],
+                        controller: _desc,
+                        maxLines: 5,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(203, 203, 203, 1),
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ),
                   ),
                   //
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: DropdownButtonFormField<String>(
-                      value: selectedOptions,
-                      decoration: InputDecoration(
-                        hintText: 'Select',
-                        hintStyle: TextStyle(
-                          fontFamily: 'medium',
-                          fontSize: 16,
-                          color: Colors.black,
-                        ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: Color.fromRGBO(203, 203, 203, 1),
-                            width: 1,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                      ),
-                      dropdownColor: Colors.black,
-                      items: options.map((String item) {
-                        return DropdownMenuItem<String>(
-                          value: item,
-                          child: Text(
-                            item,
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.08,
+                    ),
+                    child: Row(
+                      children: [
+                        Text(
+                          '*Max 600 Characters',
+                          style: TextStyle(
                               fontFamily: 'regular',
-                            ),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: null,
+                              fontSize: 12,
+                              color: Color.fromRGBO(127, 127, 127, 1)),
+                        )
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-            //description...
-            Padding(
-              padding: EdgeInsets.only(
-                top: 50,
-                left: MediaQuery.of(context).size.width * 0.07,
-              ),
-              child: Row(children: [
-                Text(
-                  'Edit Description',
-                  style: TextStyle(
-                      fontFamily: 'medium',
-                      fontSize: 14,
-                      color: Color.fromRGBO(38, 38, 38, 1)),
-                ),
-              ]),
-            ),
-            //description..
-            Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-              child: Container(
-                child: TextFormField(
-                  inputFormatters: [LengthLimitingTextInputFormatter(600)],
-                  controller: _desc,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color.fromRGBO(203, 203, 203, 1),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color.fromRGBO(203, 203, 203, 1),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color.fromRGBO(203, 203, 203, 1),
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            //
-            Padding(
-              padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width * 0.08,
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    '*Max 600 Characters',
-                    style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Color.fromRGBO(127, 127, 127, 1)),
-                  )
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
       bottomNavigationBar: Container(
         child: //draft
             Padding(
@@ -390,18 +401,41 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
               ),
 
               ///post
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     update();
+              //   },
+              //   child: Text(
+              //     'Update',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  update();
-                },
-                child: Text(
-                  'Update',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isupdate ? null : update,
+                child: isupdate
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.appBackgroundPrimaryColor,
+                        ),
+                      )
+                    : Text(
+                        'Update',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
             ],
           ),
@@ -410,8 +444,29 @@ class _ParentFeedbackEditpageState extends State<ParentFeedbackEditpage> {
     );
   }
 
+  //
+  bool isupdate = false;
+
   //update...functions....
   void update() {
+    setState(() {
+      isupdate = true;
+    });
+    if (_desc.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please enter Description!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isupdate = false;
+      });
+      return;
+    }
+    setState(() {
+      isupdate = true;
+    });
     String postedOn = DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
     ParentFeedbackUpdateModel update = ParentFeedbackUpdateModel(

@@ -7,9 +7,9 @@ class NewsUpdateModel {
   final String file;
   final String fileType;
   final String link;
-  final String status;
+  // final String status;
   final String? scheduleOn;
-  final String postedOn;
+  // final String postedOn;
   final String? updatedOn;
 
   NewsUpdateModel({
@@ -21,9 +21,9 @@ class NewsUpdateModel {
     required this.file,
     required this.fileType,
     required this.link,
-    required this.status,
+    // required this.status,
     this.scheduleOn,
-    required this.postedOn,
+    // required this.postedOn,
     this.updatedOn,
   });
 
@@ -37,9 +37,9 @@ class NewsUpdateModel {
       'file': file,
       'fileType': fileType,
       'link': link,
-      'status': status,
+      // 'status': status,
       'scheduleOn': scheduleOn,
-      'postedOn': postedOn,
+      // 'postedOn': postedOn,
       'updatedOn': updatedOn,
     };
   }
@@ -54,9 +54,9 @@ class NewsUpdateModel {
       file: json['file'],
       fileType: json['fileType'],
       link: json['link'],
-      status: json['status'],
+      // status: json['status'],
       scheduleOn: json['scheduleOn'],
-      postedOn: json['postedOn'],
+      // postedOn: json['postedOn'],
       updatedOn: json['updatedOn'],
     );
   }

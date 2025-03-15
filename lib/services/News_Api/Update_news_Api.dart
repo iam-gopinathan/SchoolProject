@@ -21,9 +21,9 @@ Future<bool> updateNewsWithFormData(NewsUpdateModel news, File? file) async {
       ..fields['news'] = news.news
       ..fields['fileType'] = news.fileType
       ..fields['link'] = news.link
-      ..fields['status'] = news.status
+      // ..fields['status'] = news.status
       ..fields['scheduleOn'] = news.scheduleOn ?? ''
-      ..fields['postedOn'] = news.postedOn ?? ''
+      // ..fields['postedOn'] = news.postedOn ?? ''
       ..fields['updatedOn'] = news.updatedOn ?? '';
 
     if (file != null) {

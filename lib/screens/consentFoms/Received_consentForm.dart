@@ -94,7 +94,7 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                   ),
                 ),
                 Container(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                  height: MediaQuery.of(context).size.height * 0.5,
                   width: double.infinity,
                   child: Column(
                     children: [
@@ -213,13 +213,12 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                     ),
                                   ),
                                 ),
-
                                 // Select Section
                                 if (sections.isNotEmpty) ...[
                                   Padding(
                                     padding: EdgeInsets.only(
                                       top: MediaQuery.of(context).size.height *
-                                          0.02,
+                                          0.03,
                                       left: MediaQuery.of(context).size.width *
                                           0.05,
                                     ),
@@ -241,6 +240,9 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                     padding: EdgeInsets.only(
                                       top: MediaQuery.of(context).size.height *
                                           0.02,
+                                      bottom:
+                                          MediaQuery.of(context).size.height *
+                                              0.03,
                                     ),
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
@@ -296,22 +298,63 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                           ),
                         ),
                       ),
+                      // if (selectedSection == null || selectedSection.isNotEmpty)
+                      //   Padding(
+                      //     padding: EdgeInsets.only(
+                      //         top: MediaQuery.of(context).size.height * 0.03),
+                      //     child: Row(
+                      //       mainAxisAlignment: MainAxisAlignment.center,
+                      //       children: [
+                      //         ElevatedButton(
+                      //           style: ElevatedButton.styleFrom(
+                      //             backgroundColor:
+                      //                 AppTheme.textFieldborderColor,
+                      //           ),
+                      //           onPressed: () {
+                      //             Navigator.of(context).pop();
+                      //             isLoading = true;
+                      //             _recievedconsent(
+                      //                 grade: selectedGrade,
+                      //                 section: selectedSection);
+                      //           },
+                      //           child: Padding(
+                      //             padding: const EdgeInsets.symmetric(
+                      //                 horizontal: 50),
+                      //             child: Text(
+                      //               'OK',
+                      //               style: TextStyle(
+                      //                 fontFamily: 'semibold',
+                      //                 fontSize: 16,
+                      //                 color: Colors.black,
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.03,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.textFieldborderColor,
+                                backgroundColor: selectedSection == null ||
+                                        selectedSection!.isEmpty
+                                    ? Colors.grey // Disabled color
+                                    : AppTheme.textFieldborderColor,
                               ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                isLoading = true;
-                                _recievedconsent(
-                                    grade: selectedGrade,
-                                    section: selectedSection);
-                              },
+                              onPressed: selectedSection == null ||
+                                      selectedSection!.isEmpty
+                                  ? null // Disables the button if no section is selected
+                                  : () {
+                                      Navigator.of(context).pop();
+                                      isLoading = true;
+                                      _recievedconsent(
+                                        grade: selectedGrade,
+                                        section: selectedSection,
+                                      );
+                                    },
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 50),
@@ -681,6 +724,9 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                                             child: Container(
                                                               decoration: BoxDecoration(
                                                                   borderRadius: BorderRadius.only(
+                                                                      topLeft: Radius
+                                                                          .circular(
+                                                                              10),
                                                                       topRight:
                                                                           Radius.circular(
                                                                               10)),
@@ -824,8 +870,30 @@ class _ReceivedConsentformState extends State<ReceivedConsentform> {
                                                                             1),
                                                                     width:
                                                                         0.5)),
-                                                            leading: Image.network(
-                                                                '$profileImage'),
+                                                            leading: profileImage !=
+                                                                        null &&
+                                                                    profileImage
+                                                                        .isNotEmpty
+                                                                ? Image.network(
+                                                                    profileImage,
+                                                                    errorBuilder:
+                                                                        (context,
+                                                                            error,
+                                                                            stackTrace) {
+                                                                      return Icon(
+                                                                          Icons
+                                                                              .person,
+                                                                          size:
+                                                                              40,
+                                                                          color:
+                                                                              Colors.grey);
+                                                                    },
+                                                                  )
+                                                                : Image.asset(
+                                                                    'assets/images/Dashboard_profileimage.png',
+                                                                    fit: BoxFit
+                                                                        .contain,
+                                                                  ),
                                                             title: Text(
                                                               '$studentName',
                                                               style: TextStyle(

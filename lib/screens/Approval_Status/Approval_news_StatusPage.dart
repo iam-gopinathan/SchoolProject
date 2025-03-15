@@ -8,7 +8,7 @@ import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:get/get.dart';
+
 import 'package:intl/intl.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -304,11 +304,18 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.8,
                                   child: TextFormField(
+                                    cursorColor: Colors.black,
                                     controller: searchController,
                                     textAlign: TextAlign.center,
                                     decoration: InputDecoration(
+                                        contentPadding:
+                                            EdgeInsets.symmetric(vertical: 5),
                                         prefixIcon: Transform.translate(
-                                          offset: Offset(50, 0),
+                                          offset: Offset(
+                                            MediaQuery.of(context).size.width *
+                                                0.12,
+                                            0,
+                                          ),
                                           child: Icon(Icons.search,
                                               color: Color.fromRGBO(
                                                   178, 178, 178, 1)),
@@ -385,7 +392,10 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                             children: [
                               //
                               Transform.translate(
-                                offset: Offset(0, 15),
+                                // offset: Offset(0, 15),
+                                offset: Offset(0,
+                                    MediaQuery.of(context).size.height * 0.020),
+
                                 child: Row(
                                   children: [
                                     SizedBox(
@@ -525,7 +535,17 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                                                         .size
                                                         .width *
                                                     0.8,
-                                                child: Html(data: e.news),
+                                                child: Html(
+                                                  data: e.news,
+                                                  style: {
+                                                    "body": Style(
+                                                        color: Colors.black,
+                                                        fontFamily: 'semibold',
+                                                        fontSize: FontSize(16),
+                                                        textAlign:
+                                                            TextAlign.justify)
+                                                  },
+                                                ),
                                               )
                                             ],
                                           ),
@@ -710,7 +730,7 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                                                                       .circular(
                                                                           10)),
                                                           content: Text(
-                                                            "Do you really want to Delete\n  to this News?",
+                                                            "Do you really want to Delete\n this News?",
                                                             style: TextStyle(
                                                                 fontFamily:
                                                                     'regular',
@@ -821,9 +841,18 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                                                                               200) {
                                                                             print('News deleted successfully $dnewsID');
                                                                             //
+                                                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                              backgroundColor: Colors.green,
+                                                                              content: Text('News item deleted successfully'),
+                                                                            ));
+                                                                            //
                                                                             Navigator.pop(context);
                                                                             await fetchApprovalNews();
                                                                           } else {
+                                                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                              backgroundColor: Colors.red,
+                                                                              content: Text('Failed to delete news item. Status code: ${response.statusCode}'),
+                                                                            ));
                                                                             print('Failed to delete news. Status code: ${response.statusCode}');
                                                                           }
                                                                         } catch (e) {

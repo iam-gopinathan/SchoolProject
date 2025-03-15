@@ -7,7 +7,8 @@ import 'package:flutter_application_1/models/TimeTable_models/Edit_timetable_mod
 import 'package:flutter_application_1/models/TimeTable_models/Update_timeTable_model.dart';
 import 'package:flutter_application_1/services/Timetables/Edit_timetables_Api.dart';
 import 'package:flutter_application_1/services/Timetables/update_timeTable_Api.dart';
-import 'package:flutter_application_1/user_session.dart';
+import 'package:flutter_application_1/user_Session.dart';
+
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -16,8 +17,12 @@ import '../../utils/theme.dart';
 class EditTimetable extends StatefulWidget {
   final int id;
   final Function fetchMaintimetable;
-  const EditTimetable(
-      {super.key, required this.id, required this.fetchMaintimetable});
+
+  const EditTimetable({
+    super.key,
+    required this.id,
+    required this.fetchMaintimetable,
+  });
 
   @override
   State<EditTimetable> createState() => _EditTimetableState();
@@ -41,7 +46,12 @@ class _EditTimetableState extends State<EditTimetable> {
     super.initState();
     EditTimetableData();
     _gradeController.fetchGrades();
+
+    print("usertypeeeeeeee${UserSession().userType}");
+    print("rooollll num${UserSession().rollNumber}");
   }
+
+  //
 
   String? imageUrl;
   Future<void> EditTimetableData() async {
@@ -191,36 +201,36 @@ class _EditTimetableState extends State<EditTimetable> {
                       ),
                     ),
 //heading...
-                    // Padding(
-                    //   padding: const EdgeInsets.only(left: 15, top: 10),
-                    //   child: Row(
-                    //     children: [
-                    //       Text(
-                    //         "${_selectedClass}",
-                    //         style: TextStyle(
-                    //             fontWeight: FontWeight.bold,
-                    //             fontSize: 16,
-                    //             color: Colors.black),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-
+                    if (_selectedClass != null && _selectedClass!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 15, top: 10),
+                        child: Row(
+                          children: [
+                            Text(
+                              "${_selectedClass}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
                     //selected section..
-                    // Padding(
-                    //   padding: const EdgeInsets.only(left: 15, top: 10),
-                    //   child: Row(
-                    //     children: [
-                    //       Text(
-                    //         "${_selectedSection}",
-                    //         style: TextStyle(
-                    //             fontWeight: FontWeight.bold,
-                    //             fontSize: 16,
-                    //             color: Colors.black),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15, top: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            "${_selectedSection}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
                     //fetched image shows
                     if (isFetchedImageVisible)
                       SizedBox(
@@ -258,9 +268,9 @@ class _EditTimetableState extends State<EditTimetable> {
       },
     );
   }
+  //
 
   bool isFetchedImageVisible = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -380,7 +390,6 @@ class _EditTimetableState extends State<EditTimetable> {
                       ],
                     ),
                   ),
-
                   //select sections.....
                   Padding(
                     padding: EdgeInsets.only(
@@ -399,7 +408,6 @@ class _EditTimetableState extends State<EditTimetable> {
                               fontSize: 14,
                               color: Color.fromRGBO(38, 38, 38, 1)),
                         ),
-
                         // Section dropdown code
                         Transform.translate(
                           offset: Offset(-3, 0),
@@ -445,9 +453,7 @@ class _EditTimetableState extends State<EditTimetable> {
                       ],
                     ),
                   ),
-
 //upload image......
-
                   Padding(
                     padding: EdgeInsets.only(
                       top: MediaQuery.of(context).size.height *
@@ -487,6 +493,7 @@ class _EditTimetableState extends State<EditTimetable> {
                           onTap: () {
                             pickFile();
                             isFetchedImageVisible = false;
+                            imageUrl = '';
                           },
                           child: Container(
                             color: Color.fromRGBO(228, 238, 253, 1)
@@ -547,6 +554,26 @@ class _EditTimetableState extends State<EditTimetable> {
                         ),
                       ),
                     ),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                      // Text(
+                      //   '*Upload either an image or a link',
+                      //   style: TextStyle(
+                      //       fontFamily: 'regular',
+                      //       fontSize: 9,
+                      //       color: Color.fromRGBO(168, 168, 168, 1)),
+                      // ),
+                    ],
                   ),
                   // Display the fetched image if the URL exists
                   if (isFetchedImageVisible &&
@@ -646,27 +673,6 @@ class _EditTimetableState extends State<EditTimetable> {
                         ],
                       ),
                     ),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Supported Format : JPEG,Webp PNG, PDF',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
-                      // Text(
-                      //   '*Upload either an image or a link',
-                      //   style: TextStyle(
-                      //       fontFamily: 'regular',
-                      //       fontSize: 9,
-                      //       color: Color.fromRGBO(168, 168, 168, 1)),
-                      // ),
-                    ],
-                  ),
                 ],
               ),
             ),
@@ -690,19 +696,34 @@ class _EditTimetableState extends State<EditTimetable> {
                 ),
               ),
 
-              ///publish
+              /// Update Button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  _updateTimetable();
-                },
-                child: Text(
-                  'Update',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: _isloading
+                    ? null // Disable button while loading
+                    : () {
+                        _updateTimetable();
+                      },
+                child: _isloading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          backgroundColor: AppTheme.textFieldborderColor,
+                          color: AppTheme.appBackgroundPrimaryColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Update',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
             ],
           ),
@@ -711,21 +732,25 @@ class _EditTimetableState extends State<EditTimetable> {
     );
   }
 
+  //
+  bool _isloading = false;
+
   //update api calls................
-
   Future<void> _updateTimetable() async {
+    setState(() {
+      _isloading = true;
+    });
     File? file;
-
     String formattedDate =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
-
-    if (selectedFile == null && imageUrl == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No file selected!')),
-      );
+    // Check if no file or image URL is available
+    if (selectedFile == null && (imageUrl == null || imageUrl!.isEmpty)) {
+      _showSnackBar("Please upload an image!"); // Show error message
+      setState(() {
+        _isloading = false;
+      });
       return;
     }
-
     String fileType = '';
     if (selectedFile != null) {
       final bytes = selectedFile!.bytes;
@@ -735,36 +760,43 @@ class _EditTimetableState extends State<EditTimetable> {
         );
         return;
       }
-
       final tempFile =
           File('${Directory.systemTemp.path}/${selectedFile!.name}');
       await tempFile.writeAsBytes(bytes);
-
       file = tempFile;
       fileType = 'image';
     } else if (imageUrl != null && imageUrl!.isNotEmpty) {
       fileType = 'existing';
       file = null;
     }
-
     final model = UpdateTimetableModel(
       id: widget.id,
-      userType: UserSession().userType ?? '',
-      rollNumber: UserSession().rollNumber ?? '',
+      userType: UserSession().userType.toString(),
+      rollNumber: UserSession().rollNumber.toString(),
       fileType: fileType,
       file: selectedFile?.extension ?? "image",
       updatedOn: formattedDate,
     );
-
     final timetableService = TimetableService();
-
     bool success = await timetableService.updateTimetable(
         model, file, context, widget.fetchMaintimetable);
-
     if (success) {
       print("Timetable updated.");
+      print('usertype first :${UserSession().userType}');
+      print('usertype first :${UserSession().rollNumber}');
     } else {
       print("Failed to update timetable.");
     }
+  }
+
+  /// Show Snackbar Function
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 }

@@ -8,7 +8,7 @@ import 'package:flutter_application_1/services/News_Api/Create_news_Api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Style;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
@@ -23,6 +23,8 @@ class CreateNewsscreen extends StatefulWidget {
 }
 
 class _CreateNewsscreenState extends State<CreateNewsscreen> {
+  //
+
   // Function to paste clipboard text
   Future<void> _pasteFromClipboard() async {
     ClipboardData? clipboardData =
@@ -49,10 +51,11 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
 
   // Method to show date picker
   Future<void> _pickDate() async {
+    DateTime now = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2101),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -161,46 +164,158 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
     }
   }
 
-  ///image bottomsheeet
+//   ///image bottomsheeet
+//   void _PreviewBottomsheet(BuildContext context) {
+//     showModalBottomSheet(
+//         backgroundColor: Colors.white,
+//         context: context,
+//         isScrollControlled: true,
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+//         ),
+//         builder: (BuildContext context) {
+//           return StatefulBuilder(
+//               builder: (BuildContext context, StateSetter setModalState) {
+//             return Stack(clipBehavior: Clip.none, children: [
+//               // Close icon
+//               Positioned(
+//                 top: MediaQuery.of(context).size.height * (-70 / 800),
+//                 left: MediaQuery.of(context).size.width * 0.4,
+//                 child: GestureDetector(
+//                   onTap: () {
+//                     Navigator.of(context).pop();
+//                   },
+//                   child: CircleAvatar(
+//                     radius: 28,
+//                     backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+//                     child: Icon(
+//                       Icons.close,
+//                       color: Colors.white,
+//                       size: 35,
+//                     ),
+//                   ),
+//                 ),
+//               ),
+//               Container(
+//                 padding: EdgeInsets.all(10),
+//                 width: double.infinity,
+//                 height: MediaQuery.of(context).size.height * 0.7,
+//                 child: SingleChildScrollView(
+//                   scrollDirection: Axis.vertical,
+//                   child: Column(
+//                     children: [
+//                       Padding(
+//                         padding: const EdgeInsets.only(top: 10, left: 10),
+//                         child: Row(
+//                           children: [
+//                             Text(
+//                               'Preview Screen',
+//                               style: TextStyle(
+//                                   fontFamily: 'medium',
+//                                   fontSize: 16,
+//                                   color: Color.fromRGBO(104, 104, 104, 1)),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       //
+//                       Padding(
+//                         padding: const EdgeInsets.only(top: 10),
+//                         child: Divider(
+//                           thickness: 2,
+//                           color: Color.fromRGBO(243, 243, 243, 1),
+//                         ),
+//                       ),
+// //heading...
+//                       Padding(
+//                         padding: const EdgeInsets.only(left: 15, top: 10),
+//                         child: Row(
+//                           children: [
+//                             Text(
+//                               _heading.text ?? '',
+//                               style:
+//                                   TextStyle(fontSize: 16, color: Colors.black),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                       // description...
+//                       Row(
+//                         children: [
+//                           Container(
+//                             width: MediaQuery.of(context).size.width * 0.7,
+//                             padding: const EdgeInsets.all(10),
+//                             child: htmlContent.isNotEmpty
+//                                 ? Html(data: htmlContent)
+//                                 : const Text(''),
+//                           ),
+//                         ],
+//                       ),
+
+//                       ///image section...
+//                       Padding(
+//                         padding: const EdgeInsets.only(top: 15),
+//                         child: Center(
+//                           child: selectedFile != null &&
+//                                   selectedFile!.bytes != null
+//                               ? Image.memory(
+//                                   selectedFile!.bytes!,
+//                                   width: double.infinity,
+//                                   fit: BoxFit.cover,
+//                                 )
+//                               : Container(),
+//                         ),
+//                       )
+//                     ],
+//                   ),
+//                 ),
+//               )
+//             ]);
+//           });
+//         });
+//   }
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: MediaQuery.of(context).size.height * (-70 / 800),
-                left: MediaQuery.of(context).size.width * 0.4,
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: MediaQuery.of(context).size.height * (-70 / 800),
+                  left: MediaQuery.of(context).size.width * 0.4,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
+
+                /// **Main Container**
+                Container(
+                  padding: EdgeInsets.all(10),
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.7,
                   child: Column(
                     children: [
+                      // ✅ **Static Header (Won't Scroll)**
                       Padding(
                         padding: const EdgeInsets.only(top: 10, left: 10),
                         child: Row(
@@ -208,14 +323,16 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                             Text(
                               'Preview Screen',
                               style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      //
+
+                      /// **Divider (Also Static)**
                       Padding(
                         padding: const EdgeInsets.only(top: 10),
                         child: Divider(
@@ -223,53 +340,84 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           color: Color.fromRGBO(243, 243, 243, 1),
                         ),
                       ),
-//heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              _heading.text ?? '',
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      // description...
-                      Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.7,
-                            padding: const EdgeInsets.all(10),
-                            child: htmlContent.isNotEmpty
-                                ? Html(data: htmlContent)
-                                : const Text(''),
-                          ),
-                        ],
-                      ),
 
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
+                      // ✅ **Scrollable Content**
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            children: [
+                              // **Heading**
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.8,
+                                      child: Text(
+                                        _heading.text ?? '',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                        textAlign: TextAlign.justify,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // **Description**
+                              Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    padding: const EdgeInsets.all(10),
+                                    child: htmlContent.isNotEmpty
+                                        ? Html(data: htmlContent, style: {
+                                            "body": Style(
+                                              fontFamily: 'semibold',
+                                              color: Colors.black,
+                                              textAlign: TextAlign.justify,
+                                              fontSize: FontSize(
+                                                16.0,
+                                              ),
+                                            ),
+                                          })
+                                        : const Text(''),
+                                  ),
+                                ],
+                              ),
+
+                              // **Image Section**
+                              Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Center(
+                                  child: selectedFile != null &&
+                                          selectedFile!.bytes != null
+                                      ? Image.memory(
+                                          selectedFile!.bytes!,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Container(),
+                                ),
+                              )
+                            ],
+                          ),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
-              )
-            ]);
-          });
-        });
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   String initialHeading = "";
@@ -307,26 +455,60 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
           },
         ) ??
         false;
+  }
+
+  // Regular expression to validate YouTube links
+  bool isValidYouTubeLink(String url) {
+    final RegExp youtubeRegex = RegExp(
+      r'^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  //
+  String? _errorMessage;
+
+  void _validateLink(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _errorMessage = "";
+      });
+    } else if (!isValidYouTubeLink(input)) {
+      setState(() {
+        _errorMessage = "Enter a valid YouTube link";
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
   }
 
   @override
@@ -520,7 +702,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                         Padding(
                           padding: const EdgeInsets.only(top: 5),
                           child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               QuillSimpleToolbar(
                                 controller: _controller,
@@ -596,7 +778,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                     quill.HorizontalSpacing(0, 0),
                                     quill.VerticalSpacing.zero,
                                     quill.VerticalSpacing(0, 0),
-                                    null, // TextAlign (null if not needed)
+                                    null,
                                   ),
                                 )),
                               ),
@@ -699,6 +881,7 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                         child: GestureDetector(
                           onTap: () {
                             pickFile();
+                            _linkController.text = '';
                           },
                           child: Container(
                             color: Color.fromRGBO(228, 238, 253, 1)
@@ -758,6 +941,22 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                       ),
                     ),
                   ),
+                if (isuploadimage)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                    ],
+                  ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.02,
+                ),
 
                 /// Display selected image...
                 if (isuploadimage)
@@ -837,36 +1036,58 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                       color: Color.fromRGBO(0, 102, 255, 1),
                       strokeWidth: 2,
                       child: Container(
-                          height: 50,
-                          child: TextFormField(
-                            controller: _linkController,
-                            decoration: InputDecoration(
-                                fillColor: Color.fromRGBO(228, 238, 253, 1)
-                                    .withOpacity(0.9),
-                                filled: true,
-                                hintText: 'Paste Link Here',
-                                hintStyle: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 14,
-                                    color: Color.fromRGBO(0, 102, 255, 1)),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none)),
-                          )),
+                        height: 50,
+                        child: TextFormField(
+                          style: TextStyle(
+                            color:
+                                Colors.black, // Set input text color to black
+                            fontSize: 14,
+                            fontFamily: 'regular',
+                          ),
+                          onChanged: (value) {
+                            //
+                            _validateLink(value);
+                            //
+                            selectedFile = null;
+                          },
+                          controller: _linkController,
+                          decoration: InputDecoration(
+                            fillColor: Color.fromRGBO(228, 238, 253, 1)
+                                .withOpacity(0.9),
+                            filled: true,
+                            hintText: 'Paste Link Here',
+                            hintStyle: TextStyle(
+                                fontFamily: 'regular',
+                                fontSize: 14,
+                                color: Color.fromRGBO(0, 102, 255, 1)),
+                            border:
+                                OutlineInputBorder(borderSide: BorderSide.none),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return "Please enter a link";
+                            } else if (!isValidYouTubeLink(value)) {
+                              return "Enter a valid YouTube link";
+                            }
+                            return null;
+                          },
+                        ),
+                      ),
                     ),
                   ),
-                if (isuploadimage)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Supported Format : JPEG,Webp PNG, PDF',
+                // Show error message below TextFormField
+                if (isaddLink && _linkController.text.isNotEmpty)
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, left: 5),
+                      child: Text(
+                        _errorMessage!,
                         style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
+                            color: Colors.red,
+                            fontSize: 12,
+                            fontFamily: 'semibold'),
                       ),
-                    ],
-                  ),
+                    ),
                 //
                 if (isaddLink)
                   Row(
@@ -974,19 +1195,63 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(horizontal: 15),
+              //       backgroundColor: Colors.white,
+              //       side: BorderSide(color: Colors.black, width: 1.5)),
+              //   onPressed: () {
+              //     _publishNews(status: 'draft');
+              //   },
+              //   child: Text(
+              //     'Save as Draft',
+              //     style: TextStyle(
+              //         fontSize: 14, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  _publishNews(status: 'draft');
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 14, fontFamily: 'medium', color: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.black, width: 1.5),
                 ),
+                onPressed: isdraft
+                    ? null
+                    : () async {
+                        setState(() {
+                          isdraft = true;
+                          debugPrint(
+                              'Loading started: $isLoading'); // Debugging
+                        });
+
+                        await Future.delayed(
+                            Duration(seconds: 2)); // Allow UI update
+
+                        await _publishNews(status: 'draft');
+
+                        setState(() {
+                          isdraft = false;
+                          debugPrint(
+                              'Loading stopped: $isLoading'); // Debugging
+                        });
+                      },
+                child: isdraft
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.textFieldborderColor,
+                        ),
+                      )
+                    : Text(
+                        'Save as Draft',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
 
               ///preview
@@ -1011,26 +1276,72 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
               ),
 
               ///scheduled or post button..
+              // if (UserSession().userType == 'superadmin')
+              //   ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //         padding: EdgeInsets.symmetric(horizontal: 20),
+              //         backgroundColor: AppTheme.textFieldborderColor,
+              //         side: BorderSide.none),
+              //     onPressed: () {
+              //       setState(() {
+              //         isLoading = true;
+              //       });
+              //       final String status = _scheduledDateandtime.text.isEmpty
+              //           ? 'post'
+              //           : 'schedule';
+              //       _publishNews(status: status);
+              //     },
+              //     child: Text(
+              //       _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
+              //       style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'medium',
+              //           color: Colors.black),
+              //     ),
+              //   ),
+
               if (UserSession().userType == 'superadmin')
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      backgroundColor: AppTheme.textFieldborderColor,
-                      side: BorderSide.none),
-                  onPressed: () {
-                    final String status = _scheduledDateandtime.text.isEmpty
-                        ? 'post'
-                        : 'schedule';
-                    _publishNews(status: status);
-                  },
-                  child: Text(
-                    _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'medium',
-                        color: Colors.black),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none,
                   ),
+                  onPressed: isLoading
+                      ? null // Disable button when loading
+                      : () {
+                          setState(() {
+                            isLoading = true; // Start loading
+                          });
+
+                          final String status =
+                              _scheduledDateandtime.text.isEmpty
+                                  ? 'post'
+                                  : 'schedule';
+
+                          _publishNews(status: status);
+                        },
+                  child: isLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            backgroundColor: AppTheme.appBackgroundPrimaryColor,
+                            strokeWidth: 4,
+                            color: AppTheme.textFieldborderColor,
+                          ),
+                        )
+                      : Text(
+                          _scheduledDateandtime.text.isEmpty
+                              ? 'Publish'
+                              : 'Schedule',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'medium',
+                              color: Colors.black),
+                        ),
                 ),
+
               ////request now button..
               if (UserSession().userType == 'admin' ||
                   UserSession().userType == 'staff')
@@ -1053,7 +1364,6 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                         );
                         return;
                       }
-//
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -1135,8 +1445,12 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
     );
   }
 
+  bool isLoading = false;
+
+  bool isdraft = false;
+
   ////create news api call....................................................
-  void _publishNews({String? status}) {
+  Future<void> _publishNews({String? status}) async {
     //
     final String heading = _heading.text;
 
@@ -1148,13 +1462,16 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
     // Print the generated HTML content for debugging
     print("Generated HTML Content: $htmlContent");
 
-    if (heading.isEmpty || htmlContent.isEmpty) {
+    if (heading.isEmpty || _controller.document.toPlainText().trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
           content: Text('Please fill in both heading and description'),
         ),
       );
+      setState(() {
+        isLoading = false; // Stop loading if validation fails
+      });
       return;
     }
 
@@ -1169,6 +1486,19 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
     } else if (_linkController.text.isNotEmpty) {
       fileType = 'link';
       link = _linkController.text;
+      // Validate YouTube Link
+      if (!isValidYouTubeLink(link)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Invalid YouTube link. Please enter a valid link.'),
+          ),
+        );
+        setState(() {
+          isLoading = false; // Stop loading if validation fails
+        });
+        return;
+      }
     } else {
       fileType = 'empty';
     }

@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/circular_models/Create_Circular_model.dart';
 import 'package:flutter_application_1/user_Session.dart';
-
 import 'package:http/http.dart' as http;
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:http_parser/http_parser.dart';
@@ -21,9 +20,7 @@ Future<void> postCircular(CreateCircularModel circular, selectedFile, context,
       HttpHeaders.authorizationHeader: 'Bearer $authToken',
       HttpHeaders.contentTypeHeader: 'application/json',
     };
-
     request.headers.addAll(headers);
-
     request.fields['HeadLine'] = circular.headline;
     request.fields['Circular'] = circular.circular;
     request.fields['UserType'] = circular.userType;
@@ -48,16 +45,27 @@ Future<void> postCircular(CreateCircularModel circular, selectedFile, context,
 
     // Send the request
     final response = await request.send();
-
     if (response.statusCode == 200) {
       String snackBarMessage = '';
       if (UserSession().userType == 'superadmin') {
-        snackBarMessage = 'Circular Created Successfully!';
+        if (circular.status == 'post') {
+          snackBarMessage = 'Circular Created Successfully!';
+        } else if (circular.status == 'schedule') {
+          snackBarMessage = 'Circular Scheduled Successfully!';
+        }
       } else if (UserSession().userType == 'admin' ||
           UserSession().userType == 'staff') {
-        snackBarMessage = 'Circular Creation Request Was Sent Successfully!';
+        if (circular.status == 'post') {
+          snackBarMessage = 'Circular Creation Request Was Sent Successfully!';
+        } else if (circular.status == 'schedule') {
+          snackBarMessage = 'Circular Schedule Request Was Sent Successfully!';
+        }
       }
 
+      //
+      if (circular.status == 'draft') {
+        snackBarMessage = 'Circular Saved as Draft!';
+      }
       if (snackBarMessage.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

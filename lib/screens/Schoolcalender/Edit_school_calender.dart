@@ -166,6 +166,13 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
         _desc.text = _schoolCalendar?.description ?? '';
         image = _schoolCalendar?.filepath ?? '';
         _isLoading = false;
+        // If fileType is "link", set the _linkController text
+
+        if (_schoolCalendar?.filetype == 'link') {
+          _linkController.text = _schoolCalendar?.filepath ?? '';
+          isaddLink = true;
+          isuploadimage = false;
+        }
       });
     } catch (e) {
       setState(() {
@@ -176,6 +183,34 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
   }
 
   bool isFetchedImageVisible = true;
+
+  // Regular expression to validate YouTube links
+  bool isValidYouTubeLink(String url) {
+    final RegExp youtubeRegex = RegExp(
+      r'^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  //
+  String? _errorMessage;
+  void _validateLink(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _errorMessage = "";
+      });
+    } else if (!isValidYouTubeLink(input)) {
+      setState(() {
+        _errorMessage = "Enter a valid YouTube link";
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -583,7 +618,6 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
                           ],
                         ),
                       ),
-
                       // Upload Image and Add Link Section
                       Padding(
                         padding: EdgeInsets.only(
@@ -649,7 +683,6 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
                           ],
                         ),
                       ),
-
                       if (isuploadimage)
 
                         ///upload section
@@ -667,6 +700,7 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
                                 onTap: () {
                                   pickFile();
                                   isFetchedImageVisible = false;
+                                  _linkController.text = '';
                                 },
                                 child: Container(
                                   color: Color.fromRGBO(228, 238, 253, 1)
@@ -730,42 +764,62 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
                             ),
                           ),
                         ),
+                      if (isuploadimage)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              'Supported Format : JPEG,Webp PNG, PDF',
+                              style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 9,
+                                  color: Color.fromRGBO(168, 168, 168, 1)),
+                            ),
+                          ],
+                        ),
                       // fetched image
-                      if (isFetchedImageVisible)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 20),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.network(
-                              _schoolCalendar!.filepath ?? '',
-                              fit: BoxFit.cover,
-                              height: 150,
-                              loadingBuilder: (BuildContext context,
-                                  Widget child,
-                                  ImageChunkEvent? loadingProgress) {
-                                if (loadingProgress == null) {
-                                  return child;
-                                } else {
-                                  return Center(
-                                    child: CircularProgressIndicator(
-                                      value:
-                                          loadingProgress.expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  (loadingProgress
-                                                          .expectedTotalBytes ??
-                                                      1)
-                                              : null,
-                                      strokeWidth: 4,
-                                      color: AppTheme.textFieldborderColor,
-                                    ),
+                      if (isuploadimage)
+                        if (isFetchedImageVisible)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 20),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Image.network(
+                                _schoolCalendar!.filepath ?? '',
+                                fit: BoxFit.cover,
+                                height: 150,
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  } else {
+                                    return Center(
+                                      child: CircularProgressIndicator(
+                                        value: loadingProgress
+                                                    .expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                (loadingProgress
+                                                        .expectedTotalBytes ??
+                                                    1)
+                                            : null,
+                                        strokeWidth: 4,
+                                        color: AppTheme.textFieldborderColor,
+                                      ),
+                                    );
+                                  }
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Text(
+                                    '',
+                                    style: TextStyle(color: Colors.red),
                                   );
-                                }
-                              },
+                                },
+                              ),
                             ),
                           ),
-                        ),
 
                       /// Display selected image...
                       if (isuploadimage)
@@ -850,6 +904,20 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
                             child: Container(
                                 height: 50,
                                 child: TextFormField(
+                                  style: TextStyle(
+                                    color: Colors
+                                        .black, // Set input text color to black
+                                    fontSize: 14,
+                                    fontFamily: 'regular',
+                                  ),
+                                  onChanged: (value) {
+                                    //
+                                    _validateLink(value);
+                                    //
+                                    selectedFile = null;
+
+                                    _schoolCalendar!.filepath == '';
+                                  },
                                   controller: _linkController,
                                   decoration: InputDecoration(
                                       fillColor:
@@ -867,19 +935,21 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
                                 )),
                           ),
                         ),
-                      if (isuploadimage)
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Text(
-                              'Supported Format : JPEG,Webp PNG, PDF',
+
+                      // Show error message below TextFormField
+                      if (isaddLink && _linkController.text.isNotEmpty)
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5, left: 5),
+                            child: Text(
+                              _errorMessage!,
                               style: TextStyle(
-                                  fontFamily: 'regular',
-                                  fontSize: 9,
-                                  color: Color.fromRGBO(168, 168, 168, 1)),
+                                  color: Colors.red,
+                                  fontSize: 12,
+                                  fontFamily: 'semibold'),
                             ),
-                          ],
-                        ),
+                          ),
+
                       if (isaddLink)
                         Padding(
                           padding: const EdgeInsets.only(top: 5, bottom: 10),
@@ -931,20 +1001,48 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
               ),
 
               ///update
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     updateSchoolCalendar();
+              //   },
+              //   child: Text(
+              //     'Update',
+              //     style: TextStyle(
+              //         fontSize: 16,
+              //         fontFamily: 'semibold',
+              //         color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  updateSchoolCalendar();
-                },
-                child: Text(
-                  'Update',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'semibold',
-                      color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isLoading
+                    ? null // Disable button while loading
+                    : () {
+                        updateSchoolCalendar();
+                      },
+                child: isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.textFieldborderColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Update',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'semibold',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -953,13 +1051,17 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
     );
   }
 
-  //update school calender function....
+  //
+  bool isLoading = false;
 
+  //update school calender function....
   void updateSchoolCalendar() {
+    setState(() {
+      isLoading = true; // Show loader when button is clicked
+    });
     String fileType = '';
     String? filePath;
     String? link;
-
     if (isuploadimage && selectedFile != null) {
       fileType = 'image';
       filePath = selectedFile!.path;
@@ -973,10 +1075,19 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
       print("Please upload a file or provide a link.");
       return;
     }
-
+    // **Validate YouTube Link**
+    if (_linkController.text.isNotEmpty &&
+        !isValidYouTubeLink(_linkController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Invalid YouTube link. Please enter a valid link.'),
+        ),
+      );
+      return;
+    }
     //updateon
     String updatedOn = DateFormat('dd-MM-yyyy').format(DateTime.now());
-
     UpdateSchoolCalendarModel update = UpdateSchoolCalendarModel(
         id: widget.Id,
         userType: UserSession().userType ?? '',
@@ -987,7 +1098,6 @@ class _EditSchoolCalenderState extends State<EditSchoolCalender> {
         fileType: fileType,
         link: _linkController.text,
         updatedOn: updatedOn);
-
     updateSchoolCalendarApi(update, context, widget.fetchStudentCalendar);
   }
 }

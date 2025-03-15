@@ -12,7 +12,7 @@ import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Style;
 import 'package:html/parser.dart' as html_parser;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -136,102 +136,117 @@ class _EditCircularpageState extends State<EditCircularpage> {
               padding: EdgeInsets.all(10),
               width: double.infinity,
               height: MediaQuery.of(context).size.height * 0.7,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10, left: 10),
-                      child: Row(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, left: 10),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Preview Screen',
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 16,
+                              color: Color.fromRGBO(104, 104, 104, 1)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  //
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: Divider(
+                      thickness: 1,
+                      color: Color.fromRGBO(243, 243, 243, 1),
+                    ),
+                  ),
+                  //heading...
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Column(
                         children: [
-                          Text(
-                            'Preview Screen',
-                            style: TextStyle(
-                                fontFamily: 'medium',
-                                fontSize: 16,
-                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.8,
+                                  child: Text(
+                                    _heading.text,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
-                    //
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Divider(
-                        thickness: 1,
-                        color: Color.fromRGBO(243, 243, 243, 1),
-                      ),
-                    ),
-//heading...
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.8,
-                            child: Text(
-                              _heading.text,
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
+                          //description...
+                          Row(
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                padding: const EdgeInsets.all(10),
+                                child: htmlContent.isNotEmpty
+                                    ? Html(
+                                        data: htmlContent,
+                                        style: {
+                                          "body": Style(
+                                              fontFamily: 'semibold',
+                                              fontSize: FontSize(16),
+                                              textAlign: TextAlign.justify)
+                                        },
+                                      )
+                                    : const Text(''),
+                              ),
+                            ],
+                          ),
+                          //fetched image..
+                          if (isFetchedImageVisible && image.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Image.network(
+                                image,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          //image..
+                          Padding(
+                            padding: const EdgeInsets.only(top: 15),
+                            child: Center(
+                              child: selectedFile != null &&
+                                      selectedFile!.bytes != null
+                                  ? Image.memory(
+                                      selectedFile!.bytes!,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Container(),
+                            ),
+                          ),
+                          //
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15, top: 10),
+                            child: Row(
+                              children: [
+                                Text(
+                                  _scheduledDateandtime.text,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black),
+                                ),
+                              ],
                             ),
                           ),
                         ],
                       ),
                     ),
-                    //description...
-                    Row(
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          padding: const EdgeInsets.all(10),
-                          child: htmlContent.isNotEmpty
-                              ? Html(data: htmlContent)
-                              : const Text(''),
-                        ),
-                      ],
-                    ),
-                    //fetched image..
-                    if (isFetchedImageVisible && image.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Image.network(
-                          image,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    //image..
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: Center(
-                        child:
-                            selectedFile != null && selectedFile!.bytes != null
-                                ? Image.memory(
-                                    selectedFile!.bytes!,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(),
-                      ),
-                    ),
-                    //
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15, top: 10),
-                      child: Row(
-                        children: [
-                          Text(
-                            _scheduledDateandtime.text,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  )
+                ],
               ),
             )
           ]);
@@ -267,8 +282,9 @@ class _EditCircularpageState extends State<EditCircularpage> {
     );
   }
 
-  ///edit circular..
+  var schedule;
 
+  ///edit circular..
   void fetchEditCircular() async {
     try {
       final data = await fetchCircularById(widget.Id);
@@ -304,6 +320,26 @@ class _EditCircularpageState extends State<EditCircularpage> {
 
           initialFilePath = data.filePath;
           initialFileType = data.fileType;
+
+          schedule = data.status;
+
+          //
+          // _scheduledDateandtime.text = data.scheduleOnRailwayTime ?? '';
+
+          //schedule..
+          if (data.ScheduleOn != null && data.ScheduleOn!.isNotEmpty) {
+            try {
+              // Convert API date to desired format
+              DateTime parsedDate = DateTime.parse(data.ScheduleOn!);
+              _scheduledDateandtime.text =
+                  DateFormat("dd-MM-yyyy HH:mm").format(parsedDate);
+            } catch (e) {
+              print("Error parsing date: $e");
+              _scheduledDateandtime.text = data.ScheduleOn!;
+            }
+          } else {
+            _scheduledDateandtime.text = '';
+          }
         });
       } else {
         setState(() {
@@ -317,10 +353,11 @@ class _EditCircularpageState extends State<EditCircularpage> {
 
   // Method to show date picker
   Future<void> _pickDate() async {
+    DateTime now = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2101),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -511,6 +548,26 @@ class _EditCircularpageState extends State<EditCircularpage> {
   }
 
   late quill.QuillController descriptionController;
+
+  //
+
+  Future<void> _pasteFromClipboard() async {
+    ClipboardData? clipboardData =
+        await Clipboard.getData(Clipboard.kTextPlain);
+    if (clipboardData != null) {
+      String text = clipboardData.text ?? "";
+
+      // Insert plain text into QuillEditor
+      descriptionController.replaceText(
+        descriptionController.selection.baseOffset,
+        descriptionController.selection.extentOffset -
+            descriptionController.selection.baseOffset,
+        text,
+        TextSelection.collapsed(
+            offset: descriptionController.selection.baseOffset + text.length),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -853,47 +910,56 @@ class _EditCircularpageState extends State<EditCircularpage> {
                                 controller: descriptionController,
                                 configurations:
                                     const QuillSimpleToolbarConfigurations(
-                                  dialogTheme: QuillDialogTheme(
-                                      labelTextStyle:
-                                          TextStyle(color: Colors.black),
-                                      inputTextStyle: TextStyle(
-                                          color: Colors.black, fontSize: 14)),
-                                  showBoldButton: true,
-                                  showClearFormat: false,
-                                  showAlignmentButtons: false,
-                                  showBackgroundColorButton: false,
-                                  showFontSize: false,
-                                  showColorButton: false,
-                                  showCenterAlignment: false,
-                                  showClipboardCut: false,
-                                  showIndent: false,
-                                  showDirection: false,
-                                  showDividers: false,
-                                  showFontFamily: false,
-                                  showItalicButton: false,
-                                  showClipboardPaste: false,
-                                  showInlineCode: false,
-                                  showCodeBlock: false,
-                                  showHeaderStyle: false,
-                                  showJustifyAlignment: false,
-                                  showLeftAlignment: false,
-                                  showLineHeightButton: false,
-                                  showLink: false,
-                                  showListBullets: false,
-                                  showListCheck: false,
-                                  showListNumbers: false,
-                                  showQuote: false,
-                                  showRightAlignment: false,
-                                  showSearchButton: false,
-                                  showRedo: false,
-                                  showSmallButton: false,
-                                  showSubscript: false,
-                                  showStrikeThrough: false,
-                                  showUndo: false,
-                                  showUnderLineButton: false,
-                                  showSuperscript: false,
-                                ),
+                                        dialogTheme: QuillDialogTheme(
+                                            labelTextStyle:
+                                                TextStyle(color: Colors.black),
+                                            inputTextStyle: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 14)),
+                                        showBoldButton: true,
+                                        showClearFormat: false,
+                                        showAlignmentButtons: false,
+                                        showBackgroundColorButton: false,
+                                        showFontSize: false,
+                                        showColorButton: false,
+                                        showCenterAlignment: false,
+                                        showClipboardCut: false,
+                                        showIndent: false,
+                                        showDirection: false,
+                                        showDividers: false,
+                                        showFontFamily: false,
+                                        showItalicButton: false,
+                                        showClipboardPaste: false,
+                                        showInlineCode: false,
+                                        showCodeBlock: false,
+                                        showHeaderStyle: false,
+                                        showJustifyAlignment: false,
+                                        showLeftAlignment: false,
+                                        showLineHeightButton: false,
+                                        showLink: false,
+                                        showListBullets: false,
+                                        showListCheck: false,
+                                        showListNumbers: false,
+                                        showQuote: false,
+                                        showRightAlignment: false,
+                                        showSearchButton: false,
+                                        showRedo: false,
+                                        showSmallButton: false,
+                                        showSubscript: false,
+                                        showStrikeThrough: false,
+                                        showUndo: false,
+                                        showUnderLineButton: false,
+                                        showSuperscript: false,
+                                        showClipboardCopy: false),
                               ),
+                              //
+                              IconButton(
+                                  icon: Icon(Icons.paste, color: Colors.black),
+                                  onPressed: () {
+                                    setState(() {
+                                      _pasteFromClipboard();
+                                    });
+                                  }),
                             ],
                           ),
                           //quill controller.....
@@ -910,7 +976,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                       ),
                     ),
                   ),
-
                   // Padding(
                   //   padding: EdgeInsets.only(
                   //       left: MediaQuery.of(context).size.width * 0.05),
@@ -926,7 +991,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                   //     ],
                   //   ),
                   // ),
-
                   // Upload Image and Add Link Section
                   Padding(
                     padding: const EdgeInsets.only(left: 15, top: 30),
@@ -961,7 +1025,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                   ),
 
                   ///upload sections....
-
                   if (isuploadimage)
                     Padding(
                       padding: const EdgeInsets.all(15.0),
@@ -1036,6 +1099,18 @@ class _EditCircularpageState extends State<EditCircularpage> {
                         ),
                       ),
                     ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                    ],
+                  ),
 
                   ///fetched image show
                   if (selectedFile == null)
@@ -1122,7 +1197,6 @@ class _EditCircularpageState extends State<EditCircularpage> {
                       ),
 
                   /// Display Selected File end...
-
                   //addlink tab....
                   if (isaddLink)
                     Padding(
@@ -1135,6 +1209,12 @@ class _EditCircularpageState extends State<EditCircularpage> {
                         child: Container(
                             height: 50,
                             child: TextFormField(
+                              style: TextStyle(
+                                color: Colors
+                                    .black, // Set input text color to black
+                                fontSize: 14,
+                                fontFamily: 'regular',
+                              ),
                               controller: _linkController,
                               decoration: InputDecoration(
                                   fillColor: Color.fromRGBO(228, 238, 253, 1)
@@ -1151,85 +1231,75 @@ class _EditCircularpageState extends State<EditCircularpage> {
                       ),
                     ),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Supported Format : JPEG,Webp PNG, PDF',
-                        style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
-                      ),
-                    ],
-                  ),
                   //schedule post...
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: MediaQuery.of(context).size.width * 0.05,
-                      top: MediaQuery.of(context).size.height * 0.03,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Schedule Post',
-                          style: TextStyle(
-                              fontFamily: 'medium',
-                              fontSize: 14,
-                              color: Color.fromRGBO(38, 38, 38, 1)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width * 0.9,
-                          child: TextFormField(
-                            controller: _scheduledDateandtime,
-                            readOnly: true,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 10, horizontal: 20),
-                              suffixIcon: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 10, bottom: 10),
-                                child: SvgPicture.asset(
-                                  'assets/icons/NewsPage_timepicker.svg',
-                                  fit: BoxFit.contain,
-                                  height: 30,
-                                  width: 30,
-                                ),
-                              ),
-                              hintText: 'Tap to select date and time',
-                              hintStyle: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 14,
-                                  color: Colors.black),
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(203, 203, 203, 1),
-                                      width: 1)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(
-                                      color: Color.fromRGBO(203, 203, 203, 1),
-                                      width: 1)),
-                            ),
-                            onTap: () async {
-                              await _pickDate();
-                              await _pickTime();
-                              _scheduledDateandtime.text = _dateTime;
-                            },
+                  if (schedule == 'schedule')
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left: MediaQuery.of(context).size.width * 0.05,
+                        top: MediaQuery.of(context).size.height * 0.03,
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Schedule Post',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 14,
+                                color: Color.fromRGBO(38, 38, 38, 1)),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
+                  if (schedule == 'schedule')
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            child: TextFormField(
+                              controller: _scheduledDateandtime,
+                              readOnly: true,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 20),
+                                suffixIcon: Padding(
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
+                                  child: SvgPicture.asset(
+                                    'assets/icons/NewsPage_timepicker.svg',
+                                    fit: BoxFit.contain,
+                                    height: 30,
+                                    width: 30,
+                                  ),
+                                ),
+                                hintText: 'Tap to select date and time',
+                                hintStyle: TextStyle(
+                                    fontFamily: 'medium',
+                                    fontSize: 14,
+                                    color: Colors.black),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: Color.fromRGBO(203, 203, 203, 1),
+                                        width: 1)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                        color: Color.fromRGBO(203, 203, 203, 1),
+                                        width: 1)),
+                              ),
+                              onTap: () async {
+                                await _pickDate();
+                                await _pickTime();
+                                _scheduledDateandtime.text = _dateTime;
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
                   //
                 ],
@@ -1260,26 +1330,65 @@ class _EditCircularpageState extends State<EditCircularpage> {
               ),
 
               ///scheduled
-              if (UserSession().userType == 'superadmin')
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.textFieldborderColor,
-                      side: BorderSide.none),
-                  onPressed: () {
-                    String status = _scheduledDateandtime.text.isEmpty
-                        ? 'post'
-                        : 'schedule';
-                    _updateCircular(status, context);
-                  },
-                  child: Text(
-                    _scheduledDateandtime.text.isEmpty ? 'Update' : 'Schedule',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'medium',
-                        color: Colors.black),
-                  ),
-                ),
-              //
+              // if (UserSession().userType == 'superadmin')
+              //   ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //         backgroundColor: AppTheme.textFieldborderColor,
+              //         side: BorderSide.none),
+              //     onPressed: () {
+              //       String status = _scheduledDateandtime.text.isEmpty
+              //           ? 'post'
+              //           : 'schedule';
+              //       _updateCircular(status, context);
+              //     },
+              //     child: Text(
+              //       _scheduledDateandtime.text.isEmpty ? 'Update' : 'Schedule',
+              //       style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'medium',
+              //           color: Colors.black),
+              //     ),
+              //   ),
+
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.textFieldborderColor,
+                    side: BorderSide.none),
+                onPressed: () async {
+                  setState(() {
+                    _isLoading = true; // Show loader
+                  });
+
+                  String status =
+                      _scheduledDateandtime.text.isEmpty ? 'post' : 'schedule';
+
+                  // ✅ Wait for _updateCircular() to complete before setting _isLoading to false
+                  await _updateCircular(status, context);
+
+                  setState(() {
+                    _isLoading = false; // Hide loader after completion
+                  });
+                },
+                child: _isLoading
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                            backgroundColor: AppTheme.appBackgroundPrimaryColor,
+                            strokeWidth: 4,
+                            color: AppTheme.textFieldborderColor),
+                      )
+                    : Text(
+                        _scheduledDateandtime.text.isEmpty
+                            ? 'Update'
+                            : 'Schedule',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
+              ),
+
               ////request now..
               if (UserSession().userType == 'admin' ||
                   UserSession().userType == 'staff')
@@ -1379,9 +1488,14 @@ class _EditCircularpageState extends State<EditCircularpage> {
     );
   }
 
+  bool _isLoading = false;
+
 //update circular.......
-  void _updateCircular(String status, BuildContext context) async {
-    //
+  Future<void> _updateCircular(String status, BuildContext context) async {
+    setState(() {
+      _isLoading = true;
+    });
+
     // Convert the QuillController content to HTML
     final generatedHtml = QuillDeltaToHtmlConverter(
       descriptionController.document.toDelta().toJson(),
@@ -1400,6 +1514,9 @@ class _EditCircularpageState extends State<EditCircularpage> {
           content: Text('Please fill in both heading and description'),
         ),
       );
+      setState(() {
+        isLoading = false; // Stop loading if validation fails
+      });
       return;
     }
     List<int> selectedGradeIds = selected
@@ -1424,15 +1541,32 @@ class _EditCircularpageState extends State<EditCircularpage> {
 
     if (selectedFile != null) {
       fileType = 'image';
-      filePath = selectedFile!.extension!;
+      filePath = selectedFile!.path;
     } else if (_linkController.text.isNotEmpty) {
       // If a link is entered
       fileType = 'link';
       filePath = _linkController.text;
     } else {
       fileType = 'existing';
-      filePath = '';
+      filePath = null;
     }
+    //
+    String? scheduleOn;
+    if (status == 'schedule' && _scheduledDateandtime.text.isNotEmpty) {
+      try {
+        DateTime selectedDate =
+            DateFormat("dd-MM-yyyy h:mm a").parse(_scheduledDateandtime.text);
+
+        scheduleOn = DateFormat("dd-MM-yyyy HH:mm").format(selectedDate);
+      } catch (e) {
+        print("Error formatting scheduleOn date: $e");
+        scheduleOn = _scheduledDateandtime.text;
+      }
+    } else {
+      scheduleOn = '';
+    }
+
+    print('schedule date : $scheduleOn');
 
     CircularUpdateRequest update = CircularUpdateRequest(
         id: widget.Id,
@@ -1442,29 +1576,18 @@ class _EditCircularpageState extends State<EditCircularpage> {
         circular: htmlContent,
         fileType: fileType,
         link: _linkController.text,
+        filePath: filePath,
         status: status,
-        postedOn: postedOn,
-        scheduleOn: _scheduledDateandtime.text,
+        // postedOn: postedOn,
+        // scheduleOn: _scheduledDateandtime.text,
+        scheduleOn: scheduleOn,
         updatedOn: updateOn,
         recipient: selectedRecipient.toString(),
         gradeIds: gradeIdsString);
 
-    // Debugging: Print all request details
-    print("Request Payload:");
-    print("ID: ${update.id}");
-    print("Roll Number: ${update.rollNumber}");
-    print("User Type: ${update.userType}");
-    print("Headline: ${update.headLine}");
-    print("Circular: ${update.circular}");
-    print("File Type: ${update.fileType}");
-    print("File Path: ${update.link}");
-    print("Status: ${update.status}");
-    print("Posted On: ${update.postedOn}");
-    print("Schedule On: ${update.scheduleOn}");
-    print("Updated On: ${update.updatedOn}");
-    print("Recipient: ${update.recipient}");
-    print("Grade IDs: ${update.gradeIds}");
-
     await updateCircular(update, context, widget.fetchcircular);
+    setState(() {
+      _isLoading = false;
+    });
   }
 }

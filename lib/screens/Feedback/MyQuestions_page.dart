@@ -514,7 +514,7 @@ class _MyquestionsPageState extends State<MyquestionsPage> {
                                                                           .circular(
                                                                               10)),
                                                               content: Text(
-                                                                "Do you really want to Delete\n  to this Feedback?",
+                                                                "Do you really want to Delete\n  this Feedback?",
                                                                 style: TextStyle(
                                                                     fontFamily:
                                                                         'regular',
@@ -584,8 +584,9 @@ class _MyquestionsPageState extends State<MyquestionsPage> {
                                                                                   SnackBar(content: Text('An error occurred: $e')),
                                                                                 );
                                                                               }
-
                                                                               Navigator.pop(context);
+
+                                                                              await fetchParentFeedback();
                                                                             },
                                                                             child: Text(
                                                                               'Delete',

@@ -72,7 +72,7 @@ Future<void> updateStudyMaterial(UpdateStudymaterialModel studyMaterial,
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             backgroundColor: Colors.green,
-            content: Text('Studymaterial updated successfully.')),
+            content: Text('Studymaterial updated successfully!')),
       );
       print("Study Material Updated Successfully");
 

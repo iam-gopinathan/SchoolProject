@@ -73,11 +73,218 @@ class _MarksShowpageState extends State<MarksShowpage> {
     }
   }
 
-//select section....
-  void _showFilterBottomSheet(BuildContext context) {
+  String selectedSection = ''; // Store selected section globally
+
+// //select section....
+//   void _showFilterBottomSheet(BuildContext context) {
+//     List<String> sections = [];
+//     final gradeController = Get.find<GradeController>();
+// //update sections..
+//     void updateSections(int gradeId) {
+//       final selectedGrade = gradeController.gradeList.firstWhere(
+//         (grade) => grade['id'] == gradeId,
+//         orElse: () => null,
+//       );
+//       if (selectedGrade != null) {
+//         sections = List<String>.from(selectedGrade['sections'] ?? []);
+//       }
+//     }
+
+//     updateSections(gradeId);
+// //section filter...
+//     showModalBottomSheet(
+//       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
+//       context: context,
+//       shape: RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+//       ),
+//       builder: (BuildContext context) {
+//         String selectedSection = '';
+//         return StatefulBuilder(
+//           builder: (BuildContext context, StateSetter setModalState) {
+//             return Stack(
+//               clipBehavior: Clip.none,
+//               children: [
+//                 Positioned(
+//                   top: -MediaQuery.of(context).size.height *
+//                       0.09, // Adjusting -70 based on screen height
+//                   left: MediaQuery.of(context).size.width * 0.45,
+//                   child: GestureDetector(
+//                     onTap: () {
+//                       Navigator.of(context).pop();
+//                     },
+//                     child: CircleAvatar(
+//                       radius: 28,
+//                       backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+//                       child: Icon(
+//                         Icons.close,
+//                         color: Colors.white,
+//                         size: 35,
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 Container(
+//                   height: MediaQuery.of(context).size.height * 0.4,
+//                   width: double.infinity,
+//                   child: Column(
+//                     children: [
+//                       Container(
+//                         decoration: BoxDecoration(
+//                           color: Colors.white,
+//                           borderRadius: BorderRadius.only(
+//                             topLeft: Radius.circular(25),
+//                             topRight: Radius.circular(25),
+//                           ),
+//                         ),
+//                         padding: EdgeInsets.symmetric(vertical: 15),
+//                         child: Padding(
+//                           padding: const EdgeInsets.only(left: 20),
+//                           child: Row(
+//                             children: [
+//                               Text(
+//                                 'Select Section',
+//                                 style: TextStyle(
+//                                   fontFamily: 'semibold',
+//                                   fontSize: 16,
+//                                   color: Colors.black,
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                       Padding(
+//                         padding: const EdgeInsets.all(8.0),
+//                         child: Card(
+//                           elevation: 0,
+//                           child: Container(
+//                             color: Colors.white,
+//                             child: Column(
+//                               children: [
+//                                 if (sections.isNotEmpty) ...[
+//                                   Padding(
+//                                     padding: const EdgeInsets.only(
+//                                         top: 30, left: 20),
+//                                     child: Row(
+//                                       children: [
+//                                         Text(
+//                                           'Select Section',
+//                                           style: TextStyle(
+//                                             fontSize: 14,
+//                                             fontFamily: 'regular',
+//                                             color:
+//                                                 Color.fromRGBO(53, 53, 53, 1),
+//                                           ),
+//                                         ),
+//                                       ],
+//                                     ),
+//                                   ),
+//                                   Padding(
+//                                     padding: const EdgeInsets.only(top: 20),
+//                                     child: SingleChildScrollView(
+//                                       scrollDirection: Axis.horizontal,
+//                                       child: Row(
+//                                         children: List.generate(sections.length,
+//                                             (index) {
+//                                           return Padding(
+//                                             padding: const EdgeInsets.symmetric(
+//                                                 horizontal: 6),
+//                                             child: GestureDetector(
+//                                               onTap: () {
+//                                                 setModalState(() {
+//                                                   selectedSection =
+//                                                       sections[index];
+//                                                 });
+//                                               },
+//                                               child: Container(
+//                                                 width: 100,
+//                                                 padding: EdgeInsets.all(5),
+//                                                 decoration: BoxDecoration(
+//                                                   color: selectedSection ==
+//                                                           sections[index]
+//                                                       ? AppTheme
+//                                                           .textFieldborderColor
+//                                                       : Colors.white,
+//                                                   borderRadius:
+//                                                       BorderRadius.circular(10),
+//                                                   border: Border.all(
+//                                                     color: Color.fromRGBO(
+//                                                         223, 223, 223, 1),
+//                                                   ),
+//                                                 ),
+//                                                 child: Center(
+//                                                   child: Text(
+//                                                     sections[index],
+//                                                     style: TextStyle(
+//                                                       fontSize: 14,
+//                                                       fontFamily: 'medium',
+//                                                       color: Colors.black,
+//                                                     ),
+//                                                   ),
+//                                                 ),
+//                                               ),
+//                                             ),
+//                                           );
+//                                         }),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ],
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                       Padding(
+//                         padding: EdgeInsets.only(
+//                           top: MediaQuery.of(context).size.height * 0.02,
+//                         ),
+//                         child: Row(
+//                           mainAxisAlignment: MainAxisAlignment.center,
+//                           children: [
+//                             ElevatedButton(
+//                               style: ElevatedButton.styleFrom(
+//                                 backgroundColor: AppTheme.textFieldborderColor,
+//                               ),
+//                               onPressed: () {
+//                                 Navigator.of(context).pop();
+
+//                                 showw(selectedSection: selectedSection);
+
+//                                 print(selectedSection);
+//                               },
+//                               child: Padding(
+//                                 padding:
+//                                     const EdgeInsets.symmetric(horizontal: 50),
+//                                 child: Text(
+//                                   'OK',
+//                                   style: TextStyle(
+//                                     fontFamily: 'semibold',
+//                                     fontSize: 16,
+//                                     color: Colors.black,
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             );
+//           },
+//         );
+//       },
+//     );
+//   }
+  void _showFilterBottomSheet(BuildContext context, int gradeId) {
     List<String> sections = [];
     final gradeController = Get.find<GradeController>();
-//update sections..
+
+    // Update sections based on gradeId
     void updateSections(int gradeId) {
       final selectedGrade = gradeController.gradeList.firstWhere(
         (grade) => grade['id'] == gradeId,
@@ -89,7 +296,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
     }
 
     updateSections(gradeId);
-//section filter...
+
     showModalBottomSheet(
       backgroundColor: Color.fromRGBO(250, 250, 250, 1),
       context: context,
@@ -97,15 +304,14 @@ class _MarksShowpageState extends State<MarksShowpage> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
       ),
       builder: (BuildContext context) {
-        String selectedSection = '';
         return StatefulBuilder(
           builder: (BuildContext context, StateSetter setModalState) {
             return Stack(
               clipBehavior: Clip.none,
               children: [
                 Positioned(
-                  top: -70,
-                  left: 180,
+                  top: -MediaQuery.of(context).size.height * 0.09,
+                  left: MediaQuery.of(context).size.width * 0.45,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pop();
@@ -234,7 +440,9 @@ class _MarksShowpageState extends State<MarksShowpage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 10),
+                        padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.height * 0.02,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -244,9 +452,7 @@ class _MarksShowpageState extends State<MarksShowpage> {
                               ),
                               onPressed: () {
                                 Navigator.of(context).pop();
-
                                 showw(selectedSection: selectedSection);
-
                                 print(selectedSection);
                               },
                               child: Padding(
@@ -338,8 +544,9 @@ class _MarksShowpageState extends State<MarksShowpage> {
             return Stack(clipBehavior: Clip.none, children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                top: -MediaQuery.of(context).size.height *
+                    0.09, // Adjusting -70 based on screen height
+                left: MediaQuery.of(context).size.width * 0.45,
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();
@@ -719,529 +926,553 @@ class _MarksShowpageState extends State<MarksShowpage> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
-          controller: _scrollController,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    //exam dropdownfield..
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.7,
-                      child: DropdownButtonFormField<String>(
-                        dropdownColor: Colors.black,
-                        menuMaxHeight: 150,
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                            ),
+        body: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  //exam dropdownfield..
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.7,
+                    child: DropdownButtonFormField<String>(
+                      dropdownColor: Colors.black,
+                      menuMaxHeight: 150,
+                      decoration: InputDecoration(
+                        contentPadding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(
+                            color: Color.fromRGBO(203, 203, 203, 1),
                           ),
                         ),
-                        value: selectedExam,
-                        hint: Text(
-                          "Select Exam",
-                          style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 14,
-                            color: Colors.black,
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(
+                            color: Color.fromRGBO(203, 203, 203, 1),
                           ),
                         ),
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedExam = value;
-                          });
-                          showw();
-                        },
-                        items: availableExams.map((exam) {
-                          return DropdownMenuItem<String>(
-                            value: exam,
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide(
+                            color: Color.fromRGBO(203, 203, 203, 1),
+                          ),
+                        ),
+                      ),
+                      value: selectedExam,
+                      hint: Text(
+                        "Select Exam",
+                        style: TextStyle(
+                          fontFamily: 'regular',
+                          fontSize: 14,
+                          color: Colors.black,
+                        ),
+                      ),
+                      onChanged: (String? value) {
+                        setState(() {
+                          selectedExam = value;
+                        });
+                        showw();
+                      },
+                      items: availableExams.map((exam) {
+                        return DropdownMenuItem<String>(
+                          value: exam,
+                          child: Text(
+                            exam,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'regular',
+                              fontSize: 14,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      selectedItemBuilder: (BuildContext context) {
+                        return availableExams.map((exam) {
+                          return Align(
+                            alignment: Alignment.centerLeft,
                             child: Text(
                               exam,
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: 'regular',
                                 fontSize: 14,
                               ),
                             ),
                           );
-                        }).toList(),
-                        selectedItemBuilder: (BuildContext context) {
-                          return availableExams.map((exam) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                exam,
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontFamily: 'regular',
-                                  fontSize: 14,
-                                ),
-                              ),
-                            );
-                          }).toList();
-                        },
-                      ),
-                    ),
-                    //filter icon..
-                    GestureDetector(
-                      onTap: () {
-                        _showFilterBottomSheet(context);
+                        }).toList();
                       },
-                      child: SvgPicture.asset(
-                        'assets/icons/Filter_icon.svg',
-                        fit: BoxFit.contain,
-                      ),
                     ),
-                    //export icon..
-                    GestureDetector(
-                      onTap: () async {
-                        String selectedSection = 'A1';
-                        _initializeNotification();
-                        exportToExcel(data!, gradeController.filteredSubjects,
-                            selectedSection);
-                      },
-                      child: SvgPicture.asset(
-                        'assets/icons/export_icon.svg',
-                        fit: BoxFit.contain,
-                      ),
-                    )
-                  ],
-                ),
+                  ),
+                  //filter icon..
+                  GestureDetector(
+                    onTap: () {
+                      _showFilterBottomSheet(context, gradeId);
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/Filter_icon.svg',
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  //export icon..
+                  GestureDetector(
+                    onTap: () async {
+                      String selectedSection = 'A1';
+                      _initializeNotification();
+                      exportToExcel(data!, gradeController.filteredSubjects,
+                          selectedSection);
+                    },
+                    child: SvgPicture.asset(
+                      'assets/icons/export_icon.svg',
+                      fit: BoxFit.contain,
+                    ),
+                  )
+                ],
               ),
-              //
-              FutureBuilder<MarksResponse>(
-                future: marksResponse,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: Padding(
-                      padding: const EdgeInsets.only(top: 30),
-                      child: CircularProgressIndicator(
-                        strokeWidth: 4,
-                        color: AppTheme.textFieldborderColor,
-                      ),
-                    ));
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData ||
-                      snapshot.data!.prekgRequest.isEmpty) {
-                    return Center(child: Text('No data available'));
-                  } else {
-                    MarksResponse data = snapshot.data!;
-                    return Column(
-                      children: [
-                        //
-                        Transform.translate(
-                          offset: Offset(0, 16),
+            ),
+            //
+            Expanded(
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                child: FutureBuilder<MarksResponse>(
+                  future: marksResponse,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
                           child: Padding(
-                            padding: EdgeInsets.only(
-                                left: MediaQuery.of(context).size.width * 0.06),
-                            child: Row(
-                              children: [
-                                IntrinsicWidth(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(10),
-                                            topLeft: Radius.circular(10)),
-                                        border: Border.all(
-                                            color: Color.fromRGBO(
-                                                234, 234, 234, 1))),
-                                    child: Row(
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                            vertical: 10,
-                                          ),
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10)),
-                                              color: Color.fromRGBO(
-                                                  31, 106, 163, 1)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 10, right: 10),
-                                            child: Text(
-                                              '${data.gradeSection}',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 12,
-                                                  color: Colors.white),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 10, right: 5),
-                                          child: Text(
-                                            'Class Teacher - ${data.classTeacher}',
-                                            style: TextStyle(
-                                                fontFamily: 'medium',
-                                                fontSize: 12,
-                                                color: Colors.black),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Spacer(),
-                              ],
+                        padding: const EdgeInsets.only(top: 30),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.textFieldborderColor,
+                        ),
+                      ));
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.prekgRequest.isEmpty) {
+                      return SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: Center(
+                          child: Text(
+                            'You haven’t made anything yet;\nstart creating now!',
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontFamily: 'regular',
+                              color: Color.fromRGBO(145, 145, 145, 1),
                             ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                        //card sections...
-                        Column(
-                          children: [
-                            ...data.prekgRequest.map((e) {
-                              return Padding(
-                                padding: EdgeInsets.all(
-                                    MediaQuery.of(context).size.width * 0.04),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 15),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      border: Border.all(
-                                        color: Color.fromRGBO(238, 238, 238, 1),
-                                      )),
-                                  child: Column(
-                                    children: [
-                                      //individual export.......
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                          right: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.05, // 5% of screen width
-                                          bottom: MediaQuery.of(context)
-                                                  .size
-                                                  .height *
-                                              0.015, // 1.5% of screen height
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () async {
-                                                _initializeNotification();
-                                                String selectedSection =
-                                                    e.section;
-                                                String rollNumber =
-                                                    e.rollnumber;
-                                                await exportIndividualStudentToExcel(
-                                                    data,
-                                                    gradeController
-                                                        .filteredSubjects,
-                                                    selectedSection,
-                                                    rollNumber);
-                                              },
-                                              child: SvgPicture.asset(
-                                                'assets/icons/IndividualExport_icons.svg',
-                                                fit: BoxFit.contain,
-                                                height: 20,
+                      );
+                    } else {
+                      MarksResponse data = snapshot.data!;
+                      return Column(
+                        children: [
+                          //
+                          Transform.translate(
+                            offset: Offset(0, 16),
+                            child: Padding(
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.06),
+                              child: Row(
+                                children: [
+                                  IntrinsicWidth(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topRight: Radius.circular(10),
+                                              topLeft: Radius.circular(10)),
+                                          border: Border.all(
+                                              color: Color.fromRGBO(
+                                                  234, 234, 234, 1))),
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            padding: EdgeInsets.symmetric(
+                                              vertical: 10,
+                                            ),
+                                            decoration: BoxDecoration(
+                                                borderRadius: BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10)),
+                                                color: Color.fromRGBO(
+                                                    31, 106, 163, 1)),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10, right: 10),
+                                              child: Text(
+                                                '${data.gradeSection}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 12,
+                                                    color: Colors.white),
                                               ),
+                                            ),
+                                          ),
+                                          if (data.classTeacher != null &&
+                                              data.classTeacher!.isNotEmpty)
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 10, right: 5),
+                                              child: Text(
+                                                'Class Teacher - ${data.classTeacher}',
+                                                style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 12,
+                                                    color: Colors.black),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
+                            ),
+                          ),
+                          //card sections...
+                          Column(
+                            children: [
+                              ...data.prekgRequest.map((e) {
+                                return Padding(
+                                  padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width * 0.04),
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(vertical: 15),
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(
+                                          color:
+                                              Color.fromRGBO(238, 238, 238, 1),
+                                        )),
+                                    child: Column(
+                                      children: [
+                                        //individual export.......
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.05, // 5% of screen width
+                                            bottom: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.015, // 1.5% of screen height
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              GestureDetector(
+                                                onTap: () async {
+                                                  _initializeNotification();
+                                                  String selectedSection =
+                                                      e.section;
+                                                  String rollNumber =
+                                                      e.rollnumber;
+                                                  await exportIndividualStudentToExcel(
+                                                      data,
+                                                      gradeController
+                                                          .filteredSubjects,
+                                                      selectedSection,
+                                                      rollNumber);
+                                                },
+                                                child: SvgPicture.asset(
+                                                  'assets/icons/IndividualExport_icons.svg',
+                                                  fit: BoxFit.contain,
+                                                  height: 20,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              '${data.prekgRequest.indexOf(e) + 1}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'medium',
+                                                  color: Colors.black),
+                                            ),
+                                            CircleAvatar(
+                                              radius: 30,
+                                              child: Image.network(
+                                                '${e.profile}',
+                                                fit: BoxFit.contain,
+                                              ),
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  '${e.studentName}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'semibold',
+                                                      fontSize: 16,
+                                                      color: Colors.black),
+                                                ),
+                                                Text(
+                                                  '${e.rollnumber}',
+                                                  style: TextStyle(
+                                                      fontFamily: 'medium',
+                                                      fontSize: 16,
+                                                      color: Colors.black),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Percentage-',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 12,
+                                                          color: Color.fromRGBO(
+                                                              54, 54, 54, 1)),
+                                                    ),
+                                                    Text(
+                                                      "${e.percentage}%",
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 16,
+                                                          color: Colors.black),
+                                                    )
+                                                  ],
+                                                )
+                                              ],
+                                            ),
+                                            //
+                                            Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Total Marks ',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 10,
+                                                          color: Color.fromRGBO(
+                                                              54, 54, 54, 1)),
+                                                    ),
+                                                    Text(
+                                                      '${e.totalMarks}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    )
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Scored Marks ',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 10,
+                                                          color: Color.fromRGBO(
+                                                              54, 54, 54, 1)),
+                                                    ),
+                                                    Text(
+                                                      '${e.marksScored}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 12,
+                                                          color: Colors.black),
+                                                    )
+                                                  ],
+                                                ),
+                                                //pass..
+                                                if (e.remarks.isNotEmpty)
+                                                  ElevatedButton(
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                            backgroundColor:
+                                                                e.remarks ==
+                                                                        'Pass'
+                                                                    ? Color
+                                                                        .fromRGBO(
+                                                                            1,
+                                                                            133,
+                                                                            53,
+                                                                            1)
+                                                                    : Colors
+                                                                        .red),
+                                                    onPressed: () {},
+                                                    child: Text(
+                                                      '${e.remarks}',
+                                                      style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 16,
+                                                          color: Colors.white),
+                                                    ),
+                                                  ),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: [
-                                          Text(
-                                            '${data.prekgRequest.indexOf(e) + 1}',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'medium',
-                                                color: Colors.black),
+                                        //
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 10,
+                                              bottom: 10,
+                                              left: 25,
+                                              right: 25),
+                                          child: Divider(
+                                            color: Color.fromRGBO(
+                                                245, 245, 245, 1),
+                                            height: 5,
+                                            thickness: 1,
                                           ),
-                                          CircleAvatar(
-                                            radius: 30,
-                                            child: Image.network(
-                                              '${e.profile}',
-                                              fit: BoxFit.contain,
-                                            ),
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${e.studentName}',
-                                                style: TextStyle(
-                                                    fontFamily: 'semibold',
-                                                    fontSize: 16,
-                                                    color: Colors.black),
-                                              ),
-                                              Text(
-                                                '${e.rollnumber}',
-                                                style: TextStyle(
-                                                    fontFamily: 'medium',
-                                                    fontSize: 16,
-                                                    color: Colors.black),
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'Percentage-',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Color.fromRGBO(
-                                                            54, 54, 54, 1)),
-                                                  ),
-                                                  Text(
-                                                    "${e.percentage}%",
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 16,
-                                                        color: Colors.black),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                          //
-                                          Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'Total Marks ',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 10,
-                                                        color: Color.fromRGBO(
-                                                            54, 54, 54, 1)),
-                                                  ),
-                                                  Text(
-                                                    '${e.totalMarks}',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black),
-                                                  )
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    'Scored Marks ',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 10,
-                                                        color: Color.fromRGBO(
-                                                            54, 54, 54, 1)),
-                                                  ),
-                                                  Text(
-                                                    '${e.marksScored}',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 12,
-                                                        color: Colors.black),
-                                                  )
-                                                ],
-                                              ),
-                                              //pass..
-                                              if (e.remarks.isNotEmpty)
-                                                ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                          backgroundColor:
-                                                              e.remarks ==
-                                                                      'Pass'
-                                                                  ? Color
-                                                                      .fromRGBO(
-                                                                          1,
-                                                                          133,
-                                                                          53,
-                                                                          1)
-                                                                  : Colors.red),
-                                                  onPressed: () {},
-                                                  child: Text(
-                                                    '${e.remarks}',
-                                                    style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 16,
-                                                        color: Colors.white),
-                                                  ),
+                                        ),
+                                        //marks table.............
+                                        Obx(
+                                          () {
+                                            if (gradeController
+                                                .filteredSubjects.isEmpty) {
+                                              return Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 4,
+                                                  color: AppTheme
+                                                      .textFieldborderColor,
                                                 ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      //
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 10,
-                                            bottom: 10,
-                                            left: 25,
-                                            right: 25),
-                                        child: Divider(
+                                              );
+                                            }
+                                            return SingleChildScrollView(
+                                              controller:
+                                                  _tableScrollController,
+                                              scrollDirection: Axis.horizontal,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: DataTable(
+                                                  headingRowColor:
+                                                      MaterialStateProperty
+                                                          .resolveWith<Color>(
+                                                    (states) =>
+                                                        const Color.fromRGBO(
+                                                            255, 247, 247, 1),
+                                                  ),
+                                                  border: TableBorder.all(
+                                                    color: Colors.black
+                                                        .withOpacity(0.1),
+                                                  ),
+                                                  columns: [
+                                                    const DataColumn(
+                                                        label: Text(
+                                                            'Total Marks')),
+                                                    ...gradeController
+                                                        .filteredSubjects
+                                                        .map((subject) {
+                                                      return DataColumn(
+                                                          label: Text(subject));
+                                                    }).toList(),
+                                                  ],
+                                                  rows: [
+                                                    DataRow(
+                                                      cells: [
+                                                        DataCell(Text(
+                                                            '${e.totalMarks}')),
+                                                        ...gradeController
+                                                            .filteredSubjects
+                                                            .map(
+                                                          (subject) {
+                                                            final value =
+                                                                getSubjectValue(
+                                                                    e, subject);
+
+                                                            return DataCell(
+                                                                Text(value));
+                                                          },
+                                                        ).toList(),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                        //
+                                        Divider(
                                           color:
                                               Color.fromRGBO(245, 245, 245, 1),
                                           height: 5,
                                           thickness: 1,
                                         ),
-                                      ),
-                                      //marks table.............
-                                      Obx(
-                                        () {
-                                          if (gradeController
-                                              .filteredSubjects.isEmpty) {
-                                            return Center(
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 4,
-                                                color: AppTheme
-                                                    .textFieldborderColor,
-                                              ),
-                                            );
-                                          }
-                                          return SingleChildScrollView(
-                                            controller: _tableScrollController,
-                                            scrollDirection: Axis.horizontal,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: DataTable(
-                                                headingRowColor:
-                                                    MaterialStateProperty
-                                                        .resolveWith<Color>(
-                                                  (states) =>
-                                                      const Color.fromRGBO(
-                                                          255, 247, 247, 1),
-                                                ),
-                                                border: TableBorder.all(
-                                                  color: Colors.black
-                                                      .withOpacity(0.1),
-                                                ),
-                                                columns: [
-                                                  const DataColumn(
-                                                      label:
-                                                          Text('Total Marks')),
-                                                  ...gradeController
-                                                      .filteredSubjects
-                                                      .map((subject) {
-                                                    return DataColumn(
-                                                        label: Text(subject));
-                                                  }).toList(),
-                                                ],
-                                                rows: [
-                                                  DataRow(
-                                                    cells: [
-                                                      DataCell(Text(
-                                                          '${e.totalMarks}')),
-                                                      ...gradeController
-                                                          .filteredSubjects
-                                                          .map(
-                                                        (subject) {
-                                                          final value =
-                                                              getSubjectValue(
-                                                                  e, subject);
-
-                                                          return DataCell(
-                                                              Text(value));
-                                                        },
-                                                      ).toList(),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                      //
-                                      Divider(
-                                        color: Color.fromRGBO(245, 245, 245, 1),
-                                        height: 5,
-                                        thickness: 1,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 15, top: 10),
-                                            child: Text(
-                                              'Teacher Comment',
-                                              style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 14,
-                                                  color: Colors.black),
-                                            ),
-                                          ),
-                                          Spacer(),
-                                          GestureDetector(
-                                            onTap: () {
-                                              var teachercomment =
-                                                  e.teacherNotes;
-                                              _viewBottomsheet(
-                                                  context, teachercomment);
-                                            },
-                                            child: Padding(
+                                        Row(
+                                          children: [
+                                            Padding(
                                               padding: const EdgeInsets.only(
-                                                  right: 15, top: 10),
+                                                  left: 15, top: 10),
                                               child: Text(
-                                                'View',
+                                                'Teacher Comment',
                                                 style: TextStyle(
+                                                    fontFamily: 'medium',
                                                     fontSize: 14,
-                                                    fontFamily: 'regular',
                                                     color: Colors.black),
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                      // // Linear progress bar
-                                      // Container(
-                                      //   width: 60,
-                                      //   height: 10,
-                                      //   child: LinearProgressIndicator(
-                                      //     borderRadius:
-                                      //         BorderRadius.circular(10),
-                                      //     backgroundColor:
-                                      //         Color.fromRGBO(225, 225, 225, 1),
-                                      //     valueColor:
-                                      //         AlwaysStoppedAnimation<Color>(
-                                      //             Colors.black),
-                                      //     value: _progress,
-                                      //   ),
-                                      // ),
-                                    ],
+                                            Spacer(),
+                                            GestureDetector(
+                                              onTap: () {
+                                                var teachercomment =
+                                                    e.teacherNotes;
+                                                _viewBottomsheet(
+                                                    context, teachercomment);
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 15, top: 10),
+                                                child: Text(
+                                                  'View',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontFamily: 'regular',
+                                                      color: Colors.black),
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        // // Linear progress bar
+                                        // Container(
+                                        //   width: 60,
+                                        //   height: 10,
+                                        //   child: LinearProgressIndicator(
+                                        //     borderRadius:
+                                        //         BorderRadius.circular(10),
+                                        //     backgroundColor:
+                                        //         Color.fromRGBO(225, 225, 225, 1),
+                                        //     valueColor:
+                                        //         AlwaysStoppedAnimation<Color>(
+                                        //             Colors.black),
+                                        //     value: _progress,
+                                        //   ),
+                                        // ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                              );
-                            }).toList(),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                },
+                                );
+                              }).toList(),
+                            ],
+                          ),
+                        ],
+                      );
+                    }
+                  },
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         //top arrow..
         floatingActionButton:

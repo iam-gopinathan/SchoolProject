@@ -26,10 +26,11 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
   TextEditingController _enddate = TextEditingController();
 
   Future<void> _selectStartDate(BuildContext context) async {
+    DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2100),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -57,10 +58,11 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
   }
 
   Future<void> _selectEndDate(BuildContext context) async {
+    DateTime now = DateTime.now();
     final DateTime? picked = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2100),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -168,26 +170,62 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
           },
         ) ??
         false;
+  }
+
+  //
+
+  // Regular expression to validate YouTube links
+  bool isValidYouTubeLink(String url) {
+    final RegExp youtubeRegex = RegExp(
+      r'^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  //
+  String? _errorMessage;
+
+  void _validateLink(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _errorMessage = "";
+      });
+    } else if (!isValidYouTubeLink(input)) {
+      setState(() {
+        _errorMessage = "Enter a valid YouTube link";
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
   }
 
   @override
@@ -692,6 +730,7 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                         child: GestureDetector(
                           onTap: () {
                             pickFile();
+                            _linkController.text = '';
                           },
                           child: Container(
                             color: Color.fromRGBO(228, 238, 253, 1)
@@ -752,6 +791,20 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                         ),
                       ),
                     ),
+                  ),
+                //
+                if (isuploadimage)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Supported Format : JPEG,Webp PNG, PDF',
+                        style: TextStyle(
+                            fontFamily: 'regular',
+                            fontSize: 9,
+                            color: Color.fromRGBO(168, 168, 168, 1)),
+                      ),
+                    ],
                   ),
 
                 /// Display selected image...
@@ -834,34 +887,56 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
                       child: Container(
                           height: 50,
                           child: TextFormField(
+                            style: TextStyle(
+                              color:
+                                  Colors.black, // Set input text color to black
+                              fontSize: 14,
+                              fontFamily: 'regular',
+                            ),
+                            onChanged: (value) {
+                              //
+                              _validateLink(value);
+                              //
+                              selectedFile = null;
+                            },
                             controller: _linkController,
                             decoration: InputDecoration(
-                                fillColor: Color.fromRGBO(228, 238, 253, 1)
-                                    .withOpacity(0.9),
-                                filled: true,
-                                hintText: 'Paste Link Here',
-                                hintStyle: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 14,
-                                    color: Color.fromRGBO(0, 102, 255, 1)),
-                                border: OutlineInputBorder(
-                                    borderSide: BorderSide.none)),
+                              fillColor: Color.fromRGBO(228, 238, 253, 1)
+                                  .withOpacity(0.9),
+                              filled: true,
+                              hintText: 'Paste Link Here',
+                              hintStyle: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 14,
+                                  color: Color.fromRGBO(0, 102, 255, 1)),
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide.none),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Please enter a link";
+                              } else if (!isValidYouTubeLink(value)) {
+                                return "Enter a valid YouTube link";
+                              }
+                              return null;
+                            },
                           )),
                     ),
                   ),
-                if (isuploadimage)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Supported Format : JPEG,Webp PNG, PDF',
+
+                // Show error message below TextFormField
+                if (isaddLink && _linkController.text.isNotEmpty)
+                  if (_errorMessage != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, left: 5),
+                      child: Text(
+                        _errorMessage!,
                         style: TextStyle(
-                            fontFamily: 'regular',
-                            fontSize: 9,
-                            color: Color.fromRGBO(168, 168, 168, 1)),
+                            color: Colors.red,
+                            fontSize: 12,
+                            fontFamily: 'semibold'),
                       ),
-                    ],
-                  ),
+                    ),
                 //
                 if (isaddLink)
                   Padding(
@@ -912,20 +987,48 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
               ),
 
               ///scheduled
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     createevent();
+              //   },
+              //   child: Text(
+              //     'Publish',
+              //     style: TextStyle(
+              //         fontSize: 16,
+              //         fontFamily: 'semibold',
+              //         color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  createevent();
-                },
-                child: Text(
-                  'Publish',
-                  style: TextStyle(
-                      fontSize: 16,
-                      fontFamily: 'semibold',
-                      color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isPublishing
+                    ? null // Disable button while loading
+                    : () {
+                        createevent();
+                      },
+                child: isPublishing
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.textFieldborderColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Publish',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'semibold',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -934,20 +1037,40 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
     );
   }
 
+//
+  bool isPublishing = false;
+//
   void createevent() {
+    setState(() {
+      isPublishing = true;
+    });
+    //
+
+    if (_startdate.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Colors.red,
+        content: Text('Please select start date!'),
+      ));
+      setState(() {
+        isPublishing = false;
+      });
+      return;
+    }
+    //
     if (_startdate.text.isEmpty ||
         _heading.text.isEmpty ||
         _desc.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red,
-          content:
-              Text('Please fill in the heading, description, and start date'),
+          content: Text('Please fill in the heading, description'),
         ),
       );
+      setState(() {
+        isPublishing = false;
+      });
       return;
     }
-
     String fileType = 'empty';
     String filePath = "";
     String link = "";
@@ -958,8 +1081,17 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
     } else if (isaddLink && _linkController.text.isNotEmpty) {
       fileType = 'link';
       link = _linkController.text;
+      // Validate YouTube Link
+      if (!isValidYouTubeLink(link)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Invalid YouTube link. Please enter a valid link.'),
+          ),
+        );
+        return;
+      }
     }
-
     CreateImportantEventModel create = CreateImportantEventModel(
       userType: UserSession().userType ?? '',
       rollNumber: UserSession().rollNumber ?? '',
@@ -971,7 +1103,6 @@ class _CreateEventCalenderState extends State<CreateEventCalender> {
       fromDate: _startdate.text,
       toDate: _enddate.text,
     );
-
     postEventCalendar(create, context, widget.fetchAndDisplayEvents);
   }
 }

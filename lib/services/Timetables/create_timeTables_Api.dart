@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/TimeTable_models/create_timeTable_model.dart';
@@ -54,17 +56,29 @@ Future<void> postTimeTable(CreateTimetableModel timeTable,
 
     var response = await request.send();
 
+    var responseBody = await response.stream.bytesToString();
+
     if (response.statusCode == 200) {
       print(
         'TimeTable posted successfully: ${response.statusCode}',
       );
       print('Response body: $response');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('TimeTable posted successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      if (timeTable.status == 'draft') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('TimeTable Saved as Draft!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('TimeTable Created Successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+
       //
       // Add a delay of 2 seconds before navigating
       await Future.delayed(Duration(seconds: 2));
@@ -74,12 +88,37 @@ Future<void> postTimeTable(CreateTimetableModel timeTable,
       Navigator.pop(
         context,
       );
-    } else {
-      print('Failed to post TimeTable: ${response.statusCode}');
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Failed to post TimeTable. Please try again.'),
-        backgroundColor: Colors.red,
-      ));
+    }
+    // else {
+    //   print('Failed to post TimeTable: ${response.statusCode}');
+    //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    //     content: Text('Failed to post TimeTable. Please try again.'),
+    //     backgroundColor: Colors.red,
+    //   ));
+    // }
+    else {
+      try {
+        // Parse JSON response and show dynamic error message
+        Map<String, dynamic> jsonResponse = json.decode(responseBody);
+        String errorMessage =
+            jsonResponse['message'] ?? "Unknown error occurred.";
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            backgroundColor: Colors.red,
+          ),
+        );
+//
+        await Future.delayed(Duration(seconds: 2));
+        await Future.delayed(Duration(seconds: 2));
+        fetchMaintimetable();
+        Navigator.pop(context);
+
+        print("Error: $errorMessage");
+      } catch (e) {
+        print("Error: $e");
+      }
     }
   } catch (e) {
     print('Error: $e');

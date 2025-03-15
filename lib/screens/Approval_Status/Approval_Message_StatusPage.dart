@@ -202,6 +202,7 @@ class _ApprovalMessageStatuspageState extends State<ApprovalMessageStatuspage> {
               children: [
                 Row(
                   children: [
+                    SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
@@ -301,11 +302,18 @@ class _ApprovalMessageStatuspageState extends State<ApprovalMessageStatuspage> {
                                 color: Colors.white,
                                 width: MediaQuery.of(context).size.width * 0.8,
                                 child: TextFormField(
+                                  cursorColor: Colors.black,
                                   controller: searchController,
                                   textAlign: TextAlign.center,
                                   decoration: InputDecoration(
+                                      contentPadding:
+                                          EdgeInsets.symmetric(vertical: 5),
                                       prefixIcon: Transform.translate(
-                                        offset: Offset(50, 0),
+                                        offset: Offset(
+                                          MediaQuery.of(context).size.width *
+                                              0.12, // Responsive X-axis (60)
+                                          0,
+                                        ),
                                         child: Icon(Icons.search,
                                             color: Color.fromRGBO(
                                                 178, 178, 178, 1)),
@@ -508,7 +516,16 @@ class _ApprovalMessageStatuspageState extends State<ApprovalMessageStatuspage> {
                                                       .size
                                                       .width *
                                                   0.8,
-                                              child: Html(data: e.message),
+                                              child: Html(
+                                                data: e.message,
+                                                style: {
+                                                  "body": Style(
+                                                      fontFamily: 'semibold',
+                                                      fontSize: FontSize(16),
+                                                      textAlign:
+                                                          TextAlign.justify)
+                                                },
+                                              ),
                                             )
                                           ],
                                         ),
@@ -642,11 +659,11 @@ class _ApprovalMessageStatuspageState extends State<ApprovalMessageStatuspage> {
                                                                             var messageId =
                                                                                 e.id;
                                                                             //
-                                                                            Future<void> deleteNews(
+                                                                            Future<void> deletemessage(
                                                                                 String id,
                                                                                 String rollNumber,
                                                                                 String userType) async {
-                                                                              String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeNews/DeleteNews';
+                                                                              String url = 'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeMessage/DeleteMessage';
 
                                                                               final Map<String, String> headers = {
                                                                                 'Content-Type': 'application/json',
@@ -666,12 +683,20 @@ class _ApprovalMessageStatuspageState extends State<ApprovalMessageStatuspage> {
                                                                                 print(url);
 
                                                                                 if (response.statusCode == 200) {
-                                                                                  print('News deleted successfully $messageId');
+                                                                                  print('Message deleted successfully $messageId');
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                                    backgroundColor: Colors.green,
+                                                                                    content: Text('Message  deleted successfully'),
+                                                                                  ));
                                                                                   //
                                                                                   Navigator.pop(context);
                                                                                   await fetchMess();
                                                                                 } else {
-                                                                                  print('Failed to delete news. Status code: ${response.statusCode}');
+                                                                                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                                                    backgroundColor: Colors.red,
+                                                                                    content: Text('Failed to delete Message. Status code: ${response.statusCode}'),
+                                                                                  ));
+                                                                                  print('Failed to delete message. Status code: ${response.statusCode}');
                                                                                 }
                                                                               } catch (e) {
                                                                                 print('Error: $e');
@@ -680,7 +705,7 @@ class _ApprovalMessageStatuspageState extends State<ApprovalMessageStatuspage> {
 
                                                                             print('object');
                                                                             //
-                                                                            await deleteNews(
+                                                                            await deletemessage(
                                                                                 messageId.toString(),
                                                                                 UserSession().rollNumber ?? '',
                                                                                 UserSession().userType ?? '');

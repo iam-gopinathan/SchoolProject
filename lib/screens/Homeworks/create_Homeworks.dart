@@ -94,10 +94,11 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
 
   // Method to show date picker
   Future<void> _pickDate() async {
+    DateTime now = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2101),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -163,44 +164,44 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
   ///image bottomsheeet
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(clipBehavior: Clip.none, children: [
-              // Close icon
-              Positioned(
-                top: MediaQuery.of(context).size.height *
-                    -0.08, // 8% of screen height (negative)
-                left: MediaQuery.of(context).size.width *
-                    0.45, // 45% of screen width
-
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.white,
-                      size: 35,
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // Close icon
+                Positioned(
+                  top: MediaQuery.of(context).size.height *
+                      -0.08, // 8% of screen height (negative)
+                  left: MediaQuery.of(context).size.width *
+                      0.45, // 45% of screen width
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: CircleAvatar(
+                      radius: 28,
+                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                      child: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                        size: 35,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
+                Container(
+                  padding:
+                      EdgeInsets.all(MediaQuery.of(context).size.width * 0.03),
+                  width: double.infinity,
+                  height: MediaQuery.of(context).size.height * 0.7,
                   child: Column(
                     children: [
                       Padding(
@@ -225,64 +226,103 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                           color: Color.fromRGBO(243, 243, 243, 1),
                         ),
                       ),
-//heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              selectedGradeId != null
-                                  ? gradeController.gradeList
-                                      .firstWhere(
-                                        (grade) =>
-                                            grade['id'].toString() ==
-                                            selectedGradeId,
-                                        orElse: () => {'sign': 'N/A'},
-                                      )['sign']
-                                      .toString()
-                                  : "Select a class",
-                            ),
-                          ],
+                      //heading...
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            children: [
+                              //
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    if (selectedGradeId != null &&
+                                        selectedGradeId!.isNotEmpty)
+                                      Text(
+                                        selectedGradeId != null
+                                            ? gradeController.gradeList
+                                                .firstWhere(
+                                                  (grade) =>
+                                                      grade['id'].toString() ==
+                                                      selectedGradeId,
+                                                  orElse: () => {'sign': 'N/A'},
+                                                )['sign']
+                                                .toString()
+                                            : "",
+                                        style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              //selected section..
+                              if (selectedSection != null &&
+                                  selectedSection!.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 15, top: 10),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        selectedSection.toString(),
+                                        style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                              ///image section...
+                              Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Center(
+                                  child: selectedFile != null &&
+                                          selectedFile!.bytes != null
+                                      ? Image.memory(
+                                          selectedFile!.bytes!,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Container(),
+                                ),
+                              ),
+                              //
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 15, left: 15),
+                                child: Center(
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        _scheduledDateandtime.text,
+                                        style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-
-                      //selected section..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              selectedSection.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
-                      )
                     ],
                   ),
-                ),
-              )
-            ]);
-          });
-        });
+                )
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   //
@@ -316,20 +356,25 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -692,6 +737,18 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                 ),
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Text(
+                  'Supported Format : JPEG,Webp PNG, PDF',
+                  style: TextStyle(
+                      fontFamily: 'regular',
+                      fontSize: 9,
+                      color: Color.fromRGBO(168, 168, 168, 1)),
+                ),
+              ],
+            ),
 
             /// Display selected image...
 
@@ -759,18 +816,7 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                   ],
                 ),
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(
-                  'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-              ],
-            ),
+
             //scheduled post...
             //schedule post...
             Padding(
@@ -860,20 +906,48 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(horizontal: 15),
+              //       backgroundColor: Colors.white,
+              //       side: BorderSide(color: Colors.black, width: 1.5)),
+              //   onPressed: () {
+              //     String status = "draft";
+              //     submitHomework(status);
+              //   },
+              //   child: Text(
+              //     'Save as Draft',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  String status = "draft";
-                  submitHomework(status);
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.black, width: 1.5),
                 ),
+                onPressed: isdraft
+                    ? null // Disable button when loading
+                    : () {
+                        String status = "draft";
+                        submitHomework(status);
+                      },
+                child: isdraft
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                            color: AppTheme.textFieldborderColor,
+                            strokeWidth: 4),
+                      )
+                    : Text(
+                        'Save as Draft',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
               //preview..
               GestureDetector(
@@ -890,21 +964,53 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
               ),
 
               ///scheduled..
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     String status =
+              //         _scheduledDateandtime.text.isEmpty ? 'post' : 'schedule';
+
+              //     submitHomework(status);
+              //   },
+              //   child: Text(
+              //     _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  String status =
-                      _scheduledDateandtime.text.isEmpty ? 'post' : 'schedule';
-
-                  submitHomework(status);
-                },
-                child: Text(
-                  _scheduledDateandtime.text.isEmpty ? 'Publish' : 'Schedule',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        String status = _scheduledDateandtime.text.isEmpty
+                            ? 'post'
+                            : 'schedule';
+                        submitHomework(status);
+                      },
+                child: isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.appBackgroundPrimaryColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        _scheduledDateandtime.text.isEmpty
+                            ? 'Publish'
+                            : 'Schedule',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
             ],
           ),
@@ -913,9 +1019,51 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
     );
   }
 
+  bool isLoading = false;
+
+  bool isdraft = false;
+
 //create homework...
   void submitHomework(String status) async {
-    // Check if no image file is selected
+    setState(() {
+      if (status == 'draft') {
+        isdraft = true; // ✅ Show loader for draft button
+        isLoading = false;
+      } else {
+        isLoading = true; // ✅ Show loader for publish button
+        isdraft = false;
+      }
+    });
+
+    // Check if grade, section, or image is empty
+    if (selectedGradeId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select a grade!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+
+    if (selectedSection == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please select a section!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+
     if (selectedFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -923,6 +1071,10 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
           backgroundColor: Colors.red,
         ),
       );
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
       return;
     }
     String currentDateTime =
@@ -943,6 +1095,6 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
       draftedOn: draftedOn,
       scheduleOn: _scheduledDateandtime.text,
     );
-    postHomework(homework, selectedFile!, context, widget.fetchHomework);
+    await postHomework(homework, selectedFile!, context, widget.fetchHomework);
   }
 }

@@ -3,7 +3,6 @@ import 'package:flutter_application_1/screens/AttendencePage/Attendence_page.dar
 import 'package:flutter_application_1/screens/AttendencePage/Parent_Attendence_mainPage.dart';
 import 'package:flutter_application_1/screens/ExamTimeTable/examTimetable_mainpage.dart';
 import 'package:flutter_application_1/screens/Feedback/ParentFeedback_Mainpage.dart';
-
 import 'package:flutter_application_1/screens/Feedback/feedback_mainpage.dart';
 import 'package:flutter_application_1/screens/Homeworks/Homework_Mainpage.dart';
 import 'package:flutter_application_1/screens/ImportantEvents/ImportantEvents_mainpage.dart';
@@ -13,14 +12,11 @@ import 'package:flutter_application_1/screens/Messages/Message_mainPage.dart';
 import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
 import 'package:flutter_application_1/screens/Schoolcalender/schoolCalender_mainPage.dart';
 import 'package:flutter_application_1/screens/StudyMaterial/studyMaterial_mainpage.dart';
-import 'package:flutter_application_1/screens/TimeTables/Teacher_timetable_create.dart';
 import 'package:flutter_application_1/screens/TimeTables/timeTable_mainpage.dart';
 import 'package:flutter_application_1/screens/circularPage/circular_mainPage.dart';
 import 'package:flutter_application_1/screens/consentFoms/ParentYesOrNo_page.dart';
-
 import 'package:flutter_application_1/screens/consentFoms/consentForm_mainpage.dart';
 import 'package:flutter_application_1/user_Session.dart';
-
 import 'package:flutter_svg/flutter_svg.dart';
 
 class Communication extends StatefulWidget {
@@ -256,7 +252,7 @@ class _CommunicationState extends State<Communication> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.9,
+              height: MediaQuery.of(context).size.height * 1,
               color: Colors.white,
               child: GridView.builder(
                 physics: ScrollPhysics(),

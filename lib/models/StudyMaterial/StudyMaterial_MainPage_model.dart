@@ -13,6 +13,7 @@ class StudyMaterialModel {
   final String filePath;
   final String status;
   final String isAlterAvailable;
+  final String updatedOn;
 
   StudyMaterialModel({
     required this.id,
@@ -29,25 +30,26 @@ class StudyMaterialModel {
     required this.filePath,
     required this.status,
     required this.isAlterAvailable,
+    required this.updatedOn,
   });
 
   factory StudyMaterialModel.fromJson(Map<String, dynamic> json) {
     return StudyMaterialModel(
-      id: json['id'],
-      postedOn: json['postedOn'] ?? '',
-      rollNumber: json['rollNumber'] ?? '',
-      postedBy: json['postedBy'] ?? '',
-      day: json['day'] ?? '',
-      gradeId: json['gradeId'].toString(),
-      section: json['section'] ?? '',
-      gradeSection: json['gradeSection'] ?? '',
-      subject: json['subject'] ?? '',
-      heading: json['heading'] ?? '',
-      fileType: json['fileType'] ?? '',
-      filePath: json['filePath'] ?? '',
-      status: json['status'] ?? '',
-      isAlterAvailable: json['isAlterAvailable'] ?? '',
-    );
+        id: json['id'],
+        postedOn: json['postedOn'] ?? '',
+        rollNumber: json['rollNumber'] ?? '',
+        postedBy: json['postedBy'] ?? '',
+        day: json['day'] ?? '',
+        gradeId: json['gradeId'].toString(),
+        section: json['section'] ?? '',
+        gradeSection: json['gradeSection'] ?? '',
+        subject: json['subject'] ?? '',
+        heading: json['heading'] ?? '',
+        fileType: json['fileType'] ?? '',
+        filePath: json['filePath'] ?? '',
+        status: json['status'] ?? '',
+        isAlterAvailable: json['isAlterAvailable'] ?? '',
+        updatedOn: json['updatedOn'] ?? '');
   }
 
   Map<String, dynamic> toJson() {

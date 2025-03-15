@@ -30,8 +30,11 @@ class ImportanteventMainpageModel {
   });
 
   // Convert fromDate and toDate to DateTime using the intl package
-  DateTime get parsedFromDate => DateFormat('dd-MM-yyyy').parse(fromDate);
-  DateTime get parsedToDate => DateFormat('dd-MM-yyyy').parse(toDate);
+  // DateTime get parsedFromDate => DateFormat('dd-MM-yyyy').parse(fromDate);
+  // DateTime get parsedToDate => DateFormat('dd-MM-yyyy').parse(toDate);
+
+  DateTime get parsedFromDate => DateFormat('dd-MM-yyyy').parseUtc(fromDate);
+  DateTime get parsedToDate => DateFormat('dd-MM-yyyy').parseUtc(toDate);
 
   // Check if event is within the selected date range
   bool isEventInRange(DateTime selectedDate) {

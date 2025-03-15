@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/News_Models/NewsMainPage_model.dart';
@@ -234,6 +233,10 @@ class _NewsmainpageState extends State<Newsmainpage> {
     );
   }
 
+  //
+
+  Set<String> displayedDates = {};
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -411,17 +414,30 @@ class _NewsmainpageState extends State<Newsmainpage> {
               color: AppTheme.textFieldborderColor,
             ))
           : newsList.isEmpty
-              ? Center(
-                  child: Text(
-                    "You haven’t made anything yet;\nstart creating now!",
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontFamily: 'regular',
-                      color: Color.fromRGBO(145, 145, 145, 1),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                )
+              ? (UserSession().userType == 'student' ||
+                      UserSession().userType == 'teacher')
+                  ? Center(
+                      child: Text(
+                        "No messages from the school yet. Stay tuned for updates!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        "You haven’t made anything yet;\nstart creating now!",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontFamily: 'regular',
+                          color: Color.fromRGBO(145, 145, 145, 1),
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    )
               : Column(
                   children: [
                     ///nextsection
@@ -443,7 +459,11 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                     contentPadding:
                                         EdgeInsets.symmetric(vertical: 5),
                                     prefixIcon: Transform.translate(
-                                      offset: Offset(60, 0),
+                                      offset: Offset(
+                                        MediaQuery.of(context).size.width *
+                                            0.16, // Responsive X-axis (60)
+                                        0, // Y-axis remains the same (no change)
+                                      ),
                                       child: Icon(Icons.search,
                                           color:
                                               Color.fromRGBO(178, 178, 178, 1)),
@@ -491,28 +511,49 @@ class _NewsmainpageState extends State<Newsmainpage> {
                               final news = newsResponse.news[index];
                               return Column(
                                 children: [
+                                  //schedule
                                   if (news.status == 'schedule')
                                     Padding(
                                       padding: EdgeInsets.only(
-                                        top:
-                                            MediaQuery.of(context).size.height *
-                                                0.02,
-                                        bottom:
-                                            MediaQuery.of(context).size.height *
-                                                0.017,
+                                        left:
+                                            MediaQuery.of(context).size.width *
+                                                0.05,
                                       ),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                            backgroundColor: Color.fromRGBO(
-                                                131, 56, 236, 1)),
-                                        onPressed: () {},
-                                        child: Text(
-                                          'Upcoming News',
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.white,
-                                              fontFamily: 'medium'),
-                                        ),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.02,
+                                              bottom: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.017,
+                                            ),
+                                            child: ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                              topRight: Radius
+                                                                  .circular(
+                                                                      10))),
+                                                  backgroundColor:
+                                                      Color.fromRGBO(
+                                                          131, 56, 236, 1)),
+                                              onPressed: () {},
+                                              child: Text(
+                                                'Upcoming News',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.white,
+                                                    fontFamily: 'medium'),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   //
@@ -527,74 +568,84 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                       .height *
                                                   0.02,
                                             ),
-                                          if (newsResponse
-                                              .postedOnDate.isNotEmpty)
-                                            //postedondate
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                left: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.05, // 5% of screen width
-                                              ),
-                                              child: Row(
-                                                children: [
-                                                  if (newsResponse
-                                                      .postedOnDate.isNotEmpty)
-                                                    Text(
-                                                      'Posted on : ${newsResponse.postedOnDate ?? ''} | ${newsResponse.postedOnDay ?? ''}',
-                                                      style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 12,
-                                                          color: Colors.black),
-                                                    ),
-                                                ],
-                                              ),
+                                          //postedondate
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                              left: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.05,
                                             ),
-
+                                            child: Row(
+                                              children: [
+                                                if (newsResponse
+                                                    .postedOnDate.isNotEmpty)
+                                                  Text(
+                                                    'Posted on : ${newsResponse.postedOnDate ?? ''} | ${newsResponse.postedOnDay ?? ''}',
+                                                    style: TextStyle(
+                                                        fontFamily: 'regular',
+                                                        fontSize: 12,
+                                                        color: Colors.black),
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
                                           //updatedon
-                                          if (newsResponse
-                                                      .news[index].updatedOn !=
-                                                  null &&
-                                              newsResponse.news[index]
-                                                  .updatedOn!.isNotEmpty)
-                                            Transform.translate(
-                                              offset: Offset(0, 16),
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceAround,
-                                                children: [
-                                                  Container(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            vertical: 10,
-                                                            horizontal: 6),
-                                                    decoration: BoxDecoration(
-                                                      color: Color.fromRGBO(
-                                                          255, 251, 245, 1),
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(10),
-                                                        topRight:
-                                                            Radius.circular(10),
-                                                      ),
+                                          Transform.translate(
+                                            offset: Offset(0, 16),
+                                            child: Row(
+                                              children: [
+                                                if (news.updatedOn != null &&
+                                                    news.updatedOn!.isNotEmpty)
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                      left: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width *
+                                                          0.08, // Adjust 0.08 as needed
                                                     ),
-                                                    child: Text(
-                                                      'Updated on ${news.updatedOn}',
-                                                      style: TextStyle(
-                                                        fontFamily: 'medium',
-                                                        fontSize: 10,
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical: 10,
+                                                              horizontal: 6),
+                                                      decoration: BoxDecoration(
                                                         color: Color.fromRGBO(
-                                                            49, 49, 49, 1),
+                                                            255, 251, 245, 1),
+                                                        borderRadius:
+                                                            BorderRadius.only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  10),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  10),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        'Updated on ${news.updatedOn}',
+                                                        style: TextStyle(
+                                                          fontFamily: 'medium',
+                                                          fontSize: 10,
+                                                          color: Color.fromRGBO(
+                                                              49, 49, 49, 1),
+                                                        ),
                                                       ),
                                                     ),
                                                   ),
-                                                  //today
-                                                  if (newsResponse
-                                                      .tag.isNotEmpty)
-                                                    Container(
+                                                Spacer(),
+                                                //today
+                                                if (newsResponse.tag.isNotEmpty)
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                      right:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.08,
+                                                    ),
+                                                    child: Container(
                                                       padding:
                                                           EdgeInsets.symmetric(
                                                               vertical: 8,
@@ -621,9 +672,10 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                         ),
                                                       ),
                                                     ),
-                                                ],
-                                              ),
+                                                  ),
+                                              ],
                                             ),
+                                          ),
 ////
                                           Padding(
                                             padding: EdgeInsets.all(
@@ -708,11 +760,16 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                                   data:
                                                                       '${news.news}',
                                                                   style: {
-                                                                    "body":
-                                                                        Style(
-                                                                      color: Colors
-                                                                          .black,
-                                                                    ),
+                                                                    "body": Style(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontFamily:
+                                                                            'semibold',
+                                                                        fontSize:
+                                                                            FontSize(
+                                                                                16),
+                                                                        textAlign:
+                                                                            TextAlign.justify),
                                                                   },
                                                                 )
                                                               : const Text(''),
@@ -977,7 +1034,7 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                                                 BorderRadius.circular(10)),
                                                                         content:
                                                                             Text(
-                                                                          "Do you really want to make\n changes to this news?",
+                                                                          "Do you really want to make\n changes to this News?,",
                                                                           style: TextStyle(
                                                                               fontFamily: 'regular',
                                                                               fontSize: 16,
@@ -1166,11 +1223,37 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                                                                             );
 
                                                                                             if (response.statusCode == 200) {
+                                                                                              //
+
+                                                                                              // if (mounted) {
+                                                                                              //   ScaffoldMessenger.of(context).showSnackBar(
+                                                                                              //     SnackBar(
+                                                                                              //       backgroundColor: Colors.green,
+                                                                                              //       content: Text('News item deleted successfully!'),
+                                                                                              //     ),
+                                                                                              //   );
+                                                                                              //   //
+                                                                                              //   if (UserSession().userType == 'admin' || UserSession().userType == 'staff') {
+                                                                                              //     ScaffoldMessenger.of(context).showSnackBar(
+                                                                                              //       SnackBar(
+                                                                                              //         backgroundColor: Colors.green,
+                                                                                              //         content: Text('News item Delete request sent successfully!'),
+                                                                                              //       ),
+                                                                                              //     );
+                                                                                              //   }
+                                                                                              // }
                                                                                               if (mounted) {
+                                                                                                String message = 'News item deleted successfully!';
+
+                                                                                                // Show different message for admin or staff
+                                                                                                if (UserSession().userType == 'admin' || UserSession().userType == 'staff') {
+                                                                                                  message = 'News item delete request sent successfully!';
+                                                                                                }
+
                                                                                                 ScaffoldMessenger.of(context).showSnackBar(
                                                                                                   SnackBar(
                                                                                                     backgroundColor: Colors.green,
-                                                                                                    content: Text('News item deleted suczxcessfully'),
+                                                                                                    content: Text(message),
                                                                                                   ),
                                                                                                 );
                                                                                               }
@@ -1256,7 +1339,16 @@ class _NewsmainpageState extends State<Newsmainpage> {
                                           ////scheduled on  code.....
                                           if (news.status == 'schedule')
                                             Transform.translate(
-                                              offset: Offset(65, -18),
+                                              offset: Offset(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.15, // Responsive X-axis (65)
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    -0.02,
+                                              ),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,8 @@ import 'package:flutter_application_1/services/News_Api/Edit_news_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_quill/flutter_quill.dart' as quill;
-import 'package:flutter_quill/flutter_quill.dart';
+
+import 'package:flutter_quill/flutter_quill.dart' hide Style;
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
@@ -29,13 +30,20 @@ class EditNewsscreen extends StatefulWidget {
 }
 
 class _EditNewsscreenState extends State<EditNewsscreen> {
-  // Function to paste clipboard text
   Future<void> _pasteFromClipboard() async {
     ClipboardData? clipboardData =
         await Clipboard.getData(Clipboard.kTextPlain);
-    if (clipboardData != null && clipboardData.text != null) {
-      _controller.document
-          .insert(_controller.selection.baseOffset, clipboardData.text!);
+    if (clipboardData != null) {
+      String text = clipboardData.text ?? "";
+      // Insert plain text into QuillEditor
+      descriptionController.replaceText(
+        descriptionController.selection.baseOffset,
+        descriptionController.selection.extentOffset -
+            descriptionController.selection.baseOffset,
+        text,
+        TextSelection.collapsed(
+            offset: descriptionController.selection.baseOffset + text.length),
+      );
     }
   }
 
@@ -43,21 +51,21 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
   late String htmlContent = "";
   bool isuploadimage = true;
   bool isaddLink = false;
-
+  //
   TextEditingController _scheduledDateandtime = TextEditingController();
   String _dateTime = "";
   bool _isScheduled = false;
-
   // Date format
   final DateFormat _dateFormat = DateFormat("dd-MM-yyyy");
   final DateFormat _timeFormat = DateFormat("HH:mm");
 
   // Method to show date picker
   Future<void> _pickDate() async {
+    DateTime now = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
-        firstDate: DateTime(2000),
+        firstDate: now,
         lastDate: DateTime(2101),
         builder: (BuildContext context, Widget? child) {
           return Theme(
@@ -77,7 +85,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
             child: child!,
           );
         });
-
     if (pickedDate != null) {
       setState(() {
         _dateTime = _dateFormat.format(pickedDate);
@@ -108,7 +115,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
             child: child!,
           );
         });
-
     if (pickedTime != null) {
       final DateTime now = DateTime.now();
       final DateTime parsedTime = DateTime(
@@ -162,86 +168,127 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                   padding: EdgeInsets.all(10),
                   width: double.infinity,
                   height: MediaQuery.of(context).size.height * 0.7,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10, left: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Preview Screen',
-                                style: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 16,
-                                    color: Color.fromRGBO(104, 104, 104, 1)),
-                              ),
-                            ],
-                          ),
-                        ),
-                        //
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Divider(
-                            thickness: 1,
-                            color: Color.fromRGBO(243, 243, 243, 1),
-                          ),
-                        ),
-//heading...
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, top: 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.8,
-                                child: Text(
-                                  headingController.text,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        // description...
-                        Row(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 10),
+                        child: Row(
                           children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              padding: const EdgeInsets.all(10),
-                              child: htmlContent.isNotEmpty
-                                  ? Html(data: htmlContent)
-                                  : const Text(''),
+                            Text(
+                              'Preview Screen',
+                              style: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 16,
+                                  color: Color.fromRGBO(104, 104, 104, 1)),
                             ),
                           ],
                         ),
-                        //fetched image...
-                        if (imageUrl.isNotEmpty)
-                          Image.network(
-                            imageUrl,
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
+                      ),
+                      //
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10),
+                        child: Divider(
+                          thickness: 1,
+                          color: Color.fromRGBO(243, 243, 243, 1),
+                        ),
+                      ),
+                      //heading...
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.8,
+                                      child: Text(
+                                        headingController.text,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                        ),
+                                        textAlign: TextAlign.justify,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
 
-                        ///image section...
-                        Padding(
-                          padding: const EdgeInsets.only(top: 15),
-                          child: Center(
-                            child: selectedFile != null &&
-                                    selectedFile!.bytes != null
-                                ? Image.memory(
-                                    selectedFile!.bytes!,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(),
+                              // description...
+                              Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    padding: EdgeInsets.all(10),
+                                    child: htmlContent.isNotEmpty
+                                        ? Html(
+                                            data: htmlContent,
+                                            style: {
+                                              "body": Style(
+                                                  fontFamily: 'semibold',
+                                                  fontSize: FontSize(16),
+                                                  textAlign: TextAlign.justify)
+                                            },
+                                          )
+                                        : const Text(''),
+                                  ),
+                                ],
+                              ),
+                              //fetched image...
+                              imageUrl.isNotEmpty && selectedFile == null
+                                  ? Image.network(
+                                      imageUrl,
+                                      width: double.infinity,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Text(""); // Fallback UI
+                                      },
+                                    )
+                                  : SizedBox.shrink(),
+
+                              ///image section...
+                              Padding(
+                                padding: const EdgeInsets.only(top: 15),
+                                child: Center(
+                                  child: selectedFile != null &&
+                                          selectedFile!.bytes != null
+                                      ? Image.memory(
+                                          selectedFile!.bytes!,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Container(),
+                                ),
+                              ),
+                              //schedule
+                              if (_scheduledDateandtime.text.isNotEmpty)
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 15, top: 15),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        _scheduledDateandtime.text,
+                                        style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 16,
+                                            color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                            ],
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      ),
+                    ],
                   ),
                 )
               ],
@@ -282,7 +329,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
             isuploadimage = true;
             imageUrl = null;
           });
-
           print('Selected file name: ${file.name}');
           print('Selected file size: ${file.size}');
           print('Selected file extension: ${file.extension}');
@@ -314,6 +360,8 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
     descriptionController.dispose();
   }
 
+  String? scheduleDate;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -321,7 +369,6 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
     _EditNews = fetchEditNews(widget.newsId);
     headingController = TextEditingController();
     descriptionController = quill.QuillController.basic();
-
     _focusNode = FocusNode();
 
     headingController.addListener(() {
@@ -333,6 +380,39 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
     _EditNews.then((data) {
       setState(() {
         htmlContent = data.news;
+        // If fileType is "link", set the _linkController text
+        if (data.fileType == "link" && data.filepath != null) {
+          _linkController.text = data.filepath!;
+          isaddLink = true;
+          isuploadimage = false;
+        }
+//schedule on...
+
+        // if (data != null && data.scheduleOnRailwayTime != null) {
+        //   scheduleDate = data.scheduleOnRailwayTime;
+        //   _scheduledDateandtime.text = scheduleDate!; // ✅ Set TextField value
+        //   debugPrint("Fetched schedule date: $scheduleDate");
+        // } else {
+        //   debugPrint("Error: scheduleOnRailwayTime is null");
+        // }
+        //schedule on...
+        _scheduledDateandtime.text = data.scheduleOn ?? '';
+        if (data.scheduleOn != null && data.scheduleOn!.isNotEmpty) {
+          try {
+            // Convert API date to desired format
+            DateTime parsedDate = DateTime.parse(data.scheduleOn!);
+            _scheduledDateandtime.text =
+                DateFormat("dd-MM-yyyy HH:mm").format(parsedDate);
+            _isScheduled = true;
+          } catch (e) {
+            print("Error parsing date: $e");
+            _scheduledDateandtime.text = data.scheduleOn!;
+            _isScheduled = true;
+          }
+        } else {
+          _scheduledDateandtime.text = '';
+          _isScheduled = false;
+        }
 
         // Parse plain text from HTML for Quill editor
         final plainText = html_parser.parse(data.news).body?.text ?? "";
@@ -353,38 +433,38 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
 
   bool isFetchedImageVisible = true;
 
+  // Regular expression to validate YouTube links
+  bool isValidYouTubeLink(String url) {
+    final RegExp youtubeRegex = RegExp(
+      r'^(https?:\/\/)?(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/)[a-zA-Z0-9_-]+$',
+      caseSensitive: false,
+      multiLine: false,
+    );
+    return youtubeRegex.hasMatch(url);
+  }
+
+  //
+  String? _errorMessage;
+
+  void _validateLink(String input) {
+    if (input.isEmpty) {
+      setState(() {
+        _errorMessage = "";
+      });
+    } else if (!isValidYouTubeLink(input)) {
+      setState(() {
+        _errorMessage = "Enter a valid YouTube link";
+      });
+    } else {
+      setState(() {
+        _errorMessage = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Color.fromRGBO(251, 251, 251, 1),
-      // appBar: PreferredSize(
-      //   preferredSize: Size.fromHeight(60),
-      //   child: ClipRRect(
-      //     borderRadius: BorderRadius.only(
-      //       bottomLeft: Radius.circular(30),
-      //       bottomRight: Radius.circular(30),
-      //     ),
-      //     child: AppBar(
-      //       iconTheme: IconThemeData(color: Colors.black),
-      //       backgroundColor: AppTheme.appBackgroundPrimaryColor,
-
-      //       leading: GestureDetector(
-      //           onTap: () {
-      //             Navigator.pop(context);
-      //             widget.onCreateNews();
-      //           },
-      //           child: Icon(Icons.arrow_back)),
-      //       title: Text(
-      //         'Edit News',
-      //         style: TextStyle(
-      //           fontFamily: 'semibold',
-      //           fontSize: 16,
-      //           color: Colors.black,
-      //         ),
-      //       ),
-      //     ),
-      //   ),
-      // ),
       backgroundColor: Color.fromRGBO(253, 253, 253, 1),
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -599,7 +679,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                             child: Column(
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
                                     QuillSimpleToolbar(
                                       controller: descriptionController,
@@ -760,6 +840,8 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                   onTap: () {
                                     pickFile();
                                     isFetchedImageVisible = false;
+
+                                    _linkController.text = '';
                                   },
                                   child: Container(
                                     color: Color.fromRGBO(228, 238, 253, 1)
@@ -824,41 +906,55 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               ),
                             ),
                           ),
+                        if (isuploadimage)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Supported Format : JPEG,Webp PNG, PDF',
+                                style: TextStyle(
+                                    fontFamily: 'regular',
+                                    fontSize: 9,
+                                    color: Color.fromRGBO(168, 168, 168, 1)),
+                              ),
+                            ],
+                          ),
 //fetched image
                         if (isFetchedImageVisible &&
                             news.file != null &&
                             news.file!.isNotEmpty &&
                             news.fileType != 'existing')
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
-                            child: Image.network(
-                              news.file,
-                              height: 150,
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                              loadingBuilder: (context, child, progress) {
-                                if (progress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 4,
-                                    color: AppTheme.textFieldborderColor,
-                                    value: progress.expectedTotalBytes != null
-                                        ? progress.cumulativeBytesLoaded /
-                                            (progress.expectedTotalBytes ?? 1)
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Text(
-                                  'Failed to load image.',
-                                  style: TextStyle(color: Colors.red),
-                                );
-                              },
+                          if (isuploadimage)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Image.network(
+                                news.file,
+                                height: 150,
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                loadingBuilder: (context, child, progress) {
+                                  if (progress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 4,
+                                      color: AppTheme.textFieldborderColor,
+                                      value: progress.expectedTotalBytes != null
+                                          ? progress.cumulativeBytesLoaded /
+                                              (progress.expectedTotalBytes ?? 1)
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Text(
+                                    '',
+                                    style: TextStyle(color: Colors.red),
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-//selected image...
+
                         /// Display selected image...
                         if (isuploadimage)
                           if (selectedFile != null)
@@ -879,7 +975,7 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                                 fit: BoxFit.contain,
                                               )
                                             : Text(
-                                                'Failed to load image data.',
+                                                '',
                                                 style: TextStyle(
                                                     color: Colors.red),
                                               )
@@ -942,6 +1038,18 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               child: Container(
                                 height: 50,
                                 child: TextFormField(
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontFamily: 'regular',
+                                  ),
+                                  onChanged: (value) {
+                                    //
+                                    _validateLink(value);
+                                    //
+                                    selectedFile = null;
+                                    news.file = '';
+                                  },
                                   controller: _linkController,
                                   decoration: InputDecoration(
                                       fillColor:
@@ -960,20 +1068,20 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               ),
                             ),
                           ),
-                        if (isuploadimage)
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Supported Format : JPEG,Webp PNG, PDF',
+
+                        // Show error message below TextFormField
+                        if (isaddLink && _linkController.text.isNotEmpty)
+                          if (_errorMessage != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5, left: 5),
+                              child: Text(
+                                _errorMessage!,
                                 style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 9,
-                                    color: Color.fromRGBO(168, 168, 168, 1)),
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                    fontFamily: 'semibold'),
                               ),
-                            ],
-                          ),
-                        //
+                            ),
                         if (isaddLink)
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -987,79 +1095,82 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                               ),
                             ],
                           ),
-
-                        ///schedule post..
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20, top: 20),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Reschedule Post',
-                                style: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 14,
-                                    color: Color.fromRGBO(38, 38, 38, 1)),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        //re-scheduled section....
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                child: TextFormField(
-                                  controller: _scheduledDateandtime,
-                                  readOnly: true,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        vertical: 10, horizontal: 20),
-                                    suffixIcon: Padding(
-                                      padding: const EdgeInsets.only(
-                                          top: 10, bottom: 10),
-                                      child: SvgPicture.asset(
-                                        'assets/icons/NewsPage_timepicker.svg',
-                                        fit: BoxFit.contain,
-                                        height: 30,
-                                        width: 30,
-                                      ),
-                                    ),
-                                    hintText: 'Tap to select date and time',
-                                    hintStyle: TextStyle(
-                                        fontFamily: 'medium',
-                                        fontSize: 14,
-                                        color: Colors.black),
-                                    border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                            color: Color.fromRGBO(
-                                                203, 203, 203, 1),
-                                            width: 1)),
-                                    focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                        borderSide: BorderSide(
-                                            color: Color.fromRGBO(
-                                                203, 203, 203, 1),
-                                            width: 1)),
-                                  ),
-                                  onTap: () async {
-                                    await _pickDate();
-                                    await _pickTime();
-                                    _scheduledDateandtime.text = _dateTime;
-                                    _isScheduled = true;
-                                  },
+                        //schedule post..
+                        if (news.status == 'schedule')
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20, top: 20),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Reschedule Post',
+                                  style: TextStyle(
+                                      fontFamily: 'medium',
+                                      fontSize: 14,
+                                      color: Color.fromRGBO(38, 38, 38, 1)),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
+                        if (news.status == 'schedule')
+                          //re-scheduled section....
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.9,
+                                  child: TextFormField(
+                                    controller: _scheduledDateandtime,
+                                    readOnly: true,
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 10, horizontal: 20),
+                                      suffixIcon: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 10, bottom: 10),
+                                        child: SvgPicture.asset(
+                                          'assets/icons/NewsPage_timepicker.svg',
+                                          fit: BoxFit.contain,
+                                          height: 30,
+                                          width: 30,
+                                        ),
+                                      ),
+                                      hintText: 'Tap to select date and time',
+                                      hintStyle: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 14,
+                                          color: Colors.black),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: Color.fromRGBO(
+                                                  203, 203, 203, 1),
+                                              width: 1)),
+                                      focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          borderSide: BorderSide(
+                                              color: Color.fromRGBO(
+                                                  203, 203, 203, 1),
+                                              width: 1)),
+                                    ),
+                                    onTap: () async {
+                                      await _pickDate();
+                                      await _pickTime();
+                                      _scheduledDateandtime.text = _dateTime;
+                                      _isScheduled = true;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         //
                         Padding(
-                          padding: const EdgeInsets.only(top: 30, bottom: 50),
+                          padding: const EdgeInsets.only(top: 40, bottom: 50),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -1076,7 +1187,27 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                       color: Colors.black),
                                 ),
                               ),
-                              //scheduled
+                              //update and schedule button..
+                              // if (UserSession().userType == 'superadmin')
+                              //   ElevatedButton(
+                              //     style: ElevatedButton.styleFrom(
+                              //       elevation: 0,
+                              //       backgroundColor:
+                              //           AppTheme.textFieldborderColor,
+                              //       side: BorderSide.none,
+                              //     ),
+                              //     onPressed: () {
+                              //       _updateNews(news);
+                              //     },
+                              //     child: Text(
+                              //       _isScheduled ? 'Schedule' : 'Update',
+                              //       style: TextStyle(
+                              //           fontSize: 16,
+                              //           fontFamily: 'medium',
+                              //           color: Colors.black),
+                              //     ),
+                              //   ),
+                              // Inside your widget:
                               if (UserSession().userType == 'superadmin')
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
@@ -1085,16 +1216,38 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
                                         AppTheme.textFieldborderColor,
                                     side: BorderSide.none,
                                   ),
-                                  onPressed: () {
-                                    _updateNews(news);
-                                  },
-                                  child: Text(
-                                    _isScheduled ? 'Schedule' : 'Update',
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        fontFamily: 'medium',
-                                        color: Colors.black),
-                                  ),
+                                  onPressed: _isLoading
+                                      ? null // Disable button when loading
+                                      : () async {
+                                          setState(() {
+                                            _isLoading = true; // Show loader
+                                          });
+
+                                          await _updateNews(news); // Call API
+
+                                          setState(() {
+                                            _isLoading =
+                                                false; // Hide loader after update
+                                          });
+                                        },
+                                  child: _isLoading
+                                      ? SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color:
+                                                AppTheme.textFieldborderColor,
+                                            strokeWidth: 4,
+                                          ),
+                                        )
+                                      : Text(
+                                          _isScheduled ? 'Schedule' : 'Update',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontFamily: 'medium',
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                 ),
                               ////request now..
                               if (UserSession().userType == 'admin' ||
@@ -1201,8 +1354,11 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
     );
   }
 
-  //update news...
-  void _updateNews(EditNewsModel news) async {
+  //
+  bool _isLoading = false;
+
+//update news...
+  Future<void> _updateNews(EditNewsModel news) async {
     // Convert the QuillController content to HTML
     final generatedHtml = QuillDeltaToHtmlConverter(
       descriptionController.document.toDelta().toJson(),
@@ -1218,10 +1374,44 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
           content: Text('Please fill in both heading and description'),
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
+      return;
+    }
+    // **Validate YouTube Link**
+    if (_linkController.text.isNotEmpty &&
+        !isValidYouTubeLink(_linkController.text)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red,
+          content: Text('Invalid YouTube link. Please enter a valid link.'),
+        ),
+      );
       return;
     }
     try {
+      // String status = _isScheduled ? 'schedule' : 'post';
+
       String status = _isScheduled ? 'schedule' : 'post';
+
+      String? scheduleOn;
+      if (status == 'schedule' && _scheduledDateandtime.text.isNotEmpty) {
+        try {
+          // Parse the input from "dd-MM-yyyy h:mm a" (12-hour format) if needed
+          DateTime selectedDate =
+              DateFormat("dd-MM-yyyy h:mm a").parse(_scheduledDateandtime.text);
+
+          // Convert it to "dd-MM-yyyy HH:mm" (24-hour format)
+          scheduleOn = DateFormat("dd-MM-yyyy HH:mm").format(selectedDate);
+        } catch (e) {
+          print("Error formatting scheduleOn date: $e");
+          scheduleOn = _scheduledDateandtime.text; // Send as is if error occurs
+        }
+      } else {
+        scheduleOn = '';
+      }
+
       String? fileToUpload;
       String? fileTypeToUpload;
 // Determine file type and file to upload
@@ -1239,22 +1429,24 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
         fileToUpload = news.file;
         fileTypeToUpload = news.fileType;
       }
-// Ensure default values
+      //
+
       fileToUpload ??= '';
       fileTypeToUpload ??= '';
-      // Debug print the values
+
       print("status: $status");
       print("fileToUpload: $fileToUpload");
       print("fileTypeToUpload: $fileTypeToUpload");
       print("Headline: ${headingController.text}");
       print("News content: ${htmlContent}");
       print("Link: ${_linkController.text}");
-      print("Scheduled On: ${_isScheduled ? _scheduledDateandtime.text : ''}");
+      print("ScheduleOn Parsed: $scheduleOn"); // Check the final format
+      print("Raw Input: ${_scheduledDateandtime.text}");
       print(
           "Posted On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
       print(
           "Updated On: ${DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now())}");
-      // Print the full updatedNews data before sending
+
       NewsUpdateModel updatedNews = NewsUpdateModel(
         id: news.id ?? 0,
         rollNumber: UserSession().rollNumber.toString(),
@@ -1264,9 +1456,10 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
         file: fileToUpload,
         fileType: fileTypeToUpload,
         link: _linkController.text,
-        status: status,
-        scheduleOn: _isScheduled ? _scheduledDateandtime.text : '',
-        postedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
+        // status: status,
+        // scheduleOn: _scheduledDateandtime.text,
+        scheduleOn: scheduleOn,
+        // postedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
         updatedOn: DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now()),
       );
       print("Updated News: ${updatedNews.toJson()}");
@@ -1278,9 +1471,15 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
         String snackBarMessage = '';
         if (UserSession().userType == 'superadmin') {
           snackBarMessage = 'News Updated Successfully!';
+        } else if (status == 'schedule') {
+          snackBarMessage = 'News Scheduled Successfully!';
         } else if (UserSession().userType == 'admin' ||
             UserSession().userType == 'staff') {
-          snackBarMessage = 'News update request sent successfully!';
+          if (status == 'schedule') {
+            snackBarMessage = 'News schedule request sent successfully!';
+          } else {
+            snackBarMessage = 'News update request sent successfully!';
+          }
         }
         if (snackBarMessage.isNotEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1295,8 +1494,9 @@ class _EditNewsscreenState extends State<EditNewsscreen> {
           Navigator.pop(context);
         }
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to update news ')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            backgroundColor: Colors.red,
+            content: Text('Failed to update news ')));
         // Delay before navigation
         await Future.delayed(Duration(seconds: 2));
         widget.onCreateNews();

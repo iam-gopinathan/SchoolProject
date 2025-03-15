@@ -183,137 +183,164 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
 
   void _PreviewBottomsheet(BuildContext context) {
     showModalBottomSheet(
-        backgroundColor: Colors.white,
-        context: context,
-        isScrollControlled: true,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-        ),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-              builder: (BuildContext context, StateSetter setModalState) {
-            return Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Close icon
-                Positioned(
-                  top: MediaQuery.of(context).size.height *
-                      -0.08, // 8% of screen height (negative)
-                  left: MediaQuery.of(context).size.width *
-                      0.45, // 45% of screen width
+      backgroundColor: Colors.white,
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+            builder: (BuildContext context, StateSetter setModalState) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              // Close icon
+              Positioned(
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // 8% of screen height (negative)
+                left: MediaQuery.of(context).size.width *
+                    0.45, // 45% of screen width
 
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
-                      child: Icon(
-                        Icons.close,
-                        color: Colors.white,
-                        size: 35,
-                      ),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundColor: Color.fromRGBO(19, 19, 19, 0.475),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                      size: 35,
                     ),
                   ),
                 ),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.7,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10, left: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Preview Screen',
-                                style: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 16,
-                                    color: Color.fromRGBO(104, 104, 104, 1)),
-                              ),
-                            ],
+              ),
+              Container(
+                padding: EdgeInsets.all(10),
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
                           ),
-                        ),
-                        //
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10),
-                          child: Divider(
-                            thickness: 2,
-                            color: Color.fromRGBO(243, 243, 243, 1),
-                          ),
-                        ),
-//heading...
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, top: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                "${selectedGradeName}",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        ),
-                        //selected section..
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, top: 10),
-                          child: Row(
-                            children: [
-                              Text(
-                                "${sections}",
-                                style: TextStyle(
-                                    fontSize: 16, color: Colors.black),
-                              ),
-                            ],
-                          ),
-                        ),
-                        //heading
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, top: 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.7,
-                                child: Text(
-                                  "${_heading.text}",
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, top: 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.7,
-                                child: Text(
-                                  questionControllers
-                                      .map((controller) => controller.text)
-                                      .join(", "),
-                                  style: TextStyle(
-                                      fontSize: 16, color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              ],
-            );
-          });
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 2,
+                        color: Color.fromRGBO(243, 243, 243, 1),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [
+                            //heading...
+                            if (selectedGradeName.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${selectedGradeName}",
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //selected section..
+                            if (sections.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      selectedSections.isEmpty
+                                          ? ""
+                                          : selectedSections.join(', '),
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //heading
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(
+                                      "${_heading.text}",
+                                      style: TextStyle(
+                                          fontSize: 16, color: Colors.black),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+//
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  for (int i = 0;
+                                      i < questionControllers.length;
+                                      i++)
+                                    Row(
+                                      children: [
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.7,
+                                          child: Text(
+                                            questionControllers[i].text,
+                                            style: const TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          );
         });
+      },
+    );
   }
 
   List<String> selectedSections = [];
@@ -464,20 +491,25 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -552,14 +584,19 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.058,
+                  ),
                   Text(
                     'Select Class',
                     style: TextStyle(
                         fontFamily: 'medium',
                         fontSize: 14,
                         color: Color.fromRGBO(38, 38, 38, 1)),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.184,
                   ),
                   //dropdown field.......
                   Container(
@@ -667,8 +704,10 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
             Padding(
               padding: const EdgeInsets.only(top: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.058,
+                  ),
                   Text(
                     'Select Section',
                     style: TextStyle(
@@ -676,45 +715,45 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
                         fontSize: 14,
                         color: Color.fromRGBO(38, 38, 38, 1)),
                   ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.152,
+                  ),
 
                   ///section dropdown..
-                  Transform.translate(
-                    offset: Offset(-5, 0),
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.5,
-                      child: GestureDetector(
-                        onTap: () {
-                          _showSectionMenu(context);
-                        },
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Color.fromRGBO(203, 203, 203, 1),
-                              width: 1,
-                            ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.5,
+                    child: GestureDetector(
+                      onTap: () {
+                        _showSectionMenu(context);
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: Color.fromRGBO(203, 203, 203, 1),
+                            width: 1,
                           ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  selectedSections.isEmpty
-                                      ? 'Select section'
-                                      : selectedSections.join(', '),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    fontFamily: 'regular',
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                selectedSections.isEmpty
+                                    ? 'Select section'
+                                    : selectedSections.join(', '),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                  fontFamily: 'regular',
                                 ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
                               ),
-                              Icon(Icons.arrow_drop_down, color: Colors.black),
-                            ],
-                          ),
+                            ),
+                            Icon(Icons.arrow_drop_down, color: Colors.black),
+                          ],
                         ),
                       ),
                     ),
@@ -811,20 +850,50 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(horizontal: 15),
+              //       backgroundColor: Colors.white,
+              //       side: BorderSide(color: Colors.black, width: 1.5)),
+              //   onPressed: () {
+              //     String status = 'draft';
+              //     _createconsentform(status);
+              //   },
+              //   child: Text(
+              //     'Save as Draft',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  String status = 'draft';
-                  _createconsentform(status);
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.black, width: 1.5),
                 ),
+                onPressed: isdraft
+                    ? null // Disable button while loading
+                    : () {
+                        String status = 'draft';
+                        _createconsentform(status);
+                      },
+                child: isdraft
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          color: AppTheme.textFieldborderColor,
+                        ),
+                      )
+                    : Text(
+                        'Save as Draft',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
               //preview
               GestureDetector(
@@ -841,20 +910,55 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
               ),
 
               ///scheduled
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     String status = 'post';
+              //     _createconsentform(status);
+              //   },
+              //   child: Text(
+              //     'Publish',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  String status = 'post';
-                  _createconsentform(status);
-                },
-                child: Text(
-                  'Publish',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
-              ),
+                onPressed: () async {
+                  setState(() {
+                    isLoading = true;
+                  });
+
+                  String status = 'post';
+                  await _createconsentform(status);
+
+                  setState(() {
+                    isLoading = false;
+                  });
+                },
+                child: isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.appBackgroundPrimaryColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Publish',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
+              )
             ],
           ),
         ),
@@ -862,8 +966,12 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
     );
   }
 
+  bool isLoading = false;
+
+  bool isdraft = false;
+
   //create consent form..
-  void _createconsentform(String status) {
+  Future<void> _createconsentform(String status) async {
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
@@ -878,6 +986,52 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
     String selectedSection =
         selectedSections.isEmpty ? "" : selectedSections.join(", ");
 
+    //
+    setState(() {
+      if (status == 'draft') {
+        isdraft = true;
+        isLoading = false;
+      } else {
+        isdraft = false;
+        isLoading = true;
+      }
+    });
+
+    // **Validation for Empty Fields**
+    if (selectedGradeId == null) {
+      _showSnackBar("Please select a Class");
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    if (selectedSections.isEmpty) {
+      _showSnackBar("Please select at least one section");
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    if (_heading.text.trim().isEmpty) {
+      _showSnackBar("Please enter heading");
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
+
+      return;
+    }
+    if (questions.isEmpty || questions.any((q) => q.isEmpty)) {
+      _showSnackBar("Please enter at least one question");
+      setState(() {
+        isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+
     CreateConsentformModel create = CreateConsentformModel(
         userType: UserSession().userType.toString(),
         rollNumber: UserSession().rollNumber.toString(),
@@ -889,6 +1043,17 @@ class _CreateConsentformpageState extends State<CreateConsentformpage> {
         postedOn: postedOn,
         draftedOn: draftedOn);
 
-    CreateConsentForm(create, context, widget.fetch);
+    await CreateConsentForm(create, context, widget.fetch);
+  }
+
+  // Function to show Snackbar
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 }

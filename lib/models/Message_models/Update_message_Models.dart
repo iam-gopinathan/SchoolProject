@@ -5,7 +5,7 @@ class UpdateMessageModel {
   String userType;
   String rollNumber;
   String status;
-  String postedOn;
+  // String postedOn;
   String scheduleOn;
   String recipient;
   String gradeIds;
@@ -18,7 +18,7 @@ class UpdateMessageModel {
     required this.userType,
     required this.rollNumber,
     required this.status,
-    required this.postedOn,
+    // required this.postedOn,
     required this.scheduleOn,
     required this.recipient,
     required this.gradeIds,
@@ -34,7 +34,7 @@ class UpdateMessageModel {
       userType: json['userType'],
       rollNumber: json['rollNumber'],
       status: json['status'],
-      postedOn: json['postedOn'],
+      // postedOn: json['postedOn'],
       scheduleOn: json['scheduleOn'],
       recipient: json['recipient'],
       gradeIds: json['gradeIds'],
@@ -50,8 +50,8 @@ class UpdateMessageModel {
       'message': message,
       'userType': userType,
       'rollNumber': rollNumber,
-      'status': status,
-      'postedOn': postedOn,
+      // 'status': status,
+      // 'postedOn': postedOn,
       'scheduleOn': scheduleOn,
       'recipient': recipient,
       'gradeIds': gradeIds,

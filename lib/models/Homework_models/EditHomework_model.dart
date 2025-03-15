@@ -6,7 +6,7 @@ class EdithomeworkModel {
   final String rollNumber;
   final String fileType;
   final String fileName;
-  final String filePath;
+  String filePath;
   final String status;
   final String postedOn;
   final String? draftedOn;

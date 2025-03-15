@@ -115,117 +115,132 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          ),
+                        ],
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 1,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 1,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
-                      //selectedclass
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              getSelectedClassSign(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //slected exam
+                    ),
+                    //selectedclass
 
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
                           children: [
-                            Text(
-                              selectedExam.toString(),
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-//heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: Text(
-                                _heading.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
+                            //
+                            if (selectedGradeId != null &&
+                                selectedGradeId!.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      getSelectedClassSign(),
+                                      style: TextStyle(
+                                        fontFamily: 'medium',
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //slected exam
+                            if (selectedExam != null &&
+                                selectedExam!.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      selectedExam.toString(),
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //heading...
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(
+                                      _heading.text,
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-
-                      //desc section..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: Text(
-                                _desc.text,
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
+                            //desc section..
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(
+                                      _desc.text,
+                                      style: TextStyle(
+                                          fontFamily: 'medium',
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+
+                            ///image section...
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Center(
+                                child: selectedFile != null &&
+                                        selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(),
+                              ),
+                            )
                           ],
                         ),
                       ),
-
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )
             ]);
@@ -273,7 +288,6 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
   }
 
   //
-  //
   String initialHeading = "";
 
   // Check if there are unsaved changes
@@ -304,20 +318,25 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -663,6 +682,25 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
                 ),
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Supported Format : JPEG,Webp PNG, PDF',
+                  style: TextStyle(
+                      fontFamily: 'regular',
+                      fontSize: 9,
+                      color: Color.fromRGBO(168, 168, 168, 1)),
+                ),
+                // Text(
+                //   '*Upload either an image or a link',
+                //   style: TextStyle(
+                //       fontFamily: 'regular',
+                //       fontSize: 9,
+                //       color: Color.fromRGBO(168, 168, 168, 1)),
+                // ),
+              ],
+            ),
 
             /// Display selected image...
             if (selectedFile != null)
@@ -729,50 +767,68 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
                   ],
                 ),
               ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-                // Text(
-                //   '*Upload either an image or a link',
-                //   style: TextStyle(
-                //       fontFamily: 'regular',
-                //       fontSize: 9,
-                //       color: Color.fromRGBO(168, 168, 168, 1)),
-                // ),
-              ],
-            ),
           ],
         ),
       ),
       bottomNavigationBar: Container(
-        child: //save as draft
+        child:
+            //save as draft
             Padding(
           padding: const EdgeInsets.only(top: 40, bottom: 50),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(horizontal: 15),
+              //       backgroundColor: Colors.white,
+              //       side: BorderSide(color: Colors.black, width: 1.5)),
+              //   onPressed: () {
+              //     String status = "draft";
+              //     CreateExamTimetables(status);
+              //   },
+              //   child: Text(
+              //     'Save as Draft',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  String status = "draft";
-                  CreateExamTimetables(status);
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.black, width: 1.5),
                 ),
+                onPressed: isdraft
+                    ? null // Disable button when loading
+                    : () async {
+                        setState(() {
+                          isdraft = true; // Start loading
+                        });
+
+                        String status = "draft";
+                        await CreateExamTimetables(status);
+
+                        setState(() {
+                          isdraft = false;
+                        });
+                      },
+                child: isdraft
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 4,
+                            color: AppTheme.textFieldborderColor),
+                      )
+                    : Text(
+                        'Save as Draft',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
               //preview
               GestureDetector(
@@ -789,21 +845,48 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
               ),
 
               //publish
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     String status = "post";
+              //     CreateExamTimetables(
+              //       status,
+              //     );
+              //   },
+              //   child: Text(
+              //     'Publish',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  String status = "post";
-                  CreateExamTimetables(
-                    status,
-                  );
-                },
-                child: Text(
-                  'Publish',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: isloading
+                    ? null // Disable button when loading
+                    : () {
+                        CreateExamTimetables("post");
+                      },
+                child: isloading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.appBackgroundPrimaryColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Publish',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
             ],
           ),
@@ -812,15 +895,58 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
     );
   }
 
+  bool isloading = false;
+
+  bool isdraft = false;
 //
-  void CreateExamTimetables(String status) async {
-    if (selectedFile == null) {
+  Future<void> CreateExamTimetables(String status) async {
+    setState(() {
+      if (status == 'draft') {
+        isloading = false;
+        isdraft = true;
+      } else {
+        isloading = true;
+        isdraft = false;
+      }
+    });
+
+    if (selectedGradeId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Please select a file before publishing."),
+          content: Text("Please select a class!"),
           backgroundColor: Colors.red,
         ),
       );
+      setState(() {
+        isloading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    if (selectedExam == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select a Exam!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isloading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    if (selectedFile == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please Upload Exam timetable!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        isloading = false;
+        isdraft = false;
+      });
       return;
     }
 
@@ -850,7 +976,7 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
 
     print("Exam TimeTable: ${ExamtimeTable.toJson()}");
 
-    CreateExamTimeTable(
+    await CreateExamTimeTable(
         ExamtimeTable, selectedFile!, context, widget.fetchmainexam);
   }
 }

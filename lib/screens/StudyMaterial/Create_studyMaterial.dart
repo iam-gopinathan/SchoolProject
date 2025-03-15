@@ -9,6 +9,7 @@ import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+
 import 'package:intl/intl.dart';
 
 class CreateStudymaterial extends StatefulWidget {
@@ -166,113 +167,128 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                 padding: EdgeInsets.all(10),
                 width: double.infinity,
                 height: MediaQuery.of(context).size.height * 0.7,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.vertical,
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Preview Screen',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Color.fromRGBO(104, 104, 104, 1)),
-                            ),
-                          ],
-                        ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10, left: 10),
+                      child: Row(
+                        children: [
+                          Text(
+                            'Preview Screen',
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 16,
+                                color: Color.fromRGBO(104, 104, 104, 1)),
+                          ),
+                        ],
                       ),
-                      //
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
+                    ),
+                    //
+                    Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Divider(
+                        thickness: 2,
+                        color: Color.fromRGBO(243, 243, 243, 1),
                       ),
-//heading...
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
+                    ),
+                    //heading...
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
                           children: [
-                            Text(
-                              "${selectedGradeName}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      //selected section..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${selectedSection}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //subject..
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Text(
-                              "${selectedSubject}",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //heading
-                      Padding(
-                        padding: const EdgeInsets.only(left: 15, top: 10),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width * 0.7,
-                              child: Text(
-                                "${_heading.text}",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.black),
+                            if (selectedGradeName.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${selectedGradeName}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //
+                            //selected section..
+                            if (selectedSection != null &&
+                                selectedSection!.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${selectedSection}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //subject..
+                            if (selectedSubject != null &&
+                                selectedSubject!.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 15, top: 10),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "${selectedSubject}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            //heading
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 10),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.7,
+                                    child: Text(
+                                      "${_heading.text}",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+
+                            ///image section...
+                            Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: Center(
+                                child: selectedFile != null &&
+                                        selectedFile!.bytes != null
+                                    ? Image.memory(
+                                        selectedFile!.bytes!,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(),
+                              ),
+                            )
                           ],
                         ),
                       ),
-
-                      ///image section...
-                      Padding(
-                        padding: const EdgeInsets.only(top: 15),
-                        child: Center(
-                          child: selectedFile != null &&
-                                  selectedFile!.bytes != null
-                              ? Image.memory(
-                                  selectedFile!.bytes!,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                )
-                              : Container(),
-                        ),
-                      )
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               )
             ]);
@@ -311,20 +327,25 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                 textAlign: TextAlign.center,
               ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text(
-                    "Discard",
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 14,
-                        color: Colors.black),
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.textFieldborderColor,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        "Discard",
+                        style: TextStyle(
+                            fontFamily: 'semibold',
+                            fontSize: 14,
+                            color: Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -442,7 +463,13 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                           dropdownColor: Colors.black,
                           menuMaxHeight: 150,
                           value: selectedGradeId,
-                          hint: Text("Select Class"),
+                          hint: Text(
+                            "Select Class",
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 12,
+                                color: Colors.black),
+                          ),
                           onChanged: (String? value) {
                             setState(() {
                               selectedGradeId = value;
@@ -549,7 +576,10 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                           value: selectedSection,
                           hint: Text(
                             "Select Section",
-                            style: TextStyle(),
+                            style: TextStyle(
+                                fontFamily: 'medium',
+                                fontSize: 12,
+                                color: Colors.black),
                           ),
                           onChanged: (String? value) {
                             setState(() {
@@ -635,7 +665,13 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                             ),
                           ),
                         ),
-                        hint: Text("Select Subject"),
+                        hint: Text(
+                          "Select Subject",
+                          style: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 12,
+                              color: Colors.black),
+                        ),
                         onChanged: (String? value) {
                           setState(() {
                             selectedSubject = value;
@@ -844,6 +880,25 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                 ),
               ),
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Supported Format : JPEG,Webp PNG, PDF',
+                  style: TextStyle(
+                      fontFamily: 'regular',
+                      fontSize: 9,
+                      color: Color.fromRGBO(168, 168, 168, 1)),
+                ),
+                // Text(
+                //   '*Upload either an image or a link',
+                //   style: TextStyle(
+                //       fontFamily: 'regular',
+                //       fontSize: 9,
+                //       color: Color.fromRGBO(168, 168, 168, 1)),
+                // ),
+              ],
+            ),
 
             ///display selected image...
 
@@ -911,25 +966,6 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
                   ],
                 ),
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Supported Format : JPEG,Webp PNG, PDF',
-                  style: TextStyle(
-                      fontFamily: 'regular',
-                      fontSize: 9,
-                      color: Color.fromRGBO(168, 168, 168, 1)),
-                ),
-                // Text(
-                //   '*Upload either an image or a link',
-                //   style: TextStyle(
-                //       fontFamily: 'regular',
-                //       fontSize: 9,
-                //       color: Color.fromRGBO(168, 168, 168, 1)),
-                // ),
-              ],
-            ),
           ],
         ),
       ),
@@ -940,20 +976,49 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       padding: EdgeInsets.symmetric(horizontal: 15),
+              //       backgroundColor: Colors.white,
+              //       side: BorderSide(color: Colors.black, width: 1.5)),
+              //   onPressed: () {
+              //     String status = 'draft';
+              //     _createstudymaterial(status);
+              //   },
+              //   child: Text(
+              //     'Save as Draft',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5)),
-                onPressed: () {
-                  String status = 'draft';
-                  _createstudymaterial(status);
-                },
-                child: Text(
-                  'Save as Draft',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
+                  backgroundColor: Colors.white,
+                  side: BorderSide(color: Colors.black, width: 1.5),
                 ),
+                onPressed: isdraft
+                    ? null // Disable button while loading
+                    : () {
+                        String status = 'draft';
+                        _createstudymaterial(status);
+                      },
+                child: isdraft
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme.textFieldborderColor,
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Save as Draft',
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'medium',
+                            color: Colors.black),
+                      ),
               ),
               //preview
               GestureDetector(
@@ -970,19 +1035,59 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
               ),
 
               ///
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //       backgroundColor: AppTheme.textFieldborderColor,
+              //       side: BorderSide.none),
+              //   onPressed: () {
+              //     String status = 'post';
+              //     _createstudymaterial(status);
+              //   },
+              //   child: Text(
+              //     'Publish',
+              //     style: TextStyle(
+              //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
+              //   ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () {
-                  String status = 'post';
-                  _createstudymaterial(status);
-                },
-                child: Text(
-                  'Publish',
-                  style: TextStyle(
-                      fontSize: 16, fontFamily: 'medium', color: Colors.black),
+                  backgroundColor: AppTheme.textFieldborderColor,
+                  side: BorderSide.none,
                 ),
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        // Disable when loading
+                        setState(() {
+                          _isLoading = true; // Start loading
+                        });
+
+                        String status = 'post';
+                        await _createstudymaterial(
+                            status); // Wait for function to complete
+
+                        setState(() {
+                          _isLoading = false; // Stop loading
+                        });
+                      },
+                child: _isLoading
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: AppTheme
+                              .appBackgroundPrimaryColor, // Loader color
+                          strokeWidth: 4,
+                        ),
+                      )
+                    : Text(
+                        'Publish',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
               ),
             ],
           ),
@@ -991,9 +1096,69 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
     );
   }
 
+  bool _isLoading = false;
+
+  bool isdraft = false;
+
   //create studymaterial function..
-  void _createstudymaterial(String status) {
+  Future<void> _createstudymaterial(String status) async {
     //
+    if (selectedClasses != null && selectedClasses!.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select class!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    //
+    if (selectedSection == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please select section!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    //
+    if (selectedSubject == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please Select Subject!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+    //
+    if (_heading.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Please Enter Heading!"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() {
+        _isLoading = false;
+        isdraft = false;
+      });
+      return;
+    }
+
     if (selectedFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -1001,8 +1166,22 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
           backgroundColor: Colors.red,
         ),
       );
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
+
+    //
+    setState(() {
+      if (status == 'draft') {
+        _isLoading = false;
+        isdraft = true;
+      } else {
+        _isLoading = true;
+        isdraft = false;
+      }
+    });
     String currentDateTime =
         DateFormat('dd-MM-yyyy HH:mm').format(DateTime.now());
 
@@ -1040,6 +1219,6 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
         status: status,
         postedOn: postedOn,
         draftedOn: draftedOn);
-    postStudyMaterial(create, context, widget.fetchstudymaterial);
+    await postStudyMaterial(create, context, widget.fetchstudymaterial);
   }
 }
