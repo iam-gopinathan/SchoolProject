@@ -902,34 +902,38 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Text(
-                                                                'Posted by : ${circularModel.name}',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Color
-                                                                        .fromRGBO(
-                                                                            138,
-                                                                            138,
-                                                                            138,
-                                                                            1)),
-                                                              ),
-                                                              Text(
-                                                                'Time : ${circularModel.time}',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Color
-                                                                        .fromRGBO(
-                                                                            138,
-                                                                            138,
-                                                                            138,
-                                                                            1)),
-                                                              )
+                                                              if (UserSession()
+                                                                      .userType !=
+                                                                  'student')
+                                                                Text(
+                                                                  'Posted by : ${circularModel.name}',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Color.fromRGBO(
+                                                                          138,
+                                                                          138,
+                                                                          138,
+                                                                          1)),
+                                                                ),
+                                                              if (UserSession()
+                                                                      .userType !=
+                                                                  'student')
+                                                                Text(
+                                                                  'Time : ${circularModel.time}',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Color.fromRGBO(
+                                                                          138,
+                                                                          138,
+                                                                          138,
+                                                                          1)),
+                                                                )
                                                             ],
                                                           ),
                                                           Spacer(),

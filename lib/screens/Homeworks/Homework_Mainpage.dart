@@ -673,7 +673,7 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                     ),
                   );
                 } else if (snapshot.hasData) {
-                  final homeworkList = snapshot.data!;
+                  final homeworkList = snapshot.data ?? [];
                   if (homeworkList.isEmpty) {
                     return Center(
                       child: Text(
@@ -687,21 +687,34 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                       ),
                     );
                   } else if (snapshot.hasData) {
-                    final homeworkList = snapshot.data!;
+                    final homeworkList = snapshot.data ?? [];
 
                     if (UserSession().userType == 'student' ||
                         UserSession().userType == 'teacher') {
-                      return Center(
-                        child: Text(
-                          "No messages from the school yet. Stay tuned for updates!",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontFamily: 'regular',
-                            color: Color.fromRGBO(145, 145, 145, 1),
+                      // return Center(
+                      //   child: Text(
+                      //     "No messages from the school yet. Stay tuned for updates!",
+                      //     style: TextStyle(
+                      //       fontSize: 22,
+                      //       fontFamily: 'regular',
+                      //       color: Color.fromRGBO(145, 145, 145, 1),
+                      //     ),
+                      //     textAlign: TextAlign.center,
+                      //   ),
+                      // );
+                      if (homeworkList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            "You haven’t made anything yet; start creating now!",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontFamily: 'regular',
+                              color: Color.fromRGBO(145, 145, 145, 1),
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      );
+                        );
+                      }
                     }
                   }
                   return SingleChildScrollView(
@@ -777,39 +790,39 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                     ],
                                   ),
                                 ),
-
-                              Transform.translate(
-                                offset: Offset(30, 20),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      padding: EdgeInsets.all(
-                                        MediaQuery.of(context).size.width *
-                                            0.0125,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10)),
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color.fromRGBO(48, 126, 185, 1),
-                                            Color.fromRGBO(0, 70, 123, 1)
-                                          ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
+                              if (UserSession().userType != 'student')
+                                Transform.translate(
+                                  offset: Offset(30, 20),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.all(
+                                          MediaQuery.of(context).size.width *
+                                              0.0125,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10)),
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Color.fromRGBO(48, 126, 185, 1),
+                                              Color.fromRGBO(0, 70, 123, 1)
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${e.gradeSection}',
+                                          style: TextStyle(
+                                              fontFamily: 'medium',
+                                              fontSize: 14,
+                                              color: Colors.white),
                                         ),
                                       ),
-                                      child: Text(
-                                        '${e.gradeSection}',
-                                        style: TextStyle(
-                                            fontFamily: 'medium',
-                                            fontSize: 14,
-                                            color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
                               Padding(
                                 padding: EdgeInsets.all(
                                   MediaQuery.of(context).size.width *
@@ -964,32 +977,37 @@ class _HomeworkMainpageState extends State<HomeworkMainpage> {
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Text(
-                                                          'Posted by :${e.postedBy}',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'regular',
-                                                              fontSize: 12,
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      138,
-                                                                      138,
-                                                                      138,
-                                                                      1)),
-                                                        ),
-                                                        Text(
-                                                          'Date : ${e.postedOn}',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'regular',
-                                                              fontSize: 12,
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      138,
-                                                                      138,
-                                                                      138,
-                                                                      1)),
-                                                        ),
+                                                        if (UserSession()
+                                                                .userType !=
+                                                            'student')
+                                                          Text(
+                                                            'Posted by :${e.postedBy}',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'regular',
+                                                                fontSize: 12,
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        138,
+                                                                        138,
+                                                                        138,
+                                                                        1)),
+                                                          ),
+                                                        if (e.postedOn
+                                                            .isNotEmpty)
+                                                          Text(
+                                                            'Date : ${e.postedOn}',
+                                                            style: TextStyle(
+                                                                fontFamily:
+                                                                    'regular',
+                                                                fontSize: 12,
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        138,
+                                                                        138,
+                                                                        138,
+                                                                        1)),
+                                                          ),
                                                       ],
                                                     ),
                                                     Spacer(),

@@ -77,6 +77,9 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
       );
       print("Fetching homework with date: $date");
       print('gradId: $grade');
+      print("Fetching study materials for:");
+      print("Grade: $gradeInt, Section: $section");
+      print("API Response: $response");
       final List<StudyMaterialModel> studyMaterials = response;
 
       setState(() {
@@ -384,6 +387,8 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                 backgroundColor: AppTheme.textFieldborderColor,
                               ),
                               onPressed: () {
+                                print("Selected Grade: $selectedGrade");
+                                print("Selected Section: $selectedSection");
                                 _fetchStudyMaterial(
                                     grade: selectedGrade,
                                     section: selectedSection);
@@ -688,24 +693,27 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                SvgPicture.asset(
-                                  'assets/icons/Filter_icon.svg',
-                                  fit: BoxFit.contain,
-                                  height: 20,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    left: MediaQuery.of(context).size.width *
-                                        0.012,
+                                //
+                                if (UserSession().userType != 'student')
+                                  SvgPicture.asset(
+                                    'assets/icons/Filter_icon.svg',
+                                    fit: BoxFit.contain,
+                                    height: 20,
                                   ),
-                                  child: Text(
-                                    'by Subjects',
-                                    style: TextStyle(
-                                        fontFamily: 'regular',
-                                        fontSize: 12,
-                                        color: Color.fromRGBO(47, 47, 47, 1)),
-                                  ),
-                                )
+                                if (UserSession().userType != 'student')
+                                  Padding(
+                                    padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.012,
+                                    ),
+                                    child: Text(
+                                      'by Subjects',
+                                      style: TextStyle(
+                                          fontFamily: 'regular',
+                                          fontSize: 12,
+                                          color: Color.fromRGBO(47, 47, 47, 1)),
+                                    ),
+                                  )
                               ],
                             ),
                           ),
@@ -725,33 +733,36 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                   ),
                                   child: Row(
                                     children: [
-                                      Transform.translate(
-                                        offset: Offset(20, 16),
-                                        child: Container(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 7, horizontal: 10),
-                                          decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                  colors: [
-                                                    Color.fromRGBO(
-                                                        48, 126, 185, 1),
-                                                    Color.fromRGBO(
-                                                        0, 70, 123, 1),
-                                                  ],
-                                                  begin: Alignment.centerLeft,
-                                                  end: Alignment.centerRight),
-                                              borderRadius: BorderRadius.only(
-                                                topLeft: Radius.circular(10),
-                                              )),
-                                          child: Text(
-                                            '${e.gradeSection}',
-                                            style: TextStyle(
-                                                fontFamily: 'medium',
-                                                fontSize: 12,
-                                                color: Colors.white),
+                                      //
+                                      if (UserSession().userType != 'student')
+                                        Transform.translate(
+                                          offset: Offset(20, 16),
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 7, horizontal: 10),
+                                            decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    colors: [
+                                                      Color.fromRGBO(
+                                                          48, 126, 185, 1),
+                                                      Color.fromRGBO(
+                                                          0, 70, 123, 1),
+                                                    ],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight),
+                                                borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(10),
+                                                )),
+                                            child: Text(
+                                              '${e.gradeSection}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 12,
+                                                  color: Colors.white),
+                                            ),
                                           ),
                                         ),
-                                      ),
+                                      //
                                     ],
                                   ),
                                 ),
@@ -1000,19 +1011,24 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Text(
-                                                          'Posted by : ${e.postedBy}',
-                                                          style: TextStyle(
-                                                              fontFamily:
-                                                                  'regular',
-                                                              fontSize: 12,
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      138,
-                                                                      138,
-                                                                      138,
-                                                                      1)),
-                                                        ),
+                                                        if (UserSession()
+                                                                .userType !=
+                                                            'student')
+                                                          if (e.postedBy
+                                                              .isNotEmpty)
+                                                            Text(
+                                                              'Posted by : ${e.postedBy}',
+                                                              style: TextStyle(
+                                                                  fontFamily:
+                                                                      'regular',
+                                                                  fontSize: 12,
+                                                                  color: Color
+                                                                      .fromRGBO(
+                                                                          138,
+                                                                          138,
+                                                                          138,
+                                                                          1)),
+                                                            ),
                                                       ],
                                                     ),
                                                     Spacer(),

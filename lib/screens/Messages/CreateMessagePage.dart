@@ -401,6 +401,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                                               data: htmlContent,
                                               style: {
                                                 "body": Style(
+                                                    color: Colors.black,
                                                     fontFamily: 'semibold',
                                                     fontSize: FontSize(16),
                                                     textAlign:
@@ -538,13 +539,13 @@ class _CreatemessagepageState extends State<Createmessagepage> {
   }
 
   // Function to show the unsaved changes dialog
-  Future<void> _showUnsavedChangesDialog() async {
-    bool discard = await showDialog<bool>(
+  Future<bool> _showUnsavedChangesDialog() async {
+    return await showDialog<bool>(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text(
-                "Unsaved Changes !",
+                "Unsaved Changes!",
                 style: TextStyle(
                   fontFamily: 'semibold',
                   fontSize: 16,
@@ -567,7 +568,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                         backgroundColor: AppTheme.textFieldborderColor,
                       ),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, true); // Allow back navigation
                       },
                       child: Text(
                         "Discard",
@@ -577,6 +578,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                             color: Colors.black),
                       ),
                     ),
+                    // Add spacing
                   ],
                 ),
               ],
@@ -588,616 +590,531 @@ class _CreatemessagepageState extends State<Createmessagepage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(253, 253, 253, 1),
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(80),
-        child: AppBar(
-          backgroundColor: Colors.white,
-          iconTheme: IconThemeData(color: Colors.black),
-          automaticallyImplyLeading: false,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              color: AppTheme.appBackgroundPrimaryColor,
-              borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30)),
-            ),
-            padding: EdgeInsets.all(10),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () async {
-                        if (hasUnsavedChanges()) {
-                          await _showUnsavedChangesDialog();
-                        }
-                        widget.messageFetch();
-                        Navigator.pop(context);
-                      },
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.black,
+    return WillPopScope(
+      onWillPop: () async {
+        return await _showUnsavedChangesDialog();
+      },
+      child: Scaffold(
+        backgroundColor: Color.fromRGBO(253, 253, 253, 1),
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(80),
+          child: AppBar(
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Colors.black),
+            automaticallyImplyLeading: false,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                color: AppTheme.appBackgroundPrimaryColor,
+                borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(30),
+                    bottomRight: Radius.circular(30)),
+              ),
+              padding: EdgeInsets.all(10),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          if (hasUnsavedChanges()) {
+                            await _showUnsavedChangesDialog();
+                          }
+                          widget.messageFetch();
+                          Navigator.pop(context);
+                        },
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Text(
-                        'Create Message',
-                        style: TextStyle(
-                            fontFamily: 'semibold',
-                            fontSize: 16,
-                            color: Colors.black),
-                      ),
-                    )
-                  ],
-                ),
-              ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Text(
+                          'Create Message',
+                          style: TextStyle(
+                              fontFamily: 'semibold',
+                              fontSize: 16,
+                              color: Colors.black),
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Text(
-                    'Select Recipient',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                  //dropdown field.......
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    child: DropdownButtonFormField<String>(
-                        value: selectedRecipient,
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide(
-                                color: Color.fromRGBO(203, 203, 203, 1),
-                                width: 0.5,
-                              )),
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-                          border: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Color.fromRGBO(203, 203, 203, 1),
-                                width: 0.5,
-                              ),
-                              borderRadius: BorderRadius.circular(10)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                color: Color.fromRGBO(203, 203, 203, 1),
-                                width: 0.5,
-                              ),
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        dropdownColor: Colors.black,
-                        items: dropdownItems.map((String item) {
-                          return DropdownMenuItem<String>(
-                            value: item,
-                            child: Text(
-                              item,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontFamily: 'regular'),
-                            ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            selectedRecipient = newValue;
-                          });
-                        },
-                        selectedItemBuilder: (BuildContext context) {
-                          return dropdownItems.map((className) {
-                            return Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8),
-                                child: Text(
-                                  className,
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontFamily: 'regular'),
-                                ),
-                              ),
-                            );
-                          }).toList();
-                        }),
-                  )
-                ],
-              ),
-            ),
-            //
-            if (selectedRecipient == 'Students')
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
               Padding(
-                padding: EdgeInsets.only(top: 35),
+                padding: const EdgeInsets.only(top: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Transform.translate(
-                      offset: Offset(-5, 0),
-                      child: Text(
-                        'Select Class',
-                        style: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 14,
-                            color: Color.fromRGBO(38, 38, 38, 1)),
-                      ),
+                    Text(
+                      'Select Recipient',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 14,
+                          color: Color.fromRGBO(38, 38, 38, 1)),
                     ),
-                    //class dropdown...
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: MediaQuery.of(context).size.width * 0.03),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: GestureDetector(
-                          onTap: () {
-                            _showMenu(context);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 12),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Color.fromRGBO(203, 203, 203, 1),
-                                width: 0.5,
+                    //dropdown field.......
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      child: DropdownButtonFormField<String>(
+                          value: selectedRecipient,
+                          decoration: InputDecoration(
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 0.5,
+                                )),
+                            contentPadding: EdgeInsets.symmetric(
+                                vertical: 7, horizontal: 10),
+                            border: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 0.5,
+                                ),
+                                borderRadius: BorderRadius.circular(10)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 0.5,
+                                ),
+                                borderRadius: BorderRadius.circular(10)),
+                          ),
+                          dropdownColor: Colors.black,
+                          items: dropdownItems.map((String item) {
+                            return DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontFamily: 'regular'),
                               ),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
+                            );
+                          }).toList(),
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedRecipient = newValue;
+                            });
+                          },
+                          selectedItemBuilder: (BuildContext context) {
+                            return dropdownItems.map((className) {
+                              return Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
                                   child: Text(
-                                    selected.isEmpty
-                                        ? 'Select class'
-                                        : selected.join(', '),
+                                    className,
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontFamily: 'regular',
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontFamily: 'regular'),
                                   ),
                                 ),
-                                Icon(Icons.arrow_drop_down,
-                                    color: Colors.black),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                              );
+                            }).toList();
+                          }),
+                    )
                   ],
                 ),
               ),
-            SizedBox(height: 20),
-            //heading...
-            Padding(
-              padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width *
-                    0.05, // 5% of screen width
-                top: MediaQuery.of(context).size.height *
-                    0.03, // 3% of screen height
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    'Add Heading',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.transparent,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color.fromARGB(255, 173, 172, 172)
-                          .withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: TextFormField(
-                  controller: _heading,
-                  inputFormatters: [LengthLimitingTextInputFormatter(100)],
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  style: TextStyle(
-                      color: Colors.black, fontFamily: 'medium', fontSize: 14),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  Text(
-                    '*Max 100 Characters',
-                    style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Color.fromRGBO(127, 127, 127, 1)),
-                  )
-                ],
-              ),
-            ),
-
-            ///add description
-            Padding(
-              padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width *
-                    0.05, // 5% of screen width
-                top: MediaQuery.of(context).size.height *
-                    0.03, // 3% of screen height
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    'Add Description',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
-              child: Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color.fromARGB(255, 173, 172, 172)
-                          .withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: Offset(0, 0),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          QuillSimpleToolbar(
-                            controller: _controller,
-                            configurations:
-                                const QuillSimpleToolbarConfigurations(
-                              dialogTheme: QuillDialogTheme(
-                                  labelTextStyle:
-                                      TextStyle(color: Colors.black),
-                                  inputTextStyle: TextStyle(
-                                      color: Colors.black, fontSize: 14)),
-                              showBoldButton: true,
-                              showClipboardCopy: false,
-                              showClearFormat: false,
-                              showAlignmentButtons: false,
-                              showBackgroundColorButton: false,
-                              showFontSize: false,
-                              showColorButton: false,
-                              showCenterAlignment: false,
-                              showClipboardCut: false,
-                              showIndent: false,
-                              showDirection: false,
-                              showDividers: false,
-                              showFontFamily: false,
-                              showItalicButton: false,
-                              showClipboardPaste: false,
-                              showInlineCode: false,
-                              showCodeBlock: false,
-                              showHeaderStyle: false,
-                              showJustifyAlignment: false,
-                              showLeftAlignment: false,
-                              showLineHeightButton: false,
-                              showLink: false,
-                              showListBullets: false,
-                              showListCheck: false,
-                              showListNumbers: false,
-                              showQuote: false,
-                              showRightAlignment: false,
-                              showSearchButton: false,
-                              showRedo: false,
-                              showSmallButton: false,
-                              showSubscript: false,
-                              showStrikeThrough: false,
-                              showUndo: false,
-                              showUnderLineButton: false,
-                              showSuperscript: false,
-                            ),
-                          ),
-                          IconButton(
-                              icon: Icon(Icons.paste, color: Colors.black),
-                              onPressed: () {
-                                setState(() {
-                                  _pasteFromClipboard();
-                                });
-                              })
-                        ],
-                      ),
-                    ),
-
-                    // Quill editor
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 5, bottom: 10),
-                          child: quill.QuillEditor.basic(
-                            controller: _controller,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            //schedule post...
-            Padding(
-              padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width *
-                    0.05, // 5% of screen width
-                top: MediaQuery.of(context).size.height *
-                    0.02, // 3% of screen height
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    'Schedule Post',
-                    style: TextStyle(
-                        fontFamily: 'medium',
-                        fontSize: 14,
-                        color: Color.fromRGBO(38, 38, 38, 1)),
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.only(top: 20),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.9,
-                    child: TextFormField(
-                      controller: _scheduledDateandtime,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                        suffixIcon: Padding(
-                          padding: const EdgeInsets.only(top: 10, bottom: 10),
-                          child: SvgPicture.asset(
-                            'assets/icons/NewsPage_timepicker.svg',
-                            fit: BoxFit.contain,
-                            height: 30,
-                            width: 30,
-                          ),
-                        ),
-                        hintText: 'Tap to select date and time',
-                        hintStyle: TextStyle(
-                            fontFamily: 'medium',
-                            fontSize: 14,
-                            color: Colors.black),
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(203, 203, 203, 1),
-                                width: 1)),
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
-                                color: Color.fromRGBO(203, 203, 203, 1),
-                                width: 1)),
-                      ),
-                      onTap: () async {
-                        await _pickDate();
-                        await _pickTime();
-                        _scheduledDateandtime.text = _dateTime;
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 20),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 40, bottom: 50),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                // ElevatedButton(
-                //   style: ElevatedButton.styleFrom(
-                //       padding: EdgeInsets.symmetric(horizontal: 15),
-                //       backgroundColor: Colors.white,
-                //       side: BorderSide(color: Colors.black, width: 1.5)),
-                //   onPressed: () {
-                //     _submitForm("draft");
-                //   },
-                //   child: Text(
-                //     'Save as Draft',
-                //     style: TextStyle(
-                //         fontSize: 16,
-                //         fontFamily: 'medium',
-                //         color: Colors.black),
-                //   ),
-                // ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(color: Colors.black, width: 1.5),
-                  ),
-                  onPressed: isdraft
-                      ? null // Disable button while loading
-                      : () async {
-                          setState(() {
-                            isdraft =
-                                true; // Show progress only for draft button
-                          });
-
-                          await _submitForm("draft");
-
-                          setState(() {
-                            isdraft = false; // Hide progress after submission
-                          });
-                        },
-                  child: isdraft
-                      ? SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: AppTheme.textFieldborderColor,
-                            strokeWidth: 4,
-                          ),
-                        )
-                      : Text(
-                          'Save as Draft',
+              //
+              if (selectedRecipient == 'Students')
+                Padding(
+                  padding: EdgeInsets.only(top: 35),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Transform.translate(
+                        offset: Offset(-5, 0),
+                        child: Text(
+                          'Select Class',
                           style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'medium',
-                            color: Colors.black,
+                              fontFamily: 'medium',
+                              fontSize: 14,
+                              color: Color.fromRGBO(38, 38, 38, 1)),
+                        ),
+                      ),
+                      //class dropdown...
+                      Padding(
+                        padding: EdgeInsets.only(
+                            left: MediaQuery.of(context).size.width * 0.03),
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.5,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showMenu(context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 0.5,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      selected.isEmpty
+                                          ? 'Select class'
+                                          : selected.join(', '),
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontFamily: 'regular',
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_drop_down,
+                                      color: Colors.black),
+                                ],
+                              ),
+                            ),
                           ),
                         ),
-                ),
-
-                ///preview
-                GestureDetector(
-                  onTap: () {
-                    final generatedHtml = QuillDeltaToHtmlConverter(
-                      _controller.document.toDelta().toJson(),
-                    ).convert();
-
-                    setState(() {
-                      htmlContent = generatedHtml;
-                    });
-                    print("Generated HTML Content: $htmlContent");
-                    _PreviewBottomsheet(context);
-                  },
-                  child: Text(
-                    'Preview',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 16,
-                        color: Colors.black),
+                      ),
+                    ],
                   ),
                 ),
+              SizedBox(height: 20),
+              //heading...
+              Padding(
+                padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width *
+                      0.05, // 5% of screen width
+                  top: MediaQuery.of(context).size.height *
+                      0.03, // 3% of screen height
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Add Heading',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 14,
+                          color: Color.fromRGBO(38, 38, 38, 1)),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding:
+                    EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.transparent,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 173, 172, 172)
+                            .withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
+                  ),
+                  child: TextFormField(
+                    controller: _heading,
+                    inputFormatters: [LengthLimitingTextInputFormatter(100)],
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontFamily: 'medium',
+                        fontSize: 14),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 15),
+                child: Row(
+                  children: [
+                    Text(
+                      '*Max 100 Characters',
+                      style: TextStyle(
+                          fontFamily: 'regular',
+                          fontSize: 12,
+                          color: Color.fromRGBO(127, 127, 127, 1)),
+                    )
+                  ],
+                ),
+              ),
 
-                ///scheduled or post button..
-                // if (UserSession().userType == 'superadmin')
-                //   ElevatedButton(
-                //     style: ElevatedButton.styleFrom(
-                //         padding: EdgeInsets.symmetric(horizontal: 20),
-                //         backgroundColor: AppTheme.textFieldborderColor,
-                //         side: BorderSide.none),
-                //     onPressed: () {
-                //       if (_scheduledDateandtime.text.isEmpty) {
-                //         _submitForm("post");
-                //       } else {
-                //         _submitForm("schedule");
-                //       }
-                //     },
-                //     child: Text(
-                //       _scheduledDateandtime.text.isEmpty
-                //           ? 'Publish'
-                //           : 'Schedule',
-                //       style: TextStyle(
-                //           fontSize: 16,
-                //           fontFamily: 'medium',
-                //           color: Colors.black),
-                //     ),
-                //   ),
-                // Inside Widget build
-                if (UserSession().userType == 'superadmin')
+              ///add description
+              Padding(
+                padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width *
+                      0.05, // 5% of screen width
+                  top: MediaQuery.of(context).size.height *
+                      0.03, // 3% of screen height
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Add Description',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 14,
+                          color: Color.fromRGBO(38, 38, 38, 1)),
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding:
+                    EdgeInsets.all(MediaQuery.of(context).size.width * 0.04),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 173, 172, 172)
+                            .withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: Offset(0, 0),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            QuillSimpleToolbar(
+                              controller: _controller,
+                              configurations:
+                                  const QuillSimpleToolbarConfigurations(
+                                dialogTheme: QuillDialogTheme(
+                                    labelTextStyle:
+                                        TextStyle(color: Colors.black),
+                                    inputTextStyle: TextStyle(
+                                        color: Colors.black, fontSize: 14)),
+                                showBoldButton: true,
+                                showClipboardCopy: false,
+                                showClearFormat: false,
+                                showAlignmentButtons: false,
+                                showBackgroundColorButton: false,
+                                showFontSize: false,
+                                showColorButton: false,
+                                showCenterAlignment: false,
+                                showClipboardCut: false,
+                                showIndent: false,
+                                showDirection: false,
+                                showDividers: false,
+                                showFontFamily: false,
+                                showItalicButton: false,
+                                showClipboardPaste: false,
+                                showInlineCode: false,
+                                showCodeBlock: false,
+                                showHeaderStyle: false,
+                                showJustifyAlignment: false,
+                                showLeftAlignment: false,
+                                showLineHeightButton: false,
+                                showLink: false,
+                                showListBullets: false,
+                                showListCheck: false,
+                                showListNumbers: false,
+                                showQuote: false,
+                                showRightAlignment: false,
+                                showSearchButton: false,
+                                showRedo: false,
+                                showSmallButton: false,
+                                showSubscript: false,
+                                showStrikeThrough: false,
+                                showUndo: false,
+                                showUnderLineButton: false,
+                                showSuperscript: false,
+                              ),
+                            ),
+                            IconButton(
+                                icon: Icon(Icons.paste, color: Colors.black),
+                                onPressed: () {
+                                  setState(() {
+                                    _pasteFromClipboard();
+                                  });
+                                })
+                          ],
+                        ),
+                      ),
+
+                      // Quill editor
+                      Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 5, bottom: 10),
+                            child: quill.QuillEditor.basic(
+                              controller: _controller,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              //schedule post...
+              Padding(
+                padding: EdgeInsets.only(
+                  left: MediaQuery.of(context).size.width *
+                      0.05, // 5% of screen width
+                  top: MediaQuery.of(context).size.height *
+                      0.02, // 3% of screen height
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Schedule Post',
+                      style: TextStyle(
+                          fontFamily: 'medium',
+                          fontSize: 14,
+                          color: Color.fromRGBO(38, 38, 38, 1)),
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      child: TextFormField(
+                        controller: _scheduledDateandtime,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 20),
+                          suffixIcon: Padding(
+                            padding: const EdgeInsets.only(top: 10, bottom: 10),
+                            child: SvgPicture.asset(
+                              'assets/icons/NewsPage_timepicker.svg',
+                              fit: BoxFit.contain,
+                              height: 30,
+                              width: 30,
+                            ),
+                          ),
+                          hintText: 'Tap to select date and time',
+                          hintStyle: TextStyle(
+                              fontFamily: 'medium',
+                              fontSize: 14,
+                              color: Colors.black),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 1)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              borderSide: BorderSide(
+                                  color: Color.fromRGBO(203, 203, 203, 1),
+                                  width: 1)),
+                        ),
+                        onTap: () async {
+                          await _pickDate();
+                          await _pickTime();
+                          _scheduledDateandtime.text = _dateTime;
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: Container(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20, bottom: 20),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40, bottom: 50),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // ElevatedButton(
+                  //   style: ElevatedButton.styleFrom(
+                  //       padding: EdgeInsets.symmetric(horizontal: 15),
+                  //       backgroundColor: Colors.white,
+                  //       side: BorderSide(color: Colors.black, width: 1.5)),
+                  //   onPressed: () {
+                  //     _submitForm("draft");
+                  //   },
+                  //   child: Text(
+                  //     'Save as Draft',
+                  //     style: TextStyle(
+                  //         fontSize: 16,
+                  //         fontFamily: 'medium',
+                  //         color: Colors.black),
+                  //   ),
+                  // ),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      backgroundColor: AppTheme.textFieldborderColor,
-                      side: BorderSide.none,
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      backgroundColor: Colors.white,
+                      side: BorderSide(color: Colors.black, width: 1.5),
                     ),
-                    onPressed: _isLoading
-                        ? null // Disable button when loading
+                    onPressed: isdraft
+                        ? null // Disable button while loading
                         : () async {
                             setState(() {
-                              _isLoading = true; // Start loading
+                              isdraft =
+                                  true; // Show progress only for draft button
                             });
 
-                            if (_scheduledDateandtime.text.isEmpty) {
-                              await _submitForm("post");
-                            } else {
-                              await _submitForm("schedule");
-                            }
+                            await _submitForm("draft");
 
                             setState(() {
-                              _isLoading =
-                                  false; // Stop loading after submission
+                              isdraft = false; // Hide progress after submission
                             });
                           },
-                    child: _isLoading
+                    child: isdraft
                         ? SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                              strokeWidth: 4,
                               color: AppTheme.textFieldborderColor,
+                              strokeWidth: 4,
                             ),
                           )
                         : Text(
-                            _scheduledDateandtime.text.isEmpty
-                                ? 'Publish'
-                                : 'Schedule',
+                            'Save as Draft',
                             style: TextStyle(
                               fontSize: 16,
                               fontFamily: 'medium',
@@ -1206,102 +1123,196 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                           ),
                   ),
 
-                ////request now..
-                if (UserSession().userType == 'admin' ||
-                    UserSession().userType == 'staff')
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      backgroundColor: AppTheme.textFieldborderColor,
-                      side: BorderSide.none,
-                    ),
-                    onPressed: () {
-                      //
-                      if (_heading.text.isEmpty ||
-                          _controller.document.isEmpty()) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.red,
-                            content: Text(
-                                'Please fill in both heading and description'),
-                          ),
-                        );
-                        return;
-                      }
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: Colors.white,
-                            title: Text(
-                              "Confirm Request !",
-                              style: TextStyle(
-                                fontFamily: 'semibold',
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            content: Text(
-                              "Are you sure you want to create a new request?",
-                              style: TextStyle(
-                                  fontFamily: 'regular',
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            ),
-                            actions: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  side:
-                                      BorderSide(color: Colors.black, width: 1),
-                                ),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(
-                                  "Cancel",
-                                  style: TextStyle(
-                                      fontFamily: 'semibold',
-                                      fontSize: 14,
-                                      color: Colors.black),
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.amber),
-                                onPressed: () {
-                                  if (_scheduledDateandtime.text.isEmpty) {
-                                    _submitForm("post");
-                                  } else {
-                                    _submitForm("schedule");
-                                  }
+                  ///preview
+                  GestureDetector(
+                    onTap: () {
+                      final generatedHtml = QuillDeltaToHtmlConverter(
+                        _controller.document.toDelta().toJson(),
+                      ).convert();
 
-                                  Navigator.of(context).pop();
-                                },
-                                child: Text(
-                                  "Yes Send",
-                                  style: TextStyle(
-                                      fontFamily: 'semibold',
-                                      fontSize: 14,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                      setState(() {
+                        htmlContent = generatedHtml;
+                      });
+                      print("Generated HTML Content: $htmlContent");
+                      _PreviewBottomsheet(context);
                     },
                     child: Text(
-                      'Request Now',
+                      'Preview',
                       style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'medium',
-                        color: Colors.black,
-                      ),
+                          fontFamily: 'semibold',
+                          fontSize: 16,
+                          color: Colors.black),
                     ),
                   ),
-              ],
+
+                  ///scheduled or post button..
+                  // if (UserSession().userType == 'superadmin')
+                  //   ElevatedButton(
+                  //     style: ElevatedButton.styleFrom(
+                  //         padding: EdgeInsets.symmetric(horizontal: 20),
+                  //         backgroundColor: AppTheme.textFieldborderColor,
+                  //         side: BorderSide.none),
+                  //     onPressed: () {
+                  //       if (_scheduledDateandtime.text.isEmpty) {
+                  //         _submitForm("post");
+                  //       } else {
+                  //         _submitForm("schedule");
+                  //       }
+                  //     },
+                  //     child: Text(
+                  //       _scheduledDateandtime.text.isEmpty
+                  //           ? 'Publish'
+                  //           : 'Schedule',
+                  //       style: TextStyle(
+                  //           fontSize: 16,
+                  //           fontFamily: 'medium',
+                  //           color: Colors.black),
+                  //     ),
+                  //   ),
+                  // Inside Widget build
+                  if (UserSession().userType == 'superadmin')
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        backgroundColor: AppTheme.textFieldborderColor,
+                        side: BorderSide.none,
+                      ),
+                      onPressed: _isLoading
+                          ? null // Disable button when loading
+                          : () async {
+                              setState(() {
+                                _isLoading = true; // Start loading
+                              });
+
+                              if (_scheduledDateandtime.text.isEmpty) {
+                                await _submitForm("post");
+                              } else {
+                                await _submitForm("schedule");
+                              }
+
+                              setState(() {
+                                _isLoading =
+                                    false; // Stop loading after submission
+                              });
+                            },
+                      child: _isLoading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 4,
+                                color: AppTheme.textFieldborderColor,
+                              ),
+                            )
+                          : Text(
+                              _scheduledDateandtime.text.isEmpty
+                                  ? 'Publish'
+                                  : 'Schedule',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'medium',
+                                color: Colors.black,
+                              ),
+                            ),
+                    ),
+
+                  ////request now..
+                  if (UserSession().userType == 'admin' ||
+                      UserSession().userType == 'staff')
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        backgroundColor: AppTheme.textFieldborderColor,
+                        side: BorderSide.none,
+                      ),
+                      onPressed: () {
+                        //
+                        if (_heading.text.isEmpty ||
+                            _controller.document.isEmpty()) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text(
+                                  'Please fill in both heading and description'),
+                            ),
+                          );
+                          return;
+                        }
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              backgroundColor: Colors.white,
+                              title: Text(
+                                "Confirm Request !",
+                                style: TextStyle(
+                                  fontFamily: 'semibold',
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              content: Text(
+                                "Are you sure you want to create a new request?",
+                                style: TextStyle(
+                                    fontFamily: 'regular',
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    side: BorderSide(
+                                        color: Colors.black, width: 1),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                        fontFamily: 'semibold',
+                                        fontSize: 14,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.amber),
+                                  onPressed: () {
+                                    if (_scheduledDateandtime.text.isEmpty) {
+                                      _submitForm("post");
+                                    } else {
+                                      _submitForm("schedule");
+                                    }
+
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text(
+                                    "Yes Send",
+                                    style: TextStyle(
+                                        fontFamily: 'semibold',
+                                        fontSize: 14,
+                                        color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: Text(
+                        'Request Now',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'medium',
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

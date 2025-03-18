@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/Login_models/newsArticlesModel.dart';
-import 'package:flutter_application_1/screens/Communication.dart';
+
 import 'package:flutter_application_1/screens/Dashboard.dart';
 import 'package:flutter_application_1/screens/Parent_communication_Page.dart';
 import 'package:flutter_application_1/services/auth_services.dart';

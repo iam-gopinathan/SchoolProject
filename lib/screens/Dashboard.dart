@@ -1085,7 +1085,7 @@ class _DashboardState extends State<Dashboard> {
                                         style: TextStyle(
                                           fontSize: 12,
                                           fontFamily: 'medium',
-                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
                                         ),
                                       ),
                                       SizedBox(
@@ -1130,7 +1130,6 @@ class _DashboardState extends State<Dashboard> {
                                             ),
                                           ),
                                         ),
-
                                       //arrow..
                                       Icon(
                                         Icons.arrow_forward,
@@ -1908,10 +1907,8 @@ class _DashboardState extends State<Dashboard> {
                     ///nursery secondary primary text......
                     Padding(
                       padding: EdgeInsets.only(
-                        left: MediaQuery.sizeOf(context).width *
-                            0.03, // 3% of screen width
-                        right: MediaQuery.sizeOf(context).width *
-                            0.03, // 3% of screen width
+                        left: MediaQuery.sizeOf(context).width * 0.03,
+                        right: MediaQuery.sizeOf(context).width * 0.03,
                         top: MediaQuery.sizeOf(context).height * 0.02,
                       ),
                       child: Card(
@@ -1925,14 +1922,6 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         child: Container(
                           decoration: BoxDecoration(
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Color.fromRGBO(204, 204, 204, 0.3),
-                                  spreadRadius: -10,
-                                  blurRadius: 20,
-                                  offset: Offset(-4, 1),
-                                ),
-                              ],
                               border: Border.all(
                                 color: Color.fromRGBO(225, 225, 225, 1),
                               ),
@@ -1940,10 +1929,8 @@ class _DashboardState extends State<Dashboard> {
                               borderRadius: BorderRadius.circular(30)),
                           child: Padding(
                             padding: EdgeInsets.only(
-                              top: MediaQuery.sizeOf(context).height *
-                                  0.005, // 0.5% of screen height
-                              bottom: MediaQuery.sizeOf(context).height *
-                                  0.005, // 0.5% of screen height
+                              top: MediaQuery.sizeOf(context).height * 0.005,
+                              bottom: MediaQuery.sizeOf(context).height * 0.005,
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

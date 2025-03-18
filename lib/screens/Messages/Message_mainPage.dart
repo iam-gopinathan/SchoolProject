@@ -731,34 +731,38 @@ class _MessageMainpageState extends State<MessageMainpage> {
                                                                 CrossAxisAlignment
                                                                     .start,
                                                             children: [
-                                                              Text(
-                                                                'Posted by : ${message.name}',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Color
-                                                                        .fromRGBO(
-                                                                            138,
-                                                                            138,
-                                                                            138,
-                                                                            1)),
-                                                              ),
-                                                              Text(
-                                                                'Time : ${message.time}',
-                                                                style: TextStyle(
-                                                                    fontFamily:
-                                                                        'regular',
-                                                                    fontSize:
-                                                                        12,
-                                                                    color: Color
-                                                                        .fromRGBO(
-                                                                            138,
-                                                                            138,
-                                                                            138,
-                                                                            1)),
-                                                              )
+                                                              if (UserSession()
+                                                                      .userType !=
+                                                                  'student')
+                                                                Text(
+                                                                  'Posted by : ${message.name}',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Color.fromRGBO(
+                                                                          138,
+                                                                          138,
+                                                                          138,
+                                                                          1)),
+                                                                ),
+                                                              if (UserSession()
+                                                                      .userType !=
+                                                                  'student')
+                                                                Text(
+                                                                  'Time : ${message.time}',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Color.fromRGBO(
+                                                                          138,
+                                                                          138,
+                                                                          138,
+                                                                          1)),
+                                                                )
                                                             ],
                                                           ),
                                                           Spacer(),

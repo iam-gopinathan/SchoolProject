@@ -485,36 +485,40 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
                         final e = timetableList[index];
                         return Column(
                           children: [
+                            //
+
                             Transform.translate(
                               offset: Offset(30, 18),
                               child: Row(
                                 children: [
-                                  Container(
-                                    padding: EdgeInsets.all(
-                                        MediaQuery.of(context).size.width *
-                                            0.02),
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(10)),
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color.fromRGBO(48, 126, 185, 1),
-                                            Color.fromRGBO(0, 70, 123, 1)
-                                          ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                        )),
-                                    child: Text(
-                                      '${e.gradeSection}',
-                                      style: TextStyle(
-                                          fontFamily: 'medium',
-                                          fontSize: 14,
-                                          color: Colors.white),
+                                  if (UserSession().userType != 'student')
+                                    Container(
+                                      padding: EdgeInsets.all(
+                                          MediaQuery.of(context).size.width *
+                                              0.02),
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10)),
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Color.fromRGBO(48, 126, 185, 1),
+                                              Color.fromRGBO(0, 70, 123, 1)
+                                            ],
+                                            begin: Alignment.centerLeft,
+                                            end: Alignment.centerRight,
+                                          )),
+                                      child: Text(
+                                        '${e.gradeSection}',
+                                        style: TextStyle(
+                                            fontFamily: 'medium',
+                                            fontSize: 14,
+                                            color: Colors.white),
+                                      ),
                                     ),
-                                  ),
                                 ],
                               ),
                             ),
+                            //
                             //card section..
                             Padding(
                               padding: EdgeInsets.all(
@@ -1114,8 +1118,13 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
             children: [
               // Close icon
               Positioned(
-                top: -70,
-                left: 180,
+                // top: -70,
+                // left: 180,
+                top: MediaQuery.of(context).size.height *
+                    -0.08, // Adjust -70 based on screen height
+                left: MediaQuery.of(context).size.width *
+                    0.45, // Adjust 180 based on screen width
+
                 child: GestureDetector(
                   onTap: () {
                     Navigator.of(context).pop();

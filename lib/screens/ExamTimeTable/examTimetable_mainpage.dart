@@ -458,100 +458,102 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
           : SingleChildScrollView(
               child: Column(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      gradeController.fetchGrades();
-                      showMenu(
-                        context: context,
-                        color: Colors.black,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        position: RelativeRect.fromLTRB(100, 180, 0, 0),
-                        items: [
-                          PopupMenuItem<String>(
-                            enabled: false,
-                            child: ConstrainedBox(
-                              constraints: const BoxConstraints(
-                                maxHeight: 150,
-                              ),
-                              child: SingleChildScrollView(
-                                controller: _scrollControllerss,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children:
-                                      gradeController.examList.map((exam) {
-                                    return PopupMenuItem<String>(
-                                      value: exam,
-                                      child: StatefulBuilder(
-                                          builder: (context, setState) {
-                                        return GestureDetector(
-                                          onTap: () {
-                                            setState(() {
-                                              selectedExam = exam;
-                                            });
-                                            Navigator.pop(context, exam);
-                                          },
-                                          child: Text(
-                                            exam,
-                                            style: TextStyle(
-                                              fontFamily: 'regular',
-                                              fontSize: 14,
-                                              color: selectedExam == exam
-                                                  ? Colors.amber
-                                                  : Colors.white,
+                  //
+                  if (UserSession().userType != 'student')
+                    GestureDetector(
+                      onTap: () {
+                        gradeController.fetchGrades();
+                        showMenu(
+                          context: context,
+                          color: Colors.black,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          position: RelativeRect.fromLTRB(100, 180, 0, 0),
+                          items: [
+                            PopupMenuItem<String>(
+                              enabled: false,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 150,
+                                ),
+                                child: SingleChildScrollView(
+                                  controller: _scrollControllerss,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children:
+                                        gradeController.examList.map((exam) {
+                                      return PopupMenuItem<String>(
+                                        value: exam,
+                                        child: StatefulBuilder(
+                                            builder: (context, setState) {
+                                          return GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedExam = exam;
+                                              });
+                                              Navigator.pop(context, exam);
+                                            },
+                                            child: Text(
+                                              exam,
+                                              style: TextStyle(
+                                                fontFamily: 'regular',
+                                                fontSize: 14,
+                                                color: selectedExam == exam
+                                                    ? Colors.amber
+                                                    : Colors.white,
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      }),
-                                    );
-                                  }).toList(),
+                                          );
+                                        }),
+                                      );
+                                    }).toList(),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                        elevation: 8.0,
-                      ).then((value) {
-                        if (value != null) {
-                          print('Selected: $value');
-                          selectedExam = value;
-                          _fetchExamMaintimetable(exam: value);
-                        }
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        right: MediaQuery.of(context).size.width *
-                            0.06, // 6% of screen width
-                        top: MediaQuery.of(context).size.height *
-                            0.014, // 1.2% of screen height
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          SvgPicture.asset(
-                            'assets/icons/Filter_icon.svg',
-                            fit: BoxFit.contain,
-                            height: 20,
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              left: MediaQuery.of(context).size.width * 0.012,
+                          ],
+                          elevation: 8.0,
+                        ).then((value) {
+                          if (value != null) {
+                            print('Selected: $value');
+                            selectedExam = value;
+                            _fetchExamMaintimetable(exam: value);
+                          }
+                        });
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width *
+                              0.06, // 6% of screen width
+                          top: MediaQuery.of(context).size.height *
+                              0.014, // 1.2% of screen height
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/Filter_icon.svg',
+                              fit: BoxFit.contain,
+                              height: 20,
                             ),
-                            child: Text(
-                              'by Exams',
-                              style: TextStyle(
-                                fontFamily: 'regular',
-                                fontSize: 12,
-                                color: Color.fromRGBO(47, 47, 47, 1),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.012,
                               ),
-                            ),
-                          )
-                        ],
+                              child: Text(
+                                'by Exams',
+                                style: TextStyle(
+                                  fontFamily: 'regular',
+                                  fontSize: 12,
+                                  color: Color.fromRGBO(47, 47, 47, 1),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
                   //
                   FutureBuilder(
                     future: ExamtimeTableFuture,
@@ -608,36 +610,41 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                       ),
                                       child: Row(
                                         children: [
-                                          Transform.translate(
-                                            offset: Offset(20, 20),
-                                            child: Container(
-                                              padding: EdgeInsets.symmetric(
-                                                  vertical: 5, horizontal: 10),
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                  colors: [
-                                                    Color.fromRGBO(
-                                                        48, 126, 185, 1),
-                                                    Color.fromRGBO(
-                                                        0, 70, 123, 1),
-                                                  ],
-                                                  begin: Alignment.centerLeft,
-                                                  end: Alignment.centerRight,
+                                          if (UserSession().userType !=
+                                              'student')
+                                            Transform.translate(
+                                              offset: Offset(20, 20),
+                                              child: Container(
+                                                padding: EdgeInsets.symmetric(
+                                                    vertical: 5,
+                                                    horizontal: 10),
+                                                decoration: BoxDecoration(
+                                                  gradient: LinearGradient(
+                                                    colors: [
+                                                      Color.fromRGBO(
+                                                          48, 126, 185, 1),
+                                                      Color.fromRGBO(
+                                                          0, 70, 123, 1),
+                                                    ],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                  ),
+                                                  borderRadius:
+                                                      BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(10),
+                                                  ),
                                                 ),
-                                                borderRadius: BorderRadius.only(
-                                                  topLeft: Radius.circular(10),
-                                                ),
-                                              ),
-                                              child: Text(
-                                                '$classSign',
-                                                style: TextStyle(
-                                                  fontFamily: 'medium',
-                                                  fontSize: 12,
-                                                  color: Colors.white,
+                                                child: Text(
+                                                  '$classSign',
+                                                  style: TextStyle(
+                                                    fontFamily: 'medium',
+                                                    fontSize: 12,
+                                                    color: Colors.white,
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
                                         ],
                                       ),
                                     ),
@@ -799,20 +806,29 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
                                                               CrossAxisAlignment
                                                                   .start,
                                                           children: [
-                                                            Text(
-                                                              'Posted by : ${e.postedBy}',
-                                                              style: TextStyle(
-                                                                fontFamily:
-                                                                    'regular',
-                                                                fontSize: 12,
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        138,
-                                                                        138,
-                                                                        138,
-                                                                        1),
-                                                              ),
-                                                            ),
+                                                            if (e.postedBy !=
+                                                                    null &&
+                                                                e.postedBy!
+                                                                    .isNotEmpty)
+                                                              if (UserSession()
+                                                                      .userType !=
+                                                                  'student')
+                                                                Text(
+                                                                  'Posted by : ${e.postedBy}',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontFamily:
+                                                                        'regular',
+                                                                    fontSize:
+                                                                        12,
+                                                                    color: Color
+                                                                        .fromRGBO(
+                                                                            138,
+                                                                            138,
+                                                                            138,
+                                                                            1),
+                                                                  ),
+                                                                ),
                                                           ],
                                                         ),
                                                         Spacer(),
