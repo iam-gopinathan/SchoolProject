@@ -15,6 +15,7 @@ import 'package:flutter_application_1/screens/Communication.dart';
 import 'package:flutter_application_1/screens/Feedback/feedback_mainpage.dart';
 import 'package:flutter_application_1/screens/Myprojects_screens/Myproject_menu.dart';
 import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
+import 'package:flutter_application_1/screens/Reset_Passwordscreen.dart';
 import 'package:flutter_application_1/screens/circularPage/circular_mainPage.dart';
 import 'package:flutter_application_1/screens/loginscreen.dart';
 import 'package:flutter_application_1/services/dashboard_API/Dashboard_Newssection.dart';
@@ -1912,6 +1913,7 @@ class _DashboardState extends State<Dashboard> {
                         top: MediaQuery.sizeOf(context).height * 0.02,
                       ),
                       child: Card(
+                        color: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -1922,9 +1924,10 @@ class _DashboardState extends State<Dashboard> {
                         ),
                         child: Container(
                           decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Color.fromRGBO(225, 225, 225, 1),
-                              ),
+                              // border: Border.all(
+                              //   color: Color.fromRGBO(225, 225, 225, 1),
+                              //   width: 1,
+                              // ),
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(30)),
                           child: Padding(
@@ -3305,6 +3308,70 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
               //
+
+              Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.sizeOf(context).height * 0.01,
+                ),
+                child: Divider(
+                  color: Color.fromRGBO(202, 202, 202, 202),
+                  thickness: 1.0,
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  'Password',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 18,
+                      color: Colors.black),
+                ),
+                subtitle: Padding(
+                  padding: EdgeInsets.only(
+                    top: MediaQuery.sizeOf(context).height * 0.02,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          print('usersession : ${UserSession().userType}');
+                          if (UserSession().userType == 'student') {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ResetPasswordscreen(),
+                              ),
+                            );
+                          }
+                        },
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              'assets/icons/enddawer_lockicon.svg',
+                              fit: BoxFit.contain,
+                              color: Colors.black,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.sizeOf(context).width * 0.02,
+                              ),
+                              child: Text(
+                                'Reset Password',
+                                style: TextStyle(
+                                    fontFamily: 'semibold',
+                                    fontSize: 16,
+                                    color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              //
               if (UserSession().userType == 'admin' ||
                   UserSession().userType == 'superadmin')
                 Padding(
@@ -3336,7 +3403,7 @@ class _DashboardState extends State<Dashboard> {
                         color: Colors.black),
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

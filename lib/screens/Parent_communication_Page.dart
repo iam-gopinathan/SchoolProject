@@ -14,6 +14,7 @@ import 'package:flutter_application_1/screens/MarksAndResults/Parent_MarksandRes
 import 'package:flutter_application_1/screens/Messages/Message_mainPage.dart';
 import 'package:flutter_application_1/screens/Myprojects_screens/Myproject_menu.dart';
 import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
+import 'package:flutter_application_1/screens/Reset_Passwordscreen.dart';
 import 'package:flutter_application_1/screens/Schoolcalender/schoolCalender_mainPage.dart';
 import 'package:flutter_application_1/screens/StudyMaterial/studyMaterial_mainpage.dart';
 import 'package:flutter_application_1/screens/TimeTables/timeTable_mainpage.dart';
@@ -533,150 +534,55 @@ class _CommunicationState extends State<ParentCommunicationPage> {
                   ),
                 ),
               ),
-              //
-              if (UserSession().userType == 'admin' ||
-                  UserSession().userType == 'superadmin' ||
-                  UserSession().userType == 'staff')
-                ListTile(
-                  title: Text(
-                    'My Projects',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 16,
-                        color: Colors.black),
-                  ),
-                  subtitle: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => MyprojectMenu()));
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: MediaQuery.sizeOf(context).height * 0.02,
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            border: Border.all(
-                                color: AppTheme.textFieldborderColor,
-                                width: 1.5)),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.add),
-                            Text(
-                              'Add / Manage',
-                              style: TextStyle(
-                                  fontFamily: 'medium',
-                                  fontSize: 16,
-                                  color: Colors.black),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+              //password section..
+              Padding(
+                padding: EdgeInsets.only(
+                  top: MediaQuery.sizeOf(context).height * 0.01,
                 ),
-              //
-              if (UserSession().userType == 'admin' ||
-                  UserSession().userType == 'superadmin')
-                Padding(
+                child: Divider(
+                  color: Color.fromRGBO(202, 202, 202, 202),
+                  thickness: 1.0,
+                ),
+              ),
+              ListTile(
+                title: Text(
+                  'Password',
+                  style: TextStyle(
+                      fontFamily: 'semibold',
+                      fontSize: 18,
+                      color: Colors.black),
+                ),
+                subtitle: Padding(
                   padding: EdgeInsets.only(
-                    top: MediaQuery.sizeOf(context).height * 0.01,
+                    top: MediaQuery.sizeOf(context).height * 0.02,
                   ),
-                  child: Divider(
-                    color: Color.fromRGBO(202, 202, 202, 202),
-                    thickness: 1.0,
-                  ),
-                ),
-              //
-              if (UserSession().userType == 'admin' ||
-                  UserSession().userType == 'superadmin' ||
-                  UserSession().userType == 'staff')
-                ListTile(
-                  title: Text(
-                    'ERP',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 18,
-                        color: Colors.black),
-                  ),
-                  subtitle: Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.sizeOf(context).height * 0.02,
-                        ),
+                      GestureDetector(
+                        onTap: () {
+                          print('usersession : ${UserSession().userType}');
+
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResetPasswordscreen(),
+                            ),
+                          );
+                        },
                         child: Row(
                           children: [
                             SvgPicture.asset(
                               'assets/icons/enddawer_lockicon.svg',
                               fit: BoxFit.contain,
+                              color: Colors.black,
                             ),
                             Padding(
                               padding: EdgeInsets.only(
                                 left: MediaQuery.sizeOf(context).width * 0.02,
                               ),
                               child: Text(
-                                'Student Management',
-                                style: TextStyle(
-                                    fontFamily: 'semibold',
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.sizeOf(context).height * 0.02,
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/staffmanagement.svg',
-                              fit: BoxFit.contain,
-                            ),
-                            //
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: MediaQuery.sizeOf(context).width * 0.02,
-                              ),
-                              child: Text(
-                                'Staff Management',
-                                style: TextStyle(
-                                    fontFamily: 'semibold',
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      //
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.sizeOf(context).height * 0.02,
-                        ),
-                        child: Row(
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/staffmanagement.svg',
-                              fit: BoxFit.contain,
-                            ),
-                            //
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: MediaQuery.sizeOf(context).width * 0.02,
-                              ),
-                              child: Text(
-                                'Academic',
+                                'Reset Password',
                                 style: TextStyle(
                                     fontFamily: 'semibold',
                                     fontSize: 16,
@@ -689,96 +595,7 @@ class _CommunicationState extends State<ParentCommunicationPage> {
                     ],
                   ),
                 ),
-              if (UserSession().userType == 'admin' ||
-                  UserSession().userType == 'superadmin' ||
-                  UserSession().userType == 'staff')
-                Padding(
-                  padding: EdgeInsets.only(
-                    top: MediaQuery.sizeOf(context).height * 0.01,
-                  ),
-                  child: Divider(
-                    color: Color.fromRGBO(202, 202, 202, 202),
-                    thickness: 1.0,
-                  ),
-                ),
-              //
-              if (UserSession().userType == 'admin' ||
-                  UserSession().userType == 'superadmin')
-                ListTile(
-                  title: Text(
-                    'Manage',
-                    style: TextStyle(
-                        fontFamily: 'semibold',
-                        fontSize: 18,
-                        color: Colors.black),
-                  ),
-                  subtitle: Padding(
-                    padding: EdgeInsets.only(
-                      top: MediaQuery.sizeOf(context).height * 0.02,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ApprovalmenuPage()));
-                          },
-                          child: Row(
-                            children: [
-                              SvgPicture.asset(
-                                'assets/icons/enddawer_lockicon.svg',
-                                fit: BoxFit.contain,
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: MediaQuery.sizeOf(context).width * 0.02,
-                                ),
-                                child: Text(
-                                  'Approvals',
-                                  style: TextStyle(
-                                      fontFamily: 'semibold',
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        if (UserSession().userType == 'admin' ||
-                            UserSession().userType == 'superadmin')
-                          Padding(
-                            padding: EdgeInsets.only(
-                              top: MediaQuery.sizeOf(context).height * 0.02,
-                            ),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  'assets/icons/Accesscontrol.svg',
-                                  fit: BoxFit.contain,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.sizeOf(context).width * 0.02,
-                                  ),
-                                  child: Text(
-                                    'Access Control',
-                                    style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 16,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
+              ),
               //
               if (UserSession().userType == 'admin' ||
                   UserSession().userType == 'superadmin')
