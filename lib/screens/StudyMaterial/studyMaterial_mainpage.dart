@@ -16,6 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class StudymaterialMainpage extends StatefulWidget {
   const StudymaterialMainpage({super.key});
@@ -1510,9 +1511,18 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
 
   Future<void> downloadFile(String fileUrl) async {
     try {
-      final directory = await getExternalStorageDirectory();
+      //
+      await requestStoragePermission();
+      //
+      // final directory = await getExternalStorageDirectory();
+      // if (directory == null) {
+      //   print("Failed to get external storage directory.");
+      //   return;
+      // }
+      // Step 2: Get storage directory
+      final directory = await getDownloadDirectory();
       if (directory == null) {
-        print("Failed to get external storage directory.");
+        print("⚠️ Failed to get storage directory.");
         return;
       }
 
@@ -1595,6 +1605,27 @@ class _StudymaterialMainpageState extends State<StudymaterialMainpage> {
     print("Opening file: $filePath");
     OpenFile.open(filePath);
   }
+
+  //
+  //
+  Future<void> requestStoragePermission() async {
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
+      print("✅ Storage permission granted");
+    } else {
+      print("❌ Storage permission denied");
+    }
+  }
+  //
+
+  Future<Directory?> getDownloadDirectory() async {
+    Directory? directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      directory = await getApplicationDocumentsDirectory(); // Fallback
+    }
+    return directory;
+  }
+//
 
   //preview bottomsheet..
   void _showBottomSheets(

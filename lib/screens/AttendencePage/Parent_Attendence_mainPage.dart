@@ -1449,6 +1449,7 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                                           'medium'),
                                                                 ),
                                                               ),
+                                                              //
                                                               Expanded(
                                                                 child: Padding(
                                                                   padding:
@@ -1475,7 +1476,7 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                                                             '${attendanceData?.attendanceStatus?.percentage}%',
                                                                             style: TextStyle(
                                                                                 fontFamily: 'medium',
-                                                                                fontSize: 20,
+                                                                                fontSize: 16,
                                                                                 color: Colors.white),
                                                                           ),
                                                                         ),

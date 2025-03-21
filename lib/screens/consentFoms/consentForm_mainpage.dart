@@ -584,7 +584,7 @@ class _ConsentformMainpageState extends State<ConsentformMainpage> {
                   controller: _scrollController,
                   child: Column(
                     children: [
-                      //recieved..
+                      //recieved.....
                       Padding(
                         padding: EdgeInsets.only(
                             right: MediaQuery.of(context).size.width * 0.04,

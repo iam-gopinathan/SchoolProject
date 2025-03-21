@@ -18,6 +18,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class TimetableMainpage extends StatefulWidget {
   const TimetableMainpage({super.key});
@@ -1186,17 +1187,31 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
   //show image bottomsheet code end....
   Future<void> downloadImage(String imageUrl) async {
     try {
-      final directory = await getExternalStorageDirectory();
+      //
+      await requestStoragePermission();
+      //
+      // Step 2: Get storage directory
+      final directory = await getDownloadDirectory();
       if (directory == null) {
-        print("Failed to get external storage directory.");
+        print("⚠️ Failed to get storage directory.");
         return;
       }
+      // final directory = await getExternalStorageDirectory();
+      // if (directory == null) {
+      //   print("Failed to get external storage directory.");
+      //   return;
+      // }
       final downloadsDirectory = Directory('/storage/emulated/0/Download');
       if (!await downloadsDirectory.exists()) {
         await downloadsDirectory.create(recursive: true);
       }
+      // final filePath =
+      //     '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
       final filePath =
-          '${downloadsDirectory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+          '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      //
+
+      // final response = await http.get(Uri.parse(imageUrl));
       final response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
         File file = File(filePath);
@@ -1261,6 +1276,25 @@ class _TimetableMainpageState extends State<TimetableMainpage> {
   void openFile(String filePath) {
     print("Opening file: $filePath");
     OpenFile.open(filePath);
+  }
+
+  //
+  Future<void> requestStoragePermission() async {
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
+      print("✅ Storage permission granted");
+    } else {
+      print("❌ Storage permission denied");
+    }
+  }
+  //
+
+  Future<Directory?> getDownloadDirectory() async {
+    Directory? directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      directory = await getApplicationDocumentsDirectory(); // Fallback
+    }
+    return directory;
   }
 
   //

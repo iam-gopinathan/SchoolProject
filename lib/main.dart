@@ -26,12 +26,12 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp, // Only allow portrait mode
-    DeviceOrientation.portraitDown, // Optional: Allow upside-down portrait
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
   ]).then((_) {
     runApp(MyApp());
   });
-
+  // Preload the splash image
   runApp(new MyApp());
 }
 
@@ -54,6 +54,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    // Wait until the first frame is rendered, then preload the image
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      precacheImage(AssetImage(AppTheme.appLogoImage), context);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final GradeController gradeController = Get.put(GradeController());

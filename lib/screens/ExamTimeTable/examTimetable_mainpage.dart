@@ -15,6 +15,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ExamtimetableMainpage extends StatefulWidget {
   const ExamtimetableMainpage({super.key});
@@ -1243,9 +1244,17 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
 //show image bottomsheet code end....
   Future<void> downloadImage(String imageUrl) async {
     try {
-      final directory = await getExternalStorageDirectory();
+      await requestStoragePermission();
+      //
+      // final directory = await getExternalStorageDirectory();
+      // if (directory == null) {
+      //   print("Failed to get external storage directory.");
+      //   return;
+      // }
+      // Step 2: Get storage directory
+      final directory = await getDownloadDirectory();
       if (directory == null) {
-        print("Failed to get external storage directory.");
+        print("⚠️ Failed to get storage directory.");
         return;
       }
       final downloadsDirectory = Directory('/storage/emulated/0/Download');
@@ -1317,6 +1326,26 @@ class _ExamtimetableMainpageState extends State<ExamtimetableMainpage> {
   void openFile(String filePath) {
     print("Opening file: $filePath");
     OpenFile.open(filePath);
+  }
+
+  //
+  //
+  Future<void> requestStoragePermission() async {
+    var status = await Permission.storage.request();
+    if (status.isGranted) {
+      print("✅ Storage permission granted");
+    } else {
+      print("❌ Storage permission denied");
+    }
+  }
+  //
+
+  Future<Directory?> getDownloadDirectory() async {
+    Directory? directory = await getExternalStorageDirectory();
+    if (directory == null) {
+      directory = await getApplicationDocumentsDirectory(); // Fallback
+    }
+    return directory;
   }
 
   //

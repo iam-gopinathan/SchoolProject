@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/screens/Approval_Status/Approval_Status_menu.dart';
-import 'package:flutter_application_1/screens/Draftsscreen/DraftMenu.dart';
-import 'package:flutter_application_1/screens/Messages/Message_mainPage.dart';
-import 'package:flutter_application_1/screens/News/NewsMainPage.dart';
-import 'package:flutter_application_1/screens/circularPage/circular_mainPage.dart';
-import 'package:flutter_application_1/user_Session.dart';
+import 'package:flutter_application_1/screens/Draftsscreen/CircularDraft/CircularDraftMainpage.dart';
+import 'package:flutter_application_1/screens/Draftsscreen/ConsentDraft/consentDraftMainpage.dart';
+import 'package:flutter_application_1/screens/Draftsscreen/MessageDraft/MessageDraftMainpage.dart';
+import 'package:flutter_application_1/screens/Draftsscreen/NewsDraft/NewsDraftmainpage.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 
-class MyprojectMenu extends StatefulWidget {
-  const MyprojectMenu({super.key});
+class Draftmenu extends StatefulWidget {
+  const Draftmenu({super.key});
 
   @override
-  State<MyprojectMenu> createState() => _MyprojectMenuState();
+  State<Draftmenu> createState() => _DraftmenuState();
 }
 
-class _MyprojectMenuState extends State<MyprojectMenu> {
+class _DraftmenuState extends State<Draftmenu> {
+  //
   final List<Map<String, dynamic>> items = [
     {
       "svg": 'assets/icons/Attendancepage_news.svg',
@@ -28,9 +27,7 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
         Color.fromRGBO(250, 248, 251, 1),
         Color.fromRGBO(250, 248, 251, 1)
       ],
-      "page": Newsmainpage(
-        isswitched: true,
-      ),
+      "page": Newsdraftmainpage(),
     },
     {
       "svg": 'assets/icons/Attendancepage_message.svg',
@@ -43,7 +40,7 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
         Color.fromRGBO(254, 252, 251, 1),
         Color.fromRGBO(254, 252, 251, 1),
       ],
-      "page": MessageMainpage(isswitched: true),
+      "page": Messagedraftmainpage(),
     },
     {
       "svg": 'assets/icons/Attendancepage_notesoutline.svg',
@@ -56,24 +53,106 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
         Color.fromRGBO(252, 253, 250, 1),
         Color.fromRGBO(252, 253, 250, 1)
       ],
-      "page": CircularMainpage(isswitched: true),
+      "page": Circulardraftmainpage(),
+    },
+    {
+      "svg": 'assets/icons/Attendencepage_form.svg',
+      "label": "Consent\n Forms",
+      "color": [
+        Color.fromRGBO(216, 70, 0, 0.1),
+        Color.fromRGBO(219, 71, 0, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(254, 251, 250, 1),
+        Color.fromRGBO(254, 251, 250, 1),
+      ],
+      "page": Consentdraftmainpage(),
+    },
+    {
+      "svg": 'assets/icons/Attendencepage_time.svg',
+      "label": "Time Tables",
+      "color": [
+        Color.fromRGBO(255, 212, 0, 0.1),
+        Color.fromRGBO(224, 186, 0, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(254, 253, 250, 1),
+        Color.fromRGBO(254, 253, 250, 1),
+      ],
+      "page": '',
+    },
+    {
+      "svg": 'assets/icons/Attendancepage_homework.svg',
+      "label": "Homeworks",
+      "color": [
+        Color.fromRGBO(230, 1, 84, 0.1),
+        Color.fromRGBO(223, 0, 81, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(254, 250, 251, 1),
+        Color.fromRGBO(254, 250, 251, 1),
+      ],
+      "page": '',
+    },
+    {
+      "svg": 'assets/icons/Attendencepage_examhomework.svg',
+      "label": "Exam\n Timetables",
+      "color": [
+        Color.fromRGBO(105, 57, 184, 0.1),
+        Color.fromRGBO(57, 0, 149, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(251, 250, 253, 1),
+        Color.fromRGBO(251, 250, 253, 1),
+      ],
+      "page": '',
+    },
+    {
+      "svg": 'assets/icons/Attendencepage_book.svg',
+      "label": "Study\n Materials",
+      "color": [
+        Color.fromRGBO(31, 115, 194, 0.1),
+        Color.fromRGBO(0, 78, 152, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(250, 251, 253, 1),
+        Color.fromRGBO(250, 251, 253, 1)
+      ],
+      "page": '',
+    },
+    {
+      "svg": 'assets/icons/Attendencepage_audit.svg',
+      "label": "Marks /\n Results",
+      "color": [
+        Color.fromRGBO(0, 65, 166, 0.1),
+        Color.fromRGBO(11, 46, 100, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(250, 251, 252, 1),
+        Color.fromRGBO(250, 251, 252, 1),
+      ],
+      "page": '',
+    },
+    {
+      "svg": 'assets/icons/Attendencepage_comment.svg',
+      "label": "Feedback",
+      "color": [
+        Color.fromRGBO(250, 90, 42, 0.1),
+        Color.fromRGBO(204, 47, 0, 0.1)
+      ],
+      "cardcolor": [
+        Color.fromRGBO(254, 251, 250, 1),
+        Color.fromRGBO(254, 251, 250, 1),
+      ],
+      "page": '',
     },
   ];
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    print('usertype:${UserSession().userType}');
-    print('rollnumber:${UserSession().rollNumber}');
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color.fromRGBO(253, 253, 253, 1),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(100),
+        preferredSize: Size.fromHeight(80),
         child: AppBar(
           backgroundColor: Colors.white,
           iconTheme: IconThemeData(color: Colors.black),
@@ -92,11 +171,11 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
                 Padding(
                   padding: EdgeInsets.only(
                     top: MediaQuery.of(context).size.height * 0.04,
-                  ), // 3% of screen height),
+                  ),
                   child: Row(
                     children: [
                       GestureDetector(
-                        onTap: () async {
+                        onTap: () {
                           Navigator.pop(context);
                         },
                         child: Icon(
@@ -107,13 +186,13 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
                       Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Text(
-                          'My Project',
+                          'Drafts',
                           style: TextStyle(
                               fontFamily: 'semibold',
                               fontSize: 16,
                               color: Colors.black),
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
@@ -125,106 +204,9 @@ class _MyprojectMenuState extends State<MyprojectMenu> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.only(
-                  left: MediaQuery.of(context).size.width * 0.05,
-                  bottom: 10,
-                  top: 10),
-              child: Row(
-                children: [
-                  if (UserSession().userType == 'admin' ||
-                      UserSession().userType == 'staff')
-                    Padding(
-                      padding: EdgeInsets.only(
-                        right: MediaQuery.of(context).size.width * 0.07,
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ApprovalStatusMenu()));
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(
-                              MediaQuery.of(context).size.width * 0.02),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              color: Color.fromRGBO(253, 247, 239, 1)),
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 8,
-                                width: 8,
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Color.fromRGBO(216, 70, 0, 1)),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 5),
-                                child: Text(
-                                  'Approval Status',
-                                  style: TextStyle(
-                                      fontFamily: 'medium',
-                                      fontSize: 16,
-                                      color: Color.fromRGBO(216, 70, 0, 1)),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  Spacer(),
-                  //draft
-                  Padding(
-                    padding: EdgeInsets.only(
-                      right: MediaQuery.of(context).size.width * 0.07,
-                    ),
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Draftmenu()));
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(
-                            MediaQuery.of(context).size.width * 0.02),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: Color.fromRGBO(253, 247, 239, 1)),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 8,
-                              width: 8,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color.fromRGBO(230, 1, 84, 1)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 5),
-                              child: Text(
-                                'Drafts',
-                                style: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 16,
-                                    color: Color.fromRGBO(230, 1, 84, 1)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
             //
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.9,
                 color: Colors.white,

@@ -1,32 +1,13 @@
 {
   "project_info": {
-    "project_number": "221228979530",
-    "project_id": "pushnotificationsfirebas-b598e",
-    "storage_bucket": "pushnotificationsfirebas-b598e.firebasestorage.app"
+    "project_number": "812607055228",
+    "project_id": "schoolmate-8244a",
+    "storage_bucket": "schoolmate-8244a.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:221228979530:android:d5ac58adc09a89d2499db3",
-        "android_client_info": {
-          "package_name": "com.examp"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyArryIqC73ZSJ_-ue0y4dadAfFDjScRV94"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:221228979530:android:d6d818dc15617cc8499db3",
+        "mobilesdk_app_id": "1:812607055228:android:085ae2d8012682ba55b0f9",
         "android_client_info": {
           "package_name": "com.example.flutter_application_1"
         }
@@ -34,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyArryIqC73ZSJ_-ue0y4dadAfFDjScRV94"
+          "current_key": "AIzaSyCdslpH1XFFGZ6llglh2k8m0zi2cp-Zi7Q"
         }
       ],
       "services": {
