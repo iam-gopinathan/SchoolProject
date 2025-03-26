@@ -1,47 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/models/DraftModels/Consent_fetch_draft_model.dart';
-import 'package:flutter_application_1/services/Draft_Api/consent_fetch_draft_api.dart';
+import 'package:flutter_application_1/models/DraftModels/Feedback_fetch_draft_model.dart';
+import 'package:flutter_application_1/services/Draft_Api/feedback_fetch_draft_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 import 'dart:ui' as ui;
+import 'package:http/http.dart' as http;
 
-class Consentdraftmainpage extends StatefulWidget {
-  const Consentdraftmainpage({super.key});
+class Feedbackdraftmainpage extends StatefulWidget {
+  const Feedbackdraftmainpage({super.key});
 
   @override
-  State<Consentdraftmainpage> createState() => _ConsentdraftmainpageState();
+  State<Feedbackdraftmainpage> createState() => _FeedbackdraftmainpageState();
 }
 
-class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
-  ScrollController _scrollController = ScrollController();
+class _FeedbackdraftmainpageState extends State<Feedbackdraftmainpage> {
   //
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-    _scrollController.removeListener(_scrollListener);
-  }
-
-  void _scrollListener() {
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController.addListener(_scrollListener);
-    //
-    _fetchConsentDraft();
-  }
-
-  bool isLoading = true;
   //select date
   String selectedDate = '';
-  var displayDate = '';
+  String displayDate = '';
   Future<void> _selectDate(BuildContext context) async {
     DateTime currentDate = DateTime.now();
     DateTime? pickedDate = await showDatePicker(
@@ -75,38 +54,33 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
       displayDate = DateFormat('EEEE, dd MMMM').format(pickedDate);
     }
   }
+
   //selected date end
-
-  ConsentFetchDraftModel? consentDraftData;
-  final ApiServiceconsent apiService = ApiServiceconsent();
   //
-  Future<void> _fetchConsentDraft() async {
+  bool isLoading = true;
+
+  FeedBackDraftModel? feedbackDraftData;
+
+  Future<void> fetchData() async {
+    FeedbackDraftController controller = FeedbackDraftController();
+    feedbackDraftData = await controller.fetchFeedbackDraft(
+      rollNumber: UserSession().rollNumber.toString(),
+      userType: UserSession().userType.toString(),
+      date: selectedDate,
+    );
+
     setState(() {
-      isLoading = true;
+      isLoading = false;
     });
-
-    try {
-      var response = await apiService.fetchConsentDraft(
-        rollNumber: UserSession().rollNumber.toString(),
-        userType: UserSession().userType.toString(),
-        date: selectedDate,
-      );
-
-      if (response != null) {
-        setState(() {
-          consentDraftData = response;
-        });
-      }
-    } catch (e) {
-      print("Error fetching data: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
-    }
   }
 
-  //
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
+
   Map<String, bool> _expandedQuestions = {};
 
   @override
@@ -126,15 +100,15 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                   bottomLeft: Radius.circular(30),
                   bottomRight: Radius.circular(30)),
             ),
-            padding: EdgeInsets.all(
-              MediaQuery.of(context).size.width * 0.025,
-            ),
+            padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.025),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
                   padding: EdgeInsets.only(
-                      top: MediaQuery.of(context).size.height * 0.04),
+                    top: MediaQuery.of(context).size.height *
+                        0.04, // 3% of screen height
+                  ),
                   child: Row(
                     children: [
                       GestureDetector(
@@ -154,24 +128,25 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Consent Form Draft',
+                                'Feedback Draft',
                                 style: TextStyle(
                                   fontFamily: 'semibold',
                                   fontSize: 16,
                                   color: Colors.black,
                                 ),
                               ),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.007,
-                              ),
+                              SizedBox(height: 10),
                               GestureDetector(
                                 onTap: () async {
                                   await _selectDate(context);
+
                                   setState(() {
                                     isLoading = true;
                                   });
-                                  await _fetchConsentDraft();
+                                  await fetchData();
+                                  setState(() {
+                                    isLoading = false;
+                                  });
                                 },
                                 child: Row(
                                   children: [
@@ -275,13 +250,15 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                     "RollNumber": UserSession()
                                                             .rollNumber ??
                                                         '',
-                                                    "Module": 'consentform',
+                                                    "Module": 'feedback',
                                                   };
+
                                                   // Construct the final URL with query parameters
                                                   final Uri uri = Uri.parse(url)
                                                       .replace(
                                                           queryParameters:
                                                               queryParams);
+
                                                   try {
                                                     final response =
                                                         await http.delete(
@@ -306,26 +283,26 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                           .showSnackBar(
                                                         SnackBar(
                                                           content: Text(
-                                                              "Draft consent question deleted successfully!"),
+                                                              "Draft feedBack deleted successfully!"),
                                                           backgroundColor:
                                                               Colors.green,
                                                         ),
                                                       );
                                                       print(
-                                                          "Draft consent question deleted successfully!");
+                                                          "Draft feedBack deleted successfully!");
                                                     } else {
                                                       ScaffoldMessenger.of(
                                                               context)
                                                           .showSnackBar(
                                                         SnackBar(
                                                           content: Text(
-                                                              "Failed to delete draft consent question. Try again."),
+                                                              "Failed to delete draft feedBack. Try again."),
                                                           backgroundColor:
                                                               Colors.red,
                                                         ),
                                                       );
                                                       print(
-                                                          "Failed to delete draft consent question. Status: ${response.statusCode}");
+                                                          "Failed to delete draft feedBack. Status: ${response.statusCode}");
                                                       print(
                                                           "Response: ${response.body}");
                                                     }
@@ -336,13 +313,13 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                         .showSnackBar(
                                                       SnackBar(
                                                         content: Text(
-                                                            "Error deleting draft consent question: $e"),
+                                                            "Error deleting draft feedBack: $e"),
                                                         backgroundColor:
                                                             Colors.red,
                                                       ),
                                                     );
                                                     print(
-                                                        "Error deleting draft consent question: $e");
+                                                        "Error deleting draft feedBack: $e");
                                                   }
                                                 }
 
@@ -351,9 +328,9 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                     rollNumber: UserSession()
                                                         .rollNumber
                                                         .toString(),
-                                                    module: 'consentform');
+                                                    module: 'feedback');
 
-                                                await _fetchConsentDraft();
+                                                await fetchData();
 
                                                 Navigator.pop(context);
                                               },
@@ -424,12 +401,12 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
               strokeWidth: 4,
               color: AppTheme.textFieldborderColor,
             ))
-          : (consentDraftData == null ||
-                  consentDraftData!.data == null ||
-                  consentDraftData!.data!.isEmpty)
+          : (feedbackDraftData == null ||
+                  feedbackDraftData!.data == null ||
+                  feedbackDraftData!.data!.isEmpty)
               ? Center(
                   child: Text(
-                    "No draft Consent questions \n available!",
+                    "No draft Feedback available!",
                     style: TextStyle(
                       fontSize: 22,
                       fontFamily: 'regular',
@@ -441,9 +418,10 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      ...consentDraftData!.data!.map((e) {
+                      ...feedbackDraftData!.data!.map((e) {
                         return Column(
                           children: [
+                            //
                             Padding(
                               padding: EdgeInsets.only(
                                 left: MediaQuery.of(context).size.width * 0.07,
@@ -452,7 +430,7 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                               child: Row(
                                 children: [
                                   Text(
-                                    'Drafted on : ${e.postedOnDate} | ${e.postedOnDay}',
+                                    'Drafted on: ${e.postedOnDate} | ${e.postedOnDay}',
                                     style: TextStyle(
                                         fontFamily: 'regular',
                                         fontSize: 12,
@@ -461,11 +439,13 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                 ],
                               ),
                             ),
-                            ...e.consentForm!.map((consent) {
+                            //
+                            ...e.feedBack!.map((detail) {
+                              //
                               //
                               TextPainter textPainter = TextPainter(
                                 text: TextSpan(
-                                  text: consent.question,
+                                  text: detail.question,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontFamily: 'medium',
@@ -481,9 +461,8 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                               //
                               bool showReadMore = textPainter.didExceedMaxLines;
 
-//
                               bool isExpanded =
-                                  _expandedQuestions[consent.question] ?? false;
+                                  _expandedQuestions[detail.question] ?? false;
                               return Padding(
                                 padding: EdgeInsets.all(
                                     MediaQuery.of(context).size.width * 0.03),
@@ -492,39 +471,28 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12)),
                                   child: Container(
-                                    padding: EdgeInsets.all(15),
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.04),
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(12),
-                                        color: Colors.white,
-                                        border: Border.all(
-                                            color: Color.fromRGBO(
-                                                238, 238, 238, 1),
-                                            width: 1.5)),
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: Colors.white,
+                                      border: Border.all(
+                                          color:
+                                              Color.fromRGBO(238, 238, 238, 1),
+                                          width: 1.5),
+                                    ),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        //heading
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.8,
-                                                child: Text(
-                                                  '${consent.heading}',
-                                                  style: TextStyle(
-                                                      fontFamily: 'medium',
-                                                      fontSize: 16,
-                                                      color: Colors.black),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                        Text(
+                                          'Feedback From:${detail.name}',
+                                          style: TextStyle(
+                                              fontFamily: 'regular',
+                                              fontSize: 12,
+                                              color: Color.fromRGBO(
+                                                  16, 16, 16, 1)),
                                         ),
                                         Divider(
                                           color:
@@ -533,62 +501,73 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                         ),
                                         Padding(
                                           padding:
-                                              const EdgeInsets.only(top: 10),
-                                          child: Row(
-                                            children: [
-                                              Container(
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.8,
-                                                child: Text(
-                                                  '${consent.question}',
-                                                  style: TextStyle(
-                                                      fontFamily: 'medium',
-                                                      fontSize: 16,
-                                                      color: Colors.black),
-                                                  maxLines:
-                                                      isExpanded ? null : 4,
-                                                ),
-                                              ),
-                                            ],
+                                              const EdgeInsets.only(top: 5),
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.8,
+                                            child: Text(
+                                              'Heading: ${detail.heading}',
+                                              style: TextStyle(
+                                                  fontFamily: 'medium',
+                                                  fontSize: 16,
+                                                  color: Colors.black),
+                                            ),
                                           ),
                                         ),
-
-                                        //readmore button...
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 15, bottom: 5),
+                                          padding:
+                                              const EdgeInsets.only(top: 5),
+                                          child: Divider(
+                                            color: Color.fromRGBO(
+                                                230, 230, 230, 1),
+                                            thickness: 1,
+                                          ),
+                                        ),
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.8,
+                                          child: Text(
+                                            detail.question ?? '',
+                                            style: TextStyle(
+                                                fontFamily: 'medium',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                            maxLines: isExpanded ? null : 4,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 15),
                                           child: Row(
                                             children: [
-                                              if (showReadMore)
-                                                ElevatedButton(
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 15),
-                                                      backgroundColor:
-                                                          Colors.black,
-                                                    ),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        _expandedQuestions[
-                                                            consent.question ??
-                                                                ''] = !isExpanded;
-                                                      });
-                                                    },
-                                                    child: Text(
-                                                      isExpanded
-                                                          ? 'Read Less'
-                                                          : 'Read More',
-                                                      style: TextStyle(
-                                                          fontFamily: 'regular',
-                                                          fontSize: 14,
-                                                          color: Colors.white),
-                                                    )),
+                                              // if (showReadMore)
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.black,
+                                                ),
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _expandedQuestions[
+                                                        detail.question ??
+                                                            ''] = !isExpanded;
+                                                  });
+                                                },
+                                                child: Text(
+                                                  isExpanded
+                                                      ? 'Read Less'
+                                                      : 'Read More',
+                                                  style: TextStyle(
+                                                      fontFamily: 'regular',
+                                                      fontSize: 16,
+                                                      color: Colors.white),
+                                                ),
+                                              ),
                                               Spacer(),
-                                              //delete
+                                              //delete..
                                               GestureDetector(
                                                 onTap: () {
                                                   showDialog(
@@ -605,7 +584,7 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                                         .circular(
                                                                             10)),
                                                             content: Text(
-                                                              "Are you sure you want to delete\n  this Consent Question?",
+                                                              "Do you really want to Delete\n  this Feedback?",
                                                               style: TextStyle(
                                                                   fontFamily:
                                                                       'regular',
@@ -646,7 +625,7 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                                               fontSize: 16,
                                                                               fontFamily: 'regular'),
                                                                         )),
-                                                                    //delete...
+                                                                    //edit...
                                                                     Padding(
                                                                       padding: const EdgeInsets
                                                                           .only(
@@ -655,11 +634,11 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                                       child: ElevatedButton(
                                                                           style: ElevatedButton.styleFrom(backgroundColor: AppTheme.textFieldborderColor, elevation: 0, side: BorderSide.none),
                                                                           onPressed: () async {
-                                                                            var consentDel =
-                                                                                consent.questionId;
+                                                                            var deleteId =
+                                                                                detail.questionId;
                                                                             final String
                                                                                 url =
-                                                                                'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/Consent/DeleteConsentForm?Id=$consentDel';
+                                                                                'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/feedBack/DeleteFeedBackForm?Id=$deleteId';
 
                                                                             try {
                                                                               final response = await http.delete(
@@ -671,14 +650,14 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                                               );
 
                                                                               if (response.statusCode == 200) {
-                                                                                print('id has beeen deleted ${consentDel}');
+                                                                                print('id has beeen deleted ${deleteId}');
 
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  SnackBar(backgroundColor: Colors.green, content: Text('Consent Form deleted successfully!')),
+                                                                                  SnackBar(backgroundColor: Colors.green, content: Text('Feedback Question deleted successfully!')),
                                                                                 );
                                                                               } else {
                                                                                 ScaffoldMessenger.of(context).showSnackBar(
-                                                                                  SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete ConsentForm.')),
+                                                                                  SnackBar(backgroundColor: Colors.red, content: Text('Failed to delete question.')),
                                                                                 );
                                                                               }
                                                                             } catch (e) {
@@ -686,9 +665,9 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                                                 SnackBar(content: Text('An error occurred: $e')),
                                                                               );
                                                                             }
-                                                                            _fetchConsentDraft();
-
                                                                             Navigator.pop(context);
+
+                                                                            await fetchData();
                                                                           },
                                                                           child: Text(
                                                                             'Delete',
@@ -707,7 +686,7 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                                                   fit: BoxFit.contain,
                                                   height: 25,
                                                 ),
-                                              ),
+                                              )
                                             ],
                                           ),
                                         ),
@@ -719,36 +698,10 @@ class _ConsentdraftmainpageState extends State<Consentdraftmainpage> {
                             }).toList(),
                           ],
                         );
-                      }).toList(),
+                      }).toList()
                     ],
                   ),
                 ),
-      floatingActionButton:
-          _scrollController.hasClients && _scrollController.offset > 50
-              ? Transform.translate(
-                  offset: Offset(0, -20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                      shape: BoxShape.circle,
-                    ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.arrow_upward_outlined,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        _scrollController.animateTo(
-                          0,
-                          duration: Duration(seconds: 1),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                    ),
-                  ),
-                )
-              : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

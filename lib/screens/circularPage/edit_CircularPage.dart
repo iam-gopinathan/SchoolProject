@@ -195,6 +195,7 @@ class _EditCircularpageState extends State<EditCircularpage> {
                                         data: htmlContent,
                                         style: {
                                           "body": Style(
+                                              color: Colors.black,
                                               fontFamily: 'semibold',
                                               fontSize: FontSize(16),
                                               textAlign: TextAlign.justify)
@@ -410,6 +411,15 @@ class _EditCircularpageState extends State<EditCircularpage> {
                 style: TextButton.styleFrom(
               foregroundColor: Colors.white,
             )),
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: Colors.black,
+              dialBackgroundColor: Colors.grey[900],
+              hourMinuteColor: Colors.white10,
+              hourMinuteTextColor: Colors.white,
+              entryModeIconColor: Colors.white,
+              dayPeriodColor: AppTheme.textFieldborderColor,
+              dayPeriodTextColor: Colors.white,
+            ),
           ),
           child: child!,
         );
@@ -420,6 +430,20 @@ class _EditCircularpageState extends State<EditCircularpage> {
       final DateTime now = DateTime.now();
       final DateTime parsedTime = DateTime(
           now.year, now.month, now.day, pickedTime.hour, pickedTime.minute);
+      // // Check if the selected time is in the past
+      if (parsedTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please select Future Time!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _dateTime = '';
+        });
+
+        return;
+      }
 
       setState(() {
         _dateTime += " ${_timeFormat.format(parsedTime)}";
@@ -903,64 +927,74 @@ class _EditCircularpageState extends State<EditCircularpage> {
                       ),
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              QuillSimpleToolbar(
-                                controller: descriptionController,
-                                configurations:
-                                    const QuillSimpleToolbarConfigurations(
-                                        dialogTheme: QuillDialogTheme(
-                                            labelTextStyle:
-                                                TextStyle(color: Colors.black),
-                                            inputTextStyle: TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 14)),
-                                        showBoldButton: true,
-                                        showClearFormat: false,
-                                        showAlignmentButtons: false,
-                                        showBackgroundColorButton: false,
-                                        showFontSize: false,
-                                        showColorButton: false,
-                                        showCenterAlignment: false,
-                                        showClipboardCut: false,
-                                        showIndent: false,
-                                        showDirection: false,
-                                        showDividers: false,
-                                        showFontFamily: false,
-                                        showItalicButton: false,
-                                        showClipboardPaste: false,
-                                        showInlineCode: false,
-                                        showCodeBlock: false,
-                                        showHeaderStyle: false,
-                                        showJustifyAlignment: false,
-                                        showLeftAlignment: false,
-                                        showLineHeightButton: false,
-                                        showLink: false,
-                                        showListBullets: false,
-                                        showListCheck: false,
-                                        showListNumbers: false,
-                                        showQuote: false,
-                                        showRightAlignment: false,
-                                        showSearchButton: false,
-                                        showRedo: false,
-                                        showSmallButton: false,
-                                        showSubscript: false,
-                                        showStrikeThrough: false,
-                                        showUndo: false,
-                                        showUnderLineButton: false,
-                                        showSuperscript: false,
-                                        showClipboardCopy: false),
-                              ),
-                              //
-                              IconButton(
-                                  icon: Icon(Icons.paste, color: Colors.black),
-                                  onPressed: () {
-                                    setState(() {
-                                      _pasteFromClipboard();
-                                    });
-                                  }),
-                            ],
+                          Container(
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border(
+                                    bottom: BorderSide(
+                                        color: const Color.fromRGBO(
+                                            225, 225, 225, 1),
+                                        width: 1))),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                QuillSimpleToolbar(
+                                  controller: descriptionController,
+                                  configurations:
+                                      const QuillSimpleToolbarConfigurations(
+                                          dialogTheme: QuillDialogTheme(
+                                              labelTextStyle: TextStyle(
+                                                  color: Colors.black),
+                                              inputTextStyle: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14)),
+                                          showBoldButton: true,
+                                          showClearFormat: false,
+                                          showAlignmentButtons: false,
+                                          showBackgroundColorButton: false,
+                                          showFontSize: false,
+                                          showColorButton: false,
+                                          showCenterAlignment: false,
+                                          showClipboardCut: false,
+                                          showIndent: false,
+                                          showDirection: false,
+                                          showDividers: false,
+                                          showFontFamily: false,
+                                          showItalicButton: false,
+                                          showClipboardPaste: false,
+                                          showInlineCode: false,
+                                          showCodeBlock: false,
+                                          showHeaderStyle: false,
+                                          showJustifyAlignment: false,
+                                          showLeftAlignment: false,
+                                          showLineHeightButton: false,
+                                          showLink: false,
+                                          showListBullets: false,
+                                          showListCheck: false,
+                                          showListNumbers: false,
+                                          showQuote: false,
+                                          showRightAlignment: false,
+                                          showSearchButton: false,
+                                          showRedo: false,
+                                          showSmallButton: false,
+                                          showSubscript: false,
+                                          showStrikeThrough: false,
+                                          showUndo: false,
+                                          showUnderLineButton: false,
+                                          showSuperscript: false,
+                                          showClipboardCopy: false),
+                                ),
+                                //
+                                IconButton(
+                                    icon:
+                                        Icon(Icons.paste, color: Colors.black),
+                                    onPressed: () {
+                                      setState(() {
+                                        _pasteFromClipboard();
+                                      });
+                                    }),
+                              ],
+                            ),
                           ),
                           //quill controller.....
                           Padding(
@@ -1250,56 +1284,56 @@ class _EditCircularpageState extends State<EditCircularpage> {
                         ],
                       ),
                     ),
-                  if (schedule == 'schedule')
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.9,
-                            child: TextFormField(
-                              controller: _scheduledDateandtime,
-                              readOnly: true,
-                              decoration: InputDecoration(
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 20),
-                                suffixIcon: Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 10, bottom: 10),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/NewsPage_timepicker.svg',
-                                    fit: BoxFit.contain,
-                                    height: 30,
-                                    width: 30,
-                                  ),
+                  // if (schedule == 'schedule')
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.9,
+                          child: TextFormField(
+                            controller: _scheduledDateandtime,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              suffixIcon: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                child: SvgPicture.asset(
+                                  'assets/icons/NewsPage_timepicker.svg',
+                                  fit: BoxFit.contain,
+                                  height: 30,
+                                  width: 30,
                                 ),
-                                hintText: 'Tap to select date and time',
-                                hintStyle: TextStyle(
-                                    fontFamily: 'medium',
-                                    fontSize: 14,
-                                    color: Colors.black),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color: Color.fromRGBO(203, 203, 203, 1),
-                                        width: 1)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                        color: Color.fromRGBO(203, 203, 203, 1),
-                                        width: 1)),
                               ),
-                              onTap: () async {
-                                await _pickDate();
-                                await _pickTime();
-                                _scheduledDateandtime.text = _dateTime;
-                              },
+                              hintText: 'Tap to select date and time',
+                              hintStyle: TextStyle(
+                                  fontFamily: 'medium',
+                                  fontSize: 14,
+                                  color: Colors.black),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(203, 203, 203, 1),
+                                      width: 1)),
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(203, 203, 203, 1),
+                                      width: 1)),
                             ),
+                            onTap: () async {
+                              await _pickDate();
+                              await _pickTime();
+                              _scheduledDateandtime.text = _dateTime;
+                            },
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
 
                   //
                 ],
@@ -1349,45 +1383,47 @@ class _EditCircularpageState extends State<EditCircularpage> {
               //           color: Colors.black),
               //     ),
               //   ),
+              if (UserSession().userType == 'superadmin')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.textFieldborderColor,
+                      side: BorderSide.none),
+                  onPressed: () async {
+                    setState(() {
+                      _isLoading = true; // Show loader
+                    });
 
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.textFieldborderColor,
-                    side: BorderSide.none),
-                onPressed: () async {
-                  setState(() {
-                    _isLoading = true; // Show loader
-                  });
+                    String status = _scheduledDateandtime.text.isEmpty
+                        ? 'post'
+                        : 'schedule';
 
-                  String status =
-                      _scheduledDateandtime.text.isEmpty ? 'post' : 'schedule';
+                    // ✅ Wait for _updateCircular() to complete before setting _isLoading to false
+                    await _updateCircular(status, context);
 
-                  // ✅ Wait for _updateCircular() to complete before setting _isLoading to false
-                  await _updateCircular(status, context);
-
-                  setState(() {
-                    _isLoading = false; // Hide loader after completion
-                  });
-                },
-                child: _isLoading
-                    ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                            backgroundColor: AppTheme.appBackgroundPrimaryColor,
-                            strokeWidth: 4,
-                            color: AppTheme.textFieldborderColor),
-                      )
-                    : Text(
-                        _scheduledDateandtime.text.isEmpty
-                            ? 'Update'
-                            : 'Schedule',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'medium',
-                            color: Colors.black),
-                      ),
-              ),
+                    setState(() {
+                      _isLoading = false; // Hide loader after completion
+                    });
+                  },
+                  child: _isLoading
+                      ? SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                              backgroundColor:
+                                  AppTheme.appBackgroundPrimaryColor,
+                              strokeWidth: 4,
+                              color: AppTheme.textFieldborderColor),
+                        )
+                      : Text(
+                          _scheduledDateandtime.text.isEmpty
+                              ? 'Update'
+                              : 'Schedule',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'medium',
+                              color: Colors.black),
+                        ),
+                ),
 
               ////request now..
               if (UserSession().userType == 'admin' ||
@@ -1399,75 +1435,175 @@ class _EditCircularpageState extends State<EditCircularpage> {
                   ),
                   onPressed: () {
                     //
-                    if (_heading.text.isEmpty || htmlContent.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.red,
-                          content: Text(
-                              'Please fill in both heading and description'),
-                        ),
-                      );
-                      return;
-                    }
+                    // if (_heading.text.isEmpty || htmlContent.isEmpty) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(
+                    //       backgroundColor: Colors.red,
+                    //       content: Text(
+                    //           'Please fill in both heading and description'),
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
+//                     showDialog(
+//                       context: context,
+//                       builder: (BuildContext context) {
+//                         return AlertDialog(
+//                           backgroundColor: Colors.white,
+//                           title: Text(
+//                             "Confirm Request !",
+//                             style: TextStyle(
+//                               fontFamily: 'semibold',
+//                               fontSize: 18,
+//                               color: Colors.black,
+//                             ),
+//                             textAlign: TextAlign.center,
+//                           ),
+//                           content: Text(
+//                             "Are you sure you want to create a new request?",
+//                             style: TextStyle(
+//                                 fontFamily: 'regular',
+//                                 fontSize: 16,
+//                                 color: Colors.black),
+//                           ),
+//                           actions: [
+//                             ElevatedButton(
+//                               style: ElevatedButton.styleFrom(
+//                                 backgroundColor: Colors.white,
+//                                 side: BorderSide(color: Colors.black, width: 1),
+//                               ),
+//                               onPressed: () {
+//                                 Navigator.of(context).pop();
+//                               },
+//                               child: Text(
+//                                 "Cancel",
+//                                 style: TextStyle(
+//                                     fontFamily: 'semibold',
+//                                     fontSize: 14,
+//                                     color: Colors.black),
+//                               ),
+//                             ),
+//                             //
+//                             ElevatedButton(
+//                               style: ElevatedButton.styleFrom(
+//                                   backgroundColor: Colors.amber),
+//                               onPressed: () {
+//                                 String status =
+//                                     _scheduledDateandtime.text.isEmpty
+//                                         ? 'post'
+//                                         : 'schedule';
+//                                 _updateCircular(status, context);
+// //
+//                                 Navigator.of(context).pop();
+//                               },
+//                               child: Text(
+//                                 "Yes Send",
+//                                 style: TextStyle(
+//                                     fontFamily: 'semibold',
+//                                     fontSize: 14,
+//                                     color: Colors.black),
+//                               ),
+//                             ),
+//                           ],
+//                         );
+//                       },
+//                     );
                     showDialog(
                       context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          backgroundColor: Colors.white,
-                          title: Text(
-                            "Confirm Request !",
-                            style: TextStyle(
-                              fontFamily: 'semibold',
-                              fontSize: 18,
-                              color: Colors.black,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          content: Text(
-                            "Are you sure you want to create a new request?",
-                            style: TextStyle(
-                                fontFamily: 'regular',
-                                fontSize: 16,
-                                color: Colors.black),
-                          ),
-                          actions: [
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                side: BorderSide(color: Colors.black, width: 1),
-                              ),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                "Cancel",
+                      builder: (BuildContext dialogContext) {
+                        bool isLoading = false; // Loading state
+                        return StatefulBuilder(
+                          builder: (context, setModalState) {
+                            return AlertDialog(
+                              backgroundColor: Colors.white,
+                              title: Text(
+                                "Confirm Request !",
                                 style: TextStyle(
-                                    fontFamily: 'semibold',
-                                    fontSize: 14,
-                                    color: Colors.black),
+                                  fontFamily: 'semibold',
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.amber),
-                              onPressed: () {
-                                String status =
-                                    _scheduledDateandtime.text.isEmpty
-                                        ? 'post'
-                                        : 'schedule';
-                                _updateCircular(status, context);
-//
-                                Navigator.of(context).pop();
-                              },
-                              child: Text(
-                                "Yes Send",
+                              content: Text(
+                                "Are you sure you want to create\n a new request?",
                                 style: TextStyle(
-                                    fontFamily: 'semibold',
-                                    fontSize: 14,
-                                    color: Colors.black),
+                                  fontFamily: 'regular',
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                ),
+                                textAlign: TextAlign.center,
                               ),
-                            ),
-                          ],
+                              actions: [
+                                // Cancel Button
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    side: BorderSide(
+                                        color: Colors.black, width: 1),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                  child: Text(
+                                    "Cancel",
+                                    style: TextStyle(
+                                      fontFamily: 'semibold',
+                                      fontSize: 14,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+
+                                // Yes Send Button with Loader
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        isLoading ? Colors.grey : Colors.amber,
+                                  ),
+                                  onPressed: isLoading
+                                      ? null // Disable while loading
+                                      : () async {
+                                          setModalState(() {
+                                            isLoading = true; // Show loader
+                                          });
+
+                                          String status =
+                                              _scheduledDateandtime.text.isEmpty
+                                                  ? 'post'
+                                                  : 'schedule';
+                                          await _updateCircular(
+                                              status, context); // API Call
+
+                                          setModalState(() {
+                                            isLoading = false; // Hide loader
+                                          });
+
+                                          Navigator.of(dialogContext)
+                                              .pop(); // Close dialog
+                                        },
+                                  child: isLoading
+                                      ? SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            color: AppTheme
+                                                .appBackgroundPrimaryColor,
+                                            strokeWidth: 4,
+                                          ),
+                                        )
+                                      : Text(
+                                          "Yes Send",
+                                          style: TextStyle(
+                                            fontFamily: 'semibold',
+                                            fontSize: 14,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
                     );
@@ -1481,6 +1617,7 @@ class _EditCircularpageState extends State<EditCircularpage> {
                     ),
                   ),
                 ),
+              //
             ],
           ),
         ),

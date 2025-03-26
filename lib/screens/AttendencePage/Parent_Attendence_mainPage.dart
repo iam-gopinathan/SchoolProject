@@ -1,3 +1,4 @@
+import 'package:dotted_border/dotted_border.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/models/Attendence_models/Parent_Attendence_mainpage_model.dart';
@@ -1140,27 +1141,72 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
                                               children: [
                                                 Column(
                                                   children: [
-                                                    ElevatedButton(
-                                                        style: ElevatedButton
-                                                            .styleFrom(
-                                                                backgroundColor:
-                                                                    Color
-                                                                        .fromRGBO(
-                                                                            1,
-                                                                            133,
-                                                                            53,
-                                                                            1)),
-                                                        onPressed: () {},
+                                                    // ElevatedButton(
+                                                    //     style: ElevatedButton
+                                                    //         .styleFrom(
+                                                    //             backgroundColor:
+                                                    //                 Color
+                                                    //                     .fromRGBO(
+                                                    //                         1,
+                                                    //                         133,
+                                                    //                         53,
+                                                    //                         1)),
+                                                    //     onPressed: () {},
+                                                    //     child: Text(
+                                                    //       '${attendanceData?.attendanceStatus?.today ?? ''}',
+                                                    //       style: TextStyle(
+                                                    //           fontFamily:
+                                                    //               'semibold',
+                                                    //           fontSize: 14,
+                                                    //           color:
+                                                    //               Colors.white),
+                                                    //     )),
+                                                    //
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          bottom: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height *
+                                                              0.01),
+                                                      child: DottedBorder(
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                          vertical: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .height *
+                                                              0.01, // 1% of screen height
+                                                          horizontal:
+                                                              MediaQuery.of(
+                                                                          context)
+                                                                      .size
+                                                                      .width *
+                                                                  0.1,
+                                                        ),
+                                                        borderType:
+                                                            BorderType.RRect,
+                                                        radius:
+                                                            Radius.circular(30),
+                                                        dashPattern: [8, 4],
+                                                        strokeWidth: 2,
+                                                        // color: Color.fromRGBO(
+                                                        //     1, 133, 53, 1),
+                                                        color: _getBorderColor(
+                                                            attendanceData
+                                                                ?.attendanceStatus
+                                                                ?.today),
                                                         child: Text(
                                                           '${attendanceData?.attendanceStatus?.today ?? ''}',
                                                           style: TextStyle(
-                                                              fontFamily:
-                                                                  'semibold',
-                                                              fontSize: 14,
-                                                              color:
-                                                                  Colors.white),
-                                                        )),
-                                                    //
+                                                            fontFamily:
+                                                                'semibold',
+                                                            fontSize: 14,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                     Padding(
                                                       padding:
                                                           const EdgeInsets.only(
@@ -1995,5 +2041,21 @@ class _ParentAttendenceMainpageState extends State<ParentAttendenceMainpage> {
               : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
+
+  //
+  Color _getBorderColor(String? status) {
+    switch (status) {
+      case 'Absent':
+        return Color.fromRGBO(218, 0, 0, 1);
+      case 'Leave':
+        return Color.fromRGBO(134, 0, 187, 1);
+      case 'Late':
+        return Color.fromRGBO(61, 73, 214, 1);
+      case 'Present':
+        return Color.fromRGBO(0, 150, 60, 1);
+      default:
+        return Color.fromRGBO(0, 150, 60, 1);
+    }
   }
 }

@@ -443,7 +443,9 @@ class _NewsmainpageState extends State<Newsmainpage> {
                     ///nextsection
                     Padding(
                       padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02),
+                        top: MediaQuery.of(context).size.height * 0.02,
+                        bottom: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       child: Container(
                         color: Colors.white,
                         child: Column(
@@ -453,6 +455,11 @@ class _NewsmainpageState extends State<Newsmainpage> {
                               color: Colors.white,
                               width: MediaQuery.of(context).size.width * 0.9,
                               child: TextFormField(
+                                cursorColor: Colors.black,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontFamily: 'medium'),
                                 controller: searchController,
                                 textAlign: TextAlign.center,
                                 decoration: InputDecoration(

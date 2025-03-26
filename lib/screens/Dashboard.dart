@@ -676,7 +676,6 @@ class _DashboardState extends State<Dashboard> {
       },
     );
   }
-  //
 
   //carousel details bottomsheet...
   void _showCarouselDetailBottomSheet(BuildContext context, circulartem) {
@@ -772,7 +771,6 @@ class _DashboardState extends State<Dashboard> {
                                     MediaQuery.of(context).size.height * 0.05,
                               ),
                               // Video or Image Display
-
                               Image.network(
                                 circulartem.filePath,
                                 fit: BoxFit.cover,

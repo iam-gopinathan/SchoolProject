@@ -991,35 +991,35 @@ class _CreateStudymaterialState extends State<CreateStudymaterial> {
               //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
               //   ),
               // ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  backgroundColor: Colors.white,
-                  side: BorderSide(color: Colors.black, width: 1.5),
-                ),
-                onPressed: isdraft
-                    ? null // Disable button while loading
-                    : () {
-                        String status = 'draft';
-                        _createstudymaterial(status);
-                      },
-                child: isdraft
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          color: AppTheme.textFieldborderColor,
-                          strokeWidth: 4,
-                        ),
-                      )
-                    : Text(
-                        'Save as Draft',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'medium',
-                            color: Colors.black),
-                      ),
-              ),
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     padding: EdgeInsets.symmetric(horizontal: 15),
+              //     backgroundColor: Colors.white,
+              //     side: BorderSide(color: Colors.black, width: 1.5),
+              //   ),
+              //   onPressed: isdraft
+              //       ? null // Disable button while loading
+              //       : () {
+              //           String status = 'draft';
+              //           _createstudymaterial(status);
+              //         },
+              //   child: isdraft
+              //       ? SizedBox(
+              //           width: 20,
+              //           height: 20,
+              //           child: CircularProgressIndicator(
+              //             color: AppTheme.textFieldborderColor,
+              //             strokeWidth: 4,
+              //           ),
+              //         )
+              //       : Text(
+              //           'Save as Draft',
+              //           style: TextStyle(
+              //               fontSize: 16,
+              //               fontFamily: 'medium',
+              //               color: Colors.black),
+              //         ),
+              // ),
               //preview
               GestureDetector(
                 onTap: () {

@@ -793,43 +793,43 @@ class _CreateExamTimetablesState extends State<CreateExamTimetables> {
               //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
               //   ),
               // ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  backgroundColor: Colors.white,
-                  side: BorderSide(color: Colors.black, width: 1.5),
-                ),
-                onPressed: isdraft
-                    ? null // Disable button when loading
-                    : () async {
-                        setState(() {
-                          isdraft = true; // Start loading
-                        });
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     padding: EdgeInsets.symmetric(horizontal: 15),
+              //     backgroundColor: Colors.white,
+              //     side: BorderSide(color: Colors.black, width: 1.5),
+              //   ),
+              //   onPressed: isdraft
+              //       ? null // Disable button when loading
+              //       : () async {
+              //           setState(() {
+              //             isdraft = true; // Start loading
+              //           });
 
-                        String status = "draft";
-                        await CreateExamTimetables(status);
+              //           String status = "draft";
+              //           await CreateExamTimetables(status);
 
-                        setState(() {
-                          isdraft = false;
-                        });
-                      },
-                child: isdraft
-                    ? SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 4,
-                            color: AppTheme.textFieldborderColor),
-                      )
-                    : Text(
-                        'Save as Draft',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'medium',
-                          color: Colors.black,
-                        ),
-                      ),
-              ),
+              //           setState(() {
+              //             isdraft = false;
+              //           });
+              //         },
+              //   child: isdraft
+              //       ? SizedBox(
+              //           width: 20,
+              //           height: 20,
+              //           child: CircularProgressIndicator(
+              //               strokeWidth: 4,
+              //               color: AppTheme.textFieldborderColor),
+              //         )
+              //       : Text(
+              //           'Save as Draft',
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontFamily: 'medium',
+              //             color: Colors.black,
+              //           ),
+              //         ),
+              // ),
               //preview
               GestureDetector(
                 onTap: () {

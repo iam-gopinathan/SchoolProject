@@ -286,9 +286,9 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                 children: [
                   //
                   Padding(
-                    padding: const EdgeInsets.only(
+                    padding: EdgeInsets.only(
                       top: 20,
-                      bottom: 20,
+                      bottom: MediaQuery.of(context).size.height * 0.02,
                     ),
                     child: Container(
                       child: Column(
@@ -304,6 +304,10 @@ class _ApprovalNewsStatuspageState extends State<ApprovalNewsStatuspage> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.8,
                                   child: TextFormField(
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontFamily: 'medium'),
                                     cursorColor: Colors.black,
                                     controller: searchController,
                                     textAlign: TextAlign.center,

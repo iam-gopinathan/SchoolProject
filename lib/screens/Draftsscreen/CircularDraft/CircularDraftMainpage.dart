@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/DraftModels/Circular_fetch_draft_model.dart';
+import 'package:flutter_application_1/services/Draft_Api/Circular_fetch_draft_api.dart';
 import 'package:flutter_application_1/user_Session.dart';
 import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
@@ -53,7 +56,6 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
     }
   }
   //selected date end
-  //
 
   ///image bottomsheeet.....
   void _showBottomSheet(BuildContext context, String imagePath) {
@@ -109,6 +111,45 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
     );
   }
 
+  bool isLoading = true;
+
+  CircularFetchDraftModel? circularDraftData;
+  final ApiService apiService = ApiService();
+  //
+  Future<void> _fetchDraftCircular() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      var response = await apiService.fetchDraftCirculars(
+        rollNumber: UserSession().rollNumber.toString(),
+        userType: UserSession().userType.toString(),
+        date: selectedDate,
+      );
+
+      if (response != null) {
+        setState(() {
+          circularDraftData = response;
+        });
+      }
+    } catch (e) {
+      print("Error fetching data: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  //
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _fetchDraftCircular();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -152,7 +193,7 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Circulars',
+                                'Circulars Draft',
                                 style: TextStyle(
                                   fontFamily: 'semibold',
                                   fontSize: 16,
@@ -165,8 +206,15 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
                               ),
                               GestureDetector(
                                 onTap: () async {
-                                  // await _selectDate(context);
-                                  // await _fetchCircular();
+                                  await _selectDate(context);
+
+                                  setState(() {
+                                    isLoading = true;
+                                  });
+                                  await _fetchDraftCircular();
+                                  setState(() {
+                                    isLoading = false;
+                                  });
                                 },
                                 child: Row(
                                   children: [
@@ -200,6 +248,7 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
                             right: MediaQuery.of(context).size.width * 0.02),
                         child: GestureDetector(
                           onTap: () {
+                            //
                             showDialog(
                               barrierDismissible: false,
                               context: context,
@@ -238,7 +287,7 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
                                                   fontSize: 16,
                                                   fontFamily: 'regular'),
                                             )),
-                                        //edit...
+                                        //delete...
                                         Padding(
                                           padding: EdgeInsets.only(
                                             left: MediaQuery.of(context)
@@ -254,7 +303,104 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
                                                     .textFieldborderColor,
                                                 elevation: 0,
                                               ),
-                                              onPressed: () {
+                                              onPressed: () async {
+                                                //
+                                                Future<void> deleteAllDraft(
+                                                    {required String rollNumber,
+                                                    required String
+                                                        module}) async {
+                                                  // API Endpoint
+                                                  String url =
+                                                      "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeNews/DeleteAllDraft";
+
+                                                  // Parameters
+                                                  final Map<String, String>
+                                                      queryParams = {
+                                                    "RollNumber": UserSession()
+                                                            .rollNumber ??
+                                                        '',
+                                                    "Module": 'circular',
+                                                  };
+
+                                                  // Construct the final URL with query parameters
+                                                  final Uri uri = Uri.parse(url)
+                                                      .replace(
+                                                          queryParameters:
+                                                              queryParams);
+
+                                                  try {
+                                                    final response =
+                                                        await http.delete(
+                                                      uri,
+                                                      headers: {
+                                                        "Authorization":
+                                                            "Bearer $authToken",
+                                                        "Content-Type":
+                                                            "application/json",
+                                                      },
+                                                    );
+
+                                                    if (response.statusCode ==
+                                                        200) {
+                                                      print(
+                                                          "Response Status Code: ${response.statusCode}");
+                                                      print(
+                                                          "Response Body: ${response.body}");
+                                                      // Show success Snackbar
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              "Draft Circular deleted successfully!"),
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                        ),
+                                                      );
+                                                      print(
+                                                          "Draft Circular deleted successfully!");
+                                                    } else {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              "Failed to delete draft Circular. Try again."),
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                        ),
+                                                      );
+                                                      print(
+                                                          "Failed to delete draft Circular. Status: ${response.statusCode}");
+                                                      print(
+                                                          "Response: ${response.body}");
+                                                    }
+                                                  } catch (e) {
+                                                    // Show error Snackbar
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            "Error deleting draft news: $e"),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                    print(
+                                                        "Error deleting draft news: $e");
+                                                  }
+                                                }
+
+                                                //
+                                                await deleteAllDraft(
+                                                    rollNumber: UserSession()
+                                                        .rollNumber
+                                                        .toString(),
+                                                    module: 'circular');
+
+                                                await _fetchDraftCircular();
+
                                                 Navigator.pop(context);
                                               },
                                               child: Text(
@@ -310,8 +456,6 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
                           ),
                         ),
                       ),
-
-                      //
                     ],
                   ),
                 ),
@@ -320,423 +464,546 @@ class _CirculardraftmainpageState extends State<Circulardraftmainpage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            //
-            Card(
-              shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: Color.fromRGBO(238, 238, 238, 1),
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+              strokeWidth: 4,
+              color: AppTheme.textFieldborderColor,
+            ))
+          : circularDraftData == null ||
+                  circularDraftData!.data == null ||
+                  circularDraftData!.data!.isEmpty
+              ? Center(
+                  child: Text(
+                    "No draft circular available!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontFamily: 'regular',
+                      color: Color.fromRGBO(145, 145, 145, 1),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  borderRadius: BorderRadius.circular(15)),
-              elevation: 0,
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.9,
-                padding: EdgeInsets.all(15),
-                color: Colors.white,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //heading.....
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      child: Text(
-                        '{circularModel.headLine}',
-                        style: TextStyle(
-                            fontFamily: 'semibold',
-                            fontSize: 16,
-                            color: Colors.black),
-                      ),
-                    ),
-                    //
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Divider(
-                        thickness: 1,
-                        color: Color.fromRGBO(243, 243, 243, 1),
-                      ),
-                    ),
-//description..
-                    Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      // child: circularModel.circular != null &&
-                      //         circularModel.circular!.isNotEmpty
-                      //     ? Html(
-                      //         data: '${circularModel.circular}',
-                      //         style: {
-                      //           "body": Style(
-                      //               color: Colors.black,
-                      //               fontFamily: 'semibold',
-                      //               fontSize: FontSize(16),
-                      //               textAlign: TextAlign.justify),
-                      //         },
-                      //       )
-                      //     : const Text(''),
-                    ),
-                    //image section...
-                    // if (circularModel.fileType == 'image')
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        //
-                        SizedBox(
-                          height: 250,
-                          width: double.infinity,
-                          child: Image.network(
-                            '{circularModel.filePath}',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.6),
-                              borderRadius: BorderRadius.circular(10)),
-                          height: 250,
-                          width: double.infinity,
-                        ),
-                        // Centered Text
-                        Center(
-                          child: GestureDetector(
-                            // onTap: () {
-                            //   String? imagePath = circularModel.filePath;
-                            //   if (imagePath != null && imagePath.isNotEmpty) {
-                            //     _showBottomSheet(context, imagePath);
-                            //   } else {
-                            //     _showBottomSheet(context,
-                            //         'assets/images/default_image.png');
-                            //   }
-                            // },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                border:
-                                    Border.all(color: Colors.white, width: 1.5),
-                                borderRadius: BorderRadius.circular(30),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      ...circularDraftData!.data!.map((e) {
+                        return Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.07,
+                                top: MediaQuery.of(context).size.height * 0.02,
                               ),
-                              child: Text(
-                                'View Image',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontFamily: 'semibold',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    ////
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Divider(
-                        thickness: 1,
-                        color: Color.fromRGBO(243, 243, 243, 1),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 20, bottom: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (UserSession().userType == 'admin' ||
-                              UserSession().userType == 'superadmin' ||
-                              UserSession().userType == 'staff')
-                            // if (circularModel.isAlterAvailable == "Y" ||
-                            //     UserSession().userType == 'superadmin')
-                            //edit
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      content: Text(
-                                        "Do you really want to make\n changes to this circular?",
-                                        style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      actions: <Widget>[
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    elevation: 0,
-                                                    side: BorderSide(
-                                                        color: Colors.black,
-                                                        width: 1)),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontFamily: 'regular'),
-                                                )),
-                                            //edit...
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 40),
-                                                    backgroundColor: AppTheme
-                                                        .textFieldborderColor,
-                                                    elevation: 0,
-                                                  ),
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                    // Navigator.push(
-                                                    //     context,
-                                                    //     MaterialPageRoute(
-                                                    //         builder: (context) =>
-                                                    //             EditCircularpage(
-                                                    //               Id: circularModel
-                                                    //                   .id,
-                                                    //               fetchcircular:
-                                                    //                   _fetchCircular,
-                                                    //             )));
-                                                  },
-                                                  child: Text(
-                                                    'Edit',
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 16,
-                                                        fontFamily: 'regular'),
-                                                  )),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 15),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: Colors.black)),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.edit,
-                                        color: Colors.black,
-                                      ),
-                                      Text(
-                                        'Edit',
-                                        style: TextStyle(
-                                            fontFamily: 'medium',
-                                            fontSize: 12,
-                                            color: Colors.black),
-                                      ),
-                                    ],
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Drafted on : ${e.postedOnDate} | ${e.postedOnDay}',
+                                    style: TextStyle(
+                                        fontFamily: 'regular',
+                                        fontSize: 12,
+                                        color: Colors.black),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
-                          //delete icon
-                          if (UserSession().userType == 'admin' ||
-                              UserSession().userType == 'superadmin' ||
-                              UserSession().userType == 'staff')
-                            // if (circularModel.isAlterAvailable == 'Y' ||
-                            //     UserSession().userType == 'superadmin')
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      content: Text(
-                                        "Are you sure you want to delete\n this circular?",
-                                        style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                        textAlign: TextAlign.center,
+                            //
+                            ...e.circular!.map((cir) {
+                              return Padding(
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.03),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                      side: BorderSide(
+                                        color: Color.fromRGBO(238, 238, 238, 1),
                                       ),
-                                      actions: <Widget>[
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    elevation: 0,
-                                                    side: BorderSide(
+                                      borderRadius: BorderRadius.circular(15)),
+                                  elevation: 0,
+                                  child: Container(
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.9,
+                                    padding: EdgeInsets.all(15),
+                                    color: Colors.white,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        //heading.....
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.8,
+                                          child: Text(
+                                            '${cir.headLine}',
+                                            style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 16,
+                                                color: Colors.black),
+                                          ),
+                                        ),
+                                        //
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(
+                                                243, 243, 243, 1),
+                                          ),
+                                        ),
+                                        //description..
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.8,
+                                          child: cir.circular != null &&
+                                                  cir.circular!.isNotEmpty
+                                              ? Html(
+                                                  data: '${cir.circular}',
+                                                  style: {
+                                                    "body": Style(
                                                         color: Colors.black,
-                                                        width: 1)),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontFamily: 'regular'),
-                                                )),
-                                            //delete......
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 10),
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 40),
-                                                  backgroundColor: AppTheme
-                                                      .textFieldborderColor,
-                                                  elevation: 0,
-                                                ),
-                                                onPressed: () async {
-                                                  var cirId = '';
-                                                  final String url =
-                                                      'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeCircular/DeleteCircular?Id=${cirId}&RollNumber=${UserSession().rollNumber}&UserType=${UserSession().userType}';
-
-                                                  try {
-                                                    final response =
-                                                        await http.delete(
-                                                      Uri.parse(url),
-                                                      headers: {
-                                                        'Content-Type':
-                                                            'application/json',
-                                                        'Authorization':
-                                                            'Bearer $authToken',
-                                                      },
-                                                    );
-
-                                                    if (response.statusCode ==
-                                                        200) {
-                                                      print(
-                                                          'id has beeen deleted ${cirId}');
-
-                                                      // ScaffoldMessenger.of(context).showSnackBar(
-                                                      //   SnackBar(backgroundColor: Colors.green, content: Text('Circular deleted successfully!')),
-                                                      // );
-                                                      // //
-                                                      // // Refresh the news data after deletion
-                                                      // Navigator.pop(context);
-
-                                                      // //
-                                                      // await _fetchCircular();
-                                                      if (mounted) {
-                                                        String message =
-                                                            'Circular deleted successfully!';
-
-                                                        // If user is admin or staff, change the message
-                                                        if (UserSession()
-                                                                    .userType ==
-                                                                'admin' ||
-                                                            UserSession()
-                                                                    .userType ==
-                                                                'staff') {
-                                                          message =
-                                                              'Delete request sent successfully!';
-                                                        }
-
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          SnackBar(
-                                                              backgroundColor:
-                                                                  Colors.green,
-                                                              content: Text(
-                                                                  message)),
-                                                        );
-                                                      }
-
-                                                      Navigator.pop(
-                                                          context); // Close the dialog
-                                                      // await _fetchCircular(); // Refresh the data
-                                                    } else {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                            backgroundColor:
-                                                                Colors.red,
-                                                            content: Text(
-                                                                'Failed to delete Circular.')),
-                                                      );
-                                                    }
-                                                  } catch (e) {
-                                                    ScaffoldMessenger.of(
-                                                            context)
-                                                        .showSnackBar(
-                                                      SnackBar(
-                                                          content: Text(
-                                                              'An error occurred: $e')),
-                                                    );
-                                                  }
-                                                  // await _fetchCircular();
-
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  'Delete',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontFamily: 'regular'),
+                                                        fontFamily: 'semibold',
+                                                        fontSize: FontSize(16),
+                                                        textAlign:
+                                                            TextAlign.justify),
+                                                  },
+                                                )
+                                              : const Text(''),
+                                        ),
+                                        //image section...
+                                        if (cir.fileType == 'image')
+                                          Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              //
+                                              SizedBox(
+                                                height: 250,
+                                                width: double.infinity,
+                                                child: Image.network(
+                                                  '${cir.filePath}',
+                                                  fit: BoxFit.cover,
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.black
+                                                        .withOpacity(0.6),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                height: 250,
+                                                width: double.infinity,
+                                              ),
+                                              // Centered Text
+                                              Center(
+                                                child: GestureDetector(
+                                                  onTap: () {
+                                                    String? imagePath =
+                                                        cir.filePath;
+                                                    if (imagePath != null &&
+                                                        imagePath.isNotEmpty) {
+                                                      _showBottomSheet(
+                                                          context, imagePath);
+                                                    }
+                                                    //  else {
+                                                    //   _showBottomSheet(context,
+                                                    //       'assets/images/default_image.png');
+                                                    // }
+                                                  },
+                                                  child: Container(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.transparent,
+                                                      border: Border.all(
+                                                          color: Colors.white,
+                                                          width: 1.5),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              30),
+                                                    ),
+                                                    child: Text(
+                                                      'View Image',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontFamily: 'semibold',
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ////
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 10),
+                                          child: Divider(
+                                            thickness: 1,
+                                            color: Color.fromRGBO(
+                                                243, 243, 243, 1),
+                                          ),
                                         ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              top: 20, bottom: 10),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              //edit
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        content: Text(
+                                                          "Do you really want to make\n changes to this circular?",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: <Widget>[
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      elevation:
+                                                                          0,
+                                                                      side: BorderSide(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          width:
+                                                                              1)),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Cancel',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontFamily:
+                                                                            'regular'),
+                                                                  )),
+                                                              //edit...
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10),
+                                                                child:
+                                                                    ElevatedButton(
+                                                                        style: ElevatedButton
+                                                                            .styleFrom(
+                                                                          padding:
+                                                                              EdgeInsets.symmetric(horizontal: 40),
+                                                                          backgroundColor:
+                                                                              AppTheme.textFieldborderColor,
+                                                                          elevation:
+                                                                              0,
+                                                                        ),
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.pop(
+                                                                              context);
+                                                                          // Navigator.push(
+                                                                          //     context,
+                                                                          //     MaterialPageRoute(
+                                                                          //         builder: (context) =>
+                                                                          //             EditCircularpage(
+                                                                          //               Id: circularModel
+                                                                          //                   .id,
+                                                                          //               fetchcircular:
+                                                                          //                   _fetchCircular,
+                                                                          //             )));
+                                                                        },
+                                                                        child:
+                                                                            Text(
+                                                                          'Edit',
+                                                                          style: TextStyle(
+                                                                              color: Colors.black,
+                                                                              fontSize: 16,
+                                                                              fontFamily: 'regular'),
+                                                                        )),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 10),
+                                                  child: Container(
+                                                    padding:
+                                                        EdgeInsets.symmetric(
+                                                            vertical: 5,
+                                                            horizontal: 15),
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                        border: Border.all(
+                                                            color:
+                                                                Colors.black)),
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.edit,
+                                                          color: Colors.black,
+                                                        ),
+                                                        Text(
+                                                          'Edit',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'medium',
+                                                              fontSize: 12,
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              //delete icon
+                                              GestureDetector(
+                                                onTap: () {
+                                                  showDialog(
+                                                    barrierDismissible: false,
+                                                    context: context,
+                                                    builder:
+                                                        (BuildContext context) {
+                                                      return AlertDialog(
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        content: Text(
+                                                          "Are you sure you want to delete\n this circular?",
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'regular',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                        actions: <Widget>[
+                                                          Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              ElevatedButton(
+                                                                  style: ElevatedButton.styleFrom(
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      elevation:
+                                                                          0,
+                                                                      side: BorderSide(
+                                                                          color: Colors
+                                                                              .black,
+                                                                          width:
+                                                                              1)),
+                                                                  onPressed:
+                                                                      () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Cancel',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontFamily:
+                                                                            'regular'),
+                                                                  )),
+                                                              //delete......
+                                                              Padding(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .only(
+                                                                        left:
+                                                                            10),
+                                                                child:
+                                                                    ElevatedButton(
+                                                                  style: ElevatedButton
+                                                                      .styleFrom(
+                                                                    padding: EdgeInsets.symmetric(
+                                                                        horizontal:
+                                                                            40),
+                                                                    backgroundColor:
+                                                                        AppTheme
+                                                                            .textFieldborderColor,
+                                                                    elevation:
+                                                                        0,
+                                                                  ),
+                                                                  onPressed:
+                                                                      () async {
+                                                                    var cirId =
+                                                                        cir.id;
+                                                                    final String
+                                                                        url =
+                                                                        'https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeCircular/DeleteCircular?Id=${cirId}&RollNumber=${UserSession().rollNumber}&UserType=${UserSession().userType}';
+
+                                                                    try {
+                                                                      final response =
+                                                                          await http
+                                                                              .delete(
+                                                                        Uri.parse(
+                                                                            url),
+                                                                        headers: {
+                                                                          'Content-Type':
+                                                                              'application/json',
+                                                                          'Authorization':
+                                                                              'Bearer $authToken',
+                                                                        },
+                                                                      );
+
+                                                                      if (response
+                                                                              .statusCode ==
+                                                                          200) {
+                                                                        print(
+                                                                            'id has beeen deleted ${cirId}');
+
+                                                                        // ScaffoldMessenger.of(context).showSnackBar(
+                                                                        //   SnackBar(backgroundColor: Colors.green, content: Text('Circular deleted successfully!')),
+                                                                        // );
+                                                                        // //
+                                                                        // // Refresh the news data after deletion
+                                                                        // Navigator.pop(context);
+
+                                                                        // //
+                                                                        // await _fetchCircular();
+                                                                        if (mounted) {
+                                                                          String
+                                                                              message =
+                                                                              'Circular deleted successfully!';
+
+                                                                          // If user is admin or staff, change the message
+
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(
+                                                                            SnackBar(
+                                                                                backgroundColor: Colors.green,
+                                                                                content: Text(message)),
+                                                                          );
+                                                                        }
+
+                                                                        Navigator.pop(
+                                                                            context); // Close the dialog
+                                                                        await _fetchDraftCircular(); // Refresh the data
+                                                                      } else {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: Colors.red,
+                                                                              content: Text('Failed to delete Circular.')),
+                                                                        );
+                                                                      }
+                                                                    } catch (e) {
+                                                                      ScaffoldMessenger.of(
+                                                                              context)
+                                                                          .showSnackBar(
+                                                                        SnackBar(
+                                                                            content:
+                                                                                Text('An error occurred: $e')),
+                                                                      );
+                                                                    }
+                                                                    await _fetchDraftCircular();
+
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: Text(
+                                                                    'Delete',
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .black,
+                                                                        fontSize:
+                                                                            16,
+                                                                        fontFamily:
+                                                                            'regular'),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
+                                                      );
+                                                    },
+                                                  );
+                                                },
+                                                child: Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 10),
+                                                  child: SvgPicture.asset(
+                                                    'assets/icons/delete_icons.svg',
+                                                    fit: BoxFit.contain,
+                                                    height: 35,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
                                       ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: SvgPicture.asset(
-                                  'assets/icons/delete_icons.svg',
-                                  fit: BoxFit.contain,
-                                  height: 35,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    )
-                  ],
+                              );
+                            }).toList()
+                          ],
+                        );
+                      }).toList(),
+                    ],
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

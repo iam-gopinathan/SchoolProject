@@ -23,9 +23,7 @@ class Createmessagepage extends StatefulWidget {
 
 class _CreatemessagepageState extends State<Createmessagepage> {
   TextEditingController _heading = TextEditingController();
-
   TextEditingController _scheduledDateandtime = TextEditingController();
-
   QuillController _controller = QuillController.basic();
 
   // Method to show date picker
@@ -54,7 +52,6 @@ class _CreatemessagepageState extends State<Createmessagepage> {
             child: child!,
           );
         });
-
     if (pickedDate != null) {
       setState(() {
         _dateTime = _dateFormat.format(pickedDate);
@@ -84,18 +81,44 @@ class _CreatemessagepageState extends State<Createmessagepage> {
               ),
               dialogBackgroundColor: Colors.black,
               textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                foregroundColor: Colors.white,
-              )),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: Colors.black,
+                dialBackgroundColor: Colors.grey[900],
+                hourMinuteColor: Colors.white10,
+                hourMinuteTextColor: Colors.white,
+                entryModeIconColor: Colors.white,
+                dayPeriodColor: AppTheme.textFieldborderColor,
+                dayPeriodTextColor: Colors.white,
+              ),
             ),
             child: child!,
           );
         });
 
     if (pickedTime != null) {
+      //
       final DateTime now = DateTime.now();
       final DateTime parsedTime = DateTime(
           now.year, now.month, now.day, pickedTime.hour, pickedTime.minute);
+
+      // Check if the selected time is in the past
+      if (parsedTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please select Future Time!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _dateTime = '';
+        });
+
+        return;
+      }
 
       setState(() {
         _dateTime += " ${_timeFormat.format(parsedTime)}";
@@ -911,73 +934,81 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            QuillSimpleToolbar(
-                              controller: _controller,
-                              configurations:
-                                  const QuillSimpleToolbarConfigurations(
-                                dialogTheme: QuillDialogTheme(
-                                    labelTextStyle:
-                                        TextStyle(color: Colors.black),
-                                    inputTextStyle: TextStyle(
-                                        color: Colors.black, fontSize: 14)),
-                                showBoldButton: true,
-                                showClipboardCopy: false,
-                                showClearFormat: false,
-                                showAlignmentButtons: false,
-                                showBackgroundColorButton: false,
-                                showFontSize: false,
-                                showColorButton: false,
-                                showCenterAlignment: false,
-                                showClipboardCut: false,
-                                showIndent: false,
-                                showDirection: false,
-                                showDividers: false,
-                                showFontFamily: false,
-                                showItalicButton: false,
-                                showClipboardPaste: false,
-                                showInlineCode: false,
-                                showCodeBlock: false,
-                                showHeaderStyle: false,
-                                showJustifyAlignment: false,
-                                showLeftAlignment: false,
-                                showLineHeightButton: false,
-                                showLink: false,
-                                showListBullets: false,
-                                showListCheck: false,
-                                showListNumbers: false,
-                                showQuote: false,
-                                showRightAlignment: false,
-                                showSearchButton: false,
-                                showRedo: false,
-                                showSmallButton: false,
-                                showSubscript: false,
-                                showStrikeThrough: false,
-                                showUndo: false,
-                                showUnderLineButton: false,
-                                showSuperscript: false,
+                        padding: const EdgeInsets.only(top: 0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                  bottom: BorderSide(
+                                      color: const Color.fromRGBO(
+                                          225, 225, 225, 1),
+                                      width: 1))),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              QuillSimpleToolbar(
+                                controller: _controller,
+                                configurations:
+                                    QuillSimpleToolbarConfigurations(
+                                  dialogTheme: QuillDialogTheme(
+                                      labelTextStyle:
+                                          TextStyle(color: Colors.black),
+                                      inputTextStyle: TextStyle(
+                                          color: Colors.black, fontSize: 14)),
+                                  showBoldButton: true,
+                                  showClipboardCopy: false,
+                                  showClearFormat: false,
+                                  showAlignmentButtons: false,
+                                  showBackgroundColorButton: false,
+                                  showFontSize: false,
+                                  showColorButton: false,
+                                  showCenterAlignment: false,
+                                  showClipboardCut: false,
+                                  showIndent: false,
+                                  showDirection: false,
+                                  showDividers: false,
+                                  showFontFamily: false,
+                                  showItalicButton: false,
+                                  showClipboardPaste: false,
+                                  showInlineCode: false,
+                                  showCodeBlock: false,
+                                  showHeaderStyle: false,
+                                  showJustifyAlignment: false,
+                                  showLeftAlignment: false,
+                                  showLineHeightButton: false,
+                                  showLink: false,
+                                  showListBullets: false,
+                                  showListCheck: false,
+                                  showListNumbers: false,
+                                  showQuote: false,
+                                  showRightAlignment: false,
+                                  showSearchButton: false,
+                                  showRedo: false,
+                                  showSmallButton: false,
+                                  showSubscript: false,
+                                  showStrikeThrough: false,
+                                  showUndo: false,
+                                  showUnderLineButton: false,
+                                  showSuperscript: false,
+                                ),
                               ),
-                            ),
-                            IconButton(
-                                icon: Icon(Icons.paste, color: Colors.black),
-                                onPressed: () {
-                                  setState(() {
-                                    _pasteFromClipboard();
-                                  });
-                                })
-                          ],
+                              IconButton(
+                                  icon: Icon(Icons.paste, color: Colors.black),
+                                  onPressed: () {
+                                    setState(() {
+                                      _pasteFromClipboard();
+                                    });
+                                  })
+                            ],
+                          ),
                         ),
                       ),
-
                       // Quill editor
                       Container(
                         child: Padding(
                           padding: const EdgeInsets.all(10),
                           child: Padding(
-                            padding: const EdgeInsets.only(top: 5, bottom: 10),
+                            padding: const EdgeInsets.only(top: 5, bottom: 20),
                             child: quill.QuillEditor.basic(
                               controller: _controller,
                             ),
@@ -1008,7 +1039,7 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                   ],
                 ),
               ),
-
+//
               Padding(
                 padding: const EdgeInsets.only(top: 20),
                 child: Row(
@@ -1215,7 +1246,6 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                               ),
                             ),
                     ),
-
                   ////request now..
                   if (UserSession().userType == 'admin' ||
                       UserSession().userType == 'staff')
@@ -1238,66 +1268,170 @@ class _CreatemessagepageState extends State<Createmessagepage> {
                           );
                           return;
                         }
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (BuildContext context) {
+                        //     return AlertDialog(
+                        //       backgroundColor: Colors.white,
+                        //       title: Text(
+                        //         "Confirm Request !",
+                        //         style: TextStyle(
+                        //           fontFamily: 'semibold',
+                        //           fontSize: 18,
+                        //           color: Colors.black,
+                        //         ),
+                        //         textAlign: TextAlign.center,
+                        //       ),
+                        //       content: Text(
+                        //         "Are you sure you want to create a new request?",
+                        //         style: TextStyle(
+                        //             fontFamily: 'regular',
+                        //             fontSize: 16,
+                        //             color: Colors.black),
+                        //       ),
+                        //       actions: [
+                        //         ElevatedButton(
+                        //           style: ElevatedButton.styleFrom(
+                        //             backgroundColor: Colors.white,
+                        //             side: BorderSide(
+                        //                 color: Colors.black, width: 1),
+                        //           ),
+                        //           onPressed: () {
+                        //             Navigator.of(context).pop();
+                        //           },
+                        //           child: Text(
+                        //             "Cancel",
+                        //             style: TextStyle(
+                        //                 fontFamily: 'semibold',
+                        //                 fontSize: 14,
+                        //                 color: Colors.black),
+                        //           ),
+                        //         ),
+                        //         ElevatedButton(
+                        //           style: ElevatedButton.styleFrom(
+                        //               backgroundColor: Colors.amber),
+                        //           onPressed: () {
+                        //             if (_scheduledDateandtime.text.isEmpty) {
+                        //               _submitForm("post");
+                        //             } else {
+                        //               _submitForm("schedule");
+                        //             }
+
+                        //             Navigator.of(context).pop();
+                        //           },
+                        //           child: Text(
+                        //             "Yes Send",
+                        //             style: TextStyle(
+                        //                 fontFamily: 'semibold',
+                        //                 fontSize: 14,
+                        //                 color: Colors.black),
+                        //           ),
+                        //         ),
+                        //       ],
+                        //     );
+                        //   },
+                        // );
                         showDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: Colors.white,
-                              title: Text(
-                                "Confirm Request !",
-                                style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              content: Text(
-                                "Are you sure you want to create a new request?",
-                                style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                              actions: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    side: BorderSide(
-                                        color: Colors.black, width: 1),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(
-                                    "Cancel",
-                                    style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 14,
-                                        color: Colors.black),
-                                  ),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.amber),
-                                  onPressed: () {
-                                    if (_scheduledDateandtime.text.isEmpty) {
-                                      _submitForm("post");
-                                    } else {
-                                      _submitForm("schedule");
-                                    }
+                          builder: (BuildContext dialogContext) {
+                            bool isLoading = false; // Loader state
 
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(
-                                    "Yes Send",
+                            return StatefulBuilder(
+                              builder: (context, setModalState) {
+                                return AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  title: Text(
+                                    "Confirm Request !",
                                     style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 14,
-                                        color: Colors.black),
+                                      fontFamily: 'semibold',
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
+                                  content: Text(
+                                    "Are you sure you want to create\n a new request?",
+                                    style: TextStyle(
+                                      fontFamily: 'regular',
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        side: BorderSide(
+                                            color: Colors.black, width: 1),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(dialogContext).pop();
+                                      },
+                                      child: Text(
+                                        "Cancel",
+                                        style: TextStyle(
+                                          fontFamily: 'semibold',
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: isLoading
+                                            ? Colors.grey
+                                            : Colors.amber,
+                                      ),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () async {
+                                              setModalState(() {
+                                                isLoading = true;
+                                              });
+
+                                              await Future.delayed(Duration(
+                                                  seconds:
+                                                      2)); // Allow UI update
+
+                                              final String status =
+                                                  _scheduledDateandtime
+                                                          .text.isEmpty
+                                                      ? "post"
+                                                      : "schedule";
+
+                                              await _submitForm(
+                                                  status); // API Call
+
+                                              setModalState(() {
+                                                isLoading =
+                                                    false; // Hide loader
+                                              });
+                                              if (context.mounted) {
+                                                Navigator.of(context).pop();
+                                              }
+                                            },
+                                      child: isLoading
+                                          ? SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                color: AppTheme
+                                                    .appBackgroundPrimaryColor,
+                                                strokeWidth: 4,
+                                              ),
+                                            )
+                                          : Text(
+                                              "Yes Send",
+                                              style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 14,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                         );

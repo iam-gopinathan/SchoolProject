@@ -171,10 +171,10 @@ class _MyquestionsPageState extends State<MyquestionsPage> {
                                 onTap: () async {
                                   await _selectDate(context);
 
-                                  await fetchParentFeedback(date: selectedDate);
                                   setState(() {
                                     isLoading = true;
                                   });
+                                  await fetchParentFeedback(date: selectedDate);
                                   setState(() {
                                     isLoading = false;
                                   });
@@ -619,7 +619,6 @@ class _MyquestionsPageState extends State<MyquestionsPage> {
                     ],
                   ),
                 ),
-      //
       //top arrow..
       floatingActionButton:
           _scrollController.hasClients && _scrollController.offset > 50

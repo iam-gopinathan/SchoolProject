@@ -254,13 +254,13 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                                     const EdgeInsets.only(left: 15, top: 10),
                                 child: Row(
                                   children: [
-                                    Text(
-                                      "${selectedRecipient}",
-                                      style: TextStyle(
-                                          fontFamily: 'medium',
-                                          fontSize: 16,
-                                          color: Colors.black),
-                                    ),
+                                    // Text(
+                                    //   "${selectedRecipient}",
+                                    //   style: TextStyle(
+                                    //       fontFamily: 'medium',
+                                    //       fontSize: 16,
+                                    //       color: Colors.black),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -850,7 +850,7 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                     ),
                   ),
                 //
-                if (selectedRecipient == 'Students')
+                if (selectedRecipient == 'Students' && sections.isNotEmpty)
                   //select sections...
                   Padding(
                     padding: const EdgeInsets.only(top: 20),
@@ -1116,6 +1116,43 @@ class _CreateFeedbackState extends State<CreateFeedback> {
               //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
               //   ),
               // ),
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     backgroundColor: AppTheme.textFieldborderColor,
+              //     side: BorderSide.none,
+              //   ),
+              //   onPressed: isPublishing
+              //       ? null // Disable button while loading
+              //       : () async {
+              //           setState(() {
+              //             isPublishing =
+              //                 true; // Update state before starting the process
+              //           });
+              //           String status = 'post';
+              //           await submitFeedback(status);
+
+              //           setState(() {
+              //             isPublishing = false; // Reset state after completion
+              //           });
+              //         },
+              //   child: isPublishing
+              //       ? SizedBox(
+              //           width: 20,
+              //           height: 20,
+              //           child: CircularProgressIndicator(
+              //             color: AppTheme.appBackgroundPrimaryColor,
+              //             strokeWidth: 4,
+              //           ),
+              //         )
+              //       : Text(
+              //           'Publish',
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontFamily: 'medium',
+              //             color: Colors.black,
+              //           ),
+              //         ),
+              // ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.textFieldborderColor,
@@ -1123,9 +1160,18 @@ class _CreateFeedbackState extends State<CreateFeedback> {
                 ),
                 onPressed: isPublishing
                     ? null // Disable button while loading
-                    : () {
+                    : () async {
+                        setState(() {
+                          isPublishing = true;
+                        });
+
                         String status = 'post';
-                        submitFeedback(status);
+
+                        try {
+                          await submitFeedback(status);
+                        } catch (e) {
+                          print("Error: $e");
+                        }
                       },
                 child: isPublishing
                     ? SizedBox(
@@ -1157,7 +1203,7 @@ class _CreateFeedbackState extends State<CreateFeedback> {
   bool isLoading = false;
   List<String> selected = [];
   // Create feedback
-  void submitFeedback(String status) {
+  Future<void> submitFeedback(String status) async {
     // Validate Section for grades (except "everyone")
     if (selectedGradeId != 'everyone' &&
         (selectedSection == null || selectedSection!.isEmpty)) {

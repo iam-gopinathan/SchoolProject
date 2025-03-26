@@ -141,6 +141,15 @@ class _EditHomeworkState extends State<EditHomework> {
                   style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
               )),
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: Colors.black,
+                dialBackgroundColor: Colors.grey[900],
+                hourMinuteColor: Colors.white10,
+                hourMinuteTextColor: Colors.white,
+                entryModeIconColor: Colors.white,
+                dayPeriodColor: AppTheme.textFieldborderColor,
+                dayPeriodTextColor: Colors.white,
+              ),
             ),
             child: child!,
           );
@@ -150,6 +159,21 @@ class _EditHomeworkState extends State<EditHomework> {
       final DateTime now = DateTime.now();
       final DateTime parsedTime = DateTime(
           now.year, now.month, now.day, pickedTime.hour, pickedTime.minute);
+      //
+      // // Check if the selected time is in the past
+      if (parsedTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please select Future Time!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _dateTime = '';
+        });
+
+        return;
+      }
 
       setState(() {
         _dateTime += " ${_timeFormat.format(parsedTime)}";

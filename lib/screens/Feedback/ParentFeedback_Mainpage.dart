@@ -56,11 +56,11 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
   ParentFeedbackYResponse? y;
 
   //
-
   void updateIsMyProject(String value) {
     setState(() {
       isswitched = value == 'Y';
     });
+    fetchparentData();
   }
 
 //fetch function...
@@ -69,19 +69,19 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
       setState(() {
         isLoading = true;
       });
-
       final response = await fetchParentFeedbackMain(
           rollNumber: UserSession().rollNumber ?? '',
           userType: UserSession().userType ?? '',
           isMyFeedback: isswitched ? 'Y' : 'N',
           context: context);
 
-      if (isswitched) {
-        y = response as ParentFeedbackYResponse;
-      } else {
-        res = response as ParentFeedbackResponse;
-      }
-
+      setState(() {
+        if (isswitched) {
+          y = response as ParentFeedbackYResponse;
+        } else {
+          res = response as ParentFeedbackResponse;
+        }
+      });
       setState(() {
         isLoading = false;
       });
@@ -225,7 +225,9 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                 color: AppTheme.textFieldborderColor,
               ),
             )
-          : res == null || res!.data.isEmpty
+          // : res == null || res!.data.isEmpty
+          : ((res == null || res!.data.isEmpty) &&
+                  (y == null || y!.feedbackList.isEmpty))
               ? Center(
                   child: Text(
                     "You haven’t made anything yet;\nstart creating now!",
@@ -267,6 +269,7 @@ class _ParentfeedbackMainpageState extends State<ParentfeedbackMainpage> {
                                 ],
                               ),
                             ),
+                            //
                             ...e.fromParents.map((parent) {
                               return Padding(
                                 padding: EdgeInsets.all(

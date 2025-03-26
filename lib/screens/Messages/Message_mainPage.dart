@@ -317,6 +317,7 @@ class _MessageMainpageState extends State<MessageMainpage> {
           Padding(
             padding: EdgeInsets.only(
               top: MediaQuery.of(context).size.height * 0.02,
+              bottom: MediaQuery.of(context).size.height * 0.02,
             ),
             child: Container(
               color: Colors.white,
@@ -330,6 +331,11 @@ class _MessageMainpageState extends State<MessageMainpage> {
                         color: Colors.white,
                         width: MediaQuery.of(context).size.width * 0.9,
                         child: TextFormField(
+                          cursorColor: Colors.black,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: 'medium'),
                           controller: searchcontroller,
                           textAlign: TextAlign.center,
                           decoration: InputDecoration(

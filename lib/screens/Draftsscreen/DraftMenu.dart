@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/screens/Draftsscreen/CircularDraft/CircularDraftMainpage.dart';
 import 'package:flutter_application_1/screens/Draftsscreen/ConsentDraft/consentDraftMainpage.dart';
+import 'package:flutter_application_1/screens/Draftsscreen/FeedbackDraft/feedbackDraftmainpage.dart';
+import 'package:flutter_application_1/screens/Draftsscreen/MarksandResultDraft/MarksDraftMainpage.dart';
 import 'package:flutter_application_1/screens/Draftsscreen/MessageDraft/MessageDraftMainpage.dart';
 import 'package:flutter_application_1/screens/Draftsscreen/NewsDraft/NewsDraftmainpage.dart';
 import 'package:flutter_application_1/utils/theme.dart';
@@ -69,58 +71,6 @@ class _DraftmenuState extends State<Draftmenu> {
       "page": Consentdraftmainpage(),
     },
     {
-      "svg": 'assets/icons/Attendencepage_time.svg',
-      "label": "Time Tables",
-      "color": [
-        Color.fromRGBO(255, 212, 0, 0.1),
-        Color.fromRGBO(224, 186, 0, 0.1)
-      ],
-      "cardcolor": [
-        Color.fromRGBO(254, 253, 250, 1),
-        Color.fromRGBO(254, 253, 250, 1),
-      ],
-      "page": '',
-    },
-    {
-      "svg": 'assets/icons/Attendancepage_homework.svg',
-      "label": "Homeworks",
-      "color": [
-        Color.fromRGBO(230, 1, 84, 0.1),
-        Color.fromRGBO(223, 0, 81, 0.1)
-      ],
-      "cardcolor": [
-        Color.fromRGBO(254, 250, 251, 1),
-        Color.fromRGBO(254, 250, 251, 1),
-      ],
-      "page": '',
-    },
-    {
-      "svg": 'assets/icons/Attendencepage_examhomework.svg',
-      "label": "Exam\n Timetables",
-      "color": [
-        Color.fromRGBO(105, 57, 184, 0.1),
-        Color.fromRGBO(57, 0, 149, 0.1)
-      ],
-      "cardcolor": [
-        Color.fromRGBO(251, 250, 253, 1),
-        Color.fromRGBO(251, 250, 253, 1),
-      ],
-      "page": '',
-    },
-    {
-      "svg": 'assets/icons/Attendencepage_book.svg',
-      "label": "Study\n Materials",
-      "color": [
-        Color.fromRGBO(31, 115, 194, 0.1),
-        Color.fromRGBO(0, 78, 152, 0.1)
-      ],
-      "cardcolor": [
-        Color.fromRGBO(250, 251, 253, 1),
-        Color.fromRGBO(250, 251, 253, 1)
-      ],
-      "page": '',
-    },
-    {
       "svg": 'assets/icons/Attendencepage_audit.svg',
       "label": "Marks /\n Results",
       "color": [
@@ -131,7 +81,7 @@ class _DraftmenuState extends State<Draftmenu> {
         Color.fromRGBO(250, 251, 252, 1),
         Color.fromRGBO(250, 251, 252, 1),
       ],
-      "page": '',
+      "page": Marksdraftmainpage(),
     },
     {
       "svg": 'assets/icons/Attendencepage_comment.svg',
@@ -144,9 +94,10 @@ class _DraftmenuState extends State<Draftmenu> {
         Color.fromRGBO(254, 251, 250, 1),
         Color.fromRGBO(254, 251, 250, 1),
       ],
-      "page": '',
+      "page": Feedbackdraftmainpage(),
     },
   ];
+  //
   @override
   Widget build(BuildContext context) {
     return Scaffold(

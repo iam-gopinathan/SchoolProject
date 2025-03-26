@@ -29,9 +29,13 @@ Future<void> CreateFeedbackss(
     );
 
     if (response.statusCode == 200) {
+      String message = feedbackModel.status == 'post'
+          ? 'Feedback Created Successfully!'
+          : 'Feedback Saved as Draft!';
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Feedback Created successfully!'),
+          content: Text(message),
           backgroundColor: Colors.green,
         ),
       );
@@ -44,8 +48,10 @@ Future<void> CreateFeedbackss(
       //
       Navigator.pop(context);
       //
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => MyquestionsPage()));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => MyquestionsPage()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Failed to create Feedback. Please try again.'),

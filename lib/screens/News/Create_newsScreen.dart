@@ -102,6 +102,15 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                   style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
               )),
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: Colors.black,
+                dialBackgroundColor: Colors.grey[900],
+                hourMinuteColor: Colors.white10,
+                hourMinuteTextColor: Colors.white,
+                entryModeIconColor: Colors.white,
+                dayPeriodColor: AppTheme.textFieldborderColor,
+                dayPeriodTextColor: Colors.white,
+              ),
             ),
             child: child!,
           );
@@ -111,6 +120,21 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
       final DateTime now = DateTime.now();
       final DateTime parsedTime = DateTime(
           now.year, now.month, now.day, pickedTime.hour, pickedTime.minute);
+      //
+      // Check if the selected time is in the past
+      if (parsedTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please select Future Time!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _dateTime = '';
+        });
+
+        return;
+      }
 
       setState(() {
         _dateTime += " ${_timeFormat.format(parsedTime)}";
@@ -390,7 +414,6 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                   ),
                                 ],
                               ),
-
                               // **Image Section**
                               Padding(
                                 padding: const EdgeInsets.only(top: 15),
@@ -755,74 +778,85 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(top: 5),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                QuillSimpleToolbar(
-                                  controller: _controller,
-                                  configurations:
-                                      const QuillSimpleToolbarConfigurations(
-                                    dialogTheme: QuillDialogTheme(
-                                        labelTextStyle:
-                                            TextStyle(color: Colors.black),
-                                        inputTextStyle: TextStyle(
-                                            color: Colors.black, fontSize: 14)),
-                                    showBoldButton: true,
-                                    showClipboardCopy: false,
-                                    showClearFormat: false,
-                                    showAlignmentButtons: false,
-                                    showBackgroundColorButton: false,
-                                    showFontSize: false,
-                                    showColorButton: false,
-                                    showCenterAlignment: false,
-                                    showClipboardCut: false,
-                                    showIndent: false,
-                                    showDirection: false,
-                                    showDividers: false,
-                                    showFontFamily: false,
-                                    showItalicButton: false,
-                                    showClipboardPaste: false,
-                                    showInlineCode: false,
-                                    showCodeBlock: false,
-                                    showHeaderStyle: false,
-                                    showJustifyAlignment: false,
-                                    showLeftAlignment: false,
-                                    showLineHeightButton: false,
-                                    showLink: false,
-                                    showListBullets: false,
-                                    showListCheck: false,
-                                    showListNumbers: false,
-                                    showQuote: false,
-                                    showRightAlignment: false,
-                                    showSearchButton: false,
-                                    showRedo: false,
-                                    showSmallButton: false,
-                                    showSubscript: false,
-                                    showStrikeThrough: false,
-                                    showUndo: false,
-                                    showUnderLineButton: false,
-                                    showSuperscript: false,
+                            padding: const EdgeInsets.only(top: 0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border(
+                                      bottom: BorderSide(
+                                          color: const Color.fromRGBO(
+                                              225, 225, 225, 1),
+                                          width: 1))),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  QuillSimpleToolbar(
+                                    controller: _controller,
+                                    configurations:
+                                        const QuillSimpleToolbarConfigurations(
+                                      dialogTheme: QuillDialogTheme(
+                                          labelTextStyle:
+                                              TextStyle(color: Colors.black),
+                                          inputTextStyle: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14)),
+                                      showBoldButton: true,
+                                      showClipboardCopy: false,
+                                      showClearFormat: false,
+                                      showAlignmentButtons: false,
+                                      showBackgroundColorButton: false,
+                                      showFontSize: false,
+                                      showColorButton: false,
+                                      showCenterAlignment: false,
+                                      showClipboardCut: false,
+                                      showIndent: false,
+                                      showDirection: false,
+                                      showDividers: false,
+                                      showFontFamily: false,
+                                      showItalicButton: false,
+                                      showClipboardPaste: false,
+                                      showInlineCode: false,
+                                      showCodeBlock: false,
+                                      showHeaderStyle: false,
+                                      showJustifyAlignment: false,
+                                      showLeftAlignment: false,
+                                      showLineHeightButton: false,
+                                      showLink: false,
+                                      showListBullets: false,
+                                      showListCheck: false,
+                                      showListNumbers: false,
+                                      showQuote: false,
+                                      showRightAlignment: false,
+                                      showSearchButton: false,
+                                      showRedo: false,
+                                      showSmallButton: false,
+                                      showSubscript: false,
+                                      showStrikeThrough: false,
+                                      showUndo: false,
+                                      showUnderLineButton: false,
+                                      showSuperscript: false,
+                                    ),
                                   ),
-                                ),
-                                IconButton(
-                                    icon:
-                                        Icon(Icons.paste, color: Colors.black),
-                                    onPressed: () {
-                                      setState(() {
-                                        _pasteFromClipboard();
-                                      });
-                                    }),
-                              ],
+                                  IconButton(
+                                      icon: Icon(Icons.paste,
+                                          color: Colors.black),
+                                      onPressed: () {
+                                        setState(() {
+                                          _pasteFromClipboard();
+                                        });
+                                      }),
+                                ],
+                              ),
                             ),
                           ),
                           // Quill editor
                           Container(
                             child: Padding(
-                              padding: const EdgeInsets.all(10),
+                              padding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.025),
                               child: Padding(
                                 padding:
-                                    const EdgeInsets.only(top: 5, bottom: 10),
+                                    const EdgeInsets.only(top: 5, bottom: 20),
                                 child: quill.QuillEditor.basic(
                                   controller: _controller,
                                   configurations: QuillEditorConfigurations(
@@ -1398,11 +1432,11 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                                 color: Colors.black),
                           ),
                   ),
-
                 ////request now button..
                 if (UserSession().userType == 'admin' ||
                     UserSession().userType == 'staff')
                   Builder(builder: (context) {
+                    bool isload = false;
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(horizontal: 20),
@@ -1421,66 +1455,276 @@ class _CreateNewsscreenState extends State<CreateNewsscreen> {
                           );
                           return;
                         }
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (BuildContext dialogContext) {
+                        //     return StatefulBuilder(
+                        //         builder: (context, setState) {
+                        //       return AlertDialog(
+                        //         backgroundColor: Colors.white,
+                        //         title: Text(
+                        //           "Confirm Request !",
+                        //           style: TextStyle(
+                        //             fontFamily: 'semibold',
+                        //             fontSize: 18,
+                        //             color: Colors.black,
+                        //           ),
+                        //           textAlign: TextAlign.center,
+                        //         ),
+                        //         content: Text(
+                        //           "Are you sure you want to create\n a new request?",
+                        //           style: TextStyle(
+                        //               fontFamily: 'regular',
+                        //               fontSize: 16,
+                        //               color: Colors.black),
+                        //           textAlign: TextAlign.center,
+                        //         ),
+                        //         actions: [
+                        //           ElevatedButton(
+                        //             style: ElevatedButton.styleFrom(
+                        //               backgroundColor: Colors.white,
+                        //               side: BorderSide(
+                        //                   color: Colors.black, width: 1),
+                        //             ),
+                        //             onPressed: () {
+                        //               Navigator.of(context).pop();
+                        //             },
+                        //             child: Text(
+                        //               "Cancel",
+                        //               style: TextStyle(
+                        //                   fontFamily: 'semibold',
+                        //                   fontSize: 14,
+                        //                   color: Colors.black),
+                        //             ),
+                        //           ),
+                        //           // ElevatedButton(
+                        //           //   style: ElevatedButton.styleFrom(
+                        //           //       backgroundColor: Colors.amber),
+                        //           //   onPressed: () {
+                        //           //     final String status =
+                        //           //         _scheduledDateandtime.text.isEmpty
+                        //           //             ? 'post'
+                        //           //             : 'schedule';
+                        //           //     _publishNews(status: status);
+                        //           //     //
+                        //           //     Navigator.of(context).pop();
+                        //           //   },
+                        //           //   child: Text(
+                        //           //     "Yes Send",
+                        //           //     style: TextStyle(
+                        //           //         fontFamily: 'semibold',
+                        //           //         fontSize: 14,
+                        //           //         color: Colors.black),
+                        //           //   ),
+                        //           // ),
+                        //           ElevatedButton(
+                        //             style: ElevatedButton.styleFrom(
+                        //               backgroundColor: isload
+                        //                   ? Colors.grey
+                        //                   : Colors
+                        //                       .amber, // Disable color when loading
+                        //             ),
+                        //             onPressed: isload
+                        //                 ? null // Disable button while loading
+                        //                 : () async {
+                        //                     setState(() {
+                        //                       isload = true; // Show loader
+                        //                     });
+
+                        //                     final String status =
+                        //                         _scheduledDateandtime
+                        //                                 .text.isEmpty
+                        //                             ? 'post'
+                        //                             : 'schedule';
+
+                        //                     await _publishNews(
+                        //                         status:
+                        //                             status); // Wait for API call to complete
+
+                        //                     setState(() {
+                        //                       isload = false; // Hide loader
+                        //                     });
+
+                        //                      Navigator.of(context).pop();
+                        //                   },
+                        //             child: isload
+                        //                 ? SizedBox(
+                        //                     width: 20,
+                        //                     height: 20,
+                        //                     child: CircularProgressIndicator(
+                        //                       color: AppTheme
+                        //                           .appBackgroundPrimaryColor,
+                        //                       strokeWidth: 4,
+                        //                     ),
+                        //                   )
+                        //                 : Text(
+                        //                     "Yes Send",
+                        //                     style: TextStyle(
+                        //                       fontFamily: 'semibold',
+                        //                       fontSize: 14,
+                        //                       color: Colors.black,
+                        //                     ),
+                        //                   ),
+                        //           ),
+                        //         ],
+                        //       );
+                        //     });
+                        //   },
+                        // );
                         showDialog(
                           context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              backgroundColor: Colors.white,
-                              title: Text(
-                                "Confirm Request !",
-                                style: TextStyle(
-                                  fontFamily: 'semibold',
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              content: Text(
-                                "Are you sure you want to create a new request?",
-                                style: TextStyle(
-                                    fontFamily: 'regular',
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                              actions: [
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.white,
-                                    side: BorderSide(
-                                        color: Colors.black, width: 1),
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(
-                                    "Cancel",
+                          builder: (BuildContext dialogContext) {
+                            return StatefulBuilder(
+                              builder: (context, setModalState) {
+                                // Use setModalState
+                                return AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  title: Text(
+                                    "Confirm Request !",
                                     style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 14,
-                                        color: Colors.black),
+                                      fontFamily: 'semibold',
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.amber),
-                                  onPressed: () {
-                                    final String status =
-                                        _scheduledDateandtime.text.isEmpty
-                                            ? 'post'
-                                            : 'schedule';
-                                    _publishNews(status: status);
-                                    //
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: Text(
-                                    "Yes Send",
+                                  content: Text(
+                                    "Are you sure you want to create\n a new request?",
                                     style: TextStyle(
-                                        fontFamily: 'semibold',
-                                        fontSize: 14,
+                                        fontFamily: 'regular',
+                                        fontSize: 16,
                                         color: Colors.black),
+                                    textAlign: TextAlign.center,
                                   ),
-                                ),
-                              ],
+                                  actions: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: Colors.white,
+                                        side: BorderSide(
+                                            color: Colors.black, width: 1),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: Text(
+                                        "Cancel",
+                                        style: TextStyle(
+                                            fontFamily: 'semibold',
+                                            fontSize: 14,
+                                            color: Colors.black),
+                                      ),
+                                    ),
+                                    // ElevatedButton(
+                                    //   style: ElevatedButton.styleFrom(
+                                    //     elevation: 0,
+                                    //     backgroundColor: isload
+                                    //         ? Colors.grey
+                                    //         : AppTheme.textFieldborderColor,
+                                    //   ),
+                                    //   onPressed: isload
+                                    //       ? null
+                                    //       : () async {
+                                    //           setModalState(() {
+                                    //             isload = true;
+                                    //           });
+
+                                    //           final String status =
+                                    //               _scheduledDateandtime
+                                    //                       .text.isEmpty
+                                    //                   ? 'post'
+                                    //                   : 'schedule';
+
+                                    //           await _publishNews(
+                                    //               status: status);
+
+                                    //           setModalState(() {
+                                    //             isload = false;
+                                    //           });
+
+                                    //           Navigator.of(context).pop();
+                                    //         },
+                                    //   child: isload
+                                    //       ? SizedBox(
+                                    //           width: 20,
+                                    //           height: 20,
+                                    //           child: CircularProgressIndicator(
+                                    //             color: AppTheme
+                                    //                 .appBackgroundPrimaryColor,
+                                    //             strokeWidth: 4,
+                                    //           ),
+                                    //         )
+                                    //       : Text(
+                                    //           "Yes Send",
+                                    //           style: TextStyle(
+                                    //             fontFamily: 'semibold',
+                                    //             fontSize: 14,
+                                    //             color: Colors.black,
+                                    //           ),
+                                    //         ),
+                                    // ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 0,
+                                        backgroundColor: isload
+                                            ? Colors.grey
+                                            : AppTheme.textFieldborderColor,
+                                      ),
+                                      onPressed: isload
+                                          ? null
+                                          : () async {
+                                              setModalState(() {
+                                                isload = true; // Show loader
+                                              });
+
+                                              await Future.delayed(Duration(
+                                                  seconds:
+                                                      2)); // Allow UI update
+
+                                              final String status =
+                                                  _scheduledDateandtime
+                                                          .text.isEmpty
+                                                      ? 'post'
+                                                      : 'schedule';
+
+                                              await _publishNews(
+                                                  status: status); // API Call
+
+                                              setModalState(() {
+                                                isload = false; // Hide loader
+                                              });
+
+                                              await Future.delayed(Duration(
+                                                  seconds:
+                                                      2)); // Small delay for smooth transition
+
+                                              if (context.mounted) {
+                                                Navigator.of(context)
+                                                    .pop(); // Close dialog only after loader update
+                                              }
+                                            },
+                                      child: isload
+                                          ? SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                color: AppTheme
+                                                    .appBackgroundPrimaryColor,
+                                                strokeWidth: 4,
+                                              ),
+                                            )
+                                          : Text(
+                                              "Yes Send",
+                                              style: TextStyle(
+                                                fontFamily: 'semibold',
+                                                fontSize: 14,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           },
                         );

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/models/DraftModels/news_fetch_draft_model.dart';
 import 'package:flutter_application_1/screens/Draftsscreen/NewsDraft/EditNewsDraft.dart';
-
+import 'package:flutter_application_1/services/Draft_Api/news_fetch_draft_api.dart';
+import 'package:flutter_application_1/user_Session.dart';
+import 'package:flutter_application_1/utils/Api_Endpoints.dart';
 import 'package:flutter_application_1/utils/theme.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
@@ -21,6 +25,8 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
   @override
   void initState() {
     super.initState();
+
+    _fetchdraft();
 
     _scrollController.addListener(_scrollListener);
   }
@@ -71,6 +77,43 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
   }
 
   //selected date end
+
+  //
+  List<NewsData> draftNews = []; // Store fetched data
+
+  Future<void> _fetchdraft() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      NewsDraftApi newsApi = NewsDraftApi();
+      NewsFetchDraftModel? response = await newsApi.fetchNews(
+        rollNumber: UserSession().rollNumber ?? '',
+        userType: UserSession().userType ?? '',
+        date: selectedDate,
+      );
+
+      if (response != null) {
+        setState(() {
+          draftNews = response.data;
+          isLoading = false;
+        });
+        print("News fetched successfully!");
+      } else {
+        print("Failed to fetch news.");
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("Error fetching draft news: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+  //
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,7 +159,7 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'News',
+                                'News Draft',
                                 style: TextStyle(
                                   fontFamily: 'semibold',
                                   fontSize: 16,
@@ -134,7 +177,7 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
                                   setState(() {
                                     isLoading = true;
                                   });
-
+                                  await _fetchdraft();
                                   setState(() {
                                     isLoading = false;
                                   });
@@ -209,7 +252,7 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
                                                   fontSize: 16,
                                                   fontFamily: 'regular'),
                                             )),
-                                        //edit...
+                                        //delete...
                                         Padding(
                                           padding: EdgeInsets.only(
                                             left: MediaQuery.of(context)
@@ -225,7 +268,104 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
                                                     .textFieldborderColor,
                                                 elevation: 0,
                                               ),
-                                              onPressed: () {
+                                              onPressed: () async {
+                                                //
+                                                Future<void> deleteAllDraft(
+                                                    {required String rollNumber,
+                                                    required String
+                                                        module}) async {
+                                                  // API Endpoint
+                                                  String url =
+                                                      "https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeNews/DeleteAllDraft";
+
+                                                  // Parameters
+                                                  final Map<String, String>
+                                                      queryParams = {
+                                                    "RollNumber": UserSession()
+                                                            .rollNumber ??
+                                                        '',
+                                                    "Module": 'news',
+                                                  };
+
+                                                  // Construct the final URL with query parameters
+                                                  final Uri uri = Uri.parse(url)
+                                                      .replace(
+                                                          queryParameters:
+                                                              queryParams);
+
+                                                  try {
+                                                    final response =
+                                                        await http.delete(
+                                                      uri,
+                                                      headers: {
+                                                        "Authorization":
+                                                            "Bearer $authToken",
+                                                        "Content-Type":
+                                                            "application/json",
+                                                      },
+                                                    );
+
+                                                    if (response.statusCode ==
+                                                        200) {
+                                                      print(
+                                                          "Response Status Code: ${response.statusCode}");
+                                                      print(
+                                                          "Response Body: ${response.body}");
+                                                      // Show success Snackbar
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              "Draft news deleted successfully!"),
+                                                          backgroundColor:
+                                                              Colors.green,
+                                                        ),
+                                                      );
+                                                      print(
+                                                          "Draft news deleted successfully!");
+                                                    } else {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              "Failed to delete draft news. Try again."),
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                        ),
+                                                      );
+                                                      print(
+                                                          "Failed to delete draft news. Status: ${response.statusCode}");
+                                                      print(
+                                                          "Response: ${response.body}");
+                                                    }
+                                                  } catch (e) {
+                                                    // Show error Snackbar
+                                                    ScaffoldMessenger.of(
+                                                            context)
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            "Error deleting draft news: $e"),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                    print(
+                                                        "Error deleting draft news: $e");
+                                                  }
+                                                }
+
+                                                //
+                                                await deleteAllDraft(
+                                                    rollNumber: UserSession()
+                                                        .rollNumber
+                                                        .toString(),
+                                                    module: 'news');
+
+                                                await _fetchdraft();
+
                                                 Navigator.pop(context);
                                               },
                                               child: Text(
@@ -290,451 +430,663 @@ class _NewsdraftmainpageState extends State<Newsdraftmainpage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width * 0.07,
-                top: MediaQuery.of(context).size.height * 0.02,
-              ),
-              child: Row(
-                children: [
-                  Text(
-                    'Drafted on : 14.11.2024 | Tuesday',
+      body: isLoading
+          ? Center(
+              child: CircularProgressIndicator(
+              strokeWidth: 4,
+              color: AppTheme.textFieldborderColor,
+            ))
+          : draftNews.isEmpty
+              ? Center(
+                  child: Text(
+                    "No draft news available!",
                     style: TextStyle(
-                        fontFamily: 'regular',
-                        fontSize: 12,
-                        color: Colors.black),
-                  ),
-                ],
-              ),
-            ),
-            //
-            Padding(
-              padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.03),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: Color.fromRGBO(238, 238, 238, 1),
+                      fontSize: 22,
+                      fontFamily: 'regular',
+                      color: Color.fromRGBO(145, 145, 145, 1),
                     ),
-                    borderRadius: BorderRadius.circular(15)),
-                elevation: 0,
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Color.fromRGBO(238, 238, 238, 1),
-                      ),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15)),
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 7),
-                            child: Container(
-                              width: MediaQuery.of(context).size.width * 0.8,
-                              child: Text(
-                                '{news.headline ?? ' '}',
-                                style: TextStyle(
-                                    fontFamily: 'semibold',
-                                    fontSize: 16,
-                                    color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10),
-                        child: Divider(
-                          thickness: 2,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
-                      ),
-
-                      ///textparagraph...
-                      Row(
-                        children: [
-                          // Container(
-                          //   width: MediaQuery.of(context).size.width * 0.8,
-                          //   child: news.news != null && news.news!.isNotEmpty
-                          //       ? Html(
-                          //           data: '${news.news}',
-                          //           style: {
-                          //             "body": Style(
-                          //                 color: Colors.black,
-                          //                 fontFamily: 'semibold',
-                          //                 fontSize: FontSize(16),
-                          //                 textAlign: TextAlign.justify),
-                          //           },
-                          //         )
-                          //       : const Text(''),
-                          // ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.02,
-                      ),
-                      //image....
-                      // if (news.filePath?.isNotEmpty ?? false)
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          //image
-                          SizedBox(
-                            height: 250,
-                            width: double.infinity,
-                            child: Opacity(
-                              opacity: 0.5,
-                              child: Image.network(
-                                '{news.filePath}',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          //video
-                          // if (news.fileType == 'link')
-                          SizedBox(
-                            height: 250,
-                            width: double.infinity,
-                            child: YoutubePlayer(
-                              progressIndicatorColor:
-                                  AppTheme.textFieldborderColor,
-                              controller: YoutubePlayerController(
-                                // initialVideoId:
-                                //     YoutubePlayer.convertUrlToId(
-                                //             news.filePath ?? '')
-                                //         .toString(),
-                                initialVideoId: '',
-                                flags: YoutubePlayerFlags(
-                                  autoPlay: false,
-                                  mute: false,
-                                ),
-                              ),
-                              showVideoProgressIndicator: true,
-                              width: 150,
-                              aspectRatio: 16 / 9,
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
-                                borderRadius: BorderRadius.circular(10)),
-                            height: 250,
-                            width: double.infinity,
-                          ),
-                          // Centered Text
-                          Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                //imagepath
-                                // String? imagePath = news.filePath;
-                                //videopath
-                                // String videopath = news.filePath.toString();
-
-                                // if (news.fileType == 'image') {
-                                //   _showBottomSheet(context, imagePath, null);
-                                // } else if (news.fileType == 'link') {
-                                //   // _showBottomSheet(
-                                //   //     context,
-                                //   //     null,
-                                //   //     videopath);
-                                //   // Navigate to VideoScreen when clicked
-                                //   Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //       builder: (context) =>
-                                //           VideoScreen(videoUrl: videopath),
-                                //     ),
-                                //   );
-                                // }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.transparent,
-                                  border: Border.all(
-                                      color: Colors.white, width: 1.5),
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                                child: Text(
-                                  '',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontFamily: 'semibold',
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      //
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.005,
-                        ),
-                        child: Divider(
-                          thickness: 1,
-                          color: Color.fromRGBO(243, 243, 243, 1),
-                        ),
-                      ),
-                      //
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height * 0.02,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: draftNews.length,
+                      itemBuilder: (context, index) {
+                        NewsData newsItem = draftNews[index];
+                        return Column(
                           children: [
-                            //
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      content: Text(
-                                        "Do you really want to make\n changes to this News?,",
-                                        style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      actions: <Widget>[
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    elevation: 0,
-                                                    side: BorderSide(
-                                                        color: Colors.black,
-                                                        width: 1)),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontFamily: 'regular'),
-                                                )),
-                                            //edit...
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                left: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.025,
-                                              ),
-                                              child: ElevatedButton(
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 40),
-                                                    backgroundColor: AppTheme
-                                                        .textFieldborderColor,
-                                                    elevation: 0,
-                                                  ),
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                    Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) =>
-                                                                Editnewsdraft()));
-                                                  },
-                                                  child: Text(
-                                                    'Edit',
-                                                    style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 16,
-                                                        fontFamily: 'regular'),
-                                                  )),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: Padding(
-                                padding: EdgeInsets.only(
-                                  right:
-                                      MediaQuery.of(context).size.width * 0.025,
-                                ),
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 15),
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: Colors.black)),
+                            Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: MediaQuery.of(context).size.width *
+                                        0.07,
+                                    top: MediaQuery.of(context).size.height *
+                                        0.02,
+                                  ),
                                   child: Row(
                                     children: [
-                                      Icon(
-                                        Icons.edit,
-                                        color: Colors.black,
-                                      ),
                                       Text(
-                                        'Edit',
+                                        'Drafted on : ${newsItem.postedOnDate} | ${newsItem.postedOnDay}',
                                         style: TextStyle(
-                                            fontFamily: 'medium',
+                                            fontFamily: 'regular',
                                             fontSize: 12,
                                             color: Colors.black),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ),
-                            ),
-
-                            //delete icon
-                            GestureDetector(
-                              onTap: () {
-                                // final int newsId = news.id;
-
-                                showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      backgroundColor: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      content: Text(
-                                        "Are you sure you want to delete\n this news?",
-                                        style: TextStyle(
-                                            fontFamily: 'regular',
-                                            fontSize: 16,
-                                            color: Colors.black),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                      actions: <Widget>[
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    elevation: 0,
-                                                    side: BorderSide(
-                                                        color: Colors.black,
-                                                        width: 1)),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  'Cancel',
-                                                  style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 16,
-                                                      fontFamily: 'regular'),
-                                                )),
-                                            //delete...
-                                            Padding(
-                                              padding: EdgeInsets.only(
-                                                left: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.025,
+                                //card section
+                                ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: newsItem.news.length,
+                                    itemBuilder: (context, subIndex) {
+                                      NewsItem newsDetail =
+                                          newsItem.news[subIndex];
+                                      return Padding(
+                                        padding: EdgeInsets.all(
+                                            MediaQuery.of(context).size.width *
+                                                0.03),
+                                        child: Card(
+                                          shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                color: Color.fromRGBO(
+                                                    238, 238, 238, 1),
                                               ),
-                                              child: ElevatedButton(
-                                                onPressed: () {},
-                                                style: ElevatedButton.styleFrom(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 40),
-                                                  backgroundColor: AppTheme
-                                                      .textFieldborderColor,
-                                                  elevation: 0,
+                                              borderRadius:
+                                                  BorderRadius.circular(15)),
+                                          elevation: 0,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Color.fromRGBO(
+                                                      238, 238, 238, 1),
                                                 ),
-                                                child: isDeleting
-                                                    ? CircularProgressIndicator(
-                                                        color: Colors.white,
-                                                        strokeWidth: 4.0,
-                                                      )
-                                                    : Text(
-                                                        'Delete',
-                                                        style: TextStyle(
-                                                            color: Colors.black,
-                                                            fontSize: 16,
-                                                            fontFamily:
-                                                                'regular'),
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(15)),
+                                            padding: EdgeInsets.all(10),
+                                            child: Column(
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.only(
+                                                              left: 7),
+                                                      child: Container(
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.8,
+                                                        child: Text(
+                                                          '${newsDetail.headLine ?? ' '}',
+                                                          style: TextStyle(
+                                                              fontFamily:
+                                                                  'semibold',
+                                                              fontSize: 16,
+                                                              color:
+                                                                  Colors.black),
+                                                        ),
                                                       ),
-                                              ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 10),
+                                                  child: Divider(
+                                                    thickness: 2,
+                                                    color: Color.fromRGBO(
+                                                        243, 243, 243, 1),
+                                                  ),
+                                                ),
+
+                                                ///textparagraph...
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              0.8,
+                                                      child: newsDetail.news !=
+                                                                  null &&
+                                                              newsDetail.news!
+                                                                  .isNotEmpty
+                                                          ? Html(
+                                                              data:
+                                                                  '${newsDetail.news}',
+                                                              style: {
+                                                                "body": Style(
+                                                                    color: Colors
+                                                                        .black,
+                                                                    fontFamily:
+                                                                        'semibold',
+                                                                    fontSize:
+                                                                        FontSize(
+                                                                            16),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .justify),
+                                                              },
+                                                            )
+                                                          : const Text(''),
+                                                    ),
+                                                  ],
+                                                ),
+                                                SizedBox(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.02,
+                                                ),
+                                                // image....
+                                                if (newsDetail
+                                                        .filePath?.isNotEmpty ??
+                                                    false)
+                                                  Stack(
+                                                    alignment: Alignment.center,
+                                                    children: [
+                                                      //image
+                                                      SizedBox(
+                                                        height: 250,
+                                                        width: double.infinity,
+                                                        child: Opacity(
+                                                          opacity: 0.5,
+                                                          child: Image.network(
+                                                            '${newsDetail.filePath}',
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      //video
+                                                      if (newsDetail.fileType ==
+                                                          'link')
+                                                        SizedBox(
+                                                          height: 250,
+                                                          width:
+                                                              double.infinity,
+                                                          child: YoutubePlayer(
+                                                            progressIndicatorColor:
+                                                                AppTheme
+                                                                    .textFieldborderColor,
+                                                            controller:
+                                                                YoutubePlayerController(
+                                                              initialVideoId:
+                                                                  YoutubePlayer.convertUrlToId(
+                                                                          newsDetail.filePath ??
+                                                                              '')
+                                                                      .toString(),
+                                                              flags:
+                                                                  YoutubePlayerFlags(
+                                                                autoPlay: false,
+                                                                mute: false,
+                                                              ),
+                                                            ),
+                                                            showVideoProgressIndicator:
+                                                                true,
+                                                            width: 150,
+                                                            aspectRatio: 16 / 9,
+                                                          ),
+                                                        ),
+                                                      Container(
+                                                        decoration: BoxDecoration(
+                                                            color: Colors.black
+                                                                .withOpacity(
+                                                                    0.6),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        height: 250,
+                                                        width: double.infinity,
+                                                      ),
+                                                      // Centered Text
+                                                      Center(
+                                                        child: GestureDetector(
+                                                          onTap: () {
+                                                            // imagepath
+                                                            String? imagePath =
+                                                                newsDetail
+                                                                    .filePath;
+                                                            //videopath
+                                                            String videopath =
+                                                                newsDetail
+                                                                    .filePath
+                                                                    .toString();
+
+                                                            if (newsDetail
+                                                                    .fileType ==
+                                                                'image') {
+                                                              _showBottomSheet(
+                                                                  context,
+                                                                  imagePath,
+                                                                  null);
+                                                            } else if (newsDetail
+                                                                    .fileType ==
+                                                                'link') {
+                                                              // Navigate to VideoScreen when clicked
+                                                              Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                  builder: (context) =>
+                                                                      VideoScreen(
+                                                                          videoUrl:
+                                                                              videopath),
+                                                                ),
+                                                              );
+                                                            }
+                                                          },
+                                                          child: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    horizontal:
+                                                                        20,
+                                                                    vertical:
+                                                                        5),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors
+                                                                  .transparent,
+                                                              border: Border.all(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  width: 1.5),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          30),
+                                                            ),
+                                                            child: Text(
+                                                              newsDetail.fileType ==
+                                                                      'image'
+                                                                  ? 'View Image'
+                                                                  : newsDetail.fileType ==
+                                                                          'link'
+                                                                      ? 'View Video'
+                                                                      : '',
+                                                              style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 14,
+                                                                fontFamily:
+                                                                    'semibold',
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                //
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    top: MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                        0.005,
+                                                  ),
+                                                  child: Divider(
+                                                    thickness: 1,
+                                                    color: Color.fromRGBO(
+                                                        243, 243, 243, 1),
+                                                  ),
+                                                ),
+                                                //
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    top: MediaQuery.of(context)
+                                                            .size
+                                                            .height *
+                                                        0.02,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      //
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          showDialog(
+                                                            barrierDismissible:
+                                                                false,
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return AlertDialog(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10)),
+                                                                content: Text(
+                                                                  "Do you really want to make\n changes to this News?,",
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: Colors
+                                                                          .black),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                                actions: <Widget>[
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      ElevatedButton(
+                                                                          style: ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              elevation: 0,
+                                                                              side: BorderSide(color: Colors.black, width: 1)),
+                                                                          onPressed: () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Text(
+                                                                            'Cancel',
+                                                                            style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 16,
+                                                                                fontFamily: 'regular'),
+                                                                          )),
+                                                                      //edit...
+                                                                      Padding(
+                                                                        padding:
+                                                                            EdgeInsets.only(
+                                                                          left: MediaQuery.of(context).size.width *
+                                                                              0.025,
+                                                                        ),
+                                                                        child: ElevatedButton(
+                                                                            style: ElevatedButton.styleFrom(
+                                                                              padding: EdgeInsets.symmetric(horizontal: 40),
+                                                                              backgroundColor: AppTheme.textFieldborderColor,
+                                                                              elevation: 0,
+                                                                            ),
+                                                                            onPressed: () {
+                                                                              Navigator.pop(context);
+                                                                              Navigator.push(context, MaterialPageRoute(builder: (context) => Editnewsdraft()));
+                                                                            },
+                                                                            child: Text(
+                                                                              'Edit',
+                                                                              style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                            )),
+                                                                      )
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            right: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.025,
+                                                          ),
+                                                          child: Container(
+                                                            padding: EdgeInsets
+                                                                .symmetric(
+                                                                    vertical: 5,
+                                                                    horizontal:
+                                                                        15),
+                                                            decoration: BoxDecoration(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            20),
+                                                                border: Border.all(
+                                                                    color: Colors
+                                                                        .black)),
+                                                            child: Row(
+                                                              children: [
+                                                                Icon(
+                                                                  Icons.edit,
+                                                                  color: Colors
+                                                                      .black,
+                                                                ),
+                                                                Text(
+                                                                  'Edit',
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'medium',
+                                                                      fontSize:
+                                                                          12,
+                                                                      color: Colors
+                                                                          .black),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      //delete icon
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          final int newsId =
+                                                              newsDetail.id;
+
+                                                          showDialog(
+                                                            barrierDismissible:
+                                                                false,
+                                                            context: context,
+                                                            builder:
+                                                                (BuildContext
+                                                                    context) {
+                                                              return AlertDialog(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10)),
+                                                                content: Text(
+                                                                  "Are you sure you want to delete\n this news?",
+                                                                  style: TextStyle(
+                                                                      fontFamily:
+                                                                          'regular',
+                                                                      fontSize:
+                                                                          16,
+                                                                      color: Colors
+                                                                          .black),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                                actions: <Widget>[
+                                                                  Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .center,
+                                                                    children: [
+                                                                      ElevatedButton(
+                                                                          style: ElevatedButton.styleFrom(
+                                                                              backgroundColor: Colors.white,
+                                                                              elevation: 0,
+                                                                              side: BorderSide(color: Colors.black, width: 1)),
+                                                                          onPressed: () {
+                                                                            Navigator.pop(context);
+                                                                          },
+                                                                          child: Text(
+                                                                            'Cancel',
+                                                                            style: TextStyle(
+                                                                                color: Colors.black,
+                                                                                fontSize: 16,
+                                                                                fontFamily: 'regular'),
+                                                                          )),
+                                                                      //delete...
+                                                                      Padding(
+                                                                        padding:
+                                                                            EdgeInsets.only(
+                                                                          left: MediaQuery.of(context).size.width *
+                                                                              0.025,
+                                                                        ),
+                                                                        child:
+                                                                            ElevatedButton(
+                                                                          style:
+                                                                              ElevatedButton.styleFrom(
+                                                                            padding:
+                                                                                EdgeInsets.symmetric(horizontal: 40),
+                                                                            backgroundColor:
+                                                                                AppTheme.textFieldborderColor,
+                                                                            elevation:
+                                                                                0,
+                                                                          ),
+                                                                          onPressed: isDeleting
+                                                                              ? null
+                                                                              : () async {
+                                                                                  try {
+                                                                                    setState(() {
+                                                                                      isDeleting = true;
+                                                                                    });
+                                                                                    final response = await http.delete(
+                                                                                      Uri.parse('https://schoolcommunication-gmdtekepd3g3ffb9.canadacentral-01.azurewebsites.net/api/changeNews/DeleteNews?Id=$newsId&RollNumber=${UserSession().rollNumber}&UserType=${UserSession().userType ?? ''}'),
+                                                                                      headers: {
+                                                                                        'Authorization': 'Bearer $authToken',
+                                                                                        'Content-Type': 'application/json',
+                                                                                      },
+                                                                                    );
+
+                                                                                    if (response.statusCode == 200) {
+                                                                                      if (mounted) {
+                                                                                        String message = 'News item deleted successfully!';
+
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(
+                                                                                            backgroundColor: Colors.green,
+                                                                                            content: Text(message),
+                                                                                          ),
+                                                                                        );
+                                                                                      }
+                                                                                      print('News item with ID $newsId has been successfully deleted.');
+                                                                                      setState(() {});
+
+                                                                                      // Refresh the news data after deletion
+                                                                                      Navigator.pop(context);
+                                                                                      //
+                                                                                      await _fetchdraft();
+                                                                                    } else {
+                                                                                      print('Failed to delete news. Status code: ${response.statusCode}');
+                                                                                      print('Response body: ${response.body}');
+
+                                                                                      if (mounted) {
+                                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                                          SnackBar(
+                                                                                            backgroundColor: Colors.red,
+                                                                                            content: Text(
+                                                                                              'Failed to delete news item. Status code: ${response.statusCode}',
+                                                                                            ),
+                                                                                          ),
+                                                                                        );
+                                                                                      }
+                                                                                    }
+                                                                                  } catch (error) {
+                                                                                    print('Error during deletion: $error');
+                                                                                    if (mounted) {
+                                                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                                                        SnackBar(
+                                                                                          backgroundColor: Colors.red,
+                                                                                          content: Text('Error: Unable to delete news item.'),
+                                                                                        ),
+                                                                                      );
+                                                                                    }
+                                                                                  } finally {
+                                                                                    isLoading = false;
+                                                                                    _fetchdraft();
+                                                                                    setState(() {
+                                                                                      isDeleting = false;
+                                                                                    });
+
+                                                                                    Navigator.pop(context);
+                                                                                  }
+                                                                                },
+                                                                          child: isDeleting
+                                                                              ? CircularProgressIndicator(
+                                                                                  color: Colors.white,
+                                                                                  strokeWidth: 4.0,
+                                                                                )
+                                                                              : Text(
+                                                                                  'Delete',
+                                                                                  style: TextStyle(color: Colors.black, fontSize: 16, fontFamily: 'regular'),
+                                                                                ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ],
+                                                              );
+                                                            },
+                                                          );
+                                                        },
+                                                        child: SvgPicture.asset(
+                                                          'assets/icons/delete_icons.svg',
+                                                          fit: BoxFit.contain,
+                                                          height: 35,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                          ],
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                                //top arrow..
+                                if (_scrollController.hasClients &&
+                                    _scrollController.offset > 50)
+                                  Transform.translate(
+                                    offset: Offset(0, -20),
+                                    child: Column(
+                                      children: [
+                                        Container(
+                                          decoration: BoxDecoration(
+                                            color: Colors.black,
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: IconButton(
+                                            icon: Icon(
+                                              Icons.arrow_upward_outlined,
+                                              color: Colors.white,
+                                            ),
+                                            onPressed: () {
+                                              _scrollController.animateTo(
+                                                0,
+                                                duration: Duration(seconds: 1),
+                                                curve: Curves.easeInOut,
+                                              );
+                                            },
+                                          ),
                                         ),
                                       ],
-                                    );
-                                  },
-                                );
-                              },
-                              child: SvgPicture.asset(
-                                'assets/icons/delete_icons.svg',
-                                fit: BoxFit.contain,
-                                height: 35,
-                              ),
+                                    ),
+                                  )
+                              ],
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
+                        );
+                      }),
                 ),
-              ),
-            ),
-            //top arrow..
-            if (_scrollController.hasClients && _scrollController.offset > 50)
-              Transform.translate(
-                offset: Offset(0, -20),
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_upward_outlined,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          _scrollController.animateTo(
-                            0,
-                            duration: Duration(seconds: 1),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              )
-          ],
-        ),
-      ),
     );
   }
 

@@ -114,6 +114,15 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
                   style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
               )),
+              timePickerTheme: TimePickerThemeData(
+                backgroundColor: Colors.black,
+                dialBackgroundColor: Colors.grey[900],
+                hourMinuteColor: Colors.white10,
+                hourMinuteTextColor: Colors.white,
+                entryModeIconColor: Colors.white,
+                dayPeriodColor: AppTheme.textFieldborderColor,
+                dayPeriodTextColor: Colors.white,
+              ),
             ),
             child: child!,
           );
@@ -154,6 +163,21 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
       final DateTime now = DateTime.now();
       final DateTime parsedTime = DateTime(
           now.year, now.month, now.day, pickedTime.hour, pickedTime.minute);
+      //
+      // // Check if the selected time is in the past
+      if (parsedTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Please select Future Time!"),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          _dateTime = '';
+        });
+
+        return;
+      }
 
       setState(() {
         _dateTime += " ${_timeFormat.format(parsedTime)}";
@@ -921,34 +945,34 @@ class _CreateHomeworksState extends State<CreateHomeworks> {
               //         fontSize: 16, fontFamily: 'medium', color: Colors.black),
               //   ),
               // ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 15),
-                  backgroundColor: Colors.white,
-                  side: BorderSide(color: Colors.black, width: 1.5),
-                ),
-                onPressed: isdraft
-                    ? null // Disable button when loading
-                    : () {
-                        String status = "draft";
-                        submitHomework(status);
-                      },
-                child: isdraft
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                            color: AppTheme.textFieldborderColor,
-                            strokeWidth: 4),
-                      )
-                    : Text(
-                        'Save as Draft',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'medium',
-                            color: Colors.black),
-                      ),
-              ),
+              // ElevatedButton(
+              //   style: ElevatedButton.styleFrom(
+              //     padding: EdgeInsets.symmetric(horizontal: 15),
+              //     backgroundColor: Colors.white,
+              //     side: BorderSide(color: Colors.black, width: 1.5),
+              //   ),
+              //   onPressed: isdraft
+              //       ? null // Disable button when loading
+              //       : () {
+              //           String status = "draft";
+              //           submitHomework(status);
+              //         },
+              //   child: isdraft
+              //       ? SizedBox(
+              //           width: 24,
+              //           height: 24,
+              //           child: CircularProgressIndicator(
+              //               color: AppTheme.textFieldborderColor,
+              //               strokeWidth: 4),
+              //         )
+              //       : Text(
+              //           'Save as Draft',
+              //           style: TextStyle(
+              //               fontSize: 16,
+              //               fontFamily: 'medium',
+              //               color: Colors.black),
+              //         ),
+              // ),
               //preview..
               GestureDetector(
                 onTap: () {

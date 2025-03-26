@@ -402,7 +402,10 @@ class _CircularMainpageState extends State<CircularMainpage> {
               : Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(top: 15),
+                      padding: EdgeInsets.only(
+                        top: 15,
+                        bottom: MediaQuery.of(context).size.height * 0.02,
+                      ),
                       child: Container(
                         color: Colors.white,
                         child: Column(
@@ -416,6 +419,11 @@ class _CircularMainpageState extends State<CircularMainpage> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.9,
                                   child: TextFormField(
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontFamily: 'medium'),
+                                    cursorColor: Colors.black,
                                     controller: searchcontroller,
                                     textAlign: TextAlign.center,
                                     decoration: InputDecoration(
